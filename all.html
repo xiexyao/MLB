@@ -107,9 +107,9 @@ $(document).ready(function(event) {
 \end{equation}<br/>
 \]</p>
 
-<p>其中\(\boldsymbol w=(w_1;w_2;w_3;...;w_d)\,\)为法向量，\(b\,\)是超平面与原定之间的距离，显然划分超平面可以被这两个参数\(\boldsymbol w\,\)和\(\,b\,\)确定。</p>
+<p>其中\(\boldsymbol w=(w_1;w_2;w_3;...;w_d)\,\)为法向量，\(b\,\)是超平面的截距，显然这个划分超平面可以被这两个参数\(\boldsymbol w\,\)和\(\,b\,\)确定，后面此超平面将简称为超平面（\(\boldsymbol w\),\(b\)）。</p>
 
-<p>假设超平面能很好的将训练样本分类，那么对于图1中红色点，若\(y_i=1\)，则有\(\boldsymbol w^T \boldsymbol x &gt; 0\)，若\(y_i=-1\)，则有\(\boldsymbol w^T \boldsymbol x &lt; 0\)，易知分类决策函数为：</p>
+<p>假设超平面能很好的将训练样本分类，如果定义图1中红色点为正类，即\(y_i=1\)，此时希望\(\boldsymbol w^T \boldsymbol x &gt; 0\)，另一侧蓝色点为负类，即\(y_i=-1\)，此时希望\(\boldsymbol w^T \boldsymbol x &lt; 0\)，易知分类决策函数可以定义为：</p>
 
 <p>\[<br/>
 \begin{equation}<br/>
@@ -117,7 +117,7 @@ y = sign(\boldsymbol w_T \boldsymbol x + b)<br/>
 \end{equation}<br/>
 \]</p>
 
-<p>可是这个\(\boldsymbol w \)和\(\,b\,\)应该怎么确定，如图2所示，到底哪个超平面才是最优的超平面呢？</p>
+<p>如图2所示，两个超平面都能满足条件，那到底哪个超平面才是最优的超平面呢？也就是\(\boldsymbol w \)和\(\,b\,\)应该如何确定其最优值。</p>
 
 <div align="center">
     <img width="350" src="media/15263116522571/15263148208656.jpg" />
@@ -134,7 +134,7 @@ y = sign(\boldsymbol w_T \boldsymbol x + b)<br/>
 \end{equation}<br/>
 \]</p>
 
-<p>定义超平面关于整个数据集\(\,T\,\)的数据集的函数几何为<br/>
+<p>定义超平面关于整个数据集\(\,T\,\)的函数间隔为数据集内关于所有点函数间隔的最小值：<br/>
 \[<br/>
     \hat\gamma = min \hat\gamma_i\,,i=1;2;...;N<br/>
 \]</p>
@@ -162,27 +162,27 @@ y = sign(\boldsymbol w_T \boldsymbol x + b)<br/>
 当点\(y_i=-1\)时，\(\boldsymbol w^T \boldsymbol x_i + b&lt;0\)，有：<br/>
 \[|\boldsymbol w^T \boldsymbol x_i + b| = y_i(\boldsymbol w^T \boldsymbol x_i + b) \]</p>
 
-<p>所以超平面关于点\(A\)（\(x_0,y_0\)）的几何间隔为：<br/>
+<p>所以超平面关于点\(A\)（\(x_0,y_0\)）的几何间隔可以表示为：<br/>
 \[<br/>
 \begin{equation}<br/>
 \label{gamma}<br/>
-\gamma_i = y_i(\frac{\boldsymbol w^T}{|\boldsymbol w|}x_i+\frac{b}{||\boldsymbol w||})<br/>
+\gamma_i = y_i(\frac{\boldsymbol w^T x_i + b}{||w||})=y_i(\frac{\boldsymbol w^T}{|\boldsymbol w|}x_i+\frac{b}{||\boldsymbol w||})<br/>
 \end{equation}<br/>
 \]</p>
 
-<p>定义超平面关于整个数据集的几何间隔为：<br/>
+<p>定义超平面关于整个数据集\(\,T\,\)的几何间隔为数据集内关于所有点的几何间隔的最小值：<br/>
 \[<br/>
     \gamma = min \gamma_i\,,i=1;2;...;N<br/>
 \]<br/>
 从公式\((\ref{gammahat})和(\ref{gamma})\)可知函数间隔和几何间隔的关系为：<br/>
 \[<br/>
-    \hat \gamma_i = \frac{\gamma_i}{||\boldsymbol w||}\\<br/>
-    \hat \gamma = \frac{\gamma}{||\boldsymbol w||}<br/>
+    \gamma_i = \frac{\hat\gamma_i}{||\boldsymbol w||}\\<br/>
+    \gamma = \frac{\hat\gamma}{||\boldsymbol w||}<br/>
 \]</p>
 
 <p>如果\(||w||=1\)时，函数间隔和几何间隔相等，当\(\boldsymbol w\)和\(b\)成比例的增大时，函数间隔相应增大，而几何间隔不变。</p>
 
-<p>现在可以知道，最大间隔分离超平面的问题可以表示下面的方程组：</p>
+<p>现在可以知道，最大间隔分离超平面的问题可以表示为如下的方程组：</p>
 
 <p>\[<br/>
 \begin{align}<br/>
@@ -200,7 +200,7 @@ s.t.\quad&amp;y_i(\boldsymbol w^T x_i+b) \ge \hat\gamma<br/>
 \end{align*}<br/>
 \]</p>
 
-<p>上面已经讨论过函数间隔的取值并不影响几何间隔的变化（将\(\boldsymbol w\)和\(b\)成比例的增大或缩小，函数间隔就能变成\(\lambda\hat\gamma\)，而此时几何间隔不变）。因此对于求解上面方程，函数间隔\(\hat\gamma\)的取值无关紧要，为方便计算，取\(\hat\gamma=1\)，这样方程组变成请求\(\frac 1{||w||}\)的最大值。</p>
+<p>上面已经讨论过函数间隔的取值并不影响几何间隔的变化（将\(\boldsymbol w\)和\(b\)成比例的增大或缩小\(\lambda\)倍，函数间隔就能相应变化\(\lambda\)倍，而此时几何间隔不变）。因此对于求解上面方程，函数间隔\(\hat\gamma\)的取值无关紧要，为方便计算，取\(\hat\gamma=1\)，这样方程组变成求\(\frac 1{||w||}\)的最大值。</p>
 
 <p>可以得到最优化方程组为：<br/>
 \[<br/>
