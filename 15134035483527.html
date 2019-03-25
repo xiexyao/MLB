@@ -1,0 +1,492 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  基于层次的聚类算法-分裂法-BiKMeans算法与DIANA算法 - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">基于层次的聚类算法-分裂法-BiKMeans算法与DIANA算法</h1>
+				<p class="meta"><time datetime="2017-12-16T13:52:28+08:00" pubdate data-updated="true">2017/12/16</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>BiKMeans算法与DIANA算法是两种典型的分裂式基于层次的聚类算法，在介绍算法之前，先了解一下基于层次聚类算法。</p>
+
+<h3 id="toc_0">基于层次聚类算法</h3>
+
+<p>在数据挖掘（data mining）和统计学（statistics）中，层次聚类（Hierarchical clustering)是聚类分析的一种方法。层次化聚类的策略通常分为两种：<br/>
+    <strong>凝聚法（Agglomerative)</strong>：这是一种自下向上的方式，开始时把每一个元素当作一个单个的簇，在沿着层次结构向上移动过程中，合并成对的簇。<br/>
+    <strong>分裂法（Divisive)</strong>：这是一种自上向下的方式，开始时将所有所有元素当成一个簇，在沿着层次结构向下移动过程中，递归的进行分裂操作。<br/>
+    通常，合并和分裂在决定过程中都是用贪心的方式。层次化聚类的结果通常表现为系统树状图（<em>dendrogram</em>）的形式。</p>
+
+<p>在大多数的层次聚类方法中，为了决定哪些簇应该被合并（凝聚法）或者两个簇应该被分裂（分裂法），我们需要来度量观察集合之间的不相似度，这可以通过选择一个合适的度量标准和链接标准来实现。</p>
+
+<h4 id="toc_1">度量标准（Metric）</h4>
+
+<p>选择一个合适的度量标准将会影响集群的形状。一些元素可能会在某个度量标准下距离很近，在另一个度量标准下距离会很远，例如在二维空间里，(1,0)和(0,0)两个点在通常标准下它们的距离总是1，但是(1,1)和(0,0)两个点它们的曼哈顿距离（Manhattan distance）是2，但是欧几里得距离（Euclidean distance）是\(\sqrt {2}\)，最大距离（Maximum distance）是1。</p>
+
+<p>下面是一些在层次聚类中通常使用的度量标准：</p>
+
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>公式</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>欧几里得距离（Euclidean distance）</td>
+<td>\(\|a-b\|_{2}=\sqrt{\sum_{i}(a_{i}-b_{i})^{2}}\)</td>
+</tr>
+<tr>
+<td>平方欧几里得距离（Squared Euclidean distance）</td>
+<td>\(\|a-b\|_{2}=\sum_{i}(a-b)^{2}\)</td>
+</tr>
+<tr>
+<td>曼哈顿距离（Manhattan distance）</td>
+<td>\(\|a-b\|_{1}=\sum_{i}\left\vert a_{i}-b_{i}\right\vert\)</td>
+</tr>
+<tr>
+<td>最大距离（Maximum distance）</td>
+<td>\(\|a-b\|_{\infty}=\max_{i}\left\vert a_{i}-b_{i}\right\vert\)</td>
+</tr>
+</tbody>
+</table>
+
+<p>对于一些文本或非数字类型的数据，通常使用海明距离（Hamming distance）或者编辑距离（Edit distance or Levenshtein distance）</p>
+
+<h4 id="toc_2">连接标准（Linkage criteria)</h4>
+
+<p>连接标准根据观察对象间成对的距离确定观察组之间的距离。两个观察对象A和B之间的常用的连接标准如下：</p>
+
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>英文名称</th>
+<th>公式</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>全连接聚类(最大连接)</td>
+<td>Maximum or complete-linkage clustering</td>
+<td>\(\max\,\{\,d(a,b):a \in A,\,b \in B\,\}\)</td>
+</tr>
+<tr>
+<td>单连接聚类(最小连接)</td>
+<td>Minimum or single-linkage clustering</td>
+<td>\(\min\,\{\,d(a,b):a\in A,\,b\in B\,\}\)</td>
+</tr>
+<tr>
+<td>平均连接聚类</td>
+<td>Mean or average-linkage clustering or UPGMA</td>
+<td>\(\frac{1}{\vert A \vert\vert B \vert}\sum_{a \in A}\sum_{b \in B}d(a,b)\)</td>
+</tr>
+<tr>
+<td>质心连接聚类</td>
+<td>Centroid-linkage clustering or UPGMC</td>
+<td>\(\|c_{t}-c_{s}\|\) 这里\(c_{t}\)和\(c_{s}\)是各自集合的质心</td>
+</tr>
+</tbody>
+</table>
+
+<p>上面公式里的d函数就是前面介绍的度量标准（Metric），采用哪种距离计算函数。</p>
+
+<h4 id="toc_3">凝聚聚类（自下而上）</h4>
+
+<p>假设需要聚类一些数据，采用欧几里得距离（Euclidean distance）作为距离计算函数。<strong>用给定的高度来切割树将会得到给定精度的分区聚类</strong>。假设聚类产生的系统树状图如下：</p>
+
+<div align=center>
+    <img width=250 src="media/15134035483527/15253679953629.jpg" />
+</div>
+
+<p>如图若在系统树状图的第二行后面切割将会产生四个集群{a},{b,c},{d,e},{f}。</p>
+
+<div align=center>
+    <img width=250 src="media/15134035483527/15253682104508.jpg" />
+</div>
+
+<p>同理，如果在系统树状图的第三行后面切割则会产生三个集群 {a} , {b,c} , {d,e,f} 。这是一个更粗糙的聚类，但是集群的数量会更少，同时集群的大小会变大。</p>
+
+<p>凝聚聚类是采用逐步合并集群的方式从单个的元素生成层次结构，在上面的例子中，有六个元素 {a} , {b} , {c} , {d}, {e} , {f} ，第一步是决定哪两个元素将被合并到一个集群。通常，我们依据距离选择两个距离最近的元素来合并。假设我们已经合并了两个最近的集群 {b} 和 {c} 得到一个新的集群 {b,c}，现在集群为 {a} , {b,c} , {e} , {f}，如果要进一步合并他们，我们需要计算 {a} 和 {b,c} 的距离，因此这里需要定义两个集群间的距离，距离计算时 {b,c} 中心点位置的选择就需要连接标准的制定。</p>
+
+<p>当集群的数量足够的少的时候，可以决定来停止聚类。另外一些连接标准可以保证凝聚之后的集群间的距离比凝聚之前更远，当集群分离太远而不能进行合并时可以选择停止聚类。</p>
+
+<h4 id="toc_4">分裂聚类（自上而下）</h4>
+
+<p>分裂聚类算法开始时将所有元素当做一个簇。一个大的簇会被逐步分裂直到簇个数达到自定的大小，因为分裂一个大小为n的集群会存在 \(2^n\) 种方式，因此这里需要启发式分裂方法。关于分裂聚类的典型算法有Bisecting KMeans算法、DIANA算法，这里直接通过BiKMeans算法和DIANA算法来了解分裂聚类算法。</p>
+
+<h3 id="toc_5">BiKMeans 算法</h3>
+
+<p>BiKMeans（Bisecting KMeans、二分KMeans）是一种常见的分裂聚类算法，通过它名字便知道它与基于划分的聚类算法KMeans算法肯定关系很大，其实它是KMeans算法的改进版本。由于传统的KMeans算法的聚类结果易受到初始聚类中心点选择的影响，因此在传统的KMeans算法的基础上进行算法改进，一定程度上克服了算法陷入局部最优状态。</p>
+
+<p>二分KMeans在分裂过程中以降低SSE（误差平方和）为目标。开始时将所有的对象作为一个簇，然后用KMeans方式（K=2）将簇一分为二；如果簇的大小小于指定给定大小，再在两个簇中选择能最大限度降低SSE的簇进行一分为二；以此进行下去，直到簇的数目等于用户给定的数目k为止。</p>
+
+<h5 id="toc_6">算法步骤</h5>
+
+<p><b>输入</b>：数据集 D ，簇个数 K<br/>
+<b>输出</b>：聚类后的簇 \(C_1\),\(C_2\),...,\(C_K\)<br/>
+<b>算法过程</b>：</p>
+
+<pre><code>将所有数据点看成一个簇；
+h=1；
+当前簇的数目 h 小于 K 时：  
+    对于每一个簇：  
+        在该簇上进行KMeans聚类（k=2），分裂成两个簇 
+        计算划分后的误差平方和 SSE
+    比较 h 种划分的SSE值，选择SSE值最小的那种簇划分进行划分
+    更新簇的分配结果
+    添加新的“簇中心”
+    簇的数目 h 加1
+</code></pre>
+
+<h3 id="toc_7">DIANA算法</h3>
+
+<p>DIANA算法（DIvisive ANAlysis)算法是一种分裂式层次聚类算法，首先将所有的对象初始化到一个簇中，然后根据一些原则将该簇分裂，直到到达用户指定的簇数目或者两个簇之间的距离超过了某个阈值。</p>
+
+<h5 id="toc_8">算法步骤</h5>
+
+<p><b>输入</b>：数据集 D ，簇个数 K<br/>
+<b>输出</b>：聚类后的簇 \(C_1\),\(C_2\),...,\(C_K\)<br/>
+<b>算法过程</b>：</p>
+
+<pre><code>将所有数据点看成一个簇；
+h=1；
+当前簇的数目 h 小于 K 时：
+    在所有簇中找出具有最大直径的簇，在该簇上操作：
+        找到簇中每一个点与其他点的平均距离；
+        将平均距离最大的点放入splinter group 中，其他点放入old party中；
+        循环 old party 中所有点：
+            找到与 splinter group 中最近的点的距离不大于到old party中最近点的距离的点；
+            将该点加入splinter group；
+        spilnter group和old party为被选中的簇分裂成的2个簇与其它簇一起组成新的簇集合；
+        簇的数目 h 加1
+</code></pre>
+
+<p>下面举例说明，假设二维空间八个元素，分布位置如下：</p>
+
+<p>\[<br/>
+\begin{array}{|c|c|c|}<br/>
+\hline<br/>
+\text{坐标点} &amp; \text{属性1} &amp; \text{属性2} \\<br/>
+\hline<br/>
+P_1 &amp; 1 &amp; 1 \\<br/>
+P_2 &amp; 1 &amp; 2 \\<br/>
+P_3 &amp; 2 &amp; 1 \\<br/>
+P_4 &amp; 2 &amp; 2 \\<br/>
+P_5 &amp; 3 &amp; 4 \\<br/>
+P_6 &amp; 3 &amp; 5 \\<br/>
+P_7 &amp; 4 &amp; 4 \\<br/>
+P_8 &amp; 4 &amp; 5 \\<br/>
+\hline<br/>
+\end{array}<br/>
+\]</p>
+
+<ol>
+<li><p>找出具有最大直径的集群，开始时指的就是所有集群。</p></li>
+<li><p>在最大直径集群中，找到每个点与其他点的平均距离：<br/>
+\(P_1\)与其他点平均距离为：<br/>
+    \(\begin{align*}<br/>
+    d(P_1)&amp;=(\sqrt{(1-1)^2+(2-1)^2}+\sqrt{(2-1)^2+(1-1)^2}+\dots+\sqrt{(4-1)^2+(5-1)^2})/7\\<br/>
+    &amp;=(1+1+1.1414+3.6+4.24+4.47+5)/7\\<br/>
+    &amp;=2.96<br/>
+    \end{align*}\)<br/>
+    同理：<br/>
+\(d(P_2)=(1+1.414+1+2.828+3.6+3.6+4.24)/7=2.526\)<br/>
+\(d(P_3)=(1+1.414+1+3.16+4.12+3.6+4.27)/7=2.68\)<br/>
+\(d(P_4)=(1.414+1+1+2.24+3.16+2.828+3.6)/7=2.18\)<br/>
+\(d(P_5)=2.18\)<br/>
+\(d(P_6)=2.68\)<br/>
+\(d(P_7)=2.526\)<br/>
+\(d(P_8)=2.96\)   </p>
+
+<p>在上面所有的距离中，\(P_1\) 与其他点的平均距离最远，放入 splinter group，其他点放入 old party 中，那么 splinter group={\(P_1\)}，old party={\(P_2\),\(P_3\),\(P_4\),\(P_5\),\(P_6\),\(P_7\),\(P_8\)}</p></li>
+<li><p>找出 old party 中到 splinter group 最近的点的距离不大于到 old party 其他点最小距离的点，加入到 splinter group 中。</p>
+
+<p>对于old party中的每一个点依次计算，首先计算点 \(P_2\) 到 splinter group 最近点的距离：\(P_2\) 到 splinter group 中点 \(P_1\) 的距离为1，因为 splinter group 中只有 \(P_1\) 一个点，所以 \(P_2\) 到 splinter group 中最近的点的距离为1；</p>
+
+<p>计算\(P_2\) 到 old parter 中最近点的距离：\(P_2\) 到 old party 中点 \(P_3\) 的距离为1.1414；\(P_2\) 到 old party 中点 \(P_4\) 的距离为1; \(P_2\) 到 old party 中点 \(P_5\) 的距离为2.828；\(P_2\) 到 old party 中点 \(P_6\) 的距离为3.6；\(P_2\) 到 old party 中点 \(P_7\) 的距离为3.6；\(P_2\) 到 old party 中点 \(P_8\) 的距离为4.24；因此 \(P_2\) 到 old party 中最近的点 \(P_4\) 的距离是1；</p>
+
+<p>满足<strong>到splinter group最近的点距离不大于到old party其他点最小距离</strong>的条件，因此将\(P_2\)加入splinter group中。此时splinter group={ \(P_1\) , \(P_2\) }，old party={ \(P_3\) , \(P_4\) , \(P_5\) , \(P_6\) , \(P_7\) , \(P_8\) }</p></li>
+<li><p>重复步骤3，直到不存在这样的点结束，此时已经将最大的集群分成两个。如果此时集群的数量未达到终止条件，则继续重复步骤2，选择一个最大直径的集群进行分裂。</p></li>
+</ol>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html'>聚类问题</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15139484052551.html" 
+	        title="Previous Post: 基于层次的聚类算法-凝聚法-BIRCH算法">&laquo; 基于层次的聚类算法-凝聚法-BIRCH算法</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15129060526675.html" 
+	        title="Next Post: 基于密度的聚类算法-Optics算法">基于密度的聚类算法-Optics算法 &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

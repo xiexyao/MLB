@@ -1,0 +1,609 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  人工神经网络-循环神经网络 - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">人工神经网络-循环神经网络</h1>
+				<p class="meta"><time datetime="2018-08-22T01:05:25+08:00" pubdate data-updated="true">2018/8/22</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>循环神经网络（Recurrent Neural Network， RNN）是一类具有短期记忆能力的神经网络。在循环神经网络中，神经元不但可以接受其它神经元的信息，也可以接受自身的信息，形成具有环路的网络结构。和前馈神经网络相比，循环神经网络更加符合生物神经网络的结构。循环神经网络已经被广泛应用在语音识别、语言模型以及自然语言生成等任务上。循环神经网络的参数学习可以通过随时间反向传播算法 [Werbos, 1990] 来学习。随时间反向传播算法即按照时间的逆序将错误信息一步步地往前传递。当输入序列比较长时，会存在梯度爆炸和消失问题[Bengio et al., 1994, Hochreiter and Schmidhuber, 1997, Hochreiteret al., 2001]，也称为长期依赖问题。为了解决这个问题，人们对循环神经网络进行了很多的改进，其中最有效的改进方式引入门控机制。</p>
+
+<p>此外，循环神经网络可以很容易地扩展到两种更广义的记忆网络模型： 递归神经网络和图网络。</p>
+
+<h3 id="toc_0">给网络增加记忆功能</h3>
+
+<p>为了处理这些时序数据并利用其历史信息，我们需要让网络具有短期记忆能力。而前馈网络是一个静态网络，不具备这种记忆能力。</p>
+
+<p>一般来讲，我们可以通过以下三种方法来给网络增加短期记忆能力。</p>
+
+<h4 id="toc_1">延时神经网络</h4>
+
+<p>一种简单的利用历史信息的方法是建立一个额外的延时单元，用来存储网络的历史信息（可以包括输入、输出、隐状态等）。比较有代表性的模型是延时神经网络（Time Delay Neural Network， TDNN）。</p>
+
+<p>延时神经网络是在前馈网络中的非输出层都添加一个延时器，记录最近几次神经元的输出。在第 \(t\) 个时刻，第 \(l + 1\) 层神经元和第 \(l\) 层神经元的最近 \(p\) 次输出相关，即<br/>
+\[<br/>
+h^{(l+1)}_t = f(h_t^{(l)}, h_{t-1}^{(l)},...,h_{t-p+1}^{(l)}. (6.1)<br/>
+\]</p>
+
+<p>通过延时器，前馈网络就具有了短期记忆的能力。</p>
+
+<h4 id="toc_2">有外部输入的非线性自回归模型</h4>
+
+<p>自回归模型（Autoregressive Model，AR）是统计学上常用的一类时间序列模型，用一个变量 \(y_t\) 的历史信息来预测自己。<br/>
+\[<br/>
+y_t = w_0 + \sum^p_{i=1} w_py_{t−p} + \epsilon_t<br/>
+\]</p>
+
+<p>其中 \(p\) 为超参数， \(w_p\) 为参数， \(\epsilon_t \sim N(0, \sigma^2)\) 为第 \(t\) 个时刻的噪声，方差 \(\sigma^2\) 和时间无关。</p>
+
+<p>有外部输入的非线性自回归模型（Nonlinear Autoregressive with Exogenous Inputs Model， NARX） [Leontaritis and Billings, 1985] 是自回归模型的扩展，在每个时刻 t都有一个外部输入\(x_t\)，产生一个输出 \(y_t\)。 NARX通过一个延时器记录最近几次的外部输入和输出，第 \(t\) 个时刻的输出 \(y_t\) 为<br/>
+\[<br/>
+y_t = f(x_t, x_{t−1},..., x_{t−p}, y_{t−1}, y_{t−2},..., y_{t−q})<br/>
+\]</p>
+
+<p>其中 \(f(\cdot)\) 表示非线性函数，可以是一个前馈网络， \(p\) 和 \(q\) 为超参数。</p>
+
+<h4 id="toc_3">循环神经网络</h4>
+
+<p>循环神经网络（RNN）通过使用带自反馈的神经元，能够处理任意长度的时序数据。RNN 也经常被翻译为递归神经网络。这里我们使用 RNN 指代循环神经网络。</p>
+
+<p>给定一个输入序列 \(x_{1:T} = (x_1, x_2,..., x_t,..., x_T )\)，循环神经网络通过下面公式更新带反馈边的隐藏层的活性值 h_t<br/>
+\[<br/>
+h_t = f(h_{t−1}, x_t)<br/>
+\]</p>
+
+<p>其中\(h_0 = 0\)， \(f(\cdot)\) 为一个非线性函数，也可以是一个前馈网络。</p>
+
+<div align=center>
+    <img src="media/15348711256289/15422003427571.jpg" width="520" />
+</div>
+
+<h3 id="toc_4">简单的循环神经网络</h3>
+
+<p>简单循环网络（Simple Recurrent Network，SRN）是一个非常简单的循环神经网络，只有一个隐藏层的神经网络。在一个两层的前馈神经网络中，连接存在相邻的层与层之间，隐藏层的节点之间是无连接的。而简单循环网络增加了从隐藏层到隐藏层的反馈连接。</p>
+
+<p>假设在时刻 \(t\) 时，网络的输入为 \(x_t\)，隐层状态（即隐层神经元活性值）为 \(h_t\) 不仅和当前时刻的输入\(x_t\) 相关，也和上一个时刻的隐层状态 \(h_{t−1}\) 相关。<br/>
+\[<br/>
+\begin{align}<br/>
+z_t &amp;= Uh_{t−1} + Wx_t + b\label{zuhw}\\<br/>
+h_t &amp;= f(z_t)\label{zuhw2}\\<br/>
+\end{align}<br/>
+\] </p>
+
+<p>其中 \(z_t\) 为隐藏层的净输入， \(f(\cdot)\) 是非线性激活函数，通常为 logistic 函数或 tanh 函数， \(U\) 为状态-状态权重矩阵， \(W\) 为状态-输入权重矩阵, \(b\) 为偏置。公式 ( \ref{zuhw} ) 和 ( \ref{zuhw2} ) 也经常直接写为<br/>
+\[<br/>
+h_t = f(Uh_{t−1} + W x_t + b)<br/>
+\]</p>
+
+<p>如果我们把每个时刻的状态都看作是前馈神经网络的一层的话，循环神经网络可以看作是在时间维度上权值共享的神经网络。</p>
+
+<h3 id="toc_5">循环神经网络的计算能力</h3>
+
+<p>由于循环神经网络具有短期记忆能力，相当于存储装置，因此其计算能力十分强大。前馈神经网络可以模拟任何连续函数，而循环神经网络可以模拟任何程序。</p>
+
+<p>我们先定义一个完全连接的循环神经网络，其输入为 \(x_t\)，输出为 \(y_t\)，<br/>
+\[<br/>
+\begin{align*}<br/>
+h_t &amp;= f(U h_{t−1} + W x_t + b)\\<br/>
+y_t &amp;= V h_t\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(h\) 为隐藏状态，\(f(\cdot)\) 为非线性激活函数，\(U\)、\(W\)、\(b\) 和\(V\) 为网络参数。</p>
+
+<h3 id="toc_6">应用到机器学习</h3>
+
+<p>循环神经网络可以应用到很多不同类型的机器学习任务。根据这些任务的特点可以分为以下几种模式:<strong>序列到类别模式</strong>、<strong>同步序列到序列模式</strong>、<strong>异步的序列到序列模式</strong>。</p>
+
+<p>下面我们分别来看下这几种应用模式。</p>
+
+<h4 id="toc_7">序列到类别模式</h4>
+
+<p>序列到类别模式主要用于序列数据的分类问题：输入为序列，输出为类别。比如在文本分类中，输入数据为单词的序列，输出为该文本的类别。假设一个样本 \(\mathbf x_{1:T} = (\mathbf x_1,...,\mathbf x_T)\) 为一个长度为 \(T\) 的序列，输出为一个类别 \(y \in {1,...,C}\)。我们可以将样本 \(\mathbf x\) 按不同时刻输入到循环神经网络中，并得到不同时刻的隐藏状态 \(\mathbf h_1,...,\mathbf h_T\)。我们可以将 \(\mathbf h_T\) 看作整个序列的最终表示（或特征），并输入给分类器 \(g(\cdot)\) 进行分类<br/>
+\[<br/>
+\hat y = g(\mathbf h_T)<br/>
+\]</p>
+
+<p>其中 \(g(\cdot)\) 可以是简单的线性分类器（比如 Logistic 回归）或复杂的分类器（比如多层前馈神经网络）。</p>
+
+<div align="center">
+    <img src="media/15348711256289/15422029676355.jpg" width="350" />
+</div>
+
+<p>除了将最后时刻的状态作为序列表示之外，我们还可以对整个序列的所有状态进行平均，并用这个平均状态来作为整个序列的表示：<br/>
+\[<br/>
+\hat y  = g(\frac 1 T \sum_{t=1}^T \mathbf h_t)<br/>
+\]</p>
+
+<div align="center">
+    <img src="media/15348711256289/15422032233597.jpg" width="350" />
+</div>
+
+<h4 id="toc_8">同步的序列到序列模式</h4>
+
+<p>同步的序列到序列模式主要用于序列标注（Sequence Labeling）任务，即每一时刻都有输入和输出，输入序列和输出序列的长度相同。比如词性标注（Partof-Speech Tagging）中，每一个单词都需要标注其对应的词性标签。</p>
+
+<p>在同步的序列到序列模式中，输入为一个长度为 \(T\) 的序列 \(\mathbf x_{1:T} = (\mathbf x_1,..., \mathbf x_T)\)，输出为序列 \(y_{1:T} = (y_1,..., y_T)\)。样本 \(\mathbf x\) 按不同时刻输入到循环神经网络中，并得到不同时刻的隐状态 \(\mathbf h_1,...,\mathbf h_T\)。每个时刻的隐状态 \(\mathbf h_t\) 代表了当前时刻和历史的信息，并输入给分类器 \(g(\cdot)\) 得到当前时刻的标签 \(\hat y_t\)。<br/>
+\[<br/>
+\hat y_t = g(\mathbf h_t), \qquad\qquad \forall  t \in [1,T]<br/>
+\]</p>
+
+<div align="center">
+    <img src="media/15348711256289/15422043099881.jpg" width="350" />
+</div>
+
+<h4 id="toc_9">异步的序列到序列模式</h4>
+
+<p>异步的序列到序列模式也称为编码器-解码器（Encoder-Decoder）模型，即输入序列和输出序列不需要有严格的对应关系，也不需要保持相同的长度。比如在机器翻译中，输入为源语言的单词序列，输出为目标语言的单词序列。</p>
+
+<p>在异步的序列到序列模式中，输入为一个长度为 \(T\) 的序列 \(\mathbf x_{1:T} = (\mathbf x_1,..., \mathbf x_T)\)，输出为长度为 \(M\) 的序列 \(y_{1:M} = (y_1,...,y_M)\)。经常通过先编码后解码的方式来实现。先将样本 \(\mathbf x\) 按不同时刻输入到一个循环神经网络（编码器）中，并得到其编码 \(\mathbf h_T\)。然后在使用另一个循环神经网络（解码器）中，得到输出序列 \(\hat y_{1:M}\)。为了建立输出序列之间的依赖关系，在解码器中通常使用非线性的自回归模型。<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbf h_t &amp;= f_1( \mathbf h_{t−1}, \mathbf x_t), &amp;\forall t \in [1,T]\\<br/>
+\mathbf h_{T+t} &amp;= f_2(\mathbf h_{T+t−1}, \mathbf {\hat y}_{t−1}), &amp;\forall t \in [1, M]\\<br/>
+\hat y_t &amp;= g(\mathbf h_{T+t}), &amp;\forall t \in [1, M]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(f_1(\cdot)\), \(f_2(\cdot)\) 分别为用作编码器和解码器的循环神经网络，\(g(\cdot)\) 为分类器， \(\mathbf {\hat y}_t\) 为预测输出 \(\hat y_t\) 的向量表示。</p>
+
+<div align="center">
+    <img src="media/15348711256289/15422062138337.jpg" width="500" />
+</div>
+
+<h3 id="toc_10">参数学习</h3>
+
+<p>循环神经网络的参数可以通过梯度下降方法来进行学习。这里我们以同步的序列到序列模式为例来介绍循环神经网络的参数学习。以随机梯度下降为例，给定一个训练样本 \((\mathbf x,\mathbf y)\)，其中 \(\mathbf x_{1:T} = (\mathbf x_1,..., \mathbf x_T)\) 为长度是 \(T\) 的输入序列， \(y_{1:T} = (y_1,..., y_T)\) 是长度为 \(T\) 的标签序列。即在每个时刻 \(t\)，都有一个监督信息 \(y_t\)，我们定义时刻 \(t\) 的损失函数为<br/>
+\[<br/>
+\mathcal L_t = \mathcal L(y_t, g(\mathbf h_t))<br/>
+\]</p>
+
+<p>其中 \(g(\mathbf h_t)\) 为第 \(t\) 时刻的输出，\(\mathcal L\)为可微分的损失函数，比如交叉熵。那么整个序列上损失函数为<br/>
+\[<br/>
+\mathcal L = \sum_{t=1}^T \mathcal L_t<br/>
+\]</p>
+
+<p>整个序列的损失函数 \(\mathcal L\) 关于参数 \(U\) 的梯度为<br/>
+\[<br/>
+\begin{align}<br/>
+\frac{\partial \mathcal L}{\partial U} &amp;= \sum_{t=0}^T \frac{\partial \mathcal L}{\partial \mathcal L_t} \frac{\partial \mathcal L_t}{\partial U}\nonumber\\<br/>
+&amp;= \sum_{t=0}^T \frac{\partial \mathcal L_t}{\partial U}\label{stfpm}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>即每个时刻损失 \(\mathcal L_t\) 对参数 \(U\) 的偏导数之和。</p>
+
+<p>循环神经网络中存在一个递归调用的函数 \(f(\cdot)\)，因此其计算参数梯度的方式和前馈神经网络不太相同。在循环神经网络中主要有两种计算梯度的方式：随时间反向传播（BPTT）和实时循环学习（RTRL）算法。</p>
+
+<h4 id="toc_11">随时间反向传播算法</h4>
+
+<p>随时间反向传播（Backpropagation Through Time， BPTT）算法的主要思想是通过类似前馈神经网络的错误反向传播算法 [Werbos, 1990] 来进行计算梯度。</p>
+
+<p>BPTT算法将循环神经网络看作是一个展开的多层前馈网络，其中“每一层”对应循环网络中的“每个时刻”。这样，循环神经网络就可以按照前馈网络中的反向传播算法进行计算参数梯度。在“展开”的前馈网络中，所有层的参数是共享的，因此参数的真实梯度是将所有“展开层”的参数梯度之和。</p>
+
+<p>计算偏导数 \(\frac{\partial \mathcal L}{\partial U}\) ，先来计算公式 ( \ref{stfpm} ) 中第 \(t\) 时刻损失对参数 \(U\) 的偏导数 \(\frac{\partial \mathcal L_t}{\partial U}\) 。</p>
+
+<p>因为参数 \(U\) 和隐藏层在每个时刻 \(k(1 \le k \le t)\) 的净输入 \(\mathbf z_k = U\mathbf h_{k−1} + W \mathbf x_k + \mathbf b\) 有关，因此第 \(t\) 时刻损失的损失函数 \(\mathcal L_t\) 关于参数 \(U_{ij}\) 的梯度为：<br/>
+\[<br/>
+\begin{align}<br/>
+\frac{\partial \mathcal L_t}{\partial U_{ij}} &amp;= \sum^t_{k=1} tr\Big((\frac{\partial \mathcal L_t}{\partial \mathbf z_k})^T \frac{\partial^+ \mathbf z_k}{\partial U_{ij}} \Big)\nonumber\\<br/>
+&amp;= \sum_{k=1}^t \Big(\frac{\partial^+ \mathbf z_k}{\partial U_{ij}} \Big)^T \frac{\partial \mathcal L_t}{\partial \mathbf z_k}\label{sktb}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>其中 \(\frac{\partial^+ \mathbf z_k}{\partial U_{ij}}\)  表示“直接”偏导数，即公式 \(\mathbf z_k = U\mathbf h_{k−1} +W \mathbf x_k + \mathbf b\) 中保持 \(\mathbf h_{k−1}\) 不变，对 \(U_{ij}\) 进行求偏导数，得到<br/>
+\[<br/>
+\begin{equation}<br/>
+\frac{\partial^+ \mathbf z_k}{\partial U_{ij}} = \left [ \begin{array}{c} 0\\ \vdots\\ [\mathbf h_{k-1}]_j\\\vdots\\0\\ \end{array} \right ] \buildrel \Delta \over= \mathbb I_i([\mathbf h_{k-1}]_j)\label{fpmzp}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>其中 \([\mathbf h_{k-1}]_j\) 为第 \(k - 1\) 时刻隐状态的第 \(j\) 维； \(\mathbb I_i(x)\) 除了第 \(i\) 行值为 \(x\) 外，其余都为0的向量。</p>
+
+<p>定义 \(\delta_{t,k} = \frac{\partial \mathcal L_t}{\partial \mathbf z_k}\) 为第 \(t\) 时刻的损失对第 \(k\) 时刻隐藏神经层的净输入 \(\mathbf z_k\) 的导数，则<br/>
+\[<br/>
+\begin{align}<br/>
+\delta_{t,k} &amp;= \frac{\partial \mathcal L_t}{\partial \mathbf z_k}\nonumber\\<br/>
+&amp;= \frac{\partial \mathbf h_k }{\partial \mathbf z_k} \cdot \frac{\partial \mathbf z_{k+1}}{\partial \mathbf h_k} \cdot \frac{\partial \mathcal L_t}{\partial \mathbf z_{k+1}}\nonumber\\<br/>
+&amp;= diag(f&#39;(\mathbf z_k)) U^T\delta_{t,k+1}\label{dmzu}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>将公式 ( \ref{fpmzp} )和 ( \ref{dmzu} )代入公式 ( \ref{sktb} )得到<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial \mathcal L_t}{\partial U_{ij}} &amp;= \sum_{k=1}^t [\delta_{t,k}]_i [\mathbf h_{k-1}]_j<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>将上式写成矩阵形式为<br/>
+\[<br/>
+\begin{equation}<br/>
+\frac{\partial \mathcal L_t}{\partial U} = \sum_{k=1}^t \delta_{t,k} \mathbf h_{k-1}^{T}\label{fpmlp}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>下图给出了误差项随时间进行反向传播算法的示例。</p>
+
+<div align="center">
+    <img src="media/15348711256289/15406548476276.jpg" width="600" />
+</div>
+
+<p><strong>参数梯度</strong>：将公式 ( \ref{fpmlp} )代入到将公式 ( \ref{stfpm} )得到整个序列的损失函数 \(\mathcal L\) 关于参数 \(U\) 的梯度<br/>
+\[<br/>
+\frac{\mathcal L}{\partial U} = \sum_{t=1}^T \sum_{k=1}^t \delta_{t,k} h_k^{T-1}<br/>
+\]</p>
+
+<p>同理可得， \(\mathcal L\) 关于权重 \(W\) 和偏置 \(\mathbf b\) 的梯度为<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial \mathcal L}{\partial W} &amp;= \sum_{t=1}^T \sum_{k=1}^t \delta_{t,k} \mathbf x_k^T\\<br/>
+\frac{\partial \mathcal L}{\partial \mathbf b} &amp;= \sum_{t=1}^T \sum_{k=1}^t \delta_{t,k}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p><strong>计算复杂度</strong>：在 BPTT 算法中，参数的梯度需要在一个完整的“前向”计算和“反向”计算后才能得到并进行参数更新。</p>
+
+<h4 id="toc_12">实时循环学习算法</h4>
+
+<p>与反向传播的 BPTT 算法不同的是，实时循环学习（Real-Time Recurrent Learning， RTRL）是通过前向传播的方式来计算梯度。</p>
+
+<p>假设循环网络网络中第 \(t + 1\) 时刻的状态 \(\mathbf h_{t+1}\) 为<br/>
+\[<br/>
+\mathbf h_{t+1} = f(\mathbf z_{t+1}) = f(U\mathbf h_t + W\mathbf x_{t+1} + \mathbf b)<br/>
+\]</p>
+
+<p>其关于参数 \(U_{ij}\) 的偏导数为<br/>
+\[<br/>
+\begin{align}<br/>
+\frac{\partial \mathbf h_{t+1}}{\partial U_{ij}} &amp;= \frac{\partial \mathbf h_{t+1}}{\partial \mathbf z_{t+1}} \frac{\partial z_{t+1}}{\partial U_{ij}}\nonumber\\<br/>
+&amp;= \frac{\partial \mathbf h_{t+1}}{\partial \mathbf z_{t+1}}\Big(\frac{\partial \mathbf z_{t+1}}{\partial U_{ij}} + \frac{\partial \mathbf z_{t+1}}{\partial \mathbf h_{t}} \frac{\partial \mathbf h_{t}}{\partial U_{ij}} \Big)\nonumber\\<br/>
+&amp;= diag(f&#39;(\mathbf z_{t+1}))\Big(\mathbb I_i([\mathbf h_t]_j) + U \frac{\partial \mathbf h_t}{\partial U_{ij}} \Big)\nonumber\\<br/>
+&amp;= f&#39;(\mathbf z_{t+1}) \odot \Big(\mathbb I_i([\mathbf h_t]_j) + U \frac{\partial \mathbf h_t}{\partial U_{ij}}\label{fmzo}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>其中 \(\mathbb I_i(x)\) 除了第 \(i\) 行值为 \(x\) 外，其余都为0的向量。</p>
+
+<p>RTRL算法从第 1 个时刻开始，除了计算循环神经网络的隐状态之外，还利用公式 ( \ref{fmzo} ) 依次前向计算偏导数 \(\frac{\partial \mathbf h_1}{\partial U_{ij}}\)，\(\frac{\partial \mathbf h_2}{\partial U_{ij}}\)，\(\frac{\partial \mathbf h_3}{\partial U_{ij}}\)，\(\dots\)。</p>
+
+<p>这样，假设第 \(t\) 个时刻存在一个监督信息，其损失函数为 \(\mathcal L_t\)，就可以同时计算损失函数对 \(U_{ij}\) 的偏导数<br/>
+\[<br/>
+\frac{\partial \mathcal L_t}{\partial U_{ij}} = \Big(\frac{\partial \mathbf h_t}{\partial U_{ij}}\Big)^T \frac{\partial \mathcal L_t}{\partial \mathbf h_t}<br/>
+\]</p>
+
+<p>这样在第 \(t\) 时刻，可以实时地计算损失 \(\mathcal L_t\) 关于参数 \(U\) 的梯度，并更新参数。参数 \(W\) 和 \(\mathbf b\) 的梯度也可以同样按上述方法实时计算。</p>
+
+<p><strong>两种算法比较</strong>：BPTT 算法和 RTRL 算法都是基于梯度下降的算法，分别通过前向模式和反向模式应用链式法则来计算梯度。在循环神经网络中，一般网络输出维度远低于输入维度，因此 BPTT算法的计算量会更小，但是 BPTT 算法需要保存所有时刻的中间梯度，空间复杂度较高。 RTRL算法不需要梯度回传，因此非常适合用于需要在线学习或无限序列的任务中。</p>
+
+<h3 id="toc_13">长期依赖问题</h3>
+
+<p>循环神经网络在学习过程中的主要问题是长期依赖问题。在 BPTT 算法中，将公式 ( \ref{dmzu} ) 展开得到<br/>
+\[<br/>
+\delta_{t,k} = \prod_{i=k}^{t-1} \Big(diag(f&#39;(\mathbf z_i)) U^T\Big) \delta_{t,t}<br/>
+\]</p>
+
+<p>如果定义 \(\gamma \cong || diag(f&#39;(\mathbf z_i)) U^T||\) ，则<br/>
+\[<br/>
+\delta_{t,k} = \gamma^{t-k} \delta_{t,t}<br/>
+\]</p>
+
+<p>若 \(\gamma &gt; 1\)，当 \(t-k \rightarrow \infty\) 时， \(\gamma^{t-k} \rightarrow \infty\)，会造成系统不稳定，称为梯度爆炸问题（Gradient Exploding Problem）；相反，若 \(\gamma &lt; 1\)，当 \(t-k \rightarrow \infty\) 时，\(\gamma^{t - k} \rightarrow 0\)，会出现和深度前馈神经网络类似的梯度消失问题（gradient vanishing problem）。</p>
+
+<p>要注意的是，在循环神经网络中的梯度消失不是说 \(\frac{\partial \mathcal L_t}{\partial U}\) 的梯度消失了，而是 \(\frac{\partial \mathcal L_t}{\partial \mathbf h_k}\) 的梯度消失了（当 \(t - k\) 比较大时）。也就是说，参数 \(U\) 的更新主要靠当前时刻 \(k\) 的几个相邻状态 \(\mathbf h_k\) 来更新，长距离的状态对 \(U\) 没有影响。</p>
+
+<p>由于循环神经网络经常使用非线性激活函数为 logistic 函数或 tanh 函数作为非线性激活函数，其导数值都小于 1；并且权重矩阵 \(||U||\) 也不会太大，因此如果时间间隔 \(t - k\) 过大， \(\delta_{t,k}\) 会趋向于 0，因此经常会出现梯度消失问题。</p>
+
+<p>虽然简单循环网络理论上可以建立长时间间隔的状态之间的依赖关系，但是由于梯度爆炸或消失问题，实际上只能学习到短期的依赖关系。这样，如果 \(t\) 时刻的输出 \(y_t\) 依赖于 \(t-k\) 时刻的输入 \(x_{t-k}\)，当间隔 \(k\) 比较大时，简单神经网络很难建模这种长距离的依赖关系，称为长期依赖问题。</p>
+
+<h3 id="toc_14">改进方案</h3>
+
+<p>为了避免梯度爆炸或消失问题，一种最直接的方式就是选取合适的参数，同时使用非饱和的激活函数，尽量使得 \(diag(f′(\mathbf z_i))U^T \approx 1\)，这种方式需要足够的人工调参经验，限制了模型的广泛应用。比较有效的方式通过改进模型或优化方法来缓解循环网络的梯度爆炸和梯度消失问题。</p>
+
+<p><strong>梯度爆炸</strong>：一般而言，循环网络的梯度爆炸问题比较容易解决，一般通过权重衰减或梯度截断来避免。</p>
+
+<p>权重衰减是通过给参数增加 \(\mathcal l_1\) 或 \(\mathcal l_2\) 范数的正则化项来限制参数的取值范围，从而使得 \(\gamma \le 1\)。梯度截断是另一种有效的启发式方法，当梯度的模大于一定阈值时，就将它截断成为一个较小的数。</p>
+
+<p><strong>梯度消失</strong>：梯度消失是循环网络的主要问题。除了使用一些优化技巧外，更有效的方式就是改变模型，比如让 \(U = I\)，同时使用 \(f′(\mathbf z_i) = 1\)，即<br/>
+\[<br/>
+\begin{equation}<br/>
+\mathbf h_t = \mathbf h_{t-1} + g(\mathbf x_t; \theta)\label{mhmh}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>其中 \(g(\cdot)\) 是一个非线性函数， \(\theta\) 为参数。公式 ( \ref{mhmh} )中， \(\mathbf h_t\) 和 \(\mathbf h_{t-1}\) 之间为线性依赖关系，且权重系数为1，这样就不存在梯度爆炸或消失问题。但是，这种改变也丢失了神经元在反馈边上的非线性激活的性质，因此也降低了模型的表示能力。</p>
+
+<p>为了避免这个缺点，我们可以采用一个更加有效的改进策略：<br/>
+\[<br/>
+\begin{equation}<br/>
+\mathbf h_t = \mathbf h_{t-1} + g(\mathbf x_t, \mathbf h_{t-1}; \theta)\label{hhgh}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>这样 \(\mathbf h_t\) 和 \(\mathbf h_{t-1}\) 之间为既有线性关系，也有非线性关系，在一定程度上可以缓解梯度消失问题。但这种改进依然有一个问题就是记忆容量（memory capacity）。随着 \(\mathbf h_t\) 不断累积存储新的输入信息，会发生饱和现象。假设 \(g(\cdot)\) 为 logistic函数，则随着时间 \(t\) 的增长， \(\mathbf h_t\) 会变得越来越大，从而导致 \(\mathbf h\) 变得饱和。也就是说，隐藏状态 \(\mathbf h_t\) 可以存储的信息是有限的，随着记忆单元存储的内容越来越多，其丢失的信息也越来越多。</p>
+
+<p>为了解决容量问题，可以有两种方法。一种是增加一些额外的存储单元：外部记忆；另一种是进行选择性的遗忘，同时也进行有选择的更新。</p>
+
+<hr/>
+
+<p><a href="https://zybuluo.com/hanbingtao/note/541458">零基础入门深度学习(5) - 循环神经网络</a></p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html'>神经网络</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15357311876395.html" 
+	        title="Previous Post: 人工神经网络-递归神经网络">&laquo; 人工神经网络-递归神经网络</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15345207395945.html" 
+	        title="Next Post: 凸函数与严格凸函数、强凸函数">凸函数与严格凸函数、强凸函数 &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

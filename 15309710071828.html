@@ -1,0 +1,500 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  自动编码器 - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">自动编码器</h1>
+				<p class="meta"><time datetime="2018-07-07T21:43:27+08:00" pubdate data-updated="true">2018/7/7</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>自动编码（Autoencodes）是一个非常激动人心的无监督学习方法，它们取得的进展已经超过了数十年的研究人员研究的手选编码特征。</p>
+
+<p>当我们试图解决一个256*256像素的灰度图，我们需要面临 65536 维度的数据，这对于很多算法来说，存储计算都不是容易的事。更何况现在动辄就是更高清的图片、语音等数据。</p>
+
+<p>为了解决更高维的问题，出现的线性学习的PCA降维方法，PCA的数学基础无懈可击，但是它的却只对线性数据效果比较好。于是提出更只能的特征提取方法--自动编码器。</p>
+
+<h3 id="toc_0">自动编码器（AutoEncoder）</h3>
+
+<p>自编码器是一种非常有用的无监督学习模型。自编码器由 encoder 和 decoder 组成，前者将原始表示编码成隐层表示，后者将隐层表示解码成原始表示，训练目标为最小化重构误差，而且一般而言，隐层的特征维度低于原始特征维度。</p>
+
+<div align=center>
+    <img width=380 src="media/15309710071828/15391710254254.jpg" />
+</div>
+
+<p>如上图，我们将input 输入一个encoder编码器，就会得到一个code，这个code也就是输入的一个表示，也就是特征。decoder通过对code的重建会输出一个与input很像的信号，而重构后的信号与input的误差就是调整网络参数（也就是Encoder,Decoder）的校正信号。由于这里不需要input带label，所以是无监督的学习过程，学习的是无监督特征。</p>
+
+<p>假设有一组 \(d\) 维度的样本 \(x^{(n)} \in \mathbb R^d\)，\(1\le n \le N\)，自编码器将这组数据映射到特征空间得到每个样本编码 \(z^{(n)}\in \mathbb R^{p}\)，\(1\le n \le N\)，并且希望这组编码可以重构出原来的样本。</p>
+
+<p>自编码器可以分成两部分：</p>
+
+<p><strong>编码器（encoder）</strong><br/>
+\[<br/>
+f : \mathbb R^d \rightarrow \mathbb R^p<br/>
+\]</p>
+
+<p><strong>解码器（decoder）</strong><br/>
+\[<br/>
+g : \mathbb R^p \rightarrow \mathbb R^d<br/>
+\]</p>
+
+<p>自编码器的学习目标是最小化重构错误（reconstruction errors）<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathcal L &amp;= \sum_{n=1}^N ||x^{(n)} - g(f(x^{(n)}))||^2\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>最简单的自编码器是如下图所示的两层神经网络。输入层到隐藏层用来编码，隐藏层到输出层用来解码，层与层之间是全连接。</p>
+
+<div align="center">
+    <img width=360 src="media/15309710071828/15391719034110.jpg" />
+</div>
+
+<p>对于样本 \(x\)，中间隐藏层为编码<br/>
+\[<br/>
+z = s(W^{(1)} x + b^{(1)})<br/>
+\]</p>
+
+<p>输出为重构的数据<br/>
+\[<br/>
+x&#39; = s(w^{(2)} z + b^{(2)})<br/>
+\]</p>
+
+<p>其中 \(W,b\) 为网络参数，\(s(\cdot)\) 为激活函数。如果令 \(W^{(2)}\) 等于 \(W^{(1)}\) 的转置，即 \(W^{(2)} = {W^{(1)}}^T\)，称为捆绑权重（tied weights）。最初的编码器确实使用了两组 \((W,b)\)，但是Vincent在2010年的论文中做了研究，发现只要单组 \(W\) 就可以了。</p>
+
+<p>并且我们可以引入正则化项，给定一组样本 \(x^{(n)} \in [0,1]^d\)，\(1\le n \le N\)，其重构错误为<br/>
+\[<br/>
+\mathcal L = \sum_{n=1}^N ||x^{(n)} - x&#39;^{(n)}||^2 + \lambda ||W||^2_F<br/>
+\]</p>
+
+<p>其中 \(\lambda\) 为正则化项系数。通过最小化重构错误，可以有效地学习网络的参数。</p>
+
+<h3 id="toc_1">稀疏自动编码器（Sparse Autoencoder）</h3>
+
+<p>自编码器除了可以学习低维编码之外，也学习高维的稀疏编码。假设中间隐藏层 \(z\) 的维度为 \(p\) 大于输入样本 \(x\) 的维度 \(d\)，并让 \(z\) 尽量稀疏，这就是稀疏自编码器（ Sparse Auto-Encoder）。和稀疏编码一样，稀疏自编码器的优点是有很高的可解释性，并同时进行了隐式的特征选择。</p>
+
+<div align="center">
+    <img src="media/15309710071828/15470498102061.jpg" width="460px" />
+</div>
+
+<p>如上图，其实就是限制每次得到的表达code尽量稀疏。因为稀疏的表达往往比其他的表达要有效（人脑好像也是这样的，某个输入只是刺激某些神经元，其他的大部分的神经元是受到抑制的）。</p>
+
+<h4 id="toc_2">稀疏编码</h4>
+
+<p>稀疏编码（ Sparse Coding）也是一种受哺乳动物视觉系统中简单细胞感受野而启发的模型。在哺乳动物的初级视觉皮层中，每个神经元仅对处于其感受野中特定的刺激信号做出响应，比如特定方向的边缘、条纹等特征。局部感受野可以被描述为具有空间局部性、方向性和带通性（即不同尺度下空间结构的敏感性）。也就是说，外界信息经过编码后仅有一小部分神经元激活，即外界刺激在视觉神经系统的表示具有很高的稀疏性。编码的稀疏性在一定程度上符合生物学的低功耗特性。</p>
+
+<p>在数学上，（线性）编码是指给一组基向量 \(A = [a_1,...,a_p]\)，将输入样本 \(\mathbf x \in \mathbb R^d\) 表示为这些基向量的线性组合<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbf x &amp;= \sum_{i=1}^p z_i a_i\\<br/>
+&amp;= A\mathbf z\\<br/>
+\end{align*}<br/>
+\] </p>
+
+<p>其中基向量的系数 \(z = [z_1,..., z_p]\) 称为输入样本 \(\mathbf x\) 的编码（encoding），基向量 \(A\) 也称为字典（dictionary）。</p>
+
+<p>编码是对 \(d\) 维空间中的样本 \(\mathbf x\) 找到其在 \(p\) 维空间中的表示（或投影），其目标通常是编码的各个维度都是统计独立的，并且可以重构出输入样本。编码的关键是找到一组“完备”的基向量 \(A\)，比如主成分分析等。但是主成分分析得到编码通常是稠密向量，没有稀疏性。</p>
+
+<p>如果 \(p\) 个基向量刚好可以支撑 p维的欧氏空间，则这 \(p\) 个基向量是完备的。如果 \(p\) 个基向量可以支撑 \(d\) 维的欧氏空间，并且 \(p &gt; d\)，则这 \(p\) 个基向量是过完备的，冗余的。</p>
+
+<p>为了得到稀疏的编码，我们需要找到一组“超完备”的基向量（即 \(p &gt; d\)）来进行编码。在超完备基向量之间往往会存在一些冗余性，因此对于一个输入样本，会存在很多有效的编码。如果加上稀疏性限制，就可以减少解空间的大小，得到“唯一”的稀疏编码。</p>
+
+<p>给定一组 \(N\) 个输入向量 \(x^{(1)},...,x^{(N)}\)，其稀疏编码的目标函数定义为：<br/>
+\[<br/>
+L(A, Z) = \sum_{n=1}^N \Big(||x^{(n)} - A\mathbf z^{(n)}||^2 + \eta \rho(\mathbf z^{(n)})\Big)<br/>
+\]</p>
+
+<p>其中 \(\rho(\cdot)\) 是一个稀疏性衡量函数， \(\eta\) 是一个超参数，用来控制稀疏性的强度。对于一个向量 \(\mathbf z \in \mathbb R^p\)，其稀疏性定义为非零元素的比例。如果一个向量只有很少的几个非零元素，就说这个向量是稀疏的。严格的稀疏向量有时比较难以得到，因此如果一个向量只有少数几个远大于零的元素，其它元素都接近于 0，我们也称这个向量为稀疏向量。稀疏性衡量函数 \(\rho(\mathbf z)\) 是给向量 \(\mathbf z\) 一个标量分数。 \(\mathbf z\) 越稀疏， \(\rho(\mathbf z)\) 越小。</p>
+
+<p>稀疏性衡量函数有多种选择，最直接的衡量向量 \(\mathbf z\) 稀疏性的函数是 \(\mathcal l^0\) 范式<br/>
+\[<br/>
+\rho(\mathbf z) = \sum_{i=1}^p \mathbf I(|z_i| \gt 0)<br/>
+\]</p>
+
+<p>但 \(\mathcal l^0\) 范数不满足连续可导，因此很难进行优化。在实际中，稀疏性衡量函数通<br/>
+常使用 \(\mathcal l^1\) 范数<br/>
+\[<br/>
+\begin{equation}<br/>
+\rho(\mathbf z) = \sum_{i=1}^p |z_i| \label{rhs1}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>或对数函数<br/>
+\[<br/>
+\begin{equation}<br/>
+\rho(\mathbf z) = \sum_{i=1}^p \log(1 + z_i^2) \label{rhs2}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>或指数函数<br/>
+\[<br/>
+\begin{equation}<br/>
+\rho(\mathbf z) = \sum_{i=1}^p - \exp(-z_i^2) \label{rhs3}<br/>
+\end{equation}<br/>
+\]</p>
+
+<h5 id="toc_3">稀疏编码的训练</h5>
+
+<p>给定一组 \(N\) 个输入向量 \(x^{(1)},...,x^{(N)}\)，需要同时学习基向量 \(A\) 以及每个输入样本对应的稀疏编码 \(z^{(1)},...,z^{(N)}\)。稀疏编码的训练过程一般用交替优化的方法进行。</p>
+
+<p>1) 固定基向量 \(A\)，对每个输入 \(x^{(n)}\)，计算其对应的最优编码<br/>
+\[<br/>
+\min_{z^{(n)}} ||x^{(n)} - A z^{(n)}||^2 - \eta\rho(z^{(n)}), \forall n \in [1, N]<br/>
+\]</p>
+
+<p>2) 固定上一步得到的编码 \(z^{((1)}, ..., z^{(N)}\)，计算其最优的基向量<br/>
+\[<br/>
+\min_{A} \sum_{n=1}^N \Big(||x^{(n)} - Az^{(n)}||^2 \Big) + \lambda \frac 1 2||A||^2<br/>
+\]</p>
+
+<p>其中第二项为正则化项， \(\lambda\) 为正则化项系数。</p>
+
+<h5 id="toc_4">稀疏编码器</h5>
+
+<p>通过给自编码器中隐藏层单元 \(\mathbf z\) 加上稀疏性限制，自编码器可以学习到数据中一些有用的结构。<br/>
+\[<br/>
+\mathcal L = \sum_{n=1}^N ||x^{(n)} - x&#39;^{(n)}||^2 + \eta \rho(\mathbf z^{(n)}) + \lambda||W||^2<br/>
+\]</p>
+
+<p>其中 \(\rho(\cdot)\) 为稀疏性度量函数， \(W\) 表示自编码器中的参数。</p>
+
+<p>稀疏性度量函数 \(\rho(\cdot)\) 除了可以选择公式 ( \ref{rhs1} )、( \ref{rhs2} ) 和 ( \ref{rhs3} ) 的定义外，还可以定义为一组训练样本中每一个神经元激活的频率。</p>
+
+<p>给定 \(N\) 个训练样本，隐藏层第 \(j\) 个神经元平均活性值为<br/>
+\[<br/>
+\hat \rho_j = \frac 1 N \sum_{n=1}^N z_j^{(n)}<br/>
+\]</p>
+
+<p>\(\hat \rho_j\) 可以近似地看作是第 \(j\) 个神经元激活的概率。我们希望 \(\hat \rho_j\) 接近于一个事先给定的值 \(\rho^*\)，比如0.05，可以通过 KL 距离来衡量 \(\hat \rho_j\) 和 \(\rho^*\) 的差异，即<br/>
+\[<br/>
+\text{KL}(\rho^*||\hat \rho_j) = \rho^* \log \frac{\rho^*}{\hat \rho_j} + (1 − \rho^*) \log \frac{1-\rho^*}{1-\hat rho_j}<br/>
+\]</p>
+
+<p>如果 \(\hat \rho_j = \rho^*\)，则 \(\text{KL}(\rho^*||\hat rho_j) = 0\)。</p>
+
+<p>稀疏性度量函数定义为<br/>
+\[<br/>
+\rho(\mathbf z^{(n)}) = \sum_{j=1}^p \text{KL}(\rho^*||\hat \rho_j)<br/>
+\]</p>
+
+<h3 id="toc_5">堆叠自编码器</h3>
+
+<p>对于很多数据来说，仅使用两层神经网络的自编码器还不足以获取一种好的数据表示。为了获取更好的数据表示，我们可以使用更深层的神经网络。深层神经网络作为自编码器提取的数据表示一般会更加抽象，能够更好地捕捉到数据的语义信息。在实践中经常使用逐层堆叠的方式来训练一个深层的自编码器，称为堆叠自编码器（ Stacked Auto-Encoder， SAE）。堆叠自编码一般可以采用逐层训练（ layer-wise training）来学习网络参数 [Bengio et al., 2007]。</p>
+
+<div align="center">
+    <img src="media/15309710071828/15470498951741.jpg" width="560px" />
+</div>
+
+<h3 id="toc_6">降噪自动编码器（Denoising Autoencoder）</h3>
+
+<p>降噪自动编码器是在自动编码器的基础之上，为了防止过拟合问题而对输入的数据（网络的输入层）加入噪音，使学习得到的编码器更具有较强的鲁棒性，从而增强模型的泛化能力。</p>
+
+<p>降噪自动编码器的示意图如下，其中 \(x\) 是原始的输入数据，降噪自动编码以一定概率把输入层节点的值设为0，从而得到含有噪音的模型输入 \(\hat x\)。这和 Dropout 很类似，不同的是Dropout是隐含层的神经元设置0。</p>
+
+<div align="center">
+    <img width="560" src="media/15309710071828/15472892939349.jpg" />
+</div>
+
+<p>以丢失的数据 \(\hat x\) 去计算 \(y\)，计算 \(z\)，并将 \(z\) 与原始 \(x\) 做误差迭代，这样，网络就学习了这个破损的数据。</p>
+
+<p>这个破损的数据是很有用的，原因有二：<br/>
+其之一，通过与非破损数据训练的对比，破损数据训练出来的Weight噪声比较小。降噪因此得名。原因不难理解，因为擦除的时候不小心把输入噪声给擦掉了。 <br/>
+其之二，破损数据一定程度上减轻了训练数据与测试数据的代沟。由于数据的部分被擦掉了，因而这破损数据一定程度上比较接近测试数据。（训练、测试肯定有同有异，当然我们要求同舍异）。</p>
+
+<p>Denoising Auto-encoder与人的感知机理类似，比如人眼看物体时，如果物体某一小部分被遮住了，人依然能够将其识别出来。 <br/>
+人在接收到多模态信息时（比如声音，图像等），少了其中某些模态的信息有时也不会造成太大影响。 <br/>
+Autoencoder的本质是学习一个相等函数，即网络的输入和重构后的输出相等，这种相等函数的表示有个缺点就是当测试样本和训练样本不符合同一分布，即相差较大时，效果不好，而Denoising Autoencoder在这方面的处理有所进步。</p>
+
+<hr/>
+
+<p><a href="https://blog.csdn.net/hjimce/article/details/49106869">自编码到栈式自编码</a><br/>
+<a href="http://www.360doc.com/content/15/0324/08/20625606_457576675.shtml">深度学习自编码有效应对维数灾难</a><br/>
+<a href="https://blog.csdn.net/app_12062011/article/details/54312880">深度学习自编码、DA算法、SDA算法、稀疏自编码</a><br/>
+<a href="https://www.jianshu.com/p/f34842a3b19a">用自编码器去噪</a><br/>
+<a href="https://blog.csdn.net/cuclxt/article/details/51469080">从反向传播（BP）到去噪自动编码器（DAE）</a><br/>
+<a href="http://www.cnblogs.com/neopenx/p/4370350.html">降噪自动编码器</a><br/>
+<a href="https://blog.csdn.net/u010089444/article/details/52601193">自动编码器</a><br/>
+<a href="https://blog.csdn.net/xiewenbo/article/details/51675287">Deep Learning（深度学习）学习笔记整理系列之（六）AutoEncoder自动编码器</a><br/>
+<a href="https://blog.csdn.net/left_la/article/details/9159949">多种范数算法</a><br/>
+<a href="https://my.oschina.net/findbill/blog/541143">稀疏自动编码器</a><br/>
+<a href="https://www.cnblogs.com/90zeng/p/Autoencoders_and_Sparsity.html">稀疏自动编码之自动编码器和稀疏性</a><br/>
+<a href="https://wenku.baidu.com/view/d45e1b726c85ec3a87c2c5ea.html">稀疏自动编码器</a></p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html'>其他算法</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15317530788642.html" 
+	        title="Previous Post: 人工神经网络-RBF径向基网络">&laquo; 人工神经网络-RBF径向基网络</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15301151892004.html" 
+	        title="Next Post: 离群点检查算法 LOF">离群点检查算法 LOF &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

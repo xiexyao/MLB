@@ -1,0 +1,603 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  Rademacher 复杂度 - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">Rademacher 复杂度</h1>
+				<p class="meta"><time datetime="2018-03-24T00:23:40+08:00" pubdate data-updated="true">2018/3/24</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>VC 维的泛化误差是分布无关、数据独立的，也就是对于任何数据分布都成立，这使得基于 VC 维的可学习分析结果具有一定的“普适性”；但从另一方面来说，由于没有考虑数据自身，基于 VC 维得到的泛化误差界通常比较 “松”，对那些与学习问题的典型情况相差甚远的较“坏”分布尤其如此。</p>
+
+<p>Rademacher 复杂度是另一种刻画假设空间复杂度的途径，与 VC 维不同的是，它在一定程度上考虑了数据分布。</p>
+
+<p>给定训练集 \(D=\{(x_1,y_1),(x_2,y_2),...,(x_m,y_m)\}\)，假设 \(h\) 的经验误差为：<br/>
+\[<br/>
+\begin{align*}\\<br/>
+\hat E(h) &amp;= \frac 1 m \sum_{i=1}^m \mathbf I(h(x_i) \neq y_i )\\<br/>
+&amp;= \frac 1 m \sum_{i=1}^m \frac{1-y_ih(x_i)}{2}\\<br/>
+&amp;= \frac 1 {2} - \frac 1{2m} \sum_{i=1}^m y_i h(x_i)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(\frac 1 m \sum_{i=1}^m y_ih(x_i)\) 体现了预测值 \(h(x_i)\) 和样例真实标记 \(y_i\) 之间的一致性，若对于所有的 \(i\in\{1,2,...,m\}\) 都有 \(y_i = h(x_i)\) ，则 \(\frac 1 m \sum_{i=1}^m y_ih(x_i)\) 取最大值 1 。也就是说，经验误差最小的假设是：<br/>
+\[<br/>
+\begin{equation}<br/>
+{\arg\min}_{h\in \mathcal H}\frac 1 m \sum_{i=1}^m y_i h(x_i)\label{ahm}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>在现实任务中，样本标记可能受到噪音影响，即对某些样例 \((x_i,y_i)\)，\(y_i\) 可能或许已经受到影响，不再是 \(x_i\) 的真实标记，在此情形下，选择假设空间 \(\mathcal H\) 中表现最好的假设，有时还不如选择 \(\mathcal H\) 中事先考虑了随机噪声影响的假设。</p>
+
+<p>考虑随机变量 \(\sigma_i\) ，它以 0.5 的概率取值 -1，以 0.5 的概率取值 +1，称为 Radermacher 随机变量：<br/>
+\[<br/>
+P(\sigma_i = 1) = P(\sigma_i = -1) = 0.5<br/>
+\]</p>
+
+<p>基于 \(\sigma_i\)，可将式 \ref{ahm} 重写为：<br/>
+\[<br/>
+\begin{equation}<br/>
+\sup_{h\in\mathcal H} \frac 1 m \sum_{i=1}^m \sigma_i h(x_i) \label{shm}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>\(\mathcal H\) 是无限假设空间，有可能取不到最大值，因此使用上确界带条最大值。</p>
+
+<p>考虑 \(\mathcal H\) 中的所有假设，对 \ref{shm} 式取期望可得：<br/>
+\[<br/>
+\begin{equation}<br/>
+\mathbb E_\sigma\bigg[\sup_{h\in\mathcal H} \frac 1 m \sum_{i=1}^m \sigma_i h(x_i) \bigg] \label{eshm}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>其中 \(\mathbb \sigma=\{\sigma_1,\sigma_2,...,\sigma_m\}\) ，式 \ref{eshm} 的取值范围为 \([0,1]\)，它体现了假设空间 \(\mathcal H\) 的表达能力，例如当 \(|\mathcal H| =1 \) 时，\(\mathcal H\) 中仅有一个假设，这时可计算出式 \ref{eshm} 的值为0：<br/>
+\[<br/>
+\mathbb E_\sigma\bigg[\sup_{h\in\mathcal H} \frac 1 m \sum_{i=1}^m \sigma_i h(x_i) \bigg] = 0.5 \cdot h(x_i) - 0.5\cdot h(x_i) = 0<br/>
+\]</p>
+
+<p>当 \(|\mathcal H|=2^m\) 且 \(\mathcal H\) 能打散 \(D\) 时，对于任意的 \(\mathbb \sigma\) 都存在一个假设 \(h(x_i) = \sigma_i;i=1,2,...,m\)，这时可计算出式 \ref{eshm} 的值为1：<br/>
+\[<br/>
+\mathbb E_\sigma\bigg[\sup_{h\in\mathcal H} \frac 1 m \sum_{i=1}^m \sigma_i h(x_i) \bigg] =  \frac 1 m\bigg(\sum_{h(x_i)=1} 1\cdot h(x_i) + \sum_{h(x_i) = -1} (-1)\cdot h(x_i)\bigg) = \frac 1 m \sum_{i=1}^m |h(x_i)| = 1<br/>
+\]</p>
+
+<p>考虑实值函数空间 \(\mathcal F:\mathcal Z\rightarrow \mathbb R\)。令 \(Z=\{z_1,z_2,...,z_m \}\)，其中 \(z_i \in \mathcal Z\)，将 \ref{eshm} 中的 \(\mathcal X\) 和 \(\mathcal H\) 替换为 \(\mathcal Z\) 和 \(\mathcal F\) 可得</p>
+
+<p><strong>定义1</strong>：函数空间 \(\mathcal F\) 关于 \(Z\) 的经验 Rademacher 复杂度：<br/>
+\[<br/>
+\begin{equation}<br/>
+\hat R_Z(\mathcal F) = \mathbb E_\sigma\bigg[\sup_{f\in\mathcal F} \frac 1 m \sum_{i=1}^m \sigma_i f(z_i) \bigg]\label{hrme}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>经验 Rademacher 复杂度衡量了函数空间 \(\mathcal F\) 与随机噪声在集合 \(Z\) 中的相关性。通常我们希望了解函数空间 \(\mathcal F\) 在 \(\mathcal Z\) 上关于 \(\mathcal D\) 的相关性，因此，对所有从 \(\mathcal D\) 独立同分布采样而得的大小为 \(m\) 的集合 \(Z\) 求期望可得：</p>
+
+<p><strong>定义2</strong>：函数空间 \(\mathcal F\) 关于 \(\mathcal Z\) 上分布 \(\mathcal D\) 的 Rademacher 复杂度：<br/>
+\[<br/>
+\begin{equation}<br/>
+R_m(\mathcal F) = \mathbb E_{Z\subset \mathcal Z:|Z|=m}\bigg[ \hat R_Z(\mathcal F) \bigg] \label{rmmm}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>基于 Rademacher 复杂度可得关于函数空间 \(\mathcal F\) 的泛化误差界。</p>
+
+<p><strong>定理1</strong> 对实数函数空间 \(\mathcal F:\mathcal Z\rightarrow[0,1]\)，根据分布 \(\mathcal D\) 从 \(\mathcal Z\) 中独立同分布采样得到示例集集 \(Z=\{z_1,z_2,...,z_m\}\)，\(z_i \in \mathcal Z\)，\(0\lt \delta \lt 1\)，对任意的 \(f\in \mathcal F\)，以至少 \(1-\delta\) 的概率有：<br/>
+\[<br/>
+\begin{align}<br/>
+\mathbb E[f(z)] \le \frac 1 m \sum_{i=1}^m f(z_i) + 2R_m(\mathcal F) + \sqrt{\frac{\ln(1/\delta)}{2m}}\label{mdl1}\\<br/>
+\mathbb E[f(z)] \le \frac 1 m \sum_{i=1}^m f(z_i) + 2\hat R_Z(\mathcal F) + 3\sqrt{\frac{\ln(1/\delta)}{2m}}\label{mdl2}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>证明：令<br/>
+\[<br/>
+\begin{align}<br/>
+\hat E_Z(f) &amp;= \frac 1 m \sum_{i=1}^m f(z_i)\label{hate}\\<br/>
+\Phi(Z) &amp;= \sup_{f\in\mathcal F}\mathbb E[f] - \hat E_Z(f)\label{phiz}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>同时令 \(Z&#39;\) 为只与 \(Z\) 有一个示例不同的训练集，不妨设 \(z_m\in Z\) 和 \(z_m&#39;\in Z&#39;\) 为不同示例，可得：<br/>
+\[<br/>
+\begin{align*}<br/>
+\Phi(Z&#39;) - \Phi(Z) = \bigg(\sup_{f\in \mathcal F}\mathbb E[f] - \hat E_{Z&#39;}(f) \bigg) - \bigg (\sup_{f \in \mathcal F} \mathbb E[f] - \hat E_Z(f) \bigg)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令 \(f&#39; = {\arg\max}_{f\in \mathcal F} E[f] - \hat E_{Z&#39;}(f)\) 代入上式：<br/>
+\[<br/>
+\begin{align*}<br/>
+\Phi(Z&#39;) - \Phi(Z) &amp;= \bigg(\sup_{f\in \mathcal F}\mathbb E[f] - \hat E_{Z&#39;}(f) \bigg) - \bigg (\sup_{f \in \mathcal F} \mathbb E[f] - \hat E_Z(f) \bigg)\\<br/>
+&amp;\le \bigg(\mathbb E[f&#39;] - \hat E_{Z&#39;}(f&#39;) \bigg) - \bigg(\mathbb E[f&#39;] - \hat E_Z(f&#39;) \bigg)\\<br/>
+&amp;\le \hat E_Z(f&#39;) - \hat E_{Z&#39;}(f&#39;)\\<br/>
+&amp;\le \sup_{f\in \mathcal F} \hat E_Z(f) - \hat E_{Z&#39;}(f)\\<br/>
+&amp;= \sum_{f\in\mathcal F} \frac {f(z_m) - f(z&#39;_m)}{m}\\<br/>
+&amp;\le \frac 1 m<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>同理可得：<br/>
+\[<br/>
+\begin{align*}<br/>
+\Phi(Z) - \Phi(Z&#39;) &amp;\le \frac 1 m\\<br/>
+|\Phi(Z) - \Phi(Z&#39;)| &amp;\le \frac 1 m\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>根据 McDiarmid 不等式可知，对任意的 \(\delta \in (0,1)\)，<br/>
+\[<br/>
+\begin{align}<br/>
+\Phi(Z) \le \mathbb E_Z[\Phi(Z)] + \sqrt{\frac{\ln(1/\delta)}{2m}}\label{phil}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>以至少 \(1-\delta\) 的概率成立，下面来估计 \(\mathbb E_Z[\Phi(Z)]\) 的上界：<br/>
+\[<br/>
+\begin{align}<br/>
+\mathbb E_Z[\Phi(Z)] &amp;= \mathbb E_Z\bigg[\sup_{f \in \mathcal F}\mathbb E[f] - \hat E_Z(f) \bigg]\label{mep1}\\<br/>
+&amp;= \mathbb E_Z\bigg[ \sup_{f\in \mathcal F} \mathbb E_{Z&#39;}[\hat E_{Z&#39;}(f) - \hat E_Z(f)] \bigg]\label{mep2}\\<br/>
+&amp;\le \mathbb E_{Z,Z&#39;} \bigg[\sup_{f\in \mathcal F} \hat E_{Z&#39;}(f) - \hat E_Z(f) \bigg] \label{mep3}\\<br/>
+&amp;= \mathbb E_{Z,Z&#39;} \bigg[\sup_{f\in \mathcal F} \frac 1 m \sum_{i=1}^m (f(z&#39;_i) - f(z_i))\bigg]\label{mep4}\\<br/>
+&amp;= \mathbb E_{\mathbf \sigma,Z,Z&#39;} \bigg[\sup_{f\in \mathcal F} \frac 1 m \sum_{i=1}^m \sigma_i(f(z&#39;_i) - f(z_i))\bigg]\label{mep5}\\<br/>
+&amp;\le \mathbb E_{\mathbf \sigma,Z&#39;} \bigg[\sup_{f\in\mathcal F} \frac 1 m \sum_{i=1}^m \sigma_i f(z&#39;_i) \bigg] + \mathbb E_{\mathbf \sigma,Z} \bigg[\sup_{f\in\mathcal F} \frac 1 m \sum_{i=1}^m -\sigma_i f(z_i) \bigg]\label{mep6}\\<br/>
+&amp;= 2\mathbb E_{\mathbf \sigma,Z} \bigg[\sup_{f\in\mathcal F} \frac 1 m \sum_{i=1}^m \sigma_i f(z_i) \bigg] = 2R_m(\mathcal F) \label{mep7}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>等式 \ref{mep1} 变成 \ref{mep2} 是因为 \(Z&#39;\) 是独立同分布采样于 \(\mathcal Z\) 所以 \(\mathbb E[f] = \mathbb E_{Z&#39;} \bigg[\hat E_{Z&#39;}(f)\bigg]\)。等式 \ref{mep3} 利用 Jensen 不等式和上确界函数的凸性可以得到。在等式 \ref{mep5} 中，我们引入了 Rademacher 变量 \(\sigma_i\) ，它是在 \([-1,1]\) 之间的均匀分布独立随机变量，并不会改变等式 \ref{mep4} 中的期望。当 \(\sigma_i=1\) 时，原式不变；当 \(\sigma_i=-1\) 关联的加数符号翻转，也就相当于交换在 \(Z\) 和 \(Z&#39;\) 中交换 \(z_i\) 和 \(z&#39;_i\)。因为我们是在所有可能的 \(Z\) 和 \(Z&#39;\) 上求期望，因此交换并不会影响最终期望。我们可以利用上确界加法的特性 \(\sup(U+V) \le \sup(U) + \sup(V)\) 得到等式 \ref{mep6}。最后等式 \ref{mep7} 是来源于 Rademacher 复杂度的定义和 \(\sigma_i\) 和 \(-\sigma_i\) 是同一个分布。</p>
+
+<blockquote>
+<p><strong>上确界函数的凸性</strong>：假设 \(X\) 是任意随机变量，对于任意的 \(f\) 都有<br/>
+\[<br/>
+\sup_{y\in Y} \mathbb E[f(X,y)] \le \mathbb E[\sup_{y\in Y} f(X,y)]<br/>
+\]</p>
+
+<p>证明很简单，因为<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\because\quad f(X,y) \le \sup_{y\in Y} f(X,y)\\<br/>
+&amp;\therefore\quad \mathbb E[f(X,y)] \le \mathbb E[\sup_{y\in Y} f(X,y)]\\<br/>
+&amp;\therefore\quad \sup_{y\in Y} \mathbb E[f(X,y)] \le \mathbb E[\sup_{y\in Y} f(X,y)]<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>等式 \ref{mep3} 可以同样由这样得到<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\because\quad \hat E_{Z&#39;}(f) - \hat E_Z(f) \le \sup_{f\in \mathcal F} \hat E_{Z&#39;}(f) - \hat E_Z(f)\\<br/>
+&amp;\therefore\quad \mathbb E_{Z&#39;}[\hat E_{Z&#39;}(f) - \hat E_Z(f)] \le \mathbb E_{Z&#39;}[\sup_{f\in \mathcal F} \hat E_{Z&#39;}(f) - \hat E_Z(f)]\\<br/>
+&amp;\therefore\quad \sup_{f\in \mathcal F}\mathbb E_{Z&#39;}[\hat E_{Z&#39;}(f) - \hat E_Z(f)] \le \mathbb E_{Z&#39;}[\sup_{f\in \mathcal F} \hat E_{Z&#39;}(f) - \hat E_Z(f)]\\<br/>
+\end{align*}<br/>
+\]</p>
+</blockquote>
+
+<p>将式 \ref{mep7} 、\ref{hate} 和 \ref{phiz} 代入式 \ref{phil} 可得：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\sup_{f\in\mathcal F}\mathbb E[f] - \frac 1 m \sum_{i=1}^m f(z_i) \le 2R_m(\mathcal F) + \sqrt{\frac{\ln(1/\delta)}{2m}}\\<br/>
+&amp;\Rightarrow \sup_{f\in\mathcal F}\mathbb E[f] \le \frac 1 m \sum_{i=1}^m f(z_i) + 2R_m(\mathcal F) + \sqrt{\frac{\ln(1/\delta)}{2m}}\\<br/>
+&amp;\Rightarrow \mathbb E[f] \le \frac 1 m \sum_{i=1}^m f(z_i) + 2R_m(\mathcal F) + \sqrt{\frac{\ln(1/\delta)}{2m}}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>至此，式 \ref{mdl1} 得证。</p>
+
+<p>由<strong>定义2</strong>可知，改变 \(Z\) 中的一个示例对 \(\hat R_Z(\mathcal F)\) 的值所造成的改变最多为 \(1/m\)。由 McDiarmid 不等式可知：<br/>
+\[<br/>
+\begin{equation}<br/>
+R_m(\mathcal F) \le \hat R_Z(\mathcal F) + \sqrt{\frac{\ln(2/\delta)}{2m}}\label{rmmf}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>以至少 \(1-\delta/2\) 的概率成立。再由 \ref{phil} 可知：<br/>
+\[<br/>
+\begin{equation}<br/>
+\Phi(Z) \le \mathbb E_Z[\Phi(Z)] + \sqrt{\frac{\ln(2/\delta)}{2m}}\label{plme}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>以至少 \(1-\delta/2\) 的概率成立。</p>
+
+<p>将式 \ref{mep7} 代入式 \ref{plme} 可得：<br/>
+\[<br/>
+\begin{align}<br/>
+\Phi(Z) &amp;\le 2R_m(\mathcal F) + \sqrt{\frac{\ln(2/\delta)}{2m}}\nonumber\\<br/>
+&amp;\le 2\big( \hat R_Z(\mathcal F) + \sqrt{\frac{\ln(2/\delta)}{2m}} \big) + \sqrt{\frac{\ln(2/\delta)}{2m}}\nonumber\\<br/>
+&amp;= 2\hat R_Z(\mathcal F) + 3\sqrt{\frac{\ln(2/\delta)}{2m}}\label{2hrz}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>以至少 \(1-\delta\) 的概率成立。</p>
+
+<p>将 \ref{2hrz} 、\ref{hate} 和 \ref{phiz} 代入式 \ref{phil} 得式 \ref{mdl2} 得证。</p>
+
+<p>上面证明的<strong>定理1</strong>的函数空间 \(\mathcal F\) 是区间 \([0,1]\) 上的实值函数，因此该定理只适用于回归问题。对二分类问题，我们有下面的定理：</p>
+
+<p><strong>定理2</strong>：对假设空间 \(\mathcal H:\mathcal X\rightarrow \{-1,+1\}\)，根据分布 \(\mathcal D\) 从 \(\mathcal X\) 中独立同分布采样得到示例集 \(D=\{x_1,x_2,...,x_m \}\)，\(x_i\in \mathcal X\)，\(0\lt \delta \lt 1\)，对任意 \(h \in \mathcal H\)，以至少 \(1-\delta\) 的概率有：<br/>
+\[<br/>
+\begin{align}<br/>
+E(h) &amp;\le \hat E(h) + R_m(\mathcal H) + \sqrt{\frac{\ln(1/\delta)}{2m}}\label{elhe1}\\<br/>
+E(h) &amp;\le \hat E(h) + R_D(\mathcal H) + 3\sqrt{\frac{\ln(1/\delta)}{2m}}\label{elhe2}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>证明：对二分类问题的假设空间 \(\mathcal H\)，令\(\mathcal Z=\mathcal X\times \{-1,+1\}\)，对 \(\mathcal H\) 中假设 \(h\) 变形为：<br/>
+\[<br/>
+f_h(z) = f_h(x,y) = \mathbf I(h(x) \neq y)<br/>
+\]</p>
+
+<p>于是就可以将值域在 \(\{-1,1\}\) 的假设空间 \(\mathcal H\) 转换为值域为 \([0,1]\) 的函数空间 \(\mathcal F_{\mathcal H} = \{f_h:h\in \mathcal H\}\)，由Radermacher 复杂度的<strong>定义1</strong> 有：<br/>
+\[<br/>
+\begin{align}<br/>
+\hat R_Z(\mathcal F_{\mathcal H}) &amp;= \mathbb E_\sigma\bigg[\sup_{f_h\in\mathcal F_{\mathcal H}} \frac 1 m \sum_{i=1}^m \sigma_i f_h(x_i,y_i) \bigg]\nonumber\\<br/>
+&amp;= \mathbb E_\sigma\bigg[\sup_{h\in\mathcal H} \frac 1 m \sum_{i=1}^m \sigma_i \mathbf I(h(x_i)\neq y_i) \bigg]\nonumber\\<br/>
+&amp;= \mathbb E_\sigma\bigg[\sup_{h\in\mathcal H} \frac 1 m \sum_{i=1}^m \sigma_i \frac{1-y_i h(x_i)}{2} \bigg]\nonumber\\<br/>
+&amp;= \frac 1 2\mathbb E_\sigma\bigg[ \frac 1 m \sum_{i=1}^m \sigma_i + \sup_{h\in \mathcal H} \frac 1 m \sum_{i=1}^m(-y_i\sigma_i h(x_i)) \bigg]\nonumber\\<br/>
+&amp;= \frac 1 2\mathbb E_\sigma\bigg[\sup_{h\in \mathcal H} \frac 1 m \sum_{i=1}^m(-y_i\sigma_i h(x_i)) \bigg]\label{f12m}\\<br/>
+&amp;= \frac 1 2\mathbb E_\sigma\bigg[\sup_{h\in \mathcal H} \frac 1 m \sum_{i=1}^m(\sigma_i h(x_i)) \bigg]\label{f12m2}\\<br/>
+&amp;= \frac 1 2 \hat R_D(\mathcal H)\label{f12m3}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>在式 \ref{f12m} 中由于 \(-y_i\sigma_i\) 与 \(\sigma_i\) 的分布相同，所以可以转换成式 \ref{f12m2} 结果不变。</p>
+
+<p>对上式取期望后可得<br/>
+\[<br/>
+\begin{align}<br/>
+R_m(\mathcal F_{\mathcal H}) = \frac 1 2R_m(\mathcal H)\label{rmmfm}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>由<strong>定理1</strong>和式(\ref{f12m3})和(\ref{rmmfm})可知<strong>定理2</strong>成立。</p>
+
+<p><strong>定理2</strong>给出了基于 Rademacher 复杂度的泛化误差界。我们知道VC维的泛化误差界式分布无关、数据独立的，而基于 Rademacher 复杂度的泛化误差界(\ref{mdl1})与分布 \(\mathcal D\) 有关，式(\ref{mdl2})与数据 \(D\) 有关。换言之，基于 Rademacher 复杂度的泛化误差界依赖于具体学习问题上的数据分布，有点类似于为该学习问题“量身定制”的，因此它通常比基于VC维的泛化误差界更紧一些。</p>
+
+<p><strong>Massart引理</strong>：用 \(A\subseteq \mathbb R^m\) 是一个有限集，有 \(R=\max_{x\in A}||x||_2\)，然后满足下式：<br/>
+\[<br/>
+E_{\sigma} \bigg[\frac 1 m \sup_{x\in A} \sum_{i=1}^m \sigma_i x_i \bigg] \le \frac{R\sqrt{2\ln|A|}}{m}<br/>
+\]</p>
+
+<p>其中 \(\sigma_i\) 是一系列在 \(\{−1,+1\}\) 上取值的独立的符合平均分布的随机变量。</p>
+
+<p>证明：<br/>
+\[<br/>
+\begin{align*}<br/>
+\exp\bigg(t E_{\sigma} \bigg[\sup_{x\in A} \sum_{i=1}^m \sigma_i x_i  \bigg]\bigg) &amp;\le E_{\sigma} \bigg[\exp\bigg(t\sup_{x\in A} \sum_{i=1}^m \sigma_i x_i  \bigg)\bigg]\quad\big(\text{Jensen Inequality}\big)\\<br/>
+&amp;= E_{\sigma} \bigg[\sup_{x\in A} \exp\bigg(t\sum_{i=1}^m \sigma_i x_i  \bigg)\bigg]\\<br/>
+&amp;\le \sum_{x\in A} E_{\sigma} \bigg[\exp\bigg(t\sum_{i=1}^m \sigma_i x_i  \bigg)\bigg]\\ <br/>
+&amp;= \sum_{x\in A} \prod_{i=1}^m E_{\sigma} \big[\exp\big(t\sigma_i x_i  \big)\big]\\ <br/>
+&amp;\le \sum_{x\in A} \prod_{i=1}^m \exp\bigg( \frac{t^2(2x_i)^2}{8} \bigg)\quad\big(\text{Hoeffding Inequality}\big)\\<br/>
+&amp;= \sum_{x\in A} \exp\bigg(\frac{4\sum_{i=1}^m t^2(x_i)^2}{8} \bigg)\\<br/>
+&amp;= \sum_{x\in A} \exp\bigg(\frac{t^2}{2} \sum_{i=1}^m (x_i)^2\bigg)\\<br/>
+&amp;\le |A| \exp\bigg(\frac{t^2R^2}{2} \bigg)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>对两边取对数<br/>
+\[<br/>
+\begin{align*}<br/>
+E_{\sigma} \bigg[\sup_{x\in A} \sum_{i=1}^m \sigma_i x_i  \bigg] &amp;\le \frac 1 t\log\bigg[|A| \exp\bigg(\frac{t^2R^2}{2} \bigg) \bigg]\\<br/>
+&amp;= \frac{\ln|A|}{t} + \frac{tR^2}{2}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>对上式右边对 \(t\) 取导数，并令其等于 0，可得令不等式最小的 \(t\)<br/>
+\[<br/>
+t = \frac{\sqrt{2\ln|A|}}{R}<br/>
+\]</p>
+
+<p>所以不等式<br/>
+\[<br/>
+E_{\sigma} \bigg[\sup_{x\in A} \sum_{i=1}^m \sigma_i x_i  \bigg] \le R\sqrt{2\ln|A|}<br/>
+\]</p>
+
+<p><strong>Massart引理</strong>得证。</p>
+
+<p><strong>定理3</strong>：假设空间 \(\mathcal H\)的 Ramacher 复杂度 \(R_m(\mathcal H)\) 与增长函数 \(\Pi_\mathcal H(m)\) 满足<br/>
+\[<br/>
+R_m(\mathcal H) \le \sqrt{\frac{2\ln\Pi_\mathcal H(m)}{m}}<br/>
+\]</p>
+
+<p>证明：<br/>
+\[<br/>
+\begin{align*}<br/>
+\hat R_Z(\mathcal H) &amp;= \mathbb E_\sigma\bigg[\sup_{f\in\mathcal H} \frac 1 m \sum_{i=1}^m \sigma_i f(z_i) \bigg]\\<br/>
+&amp;\le \frac{\sqrt{m} \sqrt{2\ln|\{(h(x_i),...,h(x_m)):h\in \mathcal H|\}}}{m}\quad\big(\text{Massart Lemma}\big)\\<br/>
+&amp;= \frac{\sqrt{m} \sqrt{2\ln \Pi_\mathcal H(m)}}{m}\\<br/>
+&amp;= \sqrt{\frac{2\ln \Pi_\mathcal H(m)}{m}}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>式中 \(R=\sqrt{m}\) 是因为 \(R=\max_{h\in \mathcal H}||h||_2\)，因为 \(h\) 的取值是 \(\{-1,+1\}\)，所以 \(||h||_2 = \sqrt{m}\)。</p>
+
+<p>由式(\ref{elhe1}) 和<strong>定理3</strong>可得<br/>
+\[<br/>
+E(h) \le \hat E(h) + \sqrt{\frac{2d\ln(em/d)}{m}} + \sqrt{\frac{\ln(1/\delta)}{2m}}<br/>
+\]</p>
+
+<p>也就是说，我们从 Rademacher 复杂度和增长函数就能推导出基于 VC 维的泛化误差界。</p>
+
+<hr/>
+
+<p><a href="">周志华 机器学习</a><br/>
+<a href="https://math.stackexchange.com/questions/2230255/supremum-of-expectation-le-expectation-of-supremum">supremum of expectation and expectation of supremum</a><br/>
+<a href="http://www.it610.com/article/1342038.htm">FML 学习笔记三</a><br/>
+<a href="https://cs.nyu.edu/%7Emohri/mls/ml_learning_with_infinite_hypothesis_sets.pdf">Foundations of Machine Learning</a></p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html'>集成学习</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15225083436209.html" 
+	        title="Previous Post: Mcdiarmid 不等式">&laquo; Mcdiarmid 不等式</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15205961685497.html" 
+	        title="Next Post: 隐马尔可夫模型 Hidden Markov Model">隐马尔可夫模型 Hidden Markov Model &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

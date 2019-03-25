@@ -1,0 +1,426 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  极坐标计算二重积分 - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">极坐标计算二重积分</h1>
+				<p class="meta"><time datetime="2018-02-28T21:13:58+08:00" pubdate data-updated="true">2018/2/28</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>在平面里取一个顶点 \(O\)，叫做极点。引一条射线 \(OX\)，叫做极轴，这样便建立了极坐标系。对于平面里任意一点M</p>
+
+<div align="center">
+    <img src="media/15198236385746/15349443539184.jpg" width="230" />
+</div>
+
+<p>其中 \(|OM|=r\)，\(\angle XOM = \theta\)，这样 \(M\) 点的极坐标便是 \((r,\theta)\)。以 \(O\) 点为原点，\(OX\) 为 \(X\) 轴，过 \(O\) 点垂直 \(X\) 轴，作射线 \(OY\) 为 \(Y\) 轴，这样可以将极坐标转为平面坐标，如下图：</p>
+
+<div align="center">
+    <img src="media/15198236385746/15349451158772.jpg" width="280" />
+</div>
+
+<p>图中显然 \(|OA| = |OM| \sin\theta = r\sin\theta\)，\(|OB| = |OM|\cos\theta = r\cos\theta\)，所以 \(M\) 点的平面坐标为 \((r\cos\theta,r\sin\theta)\)。同理如果给出了点 \(N\) 的平面坐标为 \((x,y)\)，那么：<br/>
+\[<br/>
+\tan\theta = \frac{y}{x}\\<br/>
+r^2 = x^2+y^2<br/>
+\]</p>
+
+<p>通过这样可以进行转换平面坐标转极坐标。</p>
+
+<h3 id="toc_0">极坐标下的面积</h3>
+
+<p>如下图的圆中：</p>
+
+<div align="center">
+    <img src='media/15198236385746/15349482178114.jpg' width="200" />
+</div>
+
+<p>在扇形夹角和半径已知的情况下，很容易求出扇形的面积：<br/>
+\[<br/>
+\Delta \mathbf A = \pi r^2 \frac{\Delta \theta}{2\pi} = \frac 1 2 r^2\Delta \theta\\<br/>
+\]</p>
+
+<p>现在来看一个无规则形状：</p>
+
+<div align="center">
+    <img src="media/15198236385746/15349533671011.jpg" width="230" />
+</div>
+
+<p>我们可以利用黎曼和的知识对其进行切分，形成一个个小扇形，这个小扇形如果角度足够小可以将其当做半径为 \(r\) 圆形里面的一个扇形：<br/>
+\[<br/>
+\Delta \mathbf A \approx \pi r^2 \frac{\Delta \theta}{2\pi} = \frac 1 2 r^2\Delta \theta\\<br/>
+\mathbb d\mathbf A = \frac 1 2 r^2\mathbb d \theta\\<br/>
+\]</p>
+
+<p>曲线内的任意扇形面积：<br/>
+\[<br/>
+\mathbf A_{part} = \int_{\theta_2}^{\theta_1} \frac 1 2 r^2\mathbb d \theta<br/>
+\]</p>
+
+<p>整个面积：<br/>
+\[<br/>
+\mathbf A = \int_{-{\pi}/{2}}^{{\pi}/{2}} \frac 1 2 r^2\mathbb d \theta<br/>
+\]</p>
+
+<h3 id="toc_1">二重积分的极坐标转换</h3>
+
+<p>二重积分的被积函数为 \(f(x,y)\)，令 \(x=r\cos\theta\)，\(y=r\sin\theta\)，所以被积函数可以转换为 \(f(r\cos\theta,r\sin\theta)\)，现在来看极坐标下的积分元素 \(d\sigma\) 的表示方法。设积分区域 \(D\) 为平面有界区域, 并且从原点发出的射线与 \(D\) 的边界线交点不多于两个, 则区域 \(D\) 被分割情形见下图. </p>
+
+<div align="center">
+    <img width="280" src="media/15198236385746/15349528135200.jpg" />
+</div>
+
+<p>图中分割的其中一小块的面积为：<br/>
+\[<br/>
+\begin{align*}<br/>
+\triangle \sigma &amp;= \frac 1 2 (r+\triangle r)^2 \triangle \theta - \frac 1 2 r^2 \triangle \theta \\<br/>
+&amp;= r \triangle r \triangle \theta + \frac 1 2 \triangle r^2\triangle \theta<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>去掉高阶无穷小 \(\frac 1 2 \triangle r^2\triangle \theta\)，可得：<br/>
+\[<br/>
+\triangle \sigma \approx r\triangle r\triangle \theta<br/>
+\]</p>
+
+<p>故：<br/>
+\[<br/>
+\mathbb d\sigma = r\mathbb d r\mathbb d\theta<br/>
+\]</p>
+
+<p>于是，二重积分<br/>
+\[<br/>
+\iint\limits_D f(x,y) \mathbb dx \mathbb dy = \iint\limits_D f(r\cos\theta,r\sin\theta) r\mathbb dr\mathbb d\theta<br/>
+\]</p>
+
+<h4 id="toc_2">极坐标下极坐标转化为累次积分的三种形式</h4>
+
+<p>如下区域特征：<br/>
+    <div align="center"><br/>
+        <img src="media/15198236385746/15349545736898.jpg" width="250" /><br/>
+    </div></p>
+
+<p>其中：<br/>
+    \[<br/>
+    D = \left \{ \begin{array}\\<br/>
+    \alpha\le\theta\le\beta\\<br/>
+    \varphi_1(\theta)\le r\le \varphi_2(\theta)<br/>
+    \end{array} \right .<br/>
+    \]</p>
+
+<p>现在区间 \([\alpha,\beta]\) 上任意取定一个 \(\theta\) 值，\(D\) 上的极径 \(r\) 从 \(\varphi_1(\theta)\) 变到 \(\varphi_2(\theta)\) 。又 \(\theta\) 是在 \([\alpha,\beta]\) 上任意取定的，所以 \(\theta\) 的变化范围是 \([\alpha,\beta]\) 。这样就可看出，极坐标系中的二重积分的公式为：<br/>
+\[<br/>
+\begin{align*}<br/>
+\iint\limits_D f(x,y) \mathbb dx \mathbb dy &amp;= \iint\limits_D f(r\cos\theta,r\sin\theta) r\mathbb dr\mathbb d\theta\\<br/>
+&amp;= \int_{\alpha}^{\beta}\Big[\int_{\varphi_1(\theta)}^{\varphi_2(\theta)} f(r\cos\theta,r\sin\theta)r\mathbb dr\Big]\mathbb d\theta\\<br/>
+&amp;= \int_{\alpha}^{\beta} \mathbb d\theta \int_{\varphi_1(\theta)}^{\varphi_2(\theta)} f(r\cos\theta,r\sin\theta)r\mathbb dr\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>再看两个上图的特例情况：</p>
+
+<ol>
+<li><p>\(0\le r \le \varphi(\theta)\)，\(\alpha\le \theta\le\beta\)：<br/>
+<div align="center"><br/>
+    <img src="media/15198236385746/15349556750495.jpg" width="220" /><br/>
+</div></p>
+
+<p>\[<br/>
+\begin{align*}<br/>
+\iint\limits_D f(x,y) \mathbb dx \mathbb dy = \int_{\alpha}^{\beta} \mathbb d\theta \int_0^{\varphi(\theta)} f(r\cos\theta,r\sin\theta)r\mathbb dr\\<br/>
+\end{align*}<br/>
+\]</p></li>
+<li><p>\(0\le r \le \varphi(\theta)\)，\(0\le\theta\le 2\pi\)：<br/>
+<div align="center"><br/>
+    <img src="media/15198236385746/15349558131970.jpg" width="220" /><br/>
+</div></p>
+
+<p>\[<br/>
+\begin{align*}<br/>
+\iint\limits_D f(x,y) \mathbb dx \mathbb dy = \int_{0}^{2\pi} \mathbb d\theta \int_0^{\varphi(\theta)} f(r\cos\theta,r\sin\theta)r\mathbb dr\\<br/>
+\end{align*}<br/>
+\]</p></li>
+</ol>
+
+<hr/>
+
+<p><a href="https://wenku.baidu.com/view/d2c27c0510661ed9ac51f325.html">极坐标下二重积分的计算</a></p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html'>数学基础</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15199171411644.html" 
+	        title="Previous Post: GeoGebra 中英文指令对照表">&laquo; GeoGebra 中英文指令对照表</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15195107498771.html" 
+	        title="Next Post: 马尔科夫链蒙特卡罗方法 Markov Chain Monte Carlo，MCMC">马尔科夫链蒙特卡罗方法 Markov Chain Monte Carlo，MCMC &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

@@ -1,0 +1,363 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  迪杰斯特拉算法 Dijkstra - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">迪杰斯特拉算法 Dijkstra</h1>
+				<p class="meta"><time datetime="2017-09-30T10:56:04+08:00" pubdate data-updated="true">2017/9/30</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>迪杰斯特拉算法是由荷兰计算机科学家狄克斯特拉于1959 年提出的，因此又叫狄克斯特拉算法。是从一个顶点到其余各顶点的最短路径算法，解决的是有向图中最短路径问题。迪杰斯特拉算法主要特点是以起始点为中心向外层层扩展，直到扩展到终点为止。</p>
+
+<p>对于这个算法如果只靠文字讲解将不够生动好理解，下面准备结合算法的内存结构进行讲解步骤，首先我们看下面的无向图：</p>
+
+<div align=center>
+    <img width='350' src="media/15067401646591/15293659850697.jpg">
+</div>
+
+<h4 id="toc_0">算法步骤</h4>
+
+<p>下面的例子是输出结点A到各结点的最短距离，如果还需要输出最短路径，看<font color=blue>蓝字</font>的描述，如果仅仅需要距离，可以不用。</p>
+
+<h6 id="toc_1">初始化：</h6>
+
+<p>定义两个队列，一个是已用结点队列 UQ（Used Queue），一个是未用结点队列 UUQ（UnUsed Queue）。初始化时UQ为空；UUQ包含所有所有结点，初始化结点A到自身距离为0，其他结点为无穷大，用UUQ（X）表示队列中结点X的当前值；<font color=blue>每一个结点内部维护着一个变量 pre ，储存每一个结点到最短距离时的前置结点，初始化时值都为-1</font>：</p>
+
+<div align=center>
+    <img width='520' src="media/15067401646591/15297227420859.jpg">
+</div>
+
+<p>接下来循环未用结点队列UUQ ，查找距离最短的结点，将该结点加入已用结点队列UQ则处理该结点。上例中此时结点A是最短的，选取结点A，从UUQ中去掉该结点加入UQ队列；更新UUQ中的最短距离，结点A到结点B的距离为5，结点A到结点D的距离为3，结点A到E的距离为2；<font color=blue>在更新距离的同时更新结点内部pre变量为前置结点，结点B、结点D、结点E的pre都更新为A：</font></p>
+
+<div align=center>
+    <img width='500' src="media/15067401646591/15297234449500.jpg">
+</div>
+
+<p>从UUQ中选择一个距离最短的结点，上例中此时选择结点E，从UUQ中去掉该结点E加入UQ队列；通过结点E更新UUQ中的最短距离，结点E到D的距离为1， 此时 UUQ(E)+ dist(E,D)=2+1=3不小于UUQ(D)=3，所以不更新D。结点E到结点A，因为结点A在UQ中不更新，结点E到F的距离为1，此时 UUQ(E)+ dist(E,F)=2+1=3 小于 UUQ(F)=\(\infty\)，所以更新UUQ中结点F为3，<font color=blue>同时更新结点F的前置结点为E</font>：</p>
+
+<div align=center>
+    <img width='500' src="media/15067401646591/15297246241834.jpg">
+</div>
+
+<p>从UUQ中选择一个距离最短的结点，上例中此时结点D和结点F的距离都为3，假设选择的是结点D，将结点D从UUQ中去掉加入UQ队列，结点D可到达的结点都在UQ队列中，不更新。</p>
+
+<div align=center>
+    <img width='500' src="media/15067401646591/15297254145110.jpg">
+</div>
+
+<p>从UUQ中选择一个距离最短的点——结点F，结点F到结点B的距离为1，此时 UUQ(F)+dist(F,B)=3+1=4 小于 UUQ(B)=5，更新UUQ(B)为4，<font color=blue>并更新结点B的前置结点为F；</font>结点F到结点G的距离4，此时 UUQ(F)+dist(F,G)=3+4=7 小于 UUQ(G)=\(\infty\)，更新UUQ(G)为7，<font color=blue>并更新结点G的前置结点为F：</font></p>
+
+<div align=center>
+    <img width='500' src="media/15067401646591/15297259293986.jpg">
+</div>
+
+<p>从UUQ中选择一个距离最短的点——结点B，结点B到结点C的距离为2，此时 UUQ(B)+dist(B,C)=4+2=6 小于 UUQ(B)=\(\infty\)，更新 UUQ(C)为6，<font color=blue>并更新C的前置结点为B：</font></p>
+
+<div align=center>
+    <img width='500' src="media/15067401646591/15297263977068.jpg">
+</div>
+
+<p>从UUQ中选择一个距离最短的点——结点C，结点C到结点G的距离为1，此时 UUQ(C)+dist(C,G)=6+1=7 不小于 UUQ(G)=7，不更新：</p>
+
+<div align=center>
+    <img width='500' src="media/15067401646591/15297266129228.jpg">
+</div>
+
+<p>从UUQ中选择一个距离最短的点——结点G，结点G没有到达的点在UUQ中，不更新：</p>
+
+<div align=center>
+    <img width='500' src="media/15067401646591/15297267591638.jpg">
+</div>
+
+<p>现在通过UQ可以知道A到E的最短距离为2，A到D最短距离为3，A到F最短距离为3，A到B最短距离为4，A到C最短距离为6，A到G最短距离为7。如果需要输出A到结点G的最短路径，可以通过前置结点倒序输出，结点G的前置结点为F，F的前置结点为E，E的前置结点为A：A \(\Rightarrow\) E \(\Rightarrow\) F \(\Rightarrow\) G</p>
+
+<h4 id="toc_2">算法限制</h4>
+
+<p>如果各结点间不能存在负的权值，如下图：</p>
+
+<div align=center>
+    <img width='180' src="media/15067401646591/15297437390198.jpg">
+</div>
+
+<p>计算从A到E的距离，开始时B和C在UUQ队列，UUQ(B)=3，UUQ(C)=2，然后第二轮开始处理结点C，将C从UUQ移除，加入UQ队列，按照我们的流程，后面C的最短距离将不会再被更新，那么我们计算出的A到C的最短距离将为2，实际我们从图中很容易看出存在更短的路线A\(\Rightarrow\)B\(\Rightarrow\)C，距离为1。</p>
+
+<p>这是因为Dijkstra算法有一个前提：<font color=red>对于处理过的节点，没有前往该节点的更短路径，处理过的结点不会再被更新。</font></p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html'>最短路径问题</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15071722270628.html" 
+	        title="Previous Post: 弗洛伊德算法 Floyd">&laquo; 弗洛伊德算法 Floyd</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15061862782517.html" 
+	        title="Next Post: 最大后验概率估计 MAP">最大后验概率估计 MAP &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

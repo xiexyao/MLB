@@ -1,0 +1,758 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  主成分分析 PCA - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">主成分分析 PCA</h1>
+				<p class="meta"><time datetime="2017-08-23T01:25:31+08:00" pubdate data-updated="true">2017/8/23</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>在介绍主成分分析之前，简单看一下方差、协方差，特征值，特征向量的概念，了解这些后才能更好了解主成分分析。</p>
+
+<h2 id="toc_0">代数基础知识</h2>
+
+<h4 id="toc_1">方差 variance</h4>
+
+<p>在统计学中，方差被描述为样本与总体平均数之间的差异，假设样本数据为\(X_i\,:\,i=1;2;...;N\)，定义：<br/>
+\[<br/>
+\mu = \frac{\sum_{i=1}^N X_i}{N}<br/>
+\]</p>
+
+<p>为总体平均数，对于总体的方差公式为（\(\sigma^2\)代表方差，\(\sigma\)代表标准差）：<br/>
+\[<br/>
+\sigma^2 = \frac{\sum_{i=1}^N (X_i - \mu)^2}{N}<br/>
+\]</p>
+
+<p>假设样本均值为\(\overline{X}\)，样本方差定义为为：<br/>
+\[<br/>
+S^2 = \frac{\sum_{i=1}^N(x_i-\overline{X})^2}{n-1}<br/>
+\]</p>
+
+<p>这里的n为样本x的数量，这里和总体方差不同的是除以的是n-1，而不是n，这是由于除以n-1是无偏方差，如果除以n会比总体方差要小。</p>
+
+<blockquote>
+<h4 id="toc_2">无偏方差为什么除以n-1？</h4>
+
+<p>假设数据集X上，有多次抽样\(X_1\)、\(X_2\)、...、\(X_n\)，每一个样本的平均值即为\(\overline{X_1}\)、\(\overline{X_2}\)、...、\(\overline{X_n}\)，随着抽样的次数逐渐增多，样本平均值的平均值将会越来越近总体平均值，即\(E(\overline{X}) = \mu\)，此时也就是无偏估计。</p>
+
+<p>首先我们来假设无偏方差是如下形式：<br/>
+\[<br/>
+S^2 = \frac{1}{n}\sum_{i=1}^N(x_i-\overline X)^2<br/>
+\]<br/>
+所以求无偏方差的期望为：<br/>
+\[<br/>
+\begin{align*}<br/>
+E[S^2] &amp;= E[\frac{1}{n} \sum_{i=1}^N(x_i-\overline X)^2] \\<br/>
+&amp;= E[\frac{1}{n} \sum_{i=1}^N (x_i - \mu + \mu - \overline X)^2] \\<br/>
+&amp;= E[\frac{1}{n} \sum_{i=1}^N [(x_i - \mu)^2 + 2(x_i - \mu)(\mu - \overline{X}) + (\mu - \overline{X})^2]] \\<br/>
+&amp;= E[\frac{1}{n} \sum_{i=1}^N(x_i-\mu)^2 + \frac{1}{n}\sum_{i=1}^N 2(x_i - \mu)(\mu-\overline{X})+\frac{1}{n}\sum_{i=1}^N(\mu-\overline{X})^2] \\<br/>
+&amp;\because\quad\frac{1}{n}\sum_{i=1}^N(x_i-\mu) = \frac{1}{n}\sum_{i=1}^Nx_i-\frac{1}{n}\sum_{i=1}^N\mu = \overline{X} - \mu \\<br/>
+E[S^2]&amp;= E[\frac{1}{n}\sum_{i=1}^N(x_i-\mu)^2 + 2(\overline{X}-\mu)(\mu - \overline{X}) + (\mu-\overline{X})^2] \\<br/>
+&amp;=E[\frac{1}{n}\sum_{i=1}^N(x_i-\mu)^2 - (\overline{X} - \mu)^2] \\<br/>
+&amp;=E[\frac{1}{n}\sum_{i=1}^N(x_i-\mu)^2] - E[(\overline{X}-\mu)^2] \\<br/>
+&amp;=\sigma^2-E[(\overline{X} - \mu)^2]<br/>
+\end{align*} <br/>
+\]</p>
+
+<p>并有：<br/>
+\[<br/>
+\begin{align*}<br/>
+E[(\overline{X}-\mu)^2] &amp;= E[(\overline{X}-E(\overline{X}))^2] = var(\overline{X})\\<br/>
+&amp;= var(\frac{\sum_{i=1}^n X_i}{n}) \\<br/>
+&amp;= \frac{1}{n^2}var(\sum_{i=1}^n X_i) \\<br/>
+&amp;= \frac{1}{n^2}\sum_{i=1}^N var(X_i) \\<br/>
+&amp;= \frac{1}{n}\sigma^2<br/>
+\end{align*}<br/>
+\]<br/>
+所以：<br/>
+\[<br/>
+E(S^2) = \sigma^2 - E[(\overline{X} - \mu)^2] = \sigma^2-\frac{\sigma^2}{n} = \frac{n-1}{n}\sigma^2<br/>
+\]<br/>
+由证明其实可知我们假设的无偏方差其实是有偏差的，它比总体方差要小，此时如果我们想要得到无偏方差\(\sigma^2\)，我们希望\(S^2\)乘上\(\frac{n}{n-1}\)，得到：<br/>
+\[<br/>
+S^2 = \frac{n}{n-1}(\frac{1}{n} \sum_{i=1}^N(x_i-\overline X)^2) = \frac{1}{n-1}\sum_{i=1}^N(x_i-\overline X)^2<br/>
+\]<br/>
+证明：<br/>
+\[<br/>
+\begin{align*}<br/>
+E[S^2] &amp;= E[\frac{1}{n-1}\sum_{i=1}^N (x_i - \mu + \mu - \overline{X})^2] \\<br/>
+&amp;= E[\frac{1}{n-1}\sum_{i=1}^N (x_i-\mu)^2+\frac{1}{n-1}\sum_{i=1}^N2(x_i-\mu)(\mu-\overline{X}) + \frac{1}{n-1}\sum_{i=1}^N (\mu-\overline{X})^2] \\<br/>
+&amp;= E[\frac{1}{n-1}\sum_{i=1}^N (x_i-\mu)^2 - \frac{2n}{n-1}(\mu-\overline{X})^2 + \frac{n}{n-1}(\mu-\overline{X})^2] \\<br/>
+&amp;= E[\frac{1}{n-1}\sum_{i=1}^N (x_i-\mu)^2 - \frac{n}{n-1}(\mu-\overline{X})^2] \\<br/>
+&amp;=E[\frac{1}{n-1}\sum_{i=1}^N (x_i-\mu)^2] - E[\frac{n}{n-1}(\mu-\overline{X})^2] \\<br/>
+&amp;=\frac{n}{n-1}E[\frac{1}{n}\sum_{i=1}^N (x_i-\mu)^2] - \frac{n}{n-1}E[(\mu-\overline{X})^2] \\<br/>
+&amp;=\frac{n}{n-1}\sigma^2-\frac{n}{n-1} \cdot\frac{\sigma^2}{n} \\<br/>
+&amp;= \sigma^2<br/>
+\end{align*}<br/>
+\]<br/>
+得证。无偏方差为：<br/>
+\[<br/>
+S^2 = \frac{1}{n-1}\sum_{i=1}^N(x_i-\overline X)^2<br/>
+\]</p>
+</blockquote>
+
+<h4 id="toc_3">协方差 Covariance</h4>
+
+<p>由前面对方差的定义可知，方差是衡量数据集中数据与平均值的偏离程度，方差处理的是一维数据的情况，而在现实生活中我们处理的多是多维数据，描述的往往是多个数据同时偏离平均值的程度。我们可以仿照方差的形式：<br/>
+\[<br/>
+var(X) = \frac{1}{n-1}\sum_{i=1}^N (X_i - \overline{X}) = \frac{1}{n-1} \sum_{i=1}^N (X_i - \overline{X})(X_i-\overline{X})<br/>
+\]<br/>
+定义协方差：<br/>
+\[<br/>
+cov(X,Y) = \frac{1}{n-1}(X_i - \overline{X})(Y_i - \overline{Y})<br/>
+\]</p>
+
+<p>通常我们可以用偏方差来描述两个维度的数据的相关性，偏方差为正数表示两者是正相关的，反之为负数表示两者负相关，如果为0，表示两者互相独立。由协方差的定义容易知：<br/>
+\[<br/>
+var(X) = cov(X,X)<br/>
+cov(X,Y) = cov(Y,X)<br/>
+\]</p>
+
+<p>由定义可知，协方差每次只可以描述两个维度数据，如果我们有n维数据，那么往往就需要计算\(\frac{1}{2}n(n-1)\)个协方差，于是便引入了协方差矩阵。一个三维的协方差矩阵如下所示：<br/>
+\[<br/>
+C = \left ( \begin{array}{ccc}<br/>
+cov(x,x) &amp;&amp; cov(x,y) &amp;&amp; cov(x,z) \\<br/>
+cov(y,x) &amp;&amp; cov(x,x) &amp;&amp; cov(y,z) \\<br/>
+cov(z,x) &amp;&amp; cov(z,y) &amp;&amp; cov(z,z) \\<br/>
+\end{array} \right)<br/>
+\]</p>
+
+<blockquote>
+<p>散度矩阵：协方差矩阵的计算有除以\((n-1)\)的步骤，如果没有没有这个步骤获得的矩阵即是散度矩阵。换言之，散度矩阵等于协方差矩阵乘以\((n-1)\)。</p>
+</blockquote>
+
+<h4 id="toc_4">特征值和特征向量</h4>
+
+<p>对于一个向量\(A\)，通过应用非零向量\(\overrightarrow{\nu}\)后仅仅相当于将\(\overrightarrow{\nu}\)同比例的缩放\(\gamma\)倍，那么我们称\(\overrightarrow{\nu}\)是特征向量，\(\gamma\)是特征值：<br/>
+\[<br/>
+A\overrightarrow{\nu} = \lambda\overrightarrow{\nu}<br/>
+\]</p>
+
+<p>1、对于一个方阵A，如果存在可逆向量P，满足\(P^{-1}AP=\Lambda\)，\(\Lambda\)是一个对角矩阵，这样我们可以说方阵A可对角化。</p>
+
+<p>首先变换表示形式，将P用其列向量的形式表示\(P = (p_1,p_2,...,p_n)\)，对角矩阵\(\Lambda\)的表示形式如下：<br/>
+\[<br/>
+\Lambda = \left [ \begin{array} \\<br/>
+\lambda_1&amp;&amp;           &amp;&amp;        &amp;&amp; \\<br/>
+         &amp;&amp; \lambda_2 &amp;&amp;        &amp;&amp; \\<br/>
+         &amp;&amp;           &amp;&amp; \ddots &amp;&amp; \\<br/>
+         &amp;&amp;           &amp;&amp;        &amp;&amp; \lambda_n \\<br/>
+\end{array}\right ]<br/>
+\]</p>
+
+<p>得：<br/>
+\[<br/>
+P^{-1}AP=\Lambda \Rightarrow AP = P\Lambda<br/>
+\Rightarrow A(p_1,p_2,...,p_n) = (p_1,p_2,...,p_n)\left [\begin{array} \\<br/>
+\lambda_1&amp;&amp;           &amp;&amp;        &amp;&amp; \\<br/>
+         &amp;&amp; \lambda_2 &amp;&amp;        &amp;&amp; \\<br/>
+         &amp;&amp;           &amp;&amp; \ddots &amp;&amp; \\<br/>
+         &amp;&amp;           &amp;&amp;        &amp;&amp; \lambda_n \\<br/>
+\end{array}\right] \\<br/>
+\Rightarrow (Ap_1,Ap_2,...,Ap_n) = (\lambda_1p_1,\lambda_2p_2,...,\lambda_np_n)<br/>
+\]</p>
+
+<p>由上式可知：\(Ap_n=\lambda_np_n\)，所以可以看成对角矩阵的每一个元素\(\lambda_n\)都是方阵A的特征值，可逆矩阵P对应位置的列向量\(p_n\)是其特征向量。</p>
+
+<p>2、对于一个可逆矩阵A，它的逆矩阵的特征值是原矩阵的倒数。设\(\lambda\)是其特征值，\(\overrightarrow{\nu}\)是特征向量，则有：<br/>
+\[<br/>
+A\overrightarrow{\nu} = \lambda\overrightarrow{\nu}<br/>
+\] </p>
+
+<p>两边同时左乘\(A^{-1}\)，可得：<br/>
+\[<br/>
+\overrightarrow{\nu} = \lambda A^{-1}\overrightarrow{\nu} \\<br/>
+\Rightarrow \frac{1}{\lambda}\overrightarrow{\nu} = A^{-1} \overrightarrow{\nu} \\<br/>
+\]</p>
+
+<p>所以可知，逆矩阵的特征值是原矩阵的倒数。</p>
+
+<p>3、复正规矩阵的特征向量和特征值</p>
+
+<p>对角矩阵、实对称矩阵(\(A^T=A\))、反实对称矩阵(\(A^T = -A\))、厄米特矩阵(\(A^H=A\))、反厄米特矩阵(\(A^H=-A\))、正交矩阵(\(AA^T=A^TA=I\))、酉矩阵(\(AA^H=A^HA=I\))等满足\(AA^H=A^HA\)条件的矩阵都叫正规矩阵。并不是正规矩阵，都是对角矩阵、实对称、反实对称矩阵等，比如\(\left [ \begin{array}{lr} 1&amp; -1\\1&amp;1\\\end{array}\right]\)，不属于上面，但是它满足\(AA^T=A^TA\)，因此也是正规矩阵。</p>
+
+<p>定理：对于正规矩阵\(A\)都存在酉矩阵\(Q\)使得：<br/>
+\[<br/>
+Q^HAQ = Q^{-1}AQ = \Sigma=\left [ \begin{array}\\\lambda_1&amp;&amp;&amp;\\&amp;\lambda_2&amp;&amp;\\&amp;&amp;\ddots&amp;\\&amp;&amp;&amp;\lambda_n\\\end{array}\right]<br/>
+\]</p>
+
+<p>证明：可以通过\(A\)可以通过酉向量\(P\)化为上（下）三角矩阵\(B\)，即\(B=P^TAP\)，再由\(B^TB=P^TA^TPP^TAP=P^TA^TAP=P^TAA^TP=BB^T\)，因为\(B\)是上（下）三角矩阵，通过比较\(BB^T=B^TB\)对角线位置的元素，可知\(B\)是对角矩阵。</p>
+
+<p>所以对于任意的复正规矩阵具有一组正交特征向量基，复正规矩阵可以被分解为：<br/>
+\[<br/>
+A = U \Sigma U^H<br/>
+\]</p>
+
+<p>其中U为一个酉矩阵，进一步：<br/>
+\(A\)为厄米特矩阵\(\quad\Leftrightarrow\quad\)\(\Sigma\)的每个对角元都为实数。<br/>
+\(A\)为反厄米特矩阵\(\quad\Leftrightarrow\quad\)\(\Sigma\)的每个对角元都为0或虚数。<br/>
+\(A\)为酉矩阵\(\quad\Leftrightarrow\quad\)\(\Sigma\)的全部特征元的模为1。</p>
+
+<p>继续：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;A = U \Sigma U^H \\<br/>
+\Rightarrow &amp;AU = U\Sigma\\<br/>
+\Rightarrow &amp;A(u_1,u_2,...,u_3) = (u_1,u_2,...,u_3)\left [ \begin{array}\\\lambda_1&amp;&amp;&amp;\\&amp;\lambda_2&amp;&amp;\\&amp;&amp;\ddots&amp;\\&amp;&amp;&amp;\lambda_n\\\end{array}\right]\\<br/>
+\Rightarrow &amp;(Au_1,Au_2,...,Au_3) = (\lambda_1u_1,\lambda_2u_2,...,\lambda_nu_n)\\<br/>
+\Rightarrow &amp; Au = \lambda u\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>4、求解特征值和特征矩阵。由特征值和特征向量的定义易看出如何求解，首先是求出其特征值：<br/>
+\[<br/>
+A\overrightarrow{\nu} = \lambda \overrightarrow{\nu} \\<br/>
+\Rightarrow (A-\lambda I)\overrightarrow{\nu} = 0<br/>
+\]</p>
+
+<p>由于特征向量\(\overrightarrow{\nu}\)不为0，所以可知\(|A-\lambda I| = 0\)，这样便可以求出特征值\(\lambda\)，再带回原式中求出特征向量\(\overrightarrow{\nu}\)</p>
+
+<p>假设求解\(A = \left( \begin{array}{ccc}<br/>
+-1 &amp;&amp; 1 &amp;&amp; 0 \\<br/>
+-4 &amp;&amp; 3 &amp;&amp; 0 \\<br/>
+1 &amp;&amp; 0 &amp;&amp; 2 \\<br/>
+\end{array} \right)<br/>
+\)的特征向量和特征值，按照之前描述需要先求出特征值，所以：<br/>
+\[<br/>
+\begin{align*}<br/>
+|A - \lambda I | &amp;= \left | \begin{array}{ccc}<br/>
+-1-\lambda &amp;&amp; 1 &amp;&amp; 0 \\<br/>
+-4 &amp;&amp; 3 - \lambda &amp;&amp; 0\\<br/>
+1 &amp;&amp; 0 &amp;&amp; 2-\lambda \\<br/>
+\end{array} \right| = (2-\lambda)\left | \begin{array}{ccc}<br/>
+-1-\lambda &amp;&amp; 1 \\<br/>
+-4 &amp;&amp; 3-\lambda \\<br/>
+\end{array} \right | \\<br/>
+&amp;=(2-\lambda)[(-1-\lambda)(3-\lambda)+4] \\<br/>
+&amp;=(2-\lambda)(\lambda^2-3\lambda+\lambda+1) \\<br/>
+&amp;=(2-\lambda)(\lambda^2-2\lambda+1) \\<br/>
+&amp;=(2-\lambda)(\lambda-1)^2 = 0<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>所以可得\(\lambda=1\)或\(\lambda=2\)。<br/>
+当\(\lambda=1\)时：<br/>
+\[<br/>
+(A-\lambda I)\overrightarrow{\nu} = \left ( \begin{array}{ccc}<br/>
+-2 &amp;&amp; 1 &amp;&amp; 0 \\<br/>
+-4 &amp;&amp; 2 &amp;&amp; 0 \\<br/>
+1 &amp;&amp; 0 &amp;&amp; 1 \\<br/>
+\end{array} \right )\left( \begin{array} \\<br/>
+x_1 \\<br/>
+x_2 \\<br/>
+x_3 \\<br/>
+\end{array} \right) = 0\\<br/>
+\Rightarrow \left \{ \begin{array}\\<br/>
+-2x_1 + x_2 = 0\\<br/>
+-4x_1 + 2x_2 = 0\\<br/>
+x_1 + x_3 = 0\\<br/>
+\end{array} \right.<br/>
+\]</p>
+
+<p>易得相应的特征向量为：\(P=\left( \begin{array}{ccc} -1 \\ -2 \\ 1 \\ \end{array} \right)\)，<br/>
+同理可求得当\(\lambda=2\)是，特征向量为：\(P=\left( \begin{array}{ccc} 0 \\ 0 \\ 1 \\ \end{array} \right)\)</p>
+
+<h2 id="toc_5">主成分分析 PCA</h2>
+
+<p>PCA的英文名称就做Principle Component analysis，是一种常用的数据分析方法。他通过对原始数据进行线性变换，将数据转变为各维度线性无关的表示，可以用于数据降维和压缩。在机器学习中，经常我们需要处理的数据是几千维甚至是几十万维度的数据，如果直接处理，不论是对计算机性能、算法性能还是对训练时间度的要求都大大增大，这时候对高维数据降维，且不能丢失主要的信息。那么我们该如何确定该删掉哪些维度的数据呢？还有如何在最大限度减小维度的同时又能让信息损失最低呢？这就是PCA可以做的事。</p>
+
+<p>PCA的主要目的在于保留最大信息量的同时降噪，如图：</p>
+
+<div align="center">
+    <img src="media/15034227314732/15272993250127.jpg" width="400px" />
+</div>
+
+<p>直观上来看将元素在红线上的投影来描述信息对信息的损失比蓝线要小很多，所以也就是希望投影后的方差最大化。信息处理认为信号具有较大的方差，噪音拥有较小的方差，信噪比就是信号与噪音的方差比。因此在PCA中，我们需要将数据有原始的m维数据转换到新的k维空间中，也就是我们需要找到k个正交基来描述空间。新的坐标系的选择与原始数据的构成有关，通常我们选择能使原始数据方差最大的方向作为第一个坐标轴，第二个坐标轴的选择是与第一个坐标轴正交且原始数据的投影方差最大的方向，依次类推选择k个坐标轴。</p>
+
+<p>用一个例子来描述PCA的过程，假设我们有一个数据集如下：</p>
+
+<p>\[<br/>
+Data = \left . \begin{array}{c|c}<br/>
+x &amp; y \\<br/>
+\hline<br/>
+2.5 &amp; 2.4 \\<br/>
+0.5 &amp; 0.7 \\<br/>
+2.2 &amp; 2.9 \\<br/>
+1.9 &amp; 2.2 \\<br/>
+3.1 &amp; 3.0 \\<br/>
+2.3 &amp; 2.7 \\<br/>
+2 &amp; 1.6 \\<br/>
+1 &amp; 1.1 \\<br/>
+1.5 &amp; 1.6 \\<br/>
+1.1 &amp; 0.9 \\<br/>
+\end{array} \right .<br/>
+\]</p>
+
+<p>我们首先需要求出数据集的协方差，由协方差计算公式可知需要先求出x和y分别的平均数：\(\overline{x} = 1.81,\,\overline{y} = 1.91\)，然后易求出协方差：<br/>
+\[<br/>
+Cov(Data) = \left ( \begin{array}{cc}<br/>
+cov(x,x) &amp; cov(x,y) \\<br/>
+cov(y,x) &amp; cov(y,y) \\<br/>
+\end{array}\right) = \left ( \begin{array}{cc}<br/>
+0.616555556 &amp; 0.615444444 \\<br/>
+0.615444444 &amp; 0.716555556 \\<br/>
+\end{array} \right )<br/>
+\]</p>
+
+<p>接下来求出该协方差矩阵的特征值，令\(A = Cov(Data)\)：<br/>
+\[<br/>
+\begin{align*}<br/>
+| A - \lambda I| &amp;= \left | \begin{array}{cc}<br/>
+0.616555556-\lambda &amp; 0.615444444 \\<br/>
+0.615444444 &amp; 0.716555556-\lambda \\<br/>
+\end{array} \right | = (0.616555556-\lambda)(0.716555556-\lambda)-0.615444444^2 \\<br/>
+&amp;= \lambda^2 - 1.333111112\lambda + 0.06302445 = 0 \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>由一元二次方程的求解易得：<br/>
+\[<br/>
+\lambda = \left ( \begin{array}{cc}<br/>
+1.28402770 \\<br/>
+0.04908340 \\<br/>
+\end{array}\right )<br/>
+\]</p>
+
+<p>将特征值排序后，选择k个最大的特征值，因为这里只有2个特征值，假设k=1，则取最大特征值\(\lambda\)=1.28402770，然后计算对应的特征向量：<br/>
+\[<br/>
+(A - \lambda I )\overrightarrow{\nu} = \left ( \begin{array}{cc}<br/>
+-0.667472144 &amp; 0.615444444 \\<br/>
+0.615444444 &amp; -0.567472144 \\<br/>
+\end{array} \right ) \left(\begin{array} \\<br/>
+x_1\\<br/>
+x_2\\<br/>
+\end{array} \right ) \\<br/>
+\Rightarrow \left \{ \begin{array}\\<br/>
+-0.667472144 x_1 + 0.615444444 x_2 = 0\\<br/>
+0.615444444 x_1 - 0.567472144 x_2 = 0<br/>
+\end{array} \right .<br/>
+\]</p>
+
+<p>很容易算出其中一个解:<br/>
+\[<br/>
+\overrightarrow{\nu} = \left \{ \begin{array} \\0.67787339 \\0.73517867 \\\end{array} \right.<br/>
+\]</p>
+
+<p>再将样本数据乘上特征向量，得到投影后的在一维空间内新数据：<br/>
+\[<br/>
+data^1 = \left ( \begin{array}{cc}<br/>
+3.45911228 \\<br/>
+0.85356176\\<br/>
+3.6233396 \\<br/>
+2.90535252 \\<br/>
+4.30694352 \\<br/>
+3.54409121 \\<br/>
+2.53203265 \\<br/>
+1.48656993 \\<br/>
+2.19309596 \\<br/>
+1.40732153 \\<br/>
+\end{array} \right )<br/>
+\]</p>
+
+<p>如果说我们的目的是将原数据从二维空间降维到一维空间，那么现在已经完成了。这里也完成了对数据的压缩，现在我们可以通过\(data^1\)和\(\overrightarrow{\nu}\)来表示原始数据，可以用\(data^1\)乘上\(\overrightarrow{\nu}^T\)来还原原始数据：<br/>
+\[<br/>
+data^{new} = data^1 \overrightarrow{\nu}^T = \left ( \begin{array}{cc}<br/>
+2.34484017 &amp;  2.54306557\\<br/>
+0.57860681 &amp;  0.6275204 \\<br/>
+2.4561655 &amp;  2.66380199\\<br/>
+1.96946116 &amp;  2.1359532 \\<br/>
+2.9195624 &amp;  3.16637301\\<br/>
+2.40244512 &amp;  2.60554026\\<br/>
+1.71639756&amp;   1.8614964 \\<br/>
+1.0077062 &amp;   1.0928945 \\<br/>
+1.48664139&amp;  1.61231737 \\<br/>
+0.95398582&amp;  1.03463277 \\<br/>
+\end{array} \right )<br/>
+\]</p>
+
+<p>和原始数据对比发现，压缩后的数据保留了大多数信息。</p>
+
+<h4 id="toc_6">矩阵的迹</h4>
+
+<p>在继续下面的PCA的最近重构解释小节之前，需要一些矩阵的迹的了解。在线性代数中，一个n*n的方阵A，主对角线上的各元素之和为矩阵的迹或者迹数，一般即为tr(A)。</p>
+
+<p>矩阵\(A=(a_1,a_2,...,a_i)\)的F范数与矩阵的迹的关系为\(||A||_F^2 = tr(AA^T)\)：<br/>
+\[<br/>
+||A||_F^2 = \sum_{i=1}^N \sum_{j=1}^N a_{ij}^2 \\<br/>
+(AA^T)_{ij} = A_i^TA_j = \sum{k=1}^N a_{ik}a_{jk} \\<br/>
+tr(AA^T) = \sum_{i=1}^N (AA^T)_{ii} = \sum_{i=1}^N \sum_{k=1}^N a_{ik}^2 = ||A||_F^2<br/>
+\]</p>
+
+<p>矩阵的迹满足几个性质：</p>
+
+<p>(1) \(tr(A+B) = tr(A)+tr(B)\)</p>
+
+<p>证明：<br/>
+\[<br/>
+\because\quad(A+B)_{ij} = A_{ij}+B_{ij} \\<br/>
+\therefore\quad tr(A+B) = \sum_i^N (A+B)_{ii} = \sum_{i=1}^N (A_{ii}+B_{ii}) = \sum_{i=1}^N A_{ii} + \sum_{j=1}^N B_{jj} = tr(A) + tr(B)<br/>
+\]</p>
+
+<p>(2) \(tr(AB) = tr(BA)\)</p>
+
+<p>证明：<br/>
+\[<br/>
+\begin{align*}<br/>
+\because \quad &amp;(AB)_{ij} = \sum_{k=1}^N a_{i,k}b_{k,j} \\<br/>
+&amp;(BA)_{ij} = \sum_{k=1}^N b_{i,k} a_{k,j} \\<br/>
+\therefore \quad &amp; tr(AB) = \sum_{i=1} (AB)_{ii} = \sum_{i=1}^N \sum_{k=1}^N a_{i,k} b_{k,i} =    tr(BA)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>(3) 由(2)知：\(tr(ABC)=tr(CAB) = tr(CBA)\)<br/>
+(4) 由转置的性质可知：\(tr(A) = tr(A^T)\)<br/>
+(5) \(\nabla_{A} tr(AB) = B^T \)<br/>
+(6) \(\nabla_{A} tr(ABA^TC) = CAB+C^T+AB^T \)<br/>
+使用链式求导证明：<br/>
+\[<br/>
+\nabla_A tr(ABA^TC) = (A^TC)^T\nabla_A tr(AB) + AB \nabla_A tr(A^TC) = C^TAB^T + C^TAB<br/>
+\]</p>
+
+<h4 id="toc_7">PCA的最近重构解释</h4>
+
+<p>假设数据集\(D=(x_1,x_2,...,x_m)\)，样本大小为m，原始数据为x_i为\(n\)维数据，再假定投影变换后得到的新坐标系为\((w_1,w_2,...,w_n)\)，正交向量有\(||w_i||=1,||w_iw_j||=0:j\neq i\)，若丢弃了部分新坐标系的坐标，即维度降低到\(k\)维（\(k&lt;m\)），那么\(x_i\)在低维坐标系中\(z_i=(z_{i1},z_{i2},...,z_{ik})\)，其中\(z_{ij}=w_j^Tx_i\)是\(x_i\)在低维坐标系第\(j\)维的坐标，若基于\(z_i\)来重构\(x_i\)，则\(\hat{x_i} = \sum_{j=1}^k z_{ij}w_j\)：</p>
+
+<p>我们希望在映射到新空间后保存最大信息，定义损失函数为：<br/>
+\[<br/>
+\begin{align*}<br/>
+\sum_{i=1}^m ||\hat {x_i}-x_i||_F^2 &amp;= \sum_{i=1}^m ||\sum_{j=1}^k z_{ij}w_j - x_i||_F^2 \\<br/>
+&amp;= \sum_{i=1}^m(\sum_{j=1}^k\sum_{l=1}^k z_{ij}w_jz_{il}w_l - 2\sum_{j=1}^k z_{ij}w_j x_i + x_i^2) \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>由\(w_i^2 = 1\)和\(w_iw_j=0\)可知：<br/>
+\[<br/>
+\begin{align*}<br/>
+\sum_{i=1}^m ||\hat {x_i}-x_i||_F^2 &amp;= \sum_{i=1}^m z^Tz - 2\sum_{i=1}^m z_i^TW^Tx_i + const<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>根据\(tr(AB)=tr(BA)\)以及\(z = W^Tx_i\)（关于矩阵的迹的性质不了解的可以，看文章最后），得：<br/>
+\[<br/>
+\begin{align*}<br/>
+\sum_{i=1}^m ||\hat {x_i}-x_i||_F^2 &amp;= -tr(W^T(\sum_{i=1}^m x_ix_i^T) W) + const \\<br/>
+&amp;= -tr(W^TXX^TW) + const<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>所以原始问题方程组为求解方程组的极大值：<br/>
+\[<br/>
+\begin{align*}<br/>
+min_{W}\quad&amp; -tr(W^TXX^TW) + const\\<br/>
+s.t. \quad&amp;WW^T = I \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>利用拉格朗日乘子法，引入拉格朗日乘子\(\alpha\)：<br/>
+\[<br/>
+L(W,\alpha) = -tr(W^TXX^TW) + const + \alpha(I-WW^T)<br/>
+\]</p>
+
+<p>那现在原始问题便变成了求解拉格朗日函数极大极小问题，先求\(L(W,\alpha)\)的最小值，让\(L(W,\alpha)\)对\(W\)求导得：<br/>
+\[<br/>
+\nabla_W L(W,\alpha) = X^TXW - \alpha W = 0 \\<br/>
+\Rightarrow X^TXW = \alpha W<br/>
+\]</p>
+
+<p>所以求得最优解时\(W\)为协方差矩阵\(X^TX\)的特征向量，特征值越大的特征向量所包含的信息越丰富。</p>
+
+<h4 id="toc_8">高维空间的PCA运算</h4>
+
+<p>在现实生活中，由于样本的高维特征，比如在图像处理中，图像的每一个像素都是一个维度。如果我们采用上面的PCA方法运算，先计算协方差，那么我们将会得到一个n*n的协方差矩阵，这个矩阵不论是计算还是存储都比较复杂，因此不可取。</p>
+
+<p>在高维特征中，假设有100个样本组成数据集\(X=(x_1,x_2,...,x_{100})\)，每一个样本的维度为10000维，那么协方差矩阵\(C=XX^T\)将是10000维的方阵，考虑一个替代的矩阵\(T=X^T\)代替协方差矩阵，，假设\(\lambda\)和\(P\)分别为协方差矩阵的特征值和特征向量，所以有：<br/>
+\[<br/>
+XX^TP = \lambda P \Leftrightarrow CP = \lambda P<br/>
+\]</p>
+
+<p>若\(\lambda^{new}\)和\(P^{new}\)为替代矩阵的特征值和特征向量：<br/>
+\[<br/>
+X^TXP^{new} = \lambda^{new} P^{new}<br/>
+\]</p>
+
+<p>两边同时左乘\(X\)，那么：<br/>
+\[<br/>
+XX^TXP^{new} = X\lambda^{new} P^{new} \Rightarrow XX^T(XP^{new}) = \lambda^{new}(XP^{new}) \\<br/>
+\Rightarrow C(XP^{new}) = \lambda (XP^{new})<br/>
+\]</p>
+
+<p>通过上式可以知道协方差矩阵的特征值等于替代矩阵的特征值，其特征向量等于替代矩阵的特征向量左乘上\(X\)，所以我们可以通过求解替代矩阵的特征值和特征向量来完成PCA操作。</p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E9%99%8D%E7%BB%B4.html'>降维</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15037711738928.html" 
+	        title="Previous Post: 奇异值分解 SVD">&laquo; 奇异值分解 SVD</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15029730205260.html" 
+	        title="Next Post: 不等式约束问题">不等式约束问题 &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

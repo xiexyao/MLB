@@ -1,0 +1,877 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  决策树 - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div class="blog-index">
+
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15145527362267.html">回归分类树-CART算法</a></h1>
+			<p class="meta"><time datetime="2017-12-29T21:05:36+08:00" 
+			pubdate data-updated="true">2017/12/29</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>CART算法的英文名称是 Classfication And Regression Tree，即可以用来创建分类树也可以用来创建回归树。通过 ID3 和 C4.5 算法得到的决策树不一定是二叉树，但是通过 CART 得到的决策树肯定是二叉树。CART 算法的生成也是分为三个部分：特征选择、决策树生成、决策树剪枝：</p>
+
+<ol>
+<li>特征选择：当 CART 是分类树的时候，以基尼指数选择最优特征，同时决定该特征的最优二值切分点。</li>
+<li>决策树生成：基于训练数据生成决策树，生成的树要求尽可能大</li>
+<li>决策树剪枝：用合适的方法对已经生成的树进行剪枝选择最优子树。</li>
+</ol>
+
+<p>首先我们来分别了解一下 CART 的分类树和回归树。</p>
+
+<h3 id="toc_0">特征选择</h3>
+
+<p>首先来了解一下特征选择所需要的基尼指数知识。</p>
+
+<h5 id="toc_1">基尼指数 Gini</h5>
+
+<p>基尼指数（基尼不纯度）表示在样本集合中一个随机选中的样本被分错的概率。Gini指数越小表示集合中被选中的样本被分错的概率越小，也就是说集合的纯度越高，反之，集合越不纯。所以基尼指数（基尼不纯度）= 样本被选中的概率 * 样本被分错的概率，定义 \(p_k\) 表示选中的样本属于k类别的概率，则这个样本被分错的概率是 \((1-p_k)\)：<br/>
+\[<br/>
+Gini(k) = \sum_{k=1}^K p_k (1-p_k) = \sum_{k=1}^K p_k - \sum_{k=1}^K p_k^2 = 1 - \sum_{k=1}^K p_k^2<br/>
+\]</p>
+
+<p>当二分类时，\(Gini(k) = 2p(1-p)\)。</p>
+
+<p>假设样本集合 D 有 K 个类别，类别 \(C_k\) 包含 \(|C_k|\) 个样本，他们被正确选中为类别 \(C_k\) 的概率为：<br/>
+\[<br/>
+p(k) = \frac{|C_k|}{|D|}<br/>
+\]</p>
+
+<p>所以基尼指数：<br/>
+\[<br/>
+Gini(k) = 1 - \sum_{k=1}^K p_k^2 = 1 - \sum_{k=1}^K (\frac{|C_k|}{|D|})^2<br/>
+\]</p>
+
+<p>基于特征 A 划分样本集合 D 后，集合被分为 \(D_1,D_2,...D_n\)，在 CART 算法中 \(n=2\)，此时基尼指数：<br/>
+\[<br/>
+Gini(D,A) = \sum_{D_i} \frac{|D_i|}{|D|} Gini(D_i)<br/>
+\]</p>
+
+<p>当拥有多个特征时，需要计算以每一个取值作为划分点，对样本D划分之后子集的纯度 \(Gini(D,Ai)\)，(其中Ai 表示特征A的可能取值)。然后从所有的可能划分的 \(Gini(D,Ai)\) 中找出Gini指数最小的划分，这个划分的划分点，便是使用特征 A 对样本集合 D 进行划分的最佳划分点。</p>
+
+<h3 id="toc_2">CART生成树</h3>
+
+<p>决策树的生成是递归生成二叉决策树的过程，对分类树用基尼指数最小化准则，对回归树采用平方误差最小化准则进行特征选择，生成二叉树。</p>
+
+<h4 id="toc_3">分类树生成算法</h4>
+
+<p><b>输入</b>：训练数据集离散数据集 D，停止计算的条件；<br/>
+<b>输出</b>：CART 决策树<br/>
+<b>算法过程</b>：<br/>
+（1）设结点的训练数据集为 D ，计算现有特征对该数据基的基尼指数。此时，对每一个特征 A，对其可能取的每个值 a，根据样本点对 A=a 的测试为“是”或“否” 将 D 分割成 \(D_1\) 和 \(D_2\) 两部分，利用 \(A=a\) 的基尼指数；<br/>
+（2）在所有可能的特征 A 以及它们所有可能的切分点 a 中，选择基尼指数最小的特征及其对应的切分点作为最优特征和最优切分点，依最优特征与最优切分点，从现结点生成两个子结点，将训练数据集依特征分配到两个子结点中去。<br/>
+（3）对两个子结点递归地调用（1）、（2），直至满足停止条件；<br/>
+（4）生成 CART 决策树；</p>
+
+<p>算法停止计算的条件是结点中的样本个数小于预定阈值，或样本集的基尼指数小于阈值阈值（样本基本属于同一类），活着没有更多特征。</p>
+
+<h5 id="toc_4">举例说明</h5>
+
+<p>比如在之前决策树的14天数据中，当 \(A_1\) = 天气特征时，有三种取值，分别是晴天、阴天、下雨，可能的划分情况有{{晴天}{阴天、下雨}}、{{晴天、阴天}{下雨}}、{{阴天}{晴天、下雨}}，分别计算每一种情况的基尼指数。<br/>
+\[<br/>
+Gini(D,A_1=阴天) = \frac 4 {14}* 2*1*0 + \frac{10}{14} *2 * \frac 5 {10} * \frac 5 {10} = 0.3571 \\<br/>
+Gini(D,A_1=下雨) = \frac 5 {14}* 2*\frac 3 5 * \frac 2 5 + \frac {9}{14} * 2* \frac{6}{9} *\frac{3}{9} = 0.4571 \\<br/>
+Gini(D,A_1=晴天) = \frac 5 {14}* 2*\frac 2 5 * \frac 3 5 + \frac 9 {14} * 2 * \frac 7 9  *\frac 2 9 = 0.3937<br/>
+\]</p>
+
+<p>再计算 \(A_2\) = 湿度特征时，有三种取值，求得每一种取值的基尼指数。。。依次类推，选择所有可能特征及其所有可能的切分点种，基尼指数最小的特征和切分点。将训练数据分到两个子结点中，再对子结点按照同样的方式选择最优特征和最优切分点。CART算法每次都是生成二叉树，在这个例子中某属性特征值为3个时，有3个可能的切分点。当特征值为4个时，如a、b、c、d，可能有{{a}{b,c,d}}、{{b}{a,c,d}}、{{c}{a,b,d}}、{{d}{a,b,c}}、{{a,b}{c,d}}、{{a,c}{b,d}}、{{a,d}{b,c}}这7种。同时，如果没有把特征 \(A\) 的取值完全分开，后面我们还有机会在子节点继续选择到特征 \(A\) 来划分子结点。这和ID3或者C4.5不同，在ID3或者C4.5的一棵子树中，离散特征只会参与一次节点的建立。</p>
+
+<h4 id="toc_5">回归树的生成</h4>
+
+<p><b>输入</b>：数据集 \(D={(x_1,y_1),(x_2,y_2),...(x_n,y_n)}\)<br/>
+<b>输出</b>：CART决策树<br/>
+<b>算法过程</b>：<br/>
+一个回归树对应着输入空间的（特征空间）一个划分以及在划分的单元的输出值。假设已将输入空间划分为M个单元 \(R_1,R_2,...,R_M\)，并且在每一个单元 \(R_M\) 上有一个固定的输出值 \(c_m\)，于是回归树模型可表示为：<br/>
+\[<br/>
+f(x) = \sum_{i=1}^M c_m I(x\in R_m)<br/>
+\]</p>
+
+<p>当输入空间的划分确定时，可以用平方误差 \(\sum_{x_i\in R_m}(y_i-f(x_i))^2\) 来表示回归树对于训练数据的预测误差，用平方误差最小的准则求解每一个单元上的最优输出值。易知，单元 \(R_m\) 上的 \(c_m\) 的最优值 \(\hat c_m\) 是 \(R_m\) 上所有的输入实例 \(x_i\) 对应的输出 \(y_i\) 的均值，即：<br/>
+\[<br/>
+\hat c_m = ave(y_i|x_i \in R_m)<br/>
+\]</p>
+
+<p>特征选择时选择第 \(j\) 个变量 \(x^{j}\) 和它的取值 \(s\) ，作为切分变量和切分点，并定义两个区域：<br/>
+\[<br/>
+R_1(j,s) = \{x|x^j \le s\} \quad\quad R_2(j,s) = \{x|x^j \gt s\}<br/>
+\]</p>
+
+<p>其中定义两个区域的 \(y_i\) 均值：<br/>
+\[<br/>
+c_1 = ave(y_i|x\in R_1(j,s) \qquad c_2 = ave(y_i|x\in R_2(j,s))<br/>
+\]</p>
+
+<p>然后在所有可能特征的最优切分点上寻找最优切分变量和最优切分点，具体地，求解：<br/>
+\[<br/>
+\min_{j,s} [\min_{c_1} \sum_{x_i\in R_1(j,s)} (y_i-c_1)^2 + \min_{c_2}\sum_{x_i \in R_2(j,s)}(y_i-c2)^2]<br/>
+\]</p>
+
+<p>遍历所有输入变量，找到最优的切分变量 \(j\)，构成一个对\((j,s)\)，依次将输入空间划分为两个区域，接着对每一个区域重复上述过程生成一棵回归树，这样的回归树通常被称为最小二乘回归树。</p>
+
+<h5 id="toc_6">举例说明</h5>
+
+<p>假设考虑如下只有一个属性 \(x\) 的数据集 D：</p>
+
+<table>
+<thead>
+<tr>
+<th>x</th>
+<th>1</th>
+<th style="text-align: left">2</th>
+<th style="text-align: left">3</th>
+<th style="text-align: left">4</th>
+<th style="text-align: left">5</th>
+<th style="text-align: left">6</th>
+<th style="text-align: left">7</th>
+<th style="text-align: left">8</th>
+<th style="text-align: left">9</th>
+<th style="text-align: left">10</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>y</td>
+<td>5.56</td>
+<td style="text-align: left">5.75</td>
+<td style="text-align: left">5.91</td>
+<td style="text-align: left">6.4</td>
+<td style="text-align: left">6.8</td>
+<td style="text-align: left">7.05</td>
+<td style="text-align: left">8.9</td>
+<td style="text-align: left">8.7</td>
+<td style="text-align: left">9</td>
+<td style="text-align: left">9.05</td>
+</tr>
+</tbody>
+</table>
+
+<p>这里我们不失一般性的考虑9个切分点：1.5 , 2.5 , 3.5 , 4.5 , 5.5 , 6.5 , 7.5 , 8.5 , 9.5 。因为数据集中只有一个属性 \(x\) ，选择属性 \(x\) 所有可能的切分点将数据集分成两部份。当 \(s=1.5\) 时：<br/>
+\[<br/>
+\begin{align*}<br/>
+R_1(j=x,s=1.5) &amp;= \{x|x \le 1.5\} = \{1\}\\<br/>
+R_2(j=x,s=1.5) &amp;= \{x|x \gt 1.5\} = \{2,3,4,5,6,7,8,9,10\} <br/>
+\end{align*}<br/>
+\]</p>
+
+<p>这个区域的输出值为对应区域所有对象 \(y\) 的均值：<br/>
+\[<br/>
+\begin{align*}<br/>
+c_1 &amp;= 5.56\\<br/>
+c_2 &amp;= ave(y_i|x \in R_2(j=x,s=1.5) = \frac 1 9(5.75 + 5.91 + 6.4 + 6.8 + 7.05 + 8.9 + 8.7 + 9 + 9.05 ) = 7.50<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>在两个区域上分别用  \(\sum_{x_i\in R_m}(y_i-f(x_i))^2\) 计算平方误差：<br/>
+\[<br/>
+\begin{align*}<br/>
+\text{Loss}(R_1) &amp;= 0\\<br/>
+\text{Loss}(R_2) &amp;= \sum_{x_i\in R_2}(y_i-f(x_i)) = (5.75-7.5)^2+(5.91-7.5)^2+(6.4-7.5)^2+(6.8-7.5)^2+(7.05-7.5)^2\\<br/>
+&amp;+(8.9-7.5)^2+(8.7-7.5)^2+(9-7.5)^2+(9.05-7.5)^2 = 15.545\\<br/>
+\text{Loss}(s=1.5) &amp;= \text{Loss}(R_1) + \text{Loss}(R_2) = 15.545<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>同理可以计算出 \(x\) 的其他分割点 \(s\) 的均方误差：\(\text{Loss}(s=2.5)=12.07\)...，如果有多个属性值，用同样的方式再求出其他属性值不同切分点的均方误差。从中选出最小的均方误差对应的属性值和切分点就是最优切分变量和最优切分点。</p>
+
+<h3 id="toc_7">CART剪枝</h3>
+
+<p>CART剪枝算法就是在完整的决策树上，剪掉一些子树，使决策树变小。对CART的剪枝可以通过代价复杂度算法（Cost-Complexity Pruning，CCP）来进行：</p>
+
+<p>在剪枝过程中，计算子树的损失函数：<br/>
+\[<br/>
+C_\alpha (T) = C(T) + \alpha|T|<br/>
+\]</p>
+
+<p>其中，\(T\) 为任意子树，\(C(T)\) 为训练数据的预测误差（后面讲具体计算过程），\(|T|\) 为子树的叶节点个数，\(\alpha \ge 0\) 为参数，正则化项。\(C_\alpha (T)\) 为参数是 \(\alpha\) 是子树 T 的整体损失，参数 \(\alpha\) 用来平衡训练数据的拟合程度和模型的复杂度。</p>
+
+<p>对于固定的 \(\alpha\) ，一定存在使损失函数 \(C_\alpha(T)\) 最小的子树，将其表示为 \(T_\alpha\)，当 \(|T|\) 越大时，模型复杂度越高，对训练数据的拟合越好，反之 \(|T|\) 越小时，模型复杂度越小，但是对训练数据的拟合也不好。当 \(\alpha\) 越大，越倾向于一个复杂度较小的树。当 \(\alpha=0\) 时，不考虑模型复杂度，未剪枝的决策树对训练数据效果最好。</p>
+
+<p>Breiman 等人证明：可以用递归的方法对树进行剪枝，将 \(\alpha\) 从小增大，\(0=\alpha_0&lt;\alpha_1&lt;\alpha_2&lt;...&lt;\alpha_n&lt;+\infty\)，产生一系列的区间 \([\alpha_i,\alpha_{i+1}]，i=0,1,...,n\)；剪枝得到的子树序列对应着区间 \(\alpha\in[\alpha_i,\alpha_{i+1}]，i=0,1,...,n\) 的最优子树序列 \(\{T_0,T_1,...,T_n]\)，序列中的子树是嵌套的。</p>
+
+<p>从整体树 \(T_0\) 开始剪枝，对 \(T_0\) 的任意内部结点 \(t\)，以 \(t\) 为单结点树的损失函数是：<br/>
+\[<br/>
+C_\alpha(t) = C(t) + \alpha<br/>
+\]</p>
+
+<blockquote>
+<p>其中：<br/>
+\[<br/>
+C(t) = p(t) r(t)<br/>
+\]</p>
+
+<p>这里 \(p(t)\) 表示结点在总样本中所占的比例，\(r(t)\) 表示该结点的误差代价（分错的结点的比例，结点中类比较多的实例为正确实例）。</p>
+</blockquote>
+
+<p>以 \(t\) 为根结点的子树 \(T_t\) 的损失函数为：<br/>
+\[<br/>
+C_\alpha(T_t) = C(T_t) + \alpha|T_t|<br/>
+\]</p>
+
+<blockquote>
+<p>其中：<br/>
+\[<br/>
+C(T_t) = \sum_i^m p(t_i)r(t_i) <br/>
+\]</p>
+
+<p>这里 \(p(t_i)\) 表示每一个叶结点在总样本中所占的比例，\(r(t)\) 表示该叶结点的误差代价。</p>
+</blockquote>
+
+<p>当 \(\alpha=0\) 及 \(\alpha\) 足够小时，有不等式<br/>
+\[<br/>
+\begin{equation}<br/>
+C_\alpha(T_t) &lt; C_\alpha(t) \label{ca}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>当 \(\alpha\) 增大时，在某一 \(\alpha\) 有：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;C_\alpha(T_t) = C_\alpha(t)\\<br/>
+&amp;\Rightarrow C(T_t) + \alpha|T_t| = C_\alpha(t)\\<br/>
+&amp;\Rightarrow \alpha = \frac{C_\alpha(t) - C_\alpha(T_t)}{|T_t|-1}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>当 \(\alpha\) 再增大时，不等式 \ref{ca} 反向。只要 \(\alpha=\frac{C(t)-C(T_t)}{|T_t|-1}\) ，\(T_t\) 与 \(t\) 有相同的损失函数值，而 \(t\) 的结点少，因此 \(t\) 比 \(T_t\) 更可取，对 \(T_t\) 进行剪枝。</p>
+
+<p>为此，对 \(T_0\) 中每一内部结点 \(t\)，计算：<br/>
+\[<br/>
+g(t) = \frac{C(t) - C(T_t)}{|T_t|-1}<br/>
+\]</p>
+
+<p>它表示剪枝后整体损失函数减少的程度。在 \(T_0\) 中剪去 \(g(t)\) 最小的 \(T_t\)，将得到的子树称为 \(T_1\)，同时将最小的 \(g(t)\) 设为 \(\alpha_i\)，\(T_i\) 为区间\([\alpha_i,\alpha_2)\) 的最优子树。</p>
+
+<p>如此剪枝下去，自下而上直至得到根结点。在这一过程中，不断地增加 \(\alpha\) 的值，产生新的区间。在剪枝得到的子树序列 \(T_0\),\(T_1\),...,\(T_n\) 中通过交叉验证选取最优子树 \(T_\alpha\)。在子树序列中，每棵子树 \(T_1\),\(T_2\),...,\(T_n\) 都对应于一个参数 \(\alpha_1\),\(\alpha_2\),...,\(\alpha_n\)。所以当最优子树 \(T_k\) 确定时，对应的 \(\alpha_k\) 也确定了，即得到最优决策树 \(T_\alpha\)。</p>
+
+<h5 id="toc_8">举例说明</h5>
+
+<p>如下这棵树：</p>
+
+<div align="center">
+    <img width="400" src="media/15145527362267/15325307805907.jpg" />
+</div>
+
+<p>一开始时 \(\alpha_0=0\) ，以结点 Node1 的损失函数为：<br/>
+\[<br/>
+C(t) = p(t)r(t) = \frac{18}{40}*\frac{8}{18} = \frac 1 5\\<br/>
+C(T_t) = \frac 3 {40} *\frac 1 3 +\frac 9 {40}*\frac 4 9  + \frac 6 {40} *\frac 1 6= \frac{6}{40}<br/>
+\]</p>
+
+<p>所以：<br/>
+\[<br/>
+g(t)=\frac{C(t)-C(T_t)}{|T_t|-1} = \frac{1}{2}*(\frac 1 5-\frac 6 {40}) = \frac{1}{40}<br/>
+\]</p>
+
+<p>以结点 Node2 的损失函数为：<br/>
+\[<br/>
+C(t) = p(t)r(t) = \frac{15}{40}*\frac{6}{15} = \frac 6 {40}\\<br/>
+C(T_t) = \frac 9 {40}*\frac 4 9  + \frac 6 {40} *\frac 1 6= \frac{5}{40}<br/>
+\]</p>
+
+<p>计算：<br/>
+\[<br/>
+g(t) =\frac{C(t)-C(T_t)}{|T_t|-1} = \frac 6 {40}-\frac 5 {40} = \frac{1}{40}<br/>
+\]</p>
+
+<p>所以这个g(t)相同，选择 \(|T_t|\) 最大的进行剪枝（在和训练集误差相等的情况下选择模型复杂度较低的决策树，所以剪掉 \(|T_t|\) 较大的枝。这里也就是选择 Node1 进行剪枝得到子树 \(T_1\)，同时将最小的 g(t) 设为 \(\alpha_1\) ，\(T_1\)  为区间 \([\alpha_1,\alpha_2)\) 的最优子树。</p>
+
+<p>继续剪枝，直到得到根结点为止，这个过程中不断增加 \(\alpha\) 的值产生新的区间。 </p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15092133657181.html">决策树 Decision Tree</a></h1>
+			<p class="meta"><time datetime="2017-10-29T01:56:05+08:00" 
+			pubdate data-updated="true">2017/10/29</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>决策树，英文名称是Decision Tree（简称DT）。DT是一种树形结构，它的每一个内部节点表示属性上的一次判断，每一个分支代表一种结果的输出，最后的每一个叶节点代表一种结果。决策树的决策过程需要从决策树的根节点开始，待测数据与决策树中的特征节点进行比较，并按照比较结果选择选择下一比较分支，直到叶子节点作为最终的决策结果。决策树在分类问题上可以看做if-then的集合，主要优点是模型具有很高的可读性和执行速度快。</p>
+
+<h3 id="toc_0">决策树学习</h3>
+
+<p>决策树学习是指利用训练数据通过最小化损失函数找到最佳分类特性和阈值，进而建立决策树。决策树的生成包括特征选择、决策树生成和决策树修剪这三个流程，后面会重点介绍这三个流程。决策树通常使用的损失函数是正则化的极大似然函数，当损失函数确定后，学习问题就变成在损失函数意义下选择最优决策树的问题。决策树的算法通常是一个递归选择最优特征，然后根据特征对数据集进行分类，得到子集，使各个子集在当前特征条件下是最好的分类。如果这个子集已经被正确分类，则停止。否则继续对这个子集选择新的最优特征，继续对其进行分割，如此递归下去直到所有的子集都被正确分类。决策树的剪枝是为了使树更加简单，减少对训练数据的拟合，使决策树能够适应更多未知问题。决策树可以认为是一种贪心算法，得到的解可能并不是最优解。</p>
+
+<h4 id="toc_1">特征选择</h4>
+
+<p>特征选择是决策树学习中最重要的步骤，直接决定着决策树的好坏。当一个特征进行分类的结果与随机分类的结果没有较大差别，那么我们认为这个特征是没有分类能力的，经验上来说可以扔掉这样的特征。特征选择是用来确定通过哪个特征来划分特征空间，特征选择的目的：使用某特征对数据集划分之后，各数据子集的纯度要比划分前的数据集的纯度高，这里划分后的纯度表示为各子集的纯度的带权和。通常有几个常见的评判标准：</p>
+
+<h5 id="toc_2">信息熵 Entropy</h5>
+
+<p>首先看一下信息熵的定义，信息熵表示一个信息所含有的信息量的大小，同时也说明一个信息的不确定度的大小。如果我们有一个六面都是1的骰子，不论怎么掷它，我们知道结果肯定是1，没有任何不确定度，所以信息熵为0。</p>
+
+<p>接下来从数学的角度，描述熵的定义：假设随机变量X的可能取值有\(x_1\)，\(x_2\)， ... , \(x_n\)，对于每一个可能的取值 \(x_i\)，其概率 \(P(X=x_i) = p_i , ( i = 1,2, ... , n)\)。随机变量X的信息熵：<br/>
+\[<br/>
+H(X) = -\sum_{i=1}^N p_i \log p_i<br/>
+\]</p>
+
+<p>这里的信息熵通常是以2为底数，具体计算中以什么为底数并没有什么影响，当以2为底数时，信息熵的单位为比特。底数不同时，单位不同，意义相同。在以下计算中，以e为底数来方便计算。而信息熵前面的负号是因为概率通常小于等于1，取对数后小于等于0，为使结果为非负数，所以加上负号。</p>
+
+<p>而对于一个数据集D，有 k 个类别，每一个类别用 \(\text{C}_k\) 表示，数量为 \(|\text{C}_k|\) ，则每一个类别的概率为 \(\frac{|\text{C}_k|}{|\text{D}|}\) ，样本集合D的经验熵：<br/>
+\[<br/>
+H(D) = -\sum_{k=1}^N \frac{|\text{C}_K|}{|D|} \log \frac{|\text{C}_K|}{|D|}<br/>
+\]</p>
+
+<p>这里举个例子：假设训练样本记录了一个人14天的天气、温度、湿度、风四个特征和是否出去玩的情况：<br/>
+\[<br/>
+\begin{array}{|c|c|c|c|c|}<br/>
+\hline<br/>
+日期&amp;天气&amp;温度&amp;湿度&amp;风&amp;是否出去玩\\\hline<br/>
+01  &amp;晴天&amp;高温&amp;高  &amp;弱&amp;否\\\hline<br/>
+02  &amp;晴天&amp;高温&amp;高  &amp;强&amp;否\\\hline<br/>
+03  &amp;阴天&amp;高温&amp;高  &amp;弱&amp;是\\\hline<br/>
+04  &amp;下雨&amp;中温&amp;高  &amp;弱&amp;是\\\hline<br/>
+05  &amp;下雨&amp;凉爽&amp;中  &amp;弱&amp;是\\\hline<br/>
+06  &amp;下雨&amp;凉爽&amp;中  &amp;强&amp;否\\\hline<br/>
+07  &amp;阴天&amp;凉爽&amp;中  &amp;强&amp;是\\\hline<br/>
+08  &amp;晴天&amp;中温&amp;高  &amp;弱&amp;否\\\hline<br/>
+09  &amp;晴天&amp;凉爽&amp;中  &amp;弱&amp;是\\\hline<br/>
+10  &amp;下雨&amp;中温&amp;中  &amp;弱&amp;是\\\hline<br/>
+11  &amp;晴天&amp;中温&amp;中  &amp;强&amp;是\\\hline<br/>
+12  &amp;阴天&amp;中温&amp;高  &amp;强&amp;是\\\hline<br/>
+13  &amp;阴天&amp;高温&amp;中  &amp;弱&amp;是\\\hline<br/>
+14  &amp;下雨&amp;中温&amp;高  &amp;强&amp;否\\<br/>
+\end{array}<br/>
+\]</p>
+
+<p>设是否出去玩为随机变量Y，则：<br/>
+\[<br/>
+P(Y=\text{是}) = \frac{9}{14}\\<br/>
+P(Y=\text{否}) = \frac{5}{14}\\<br/>
+\]</p>
+
+<p>所以：<br/>
+\[<br/>
+H(Y) = - P(Y=\text{是})\log P(Y=\text{是}) - P(Y=\text{否})\log P(Y=\text{否}) = -\frac{9}{14}\log \frac{9}{14} - \frac{5}{14}\log\frac{5}{14} = 0.6518<br/>
+\]</p>
+
+<h5 id="toc_3">代码示例</h5>
+
+<pre><code class="language-python">## 最后一行是标签
+def calculateEntropy(data):
+    count = len(data)
+    labelCounts = np.unique(data[:,-1],return_counts=True)[1]
+    entropy = 0
+    for labelCount in labelCounts:
+        entropy -= labelCount/count * math.log(labelCount/count)
+    return entropy
+</code></pre>
+
+<h5 id="toc_4">条件熵 Condition Entropy</h5>
+
+<p>条件熵表示在某个条件下的信息熵， \(P(Y|X)\) 则表示在 \(X\) 的条件下 \(Y\) 的信息熵：<br/>
+\[<br/>
+H(Y|X) = \sum_{x\in X} P(x) H(Y|X=x)<br/>
+\]</p>
+
+<p>在上个例子中若 \(X\) 表示湿度，使用 \(Y\) 表示是否出去玩，则：<br/>
+\[<br/>
+P(x=\text{高}) = \frac{7}{14} = \frac 1 2\\<br/>
+P(\text{Y=是}|x=\text{高}) = \frac{3}{7}\\<br/>
+P(\text{Y=否}|x=\text{高}) = \frac{4}{7}\\<br/>
+P(x=\text{中}) = \frac{7}{14} = \frac 1 2\\<br/>
+P(\text{Y=是}|x=\text{中}) = \frac 6 7\\<br/>
+P(\text{Y=否}|x=\text{中}) = \frac 1 7<br/>
+\]</p>
+
+<p>所以信息熵：<br/>
+\[<br/>
+\begin{align*}<br/>
+H(Y|x=\text{高}) &amp;= -P(\text{是}|x=\text{高}) \log P(\text{是}|x=\text{高}) - P(\text{否}|x=\text{高})\log P(\text{否}|x=\text{高}) \\<br/>
+&amp;= -\frac 3 7 \log(\frac 3 7) - \frac 4 7 \log(\frac 4 7) = 0.6829\\<br/>
+H(Y|x=\text{中}) &amp;= -P(\text{是}|x=\text{中}) \log P(\text{是}|x=\text{中}) - P(\text{否}|x=\text{中})\log P(\text{否}|x=\text{中}) \\<br/>
+&amp;= -\frac 6 7 \log(\frac 6 7) - \frac 1 7 \log(\frac 1 7) = 0.41<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>条件熵为：<br/>
+\[<br/>
+\begin{align*}<br/>
+H(Y|X) &amp;= P(x=\text{高})H(Y|x=\text{高})+P(x=\text{中})H(Y|x=\text{中})\\<br/>
+&amp;= \frac 1 2 \times 0.6829 + \frac 1 2 \times 0.41 = 0.5465<br/>
+\end{align*}<br/>
+\]</p>
+
+<h5 id="toc_5">代码示例</h5>
+
+<pre><code class="language-python"># 以data的第i行为条件，data的最后一行为标签
+def calculateConditionEntropy(data,k):
+    entropy = 0
+    count = len(data)
+    labelLabels, labelCounts = np.unique(data[:,k],return_counts=True)
+    for i in range(len(labelLabels)):
+        entropy += labelCounts[i]/count * calculateEntropy(data[data[:,k] == labelLabels[i]])
+    return entropy
+</code></pre>
+
+<h5 id="toc_6">信息增益 Information Gain</h5>
+
+<p>信息增益是指以某特征划分数据集前后熵的差值，我们认为在数据集划分前熵的值已经是确定的，而划分后，如果得到的熵越小，也就是各子集的混乱度越小，纯度越高。因此在选择特征的时候，选择使划分后熵最小的特征，这一点有点类似于梯度下降法，通常会选择梯度最大的方向。定义信息增益为Y的信息熵减去在特征X下的条件熵，即：<br/>
+\[<br/>
+IG(X) = H(Y) - H(Y|X)<br/>
+\]</p>
+
+<p>所以上例子中，\(IG(X) = 0.6518-0.5465 = 0.1053\) ，用相同的方式我们可以求出其他特征的信息增益。</p>
+
+<p>优点：容易理解，计算简单。<br/>
+缺点： <br/>
+1.信息增益考察的是特征对整个系统的贡献（所有类别使用相同的特征集合），没有到具体的类别上，所以一般只能用来做全局的特征选择，而没法针对单个类别做特征选择（每一个类别有自己的特征集合）。 <br/>
+2.只能处理连续型的属性值，没法处理连续值的特征。 <br/>
+3.算法天生偏向选择分支多的属性，容易导致overfitting。</p>
+
+<h5 id="toc_7">信息增益比 Infomation Gain Ratio</h5>
+
+<p>在上面提到信息增益天生偏向选择分支多的属性，举个极端的例子：刚才的例子中，如果选择的特征是第一列日期，那么每一天都会被分到一个单独的类中，此时一个类也只有一条记录，此时子集信息熵会变成0，但是这并不是我们希望得到的。为了解决这个问题，自然想到的就是给分支多的特征加以惩罚，定义惩罚系数 \(\text{pub}\) 。于是便有了信息增益比：<br/>
+\[<br/>
+IGR(X) = \text{pub}\cdot IG(X)<br/>
+\]</p>
+
+<p>其中惩罚系数定义为 \(\text{pub}\)：<br/>
+\[<br/>
+\text{pub} = \frac{1}{\text{IntI}(X)}<br/>
+\]</p>
+
+<p>这里的 \(\text{IntI}(X)\) 定义为属性 X 的固有信息（Intrinsic Information of an Attribute），还记得我们在前面信息熵小节里说过数据集D有k个类别 \(C_1,C_2,...,C_k\)，样本集合D的经验熵的计算，这个固有信息便可以理解为这里的经验熵：<br/>
+\[<br/>
+H(D) = -\sum_{k=1}^N \frac{|\text{C}_K|}{|D|} \log \frac{|\text{C}_K|}{|D|}<br/>
+\]</p>
+
+<p>所以代入这里，便是：<br/>
+\[<br/>
+\text{pub} = \frac{1}{H(X)} = \frac{1}{-\sum_{k=1}^N \frac{|\text{C}_K|}{|X|} \log \frac{|\text{C}_K|}{|X|}}\\<br/>
+\] </p>
+
+<p>当我们使用信息增益比时会更加偏向于选择分支较少的特征，为了解决这个问题，一个做法是先通过信息增益过滤掉小于平均增益的特征，然后对剩余特征比较信息增益比，使用信息增益比最大的特征进行分类。</p>
+
+<h4 id="toc_8">决策树的生成</h4>
+
+<p>以下就 ID3算法、C4.5算法、CART算法了解决策树的生成：</p>
+
+<h5 id="toc_9">ID3 算法</h5>
+
+<p>ID3决策树的英文名称是 Iterative Dichotomiser 3，即迭代二叉树3代，它在决策树各节点特征选择上使用信息增益准则，递归选择决策树。从根结点开始，对结点计算所有可能特征的信息增益，选择信息增益最大的特征作为结点的特征，由该特征划分形成子结点；再对子结点递归地调用以上方法，构建决策树；直到所有特征的信息增益均很小或没有可以选择的特征为止，最后得到一个决策树。</p>
+
+<p><b>输入</b>：训练数据集D，特征集A，阈值 \(\epsilon\)<br/>
+<b>输出</b>：决策树T<br/>
+<b>算法过程</b>：<br/>
+（1）若 D 中所有实例都属于同一类别 \(C_k\)，则 T 为单结点树，并将 \(C_k\) 做为该结点的类标记，返回 T；<br/>
+（2）若 A=\(\varnothing\)，则T为单结点树，将 D 中数量最大的类别 \(C_k\) 作为该结点的类标记；<br/>
+（3）计算 A 中的各特征对数据 D 的信息增益，选择信息增益最大的特征 \(A_z\)；<br/>
+（4）如果 \(A_z\) 的信息增益小于阈值 \(\epsilon\) ，则置 T 为单结点树，并将 D 中数量最大的类别 \(C_k\) 作为该结点的类标记，返回 T；<br/>
+（5）否则，对 \(A_z\) 的每一个可能去值 \(a_i\) ，将 D 分给成若干个非空子集 \(D_i\)，将 \(D_i\) 中实例树最大的类作为标记，构建子节点，由结点及其子结点构成树 T，返回 T；<br/>
+（6）对第 i 个子结点，以 \(D_i\) 为训练集，以 \(A-A_z\) 为特征集，递归地调用（1）～（5）步，得到子树 \(T_i\)，返回 \(T_i\)。</p>
+
+<h5 id="toc_10">代码示例</h5>
+
+<p>代码每次创建子树都会删除已经划分的特征，可以优化一下。</p>
+
+<pre><code class="language-python">import os
+import numpy as np
+import math
+
+class Cluster():
+    def __init__(self, label=&quot;&quot;, feature=&quot;&quot;):
+        self.label = label
+        self.feature= feature
+        self.children = []
+        self.data = []
+
+    def addData(self, data):
+        self.data.extend(data)
+
+def loadData():
+    fileName = &quot;14day.txt&quot;
+    if not os.path.exists(fileName):
+        print(&quot;Data File Not Exists&quot;)
+        return
+    feature = []
+    data  = []
+    with open(fileName) as fOpen:
+        for index,line in enumerate(fOpen.readlines()):
+            if index == 0:
+                feature = line.strip().split(&quot; &quot;)
+            else:
+                data.append(line.strip().split(&quot; &quot;))
+    return feature,data
+
+def calculateEntropy(data):
+    count = len(data)
+    labelCounts = np.unique(data[:,-1],return_counts=True)[1]
+    entropy = 0
+    for labelCount in labelCounts:
+        entropy -= labelCount/count * math.log(labelCount/count)
+    return entropy
+
+def calculateConditionEntropy(data,k):
+    entropy = 0
+    count = len(data)
+    labelLabels, labelCounts = np.unique(data[:,k],return_counts=True)
+    for i in range(len(labelLabels)):
+        entropy += labelCounts[i]/count * calculateEntropy(data[data[:,k] == labelLabels[i]])
+    return entropy
+
+def createTree(feature, data):
+    data = np.array(data)
+    if len(set(data[:,-1])) == 1:
+        cluster = Cluster(data[-1,-1])
+        cluster.addData(data)
+        return cluster
+    if len(feature) == 0:
+        tempLabel,tempCount = np.unique(data[:,-1],return_counts=True)
+        maxLabel = tempLabel[np.argmax(tempCount)]
+        cluster = Cluster(maxLabel)
+        cluster.addData(data)
+        return cluster
+
+    # 计算当前信息熵
+    # entropyBefore = calculateEntropy(data)
+    minEntropy = math.inf
+    minIdex = -1
+    for i in range(len(feature)-1):
+        entropy = calculateConditionEntropy(data,i)
+        if entropy &lt; minEntropy:
+            minEntropy = entropy
+            minIdex = i
+    print(&quot;划分:&quot;+feature[minIdex])
+    cluster = Cluster(feature=feature[minIdex])
+    newFeature = list(np.delete(feature,minIdex))
+    newLabel = set(data[:,minIdex])
+    for label in newLabel:
+        newData = np.delete(data[data[:,minIdex]==label],minIdex,axis=1)
+        newCluster = createTree(newFeature,newData)
+        cluster.children.append(newCluster)
+    return cluster
+
+if __name__ == &quot;__main__&quot;:
+    feature, data = loadData()
+    root = createTree(feature, data)
+    print(feature)
+</code></pre>
+
+<h4 id="toc_11">C4.5算法</h4>
+
+<p>C4.5算法与ID3算法类似，不同的是在树的生成过程中，使用信息增益率来进行选择特征。</p>
+
+<p><b>输入</b>：训练数据集 D，特征集 A ，阈值 \(\epsilon\)<br/>
+<b>输出</b>：决策树 T<br/>
+<b>算法过程</b>：<br/>
+（1）若 D 中所有实例都属于同一类别 \(C_k\)，则 T 为单结点树，并将 \(C_k\) 做为该结点的类标记，返回T；<br/>
+（2）若 A=\(\varnothing\) ，则 T 为单结点树，将 D 中数量最大的类别 \(C_k\) 作为该结点的类标记；<br/>
+（3）计算 A 中的各特征对数据D的信息增益率，选择信息增益率最大的特征 \(A_z\)；<br/>
+（4）如果 \(A_z\) 的信息增益率小于阈值 \(\epsilon\) ，则置T为单结点树，并将 D 中数量最大的类别 \(C_k\) 作为该结点的类标记，返回 T；<br/>
+（5）否则，对 \(A_z\) 的每一个可能去值 \(a_i\) ，将 D 分给成若干个非空子集 \(D_i\)，将 \(D_i\) 中实例树最大的类作为标记，构建子节点，由结点及其子结点构成树 T，返回 T；<br/>
+（6）对第 i 个子结点，以 \(D_i\)为训练集，以 \(A-A_z\) 为特征集，递归地调用（1）～（5）步，得到子树 \(T_i\)，返回 \(T_i\)。</p>
+
+<h4 id="toc_12">决策树剪枝</h4>
+
+<p>在决策树的学习中，我们知道层数越多，叶结点越复杂，分类效果越好，越容易产生过拟合，对测试集的效果也会受影响。在决策树学习中将已生成的树进行简化的过程称为剪枝，具体地，剪枝从已生成的树上裁掉一些子树或叶节点，并将其根结点和父结点作为新的叶结点，从而简化分类树模型。</p>
+
+<p>通常有两个剪枝方法，预剪枝和后剪枝：</p>
+
+<h5 id="toc_13">预剪枝</h5>
+
+<p>在决策树的生成过程中进行剪枝，常见的有以下几种方式：</p>
+
+<ol>
+<li>设置树的高度阈值，当树的高度超过阈值时停止生长。</li>
+<li>设置叶结点的最小实例个数，当叶节点的实例树小于阈值时停止生长，不足之处是不能处理那些数据量比较小的特殊情况。</li>
+<li>设置经验熵阈值，当叶节点的经验熵小于阈值时停止生长。</li>
+<li>设置性能增益阈值，当每次扩展对系统性能的增益小于阈值就可以让它停止生长。</li>
+</ol>
+
+<h5 id="toc_14">后剪枝</h5>
+
+<p>设树的叶节点的数量为 \(|T|\)，叶节点 \(t\) 有 \(N_t\) 个样本点，其中 k 类样本点有 \(N_{tk}\) 个，\(k=1,2,...,K\)，定义 \(H(t)\) 为叶节点 \(t\) 的经验熵：<br/>
+\[<br/>
+H_t(T) = \sum_k^K \frac{N_{tk}}{N_t} \log \frac{N_{tk}}{N_t}<br/>
+\]</p>
+
+<p>经验熵反应一个叶结点的分类的混乱程度，经验熵越大，说明该叶结点所对应的分类结果越混乱，也就是说分类结果中包含了较多的类别，表明该分支的分类效果较差。</p>
+
+<p>定义该决策树的损失函数 \(C_\alpha(T)\)为：<br/>
+\[<br/>
+C_\alpha(T) = \sum_t^{|T|} N_t H_t(T)<br/>
+\]</p>
+
+<p>损失函数实际熵是求经验熵的权重，给每一个经验熵一个权重 \(N_t\)。</p>
+
+<p>为了防止过拟合添加 L1 正则化项，修正后的损失函数为：<br/>
+\[<br/>
+C_\alpha(T) = \sum_t^{|T|} N_t H_t(T) + \alpha |T|<br/>
+\]</p>
+
+<p>添加L1正则化项是为了防止过度拟合，在决策树中要追求损失函数和模型复杂度的平衡。当 \(|T|\) 越大时，模型复杂度越高，对训练数据的拟合越好，反之 \(|T|\) 越小时，模型复杂度越小，但是对训练数据的拟合也不好。当 \(\alpha\) 越大，越倾向于一个复杂度较小的树。当 \(\alpha=0\) 时，不考虑模型复杂度，未剪枝的决策树对训练数据效果最好。</p>
+
+<ol>
+<li>计算每一个结点的经验熵</li>
+<li>递归地从树的叶节点向子结点收缩，设一组叶节点回缩到其父结点之前和之后的整体树为 \(T_{b}\) 和 \(T_{a}\) ，计算损失函数得 \(C_\alpha(T_{b})\) 和 \(C_\alpha(T_{a})\)，当 \(C_\alpha(T_a) \le C_\alpha(T_b)\) 时则进行剪枝，将父结点变成新的叶结点。</li>
+<li>重复2，直到不能剪枝为止。</li>
+</ol>
+
+<p>决策树的剪枝算法可以由一种动态规划的算法实现。</p>
+
+<hr/>
+
+<p><a href="https://blog.csdn.net/bird_fly_i/article/details/72824639">决策树剪枝算法原理</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+  
+	<div class="pagination">
+	
+<a href="archives.html">Blog Archives</a>
+	 
+	    
+	</div>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

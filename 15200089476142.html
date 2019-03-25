@@ -1,0 +1,367 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  正态分布的累积分布函数 Cumulative distribution function of Normal distribution - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">正态分布的累积分布函数 Cumulative distribution function of Normal distribution</h1>
+				<p class="meta"><time datetime="2018-03-03T00:42:27+08:00" pubdate data-updated="true">2018/3/3</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>标准正态分布（均值为0，方差为1）<br/>
+\[<br/>
+\mathcal N(0,1) = \frac 1 {\sqrt{2\pi}} \exp(-\frac{x^2}{2})<br/>
+\]</p>
+
+<p>的累积分布函数常用大写希腊字母 \(\Phi\) 表示：<br/>
+\[<br/>
+\Phi(x) = P(X \le x) = \frac 1 {\sqrt{2\pi}} \int^x_{-\infty}\exp(-\frac{t^2}{2}) \mathbb dt<br/>
+\]</p>
+
+<p>这个积分不能使用基础函数表示，被认为是一个特殊函数。我们先来看另一个定义误差函数。</p>
+
+<h3 id="toc_0">误差函数</h3>
+
+<p>在数学中，误差函数（经常被称为高斯误差函数）是一个特殊函数（非基础），它是 sigmoid 形状，常出现在概率学、统计学中。定义为：<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbf{Erf}(x) &amp;= \frac{1}{\sqrt{\pi}} \int_{-x}^x \exp(-{t^2}) \mathbb dt\\<br/>
+&amp;= \frac{2}{\sqrt{\pi}} \int_0^x \exp(-{t^2}) \mathbb dt\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>在统计学中，对于非负 \(x\) ，误差函数的解释是：对于通常分布在均值为 0，方差为 \(\frac 1 2\) 的随机变量 \(Y\)，\(\mathbf{Erf}(x)\) 描述为 \(Y\) 落在范围 \([-x,x]\) 之间的概率，所以：<br/>
+\[<br/>
+\mathbf{Erf}(x) = \int_{-x}^{x} \frac{1}{\sqrt{2\pi}\cdot \sqrt{1/2}} \exp(-\frac{t^2}{2\cdot \frac 1 2}) \mathbb dt= \frac{1}{\sqrt{\pi}} \int_{-x}^x \exp(-{t^2}) \mathbb dt<br/>
+\]</p>
+
+<h3 id="toc_1">累积分布函数与误差函数</h3>
+
+<p>比较正态分布的累积分布函数与误差函数，可以发现非常相像<br/>
+\[<br/>
+\begin{align}<br/>
+\Phi(x) &amp;= P(X \le x) = \frac 1 {\sqrt{2\pi}} \int^x_{-\infty}\exp(-\frac{t^2}{2}) \mathbb dt\label{px}\\<br/>
+\mathbf{Erf}(x) &amp;= \frac{2}{\sqrt{\pi}} \int_{0}^x \exp(-{t^2}) \mathbb dt\label{erfx}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>对于误差函数 \(\mathbf{Erf}(x)\)，令 \(t^2 = {s^2}/{2}\)，也就是 \(t = {s}/{\sqrt{2}}\)（ \(t\) 是非负数），由此 \(\mathbb dt = \mathbb d({s}/{\sqrt{2}})\)，令 \(t=0\) 和 \(t=x\) 得 \(s=0\) 和 \(s = \sqrt{2}x\)，代入 \ref{erfx} 式可得：<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbf{Erf}(x) &amp;= \frac{2}{\sqrt{\pi}} \int_{0}^{\sqrt{2}x} \exp(-\frac{s^2}{2}) \mathbb d(s/\sqrt{2})\\<br/>
+&amp;= \frac{2}{\sqrt{\pi}} \int_{0}^{\sqrt{2}x} \frac{1}{\sqrt{2}} \exp(-\frac{s^2}{2}) \mathbb ds\\<br/>
+&amp;= \frac{2}{\sqrt{2\pi}} \int_{0}^{\sqrt{2}x}\exp(-\frac{t^2}{2}) \mathbb dt\\<br/>
+&amp;= 2\bigg(\frac{1}{\sqrt{2\pi}} \int_{0}^{\sqrt{2}x}\exp(-\frac{t^2}{2}) \mathbb dt \bigg)\\<br/>
+&amp;= 2\bigg(\frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\sqrt{2}x}\exp(-\frac{t^2}{2}) \mathbb dt  - \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{0}\exp(-\frac{t^2}{2}) \mathbb dt\bigg)\\<br/>
+&amp;= 2\bigg(\Phi(\sqrt{2}x)- \Phi(0)\bigg)\\<br/>
+&amp;= 2\bigg(\Phi(\sqrt{2}x)- \frac 1 2\bigg)\\<br/>
+&amp;= 2\Phi(\sqrt{2}x) - 1<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>现在很容易用误差函数来表示高斯分布的CDF：<br/>
+\[<br/>
+\Phi(\sqrt{2}x) = \frac 1 2 \bigg[{ \mathbf{Erf}(x) + 1}\bigg]\\<br/>
+\Rightarrow \Phi(x) = \frac 12 \bigg[{\mathbf{Erf}\bigg(\frac{x}{\sqrt{2}}\bigg) + 1}\bigg]<br/>
+\]</p>
+
+<p>对于一般均值为 \(\mu\)，方差为 \(\sigma\) 的正态分布 \(f(x)\)，其 CDF 为：<br/>
+\[<br/>
+{\displaystyle F(x)=\Phi \left({\frac {x-\mu }{\sigma }}\right)={\frac {1}{2}}\left[1+\mathbf {Erf} \left({\frac {x-\mu }{\sigma {\sqrt {2}}}}\right)\right]}<br/>
+\] </p>
+
+<p>那现在我们可以绘制出<font color="#006400"> <strong>正态分布</strong> </font>和对应的 <font color="#cc0000"><strong>CDF</strong></font> 图像：</p>
+
+<div align="center">
+    <img src="media/15200089476142/15350352677388.jpg" width="240" />
+</div>
+
+<p>高斯分布的 CDF 函数的反函数被称为反误差函数，为：<br/>
+\[<br/>
+\Phi^{-1}(p)=\sqrt2\;\mathbf{Erf}^{-1} \left(2p - 1 \right). \quad p \in (0,1)<br/>
+\]</p>
+
+<p>该分位数函数有时也被称为probit函数。probit函数已被证明没有初等原函数。</p>
+
+<hr/>
+
+<p><a href="https://en.wikipedia.org/wiki/Error_function">Error Function</a><br/>
+<a href="https://en.wikipedia.org/wiki/Normal_distribution">Normal Distribution</a></p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html'>数学基础</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15205961685497.html" 
+	        title="Previous Post: 隐马尔可夫模型 Hidden Markov Model">&laquo; 隐马尔可夫模型 Hidden Markov Model</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15199171411644.html" 
+	        title="Next Post: GeoGebra 中英文指令对照表">GeoGebra 中英文指令对照表 &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

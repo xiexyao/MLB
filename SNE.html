@@ -1,0 +1,727 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  SNE - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div class="blog-index">
+
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15042890159558.html">随机领域嵌入算法 SNE</a></h1>
+			<p class="meta"><time datetime="2017-09-02T02:03:35+08:00" 
+			pubdate data-updated="true">2017/9/2</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>SNE算法，英文全称是stochastic neighbor embedding，它是将高维向量或成对的不相似度描述的对象“嵌入（Embed）”到低维空间中，并保持对象邻居间的特性。SNE将高维或低维空间的点都看做高斯分布，在这个高斯分布下的密度，用来定义对象所有潜在邻居点的概率分布。SNE属于一种流行学习的降维方法，首先我们介绍一下流行学习。</p>
+
+<h3 id="toc_0">前置知识</h3>
+
+<h4 id="toc_1">流形学习</h4>
+
+<p>关于“流形”两个字一直不好理解，如果按照字面意思翻译，那么“manifold”翻译成“多样体”的意思。看到一篇论文上说到，中国第一个拓扑学家江泽涵（北大老教授）把这个词翻译为 “流形”，取自文天祥《正气歌》，“天地有正气，杂然赋流形”，而其原始出处为《易经》，“大哉乾元，万物资始，乃统天。云行雨施，品物流形。” 这个翻 译比英文翻译更加符合黎曼的原意，即多样化的形体。黎曼定义的“n 维流形”大概是这个样子的：以其中一个点为基准，则周围每个点的位置都可以用 n 个实数来确定，比如圆形如果用极坐标表示以圆心作为基点，那么只需要一个实数（坐标）就可以确定，所以称圆形为一维流形，再比如如果是一个圆球，假设为地球，那么如果以某个点为基点，作经纬线，那么只需要两个个实数（经度值、纬度值）便能确定其他点，可以称圆球为二维流形。</p>
+
+<p>在流形空间里，存在一些性质：（1）流形空间中，过任意两点都不存在平行线，即任意两线都会相交，这个性质很容易在球面上看出来，球面上任意两线都会相交。（2）流形空间里，三角形的内角和不一定等于180度，也容易在一个球面上看出来。（3）总有一点是风平浪静的，如果放到一维流形中便是极坐标远点，如果在二维流形中便是极点了。</p>
+
+<p>那么什么样的空间是流形空间呢？一个直观的感受是在空间内任意一个足够小的区域内，可以近似为欧式空间，这样的空间就是流形空间。比如圆球上任意一个足够小的区域，都可以看做欧式空间，可以找到平行线，三角形内角和为180度，所以认为圆球是流形空间。而假设圆球上竖起了一个直杆，假设直杆可以看做一条线，那么它将不能被看做是一个流形空间了，因为考虑到这个直杆所在的微小区域无法描述为欧式空间。</p>
+
+<p>流形学习的英文名称叫做manifold Learning，是机器学习、模式识别中的一种方法，其主要思想是把一个高维的数据非线性映射到低维，该低维数据能够反映高维数据的本质，当然有一个前提假设就是高维观察数据存在流形结构，其优点是非参数，非线性，求解过程简单。</p>
+
+<p>总体上来说这里关于流形的介绍不够严谨科学，仅是作为我对流形的初步理解，推荐几篇比较好的文章：<a href="http://blog.pluskid.org/?p=533">浅谈流形学习</a>，<a href="http://www.cad.zju.edu.cn/reports/%C1%F7%D0%CE%D1%A7%CF%B0.pdf">浙大流形学习PPT</a></p>
+
+<h3 id="toc_2">SNE基本原理</h3>
+
+<p>SNE是由Geoffrey Hinton 和 Sam Roweis在2012年提出的算法，原始论文看<a href="https://www.cs.toronto.edu/%7Ehinton/absps/sne.pdf">这里</a>，论文提出了用邻居点概率分布的方式来将高维空间点映射到低维空间。</p>
+
+<h4 id="toc_3">SNE原理推导</h4>
+
+<p>对于每一个对象 \(i\) ，和它潜在的邻居点 \(j\) ,我们来计算它们之间的非对称概率 \(p_{j|i}\) ，即 \(i\) 选择 \(j\) 作为邻居的概率：<br/>
+\[<br/>
+p_{j|i} = \frac{\exp(-{d_{i|j}}^2)}{\sum_{k\neq i}\exp(-{d_{i,k}}^2)}<br/>
+\]<br/>
+其中不相似度\({d_{i|j}}^2\)可以是问题定义时给定的（不需要是对称的）也可以能是两个高维点 \(x_i\) 和 \(x_j\) 通过缩放的平方欧几里得距离计算得到的：<br/>
+\[<br/>
+{d_{j|i}}^2 = \frac{||x_i - x_j||^2}{2\sigma_i^2}<br/>
+\]<br/>
+这里的 \(\sigma_i\) 可以手动设置或者（在我们的经验里）通过二分搜索法找到使邻居分布的熵等于 \(\log(k)\) 的 \(\sigma_i\)值，其中这里 \(k\) 是附近有效邻居点个数或者我们手动设置的困惑度（perplexity）。原文中的这段话比较拗口，简单来说就是我们可以先手动选取一个困惑度（proplexity）通常选取的依据是点 \(i\) 附近有效邻居点的个数，SNE对困惑度的调整比较有鲁棒性，通常选择5-50之间，假设这个值为 \(k\) 。由概率分布中困惑度通常写作：<br/>
+\[<br/>
+\text{Perplexity}(P_i) = b^{H(P_i)}<br/>
+\]<br/>
+通常这里的b取2，其中\(H(P_i)\)表示 \(P_i\)的熵：<br/>
+\[<br/>
+H(P_i) = -\sum_j p_{j|i}\log_2(p_{j|i})<br/>
+\]<br/>
+所以可得\(\log_2(\text{Perplexity}(P_i))\) 等于 \(P_i\)的熵，即 \(\log_2(k) = H(P_i)\)，而我们需要做的就是通过二分法找到合适的 \(\sigma_i\) 使这个等式成立。</p>
+
+<p>而在低维空间中我们也用高斯邻居，但是使用一个固定的方差（这里我们不失一般性的设置为 \(\sigma_i^2=\frac{1}{2}\) ），因此低维空间点 \(i\) 选择点 \(j\) 作为它的邻居的概率 \(q_{i|j}\) 是关于低维图像中对象 \(y_i\) 的函数，通过下面的表达式给出：<br/>
+\[<br/>
+\begin{equation}<br/>
+q_{j|i} = \frac{\exp(-||y_i - y_j||^2)}{\sum_{k\neq i}\exp(-||y_i - y_k||^2)} \\\label{q_j_i}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>嵌入的目的是使这两个分布尽可能的匹配。我们可以用最小化原始概率 \(p_{ij}\) 和归纳概率 \(q_{ij}\) 之间的KL散度（Kullback-Leibler divergences）之和作为损失函数，并通过最小化这个损失函数来达到目的：<br/>
+\[<br/>
+C = \sum_i \sum_j p_{j|i}\log\frac{p_{j|i}}{q_{j|i}} = \sum_{i} KL(P_i || Q_i)<br/>
+\]</p>
+
+<p>这里 \(y\) 空间（即降维后空间）的维度也是手动选择的（远小于对象的个数），由于KL散度具有不对称性,在低维映射中不同的距离对应的惩罚权重是不同的，直观上来看SNE强调局部距离，它的损失函数倾向使对象附近的图像靠近，使对象分离的图像相对较远。具体来说：距离较远的两个点来表达距离较近的两个点会产生更大的cost，相反，用较近的两个点来表达较远的两个点产生的cost相对较小。</p>
+
+<p>代价函数C对 \(y_i\) 求导可得：<br/>
+\[<br/>
+\frac{\partial C}{\partial y_i} = \sum_j 2(y_i-y_j)(p_{i|j} - q_{i|j} + p_{j|i} -q_{j|i} )<br/>
+\]<br/>
+具体推导过程如下：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial C}{\partial y_i} &amp;= \frac{\partial \sum_i \sum_j p_{j|i} \log(p_{j|i}/q_{j|i})}{\partial q_{j|i}} \cdot \frac{\partial q_{j|i}}{\partial y_i} \\<br/>
+&amp;= -\sum_i\sum_j \frac{p_{j|i}}{q_{j|i}} \frac{\partial q_{j|i}}{\partial y_i}\\<br/>
+&amp;= -\sum_m\sum_n \frac{p_{n|m}}{q_{n|m}} \frac{\partial q_{n|m}}{\partial y_i}\\<br/>
+&amp;= -\sum_{m\neq i}\sum_{n\neq i} \frac{p_{n|m}}{q_{n|m}} \frac{\partial q_{n|m}}{\partial y_i}-\sum_{m\neq i}\sum_{n=i} \frac{p_{i|m}}{q_{i|m}} \frac{\partial q_{i|m}}{\partial y_i}<br/>
+-\sum_{m=i}\sum_{n\neq i} \frac{p_{n|i}}{q_{n|i}} \frac{\partial q_{n|i}}{\partial y_i}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>先看第一项：<br/>
+\[<br/>
+\begin{align*}<br/>
+-\sum_{m\neq i}\sum_{n\neq i} \frac{p_{n|m}}{q_{n|m}} \frac{\partial q_{n|m}}{\partial y_i} &amp;=  -\sum_{m\neq i}\sum_{n\neq i} \frac{p_{n|m}}{q_{n|m}} \frac{\partial \big[{\exp(-||y_m-y_n||^2)}/{\sum_{k\neq m} \exp(-||y_k-y_m||^2)}\big]}{\partial y_i} \\<br/>
+&amp;= \sum_{m\neq i}\sum_{n\neq i}\frac{\exp(-||y_m-y_n||^2)\exp(-||y_i-y_m||^2)(-2y_i+2y_m)}{(\sum_{k\neq m} \exp(-||y_k -y_m||^2))^2} \\<br/>
+&amp;= \sum_{m\neq i}\sum_{n\neq i} p_{n|m} \frac{\exp(-||y_i-y_m||^2)(-2y_i+2y_m)}{\sum_{k\neq m} \exp(-||y_k -y_m||^2)} \\<br/>
+&amp;= \sum_{m\neq i}\sum_{n\neq i} p_{n|m} q_{i|m}(2y_m-2y_i)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>再看第二项：</p>
+
+<p>\[<br/>
+\begin{align*}<br/>
+-\sum_{m\neq i}\sum_{n=i}  \frac{p_{i|m}}{q_{i|m}} \frac{\partial q_{i|m}}{\partial y_i} &amp;= -\sum_{m\neq i}\frac{p_{i|m}}{q_{i|m}} \frac{\partial \big[{\exp(-||y_m-y_i||^2)}/{\sum_{k\neq m} \exp(-||y_k-y_m||^2)}\big]}{\partial y_i} \\<br/>
+&amp;= -\sum_{m\neq i}\frac{p_{i|m}}{q_{i|m}} \bigg(\frac{\exp(-||y_i-y_m||^2)(2y_m-2y_i)}{\sum_{k\neq m} \exp(-||y_k-y_m||^2)}-\frac{\exp(-||y_m-y_i||^2)\exp(-||y_i-y_m||^2)(2y_m-2y_i)}{(\sum_{k\neq m} \exp(-||y_k-y_m||^2))^2} \bigg)\\<br/>
+&amp;= -\sum_{m\neq i} \frac{p_{i|m}}{q_{i|m}} \bigg(q_{i|m} (2y_m-2y_i)-q_{i|m}\frac{\exp(-||y_i-y_m||^2)(2y_m-2y_i)}{\sum_{k\neq m} \exp(-||y_k-y_m||^2)} \bigg)\\<br/>
+&amp;= -\sum_{m\neq i} {p_{i|m}} \bigg((2y_m-2y_i)-\frac{\exp(-||y_i-y_m||^2)(2y_m-2y_i)}{\sum_{k\neq m} \exp(-||y_k-y_m||^2)} \bigg)\\<br/>
+&amp;= -\sum_{m\neq i} {p_{i|m}} \bigg((2y_m-2y_i)-{q_{i|m}(2y_m-2y_i)}\bigg)\\<br/>
+&amp;= -\sum_{m\neq i} p_{i|m}(2y_m-2y_i) + \sum_{m\neq i}p_{i|m} q_{i|m}(2y_m-2y_i)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>再看第三项：<br/>
+\[<br/>
+\begin{align*}<br/>
+-\sum_{m=i}\sum_{n\neq i} \frac{p_{n|i}}{q_{n|i}} \frac{\partial q_{n|i}}{\partial y_i} &amp;= -\sum_{n\neq i}\frac{p_{n|i}}{q_{n|i}} \frac{\partial \big[{\exp(-||y_n-y_i||^2)}/{\sum_{k\neq i} \exp(-||y_k-y_i||^2)}\big]}{\partial y_i} \\<br/>
+&amp;= -\sum_{n\neq i}  \frac{p_{n|i}}{q_{n|i}} \bigg(\frac{\exp(-||y_n-y_i||^2)(2y_n-2y_i)}{\sum_{k\neq i} \exp(-||y_k-y_i||^2)}-\frac{\exp(-||y_n-y_i||^2)(\sum_{k\neq i} \exp(-||y_k-y_i||^2)(2y_k-2y_i))}{(\sum_{k\neq i} \exp(-||y_k-y_i||^2))^2}\bigg)\\<br/>
+&amp;= -\sum_{n\neq i}  \frac{p_{n|i}}{q_{n|i}} \bigg({q_{n|i}(2y_n-2y_i)}-\frac{q_{n|i}(\sum_{k\neq i} \exp(-||y_k-y_i||^2)(2y_k-2y_i))}{\sum_{k\neq i} \exp(-||y_k-y_i||^2)}\bigg)\\<br/>
+&amp;= -\sum_{n\neq i}  p_{n|i}\bigg({(2y_n-2y_i)}-\frac{\sum_{k\neq i} \exp(-||y_k-y_i||^2)(2y_k-2y_i)}{\sum_{k\neq i} \exp(-||y_k-y_i||^2)}\bigg)\\<br/>
+&amp;= -\sum_{n\neq i}  p_{n|i}\bigg({(2y_n-2y_i)}-\sum_{k\neq i} q_{k|i}(2y_k-2y_i)\bigg)\\<br/>
+&amp;= -\sum_{n\neq i}  p_{n|i} (2y_n-2y_i)+\sum_{n\neq i}  p_{n|i}\sum_{k\neq i} q_{k|i}(2y_k-2y_i)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>将上面三式代入，其中\(p_{i|i} = 0\)：<br/>
+\[<br/>
+\begin{align}<br/>
+\frac{\partial C}{\partial y_i} &amp;= -\sum_{m\neq i}\sum_{n\neq i} \frac{p_{n|m}}{q_{n|m}} \frac{\partial q_{n|m}}{\partial y_i}-\sum_{m\neq i}\sum_{n=i} \frac{p_{i|m}}{q_{i|m}} \frac{\partial q_{i|m}}{\partial y_i}<br/>
+-\sum_{m=i}\sum_{n\neq i} \frac{p_{n|i}}{q_{n|i}} \frac{\partial q_{n|i}}{\partial y_i}\nonumber\\<br/>
+&amp;= \sum_{m\neq i}\sum_{n\neq i} p_{n|m} q_{i|m}(2y_m-2y_i) - \sum_{m\neq i}p_{i|m}(2y_m-2y_i) + \sum_{m\neq i}p_{i|m} q_{i|m}(2y_m-2y_i) -\sum_{n\neq i}  p_{n|i} (2y_n-2y_i)+\sum_{n\neq i}  p_{n|i}\sum_{k\neq i} q_{k|i}(2y_k-2y_i)\nonumber\\<br/>
+&amp;= \sum_{m\neq i}\sum_{n} p_{n|m} q_{i|m}(2y_m-2y_i) - \sum_{m\neq i}p_{i|m}(2y_m-2y_i) -\sum_{n\neq i}  p_{n|i} (2y_n-2y_i)+\sum_{n\neq i}  p_{n|i}\sum_{k\neq i} q_{k|i}(2y_k-2y_i)\nonumber\\<br/>
+&amp;= \sum_{m\neq i}q_{i|m}(2y_m-2y_i) \sum_{n} p_{n|m} - \sum_{m\neq i}p_{i|m}(2y_m-2y_i) -\sum_{n\neq i}  p_{n|i} (2y_n-2y_i)+\sum_{k\neq i} q_{k|i}(2y_k-2y_i)\sum_{n\neq i}  p_{n|i}\label{ttd}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>考虑到：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\sum_{n\neq i} p_{n|i} = \sum_{n\neq i} \frac{\exp(-{||x_i - x_n||^2}/{2\sigma_i^2})}{\sum_{k\neq i}\exp(-{||x_i - x_k||^2}/{2\sigma_i^2})} = \frac{\sum_{n\neq i}\exp(-{||x_i - x_n||^2}/{2\sigma_i^2})}{\sum_{k\neq i}\exp(-{||x_i - x_k||^2}/{2\sigma_i^2})} = 1\\<br/>
+&amp;\sum_n p_{n|i} = \sum_{n\neq i} p_{n|i}  + p_{i|i} = 1 <br/>
+\end{align*}<br/>
+\]</p>
+
+<p>上结论代入 \ref{ttd} 可得：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial C}{\partial y_i} &amp;=\sum_{m\neq i}q_{i|m}(2y_m-2y_i) - \sum_{m\neq i}p_{i|m}(2y_m-2y_i) -\sum_{n\neq i}  p_{n|i} (2y_n-2y_i)+\sum_{k\neq i} q_{k|i}(2y_k-2y_i)\\<br/>
+&amp;=\sum_{j\neq i}q_{i|j}(2y_j-2y_i) - \sum_{j\neq i}p_{i|j}(2y_j-2y_i) -\sum_{j\neq i}  p_{j|i} (2y_j-2y_i)+\sum_{j\neq i} q_{j|i}(2y_j-2y_i)\\<br/>
+&amp;=\sum_{j\neq i}2(y_i-y_j)(p_{i|j} - q_{i|j} + p_{j|i} - q_{j|i})\\<br/>
+&amp;=\sum_{j}2(y_i-y_j)(p_{i|j} - q_{i|j} + p_{j|i} - q_{j|i})\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>推导结束。</p>
+
+<p>初始化时，可以以原点为中心选择较小的 \(\sigma\) 的高斯分布。为了避免陷入局部最优解，梯度中还需要一个相对较大的动量 momentum。即参数更新中除了当前梯度，还要引入之前梯度累加的指数衰减项，如下：<br/>
+\[<br/>
+Y^{(t)} = Y^{(t-1)} + \eta \frac{\partial C}{\partial Y} + \alpha^{(t)}(Y^{(t-1)} - Y^{(t-2)})<br/>
+\]</p>
+
+<p>这里 \(Y^{(t)}\) 表示迭代 \(t\) 次的解，\(\eta\) 表示学习速率，\(\alpha^{(t)}\) 表示迭代 \(t\) 次的动量。</p>
+
+<p>此外，在优化的早期阶段，在每一轮迭代后向映射点中间加入一些高斯噪声，之后像模拟退火一样逐渐减小该噪声的方差，可以用来避免局部最优解。如果噪声的方差在全局结构开始形成临界点处改变非常慢，SNE 倾向于找到更好的全局结构的映射。不幸的是，这需要明智的选择一个高斯噪声的初始值和衰减速率，进一步来说，这个选择与动量大小及梯度下降中步长大小相互作用。因此通常在数据集上多次进行优化来寻找一个合适的参数。从这个角度来说，SNE 不如一些允许凸优化和不用引入模拟退火花费额外的计算时间和参数选择，就能给出很好的结果的优化方法。</p>
+
+<h3 id="toc_4">T-SNE(t-Distributed Stochastic Neighbor Embedding)</h3>
+
+<p>上一节介绍了 2002 年 Hinton 和 Roweis 提出的 SNE ，尽管 SNE 构造了相当好的可视化，但是它被难以优化的损失函数所束缚，我们把这个问题称为“crowding（拥挤）问题”。在这一小节中，我们将介绍一个新技术“T-SNE”来缓解这个问题。t-SNE 的损失函数和 SNE 的损失函数在两个地方有点不同：</p>
+
+<ol>
+<li>使个对称版本的 SNE ，其损失函数有着更简单的梯度。</li>
+<li>使用 t 分布代替了高斯分布来计算在低维空间两个点的相似度。</li>
+</ol>
+
+<p>t-SNE 在低维空间使用一个重尾分布来避免 SNE 的拥挤问题和优化问题。在这一小节中，我们首先来介绍一下对称 SNE ，然后再来介绍拥挤问题，和使用重尾分布来处理这个问题。我们最后来介绍我们的方法来优化 t-SNE 损失函数。</p>
+
+<h4 id="toc_5">对称 SNE（Symmetric SNE）</h4>
+
+<p>对称 SNE 可以作为优化条件概率 \(p_{j|i}\) 和 \(p_{i|j}\) 的 KL 散度之和一个替代方案，还可以最小化高维空间中的联合概率分布 \(P\) 和低维空间的联合分布概率 \(Q\) 的单个 KL 散度：<br/>
+\[<br/>
+C = KL(P||Q) = \sum_{i} \sum_{j} p_{ij} \log \frac{p_{ij}}{q_{ij}}<br/>
+\]</p>
+
+<p>这里我们还是将 \(p_{ii}\) 和 \(q_{ii}\) 设为 0，我们称这种 SNE 叫做对称 SNE，因为联合概率分布有个特性 \(p_{ij} = p_{ji}\) 和 \(q_{ij} = q{ji}\)，在对称 SNE 中，低维空间映射的成对相似度 \(q_{ji}\) 可以表示为：<br/>
+\[<br/>
+\begin{equation}<br/>
+q_{ij} = \frac{\exp(-||y_i-y_j||^2)}{\sum_{k\neq l} \exp(-||y_k - y_l||^2)} \label{qij}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>显而易见定义在高维空间的成对相似度 \(p_{ij}\) 为：<br/>
+\[<br/>
+p_{ij} = \frac{\exp(-||x_i-x_j||^2/2\sigma^2)}{\sum_{k \neq l} \exp(-||x_k - x_l||^2/2\sigma^2)}<br/>
+\]</p>
+
+<p>但是考虑到高维数据点 \(x_i\) 是异常点时将产生问题（所有的点关于 \(x_i\) 的成对距离 \(||x_i-x_j||^2\) 都很大）。对于这样的异常点，\(p_{ij}\) 对于所有的 \(j\) 都非常小（之前仅是在 \(x_i\) 下很小），因此低维空间映射点 \(y_i\) 位置对损失函数的影响会很小，结果就是映射点的位置不能很好的由其他映射点的位置确定。我们可以通过定义高维空间的联合概率 \(p_{ij}\) 为对称条件概率来回避这个问题，即：<br/>
+\[<br/>
+p_{ij} = \frac{p_{j|i} + p_{i|j}}{2n}<br/>
+\]</p>
+
+<p>这即保证了 \(p_{ij}\) 的对称性，且对于所有的数据点 \(x_i\) 都有 \(\sum_{j} p_{ij} &gt; \frac{1}{2n}\) ，使每一个点 \(x_i\) 对损失函数都有一定的贡献。在低维空间里，对称 SNE 简单的使用式 \ref{qij} 。对称 SNE 最大的优点是梯度的形式更简单，可以更快的计算。来计算一下梯度，对称 SNE 的梯度与不对称 SNE 相似，如下：<br/>
+\[<br/>
+\frac{\partial C}{\partial y_i} = 4\sum_{j} (p_{ij} - q_{ij})(y_i - y_j)<br/>
+\]</p>
+
+<p>详细推导过程如下：<br/>
+\[<br/>
+\begin{align}<br/>
+\frac{\partial C}{\partial y_i} &amp;= \frac{\partial \sum_i \sum_j p_{ij} \log(p_{ij}/q_{ij})}{\partial q_{ij}} \cdot \frac{\partial q_{ij}}{\partial y_i} \nonumber\\<br/>
+&amp;= -\sum_i\sum_j \frac{p_{ij}}{q_{ij}} \frac{\partial q_{ij}}{\partial y_i}\nonumber\\<br/>
+&amp;= -\sum_m\sum_n \frac{p_{mn}}{q_{mn}} \frac{\partial q_{mn}}{\partial y_i}\nonumber\\<br/>
+&amp;= -\sum_{m\neq i}\sum_{n\neq i} \frac{p_{mn}}{q_{mn}} \frac{\partial q_{mn}}{\partial y_i}-\sum_{m\neq i}\sum_{n=i} \frac{p_{mi}}{q_{mi}} \frac{\partial q_{mi}}{\partial y_i}<br/>
+-\sum_{m=i}\sum_{n\neq i} \frac{p_{in}}{q_{in}} \frac{\partial q_{in}}{\partial y_i}\label{mnf}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>先看第一项：<br/>
+\[<br/>
+\begin{align*}<br/>
+-\sum_{m\neq i}\sum_{n\neq i} \frac{p_{mn}}{q_{mn}} \frac{\partial q_{mn}}{\partial y_i} &amp;= -\sum_{m\neq i}\sum_{n\neq i} \frac{p_{mn}}{q_{mn}} \frac{\partial \big[{\exp(-||y_m-y_n||^2)}/{\sum_{k\neq l} \exp(-||y_k - y_l||^2)}\big]}{\partial y_i}\\<br/>
+&amp;= \sum_{m\neq i}\sum_{n\neq i} \frac{p_{mn}}{q_{mn}} \frac{\exp(-||y_m-y_n||^2)(\sum_{k \neq i,l=i} 2(y_k-y_i) \exp(-||y_k - y_i||^2) - \sum_{k=i,l\neq i} 2(y_i - y_l)\exp(-||y_i - y_l||^2))}{(\sum_{k\neq l} \exp(-||y_k - y_l||^2))^2}\\<br/>
+&amp;= \sum_{m\neq i}\sum_{n\neq i} {p_{mn}} \frac{\sum_{k \neq i} 2(y_k-y_i) \exp(-||y_k - y_i||^2) - \sum_{l\neq i} 2(y_i - y_l)\exp(-||y_i - y_l||^2)}{\sum_{k\neq l} \exp(-||y_k - y_l||^2)}\\<br/>
+&amp;= \sum_{m\neq i}\sum_{n\neq i} {p_{mn}} \frac{\sum_{j \neq i} 2(y_j-y_i) \exp(-||y_j - y_i||^2) - \sum_{j\neq i} 2(y_i - y_j)\exp(-||y_i - y_j||^2)}{\sum_{k\neq l} \exp(-||y_k - y_l||^2)}\\<br/>
+&amp;= \sum_{m\neq i}\sum_{n\neq i} {p_{mn}} \frac{\sum_{j \neq i} 2(y_j-y_i-y_i+y_j) \exp(-||y_k - y_i||^2)}{\sum_{k\neq l} \exp(-||y_k - y_l||^2)}\\<br/>
+&amp;= \sum_{m\neq i}\sum_{n\neq i} {p_{mn}} \sum_{j \neq i} 4(y_j-y_i) q_{ij}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>再看第二项<br/>
+\[<br/>
+\begin{align*}<br/>
+-\sum_{m\neq i}\sum_{n=i} \frac{p_{mi}}{q_{mi}} \frac{\partial q_{mi}}{\partial y_i} &amp;=-\sum_{m\neq i}\frac{p_{mi}}{q_{mi}} \frac{\partial \big[{\exp(-||y_i-y_m||^2)}/{\sum_{k\neq l} \exp(-||y_k - y_l||^2)}\big]}{\partial y_i}\\<br/>
+&amp;= -\sum_{m\neq i}\frac{p_{mi}}{q_{mi}} \bigg(\frac{-2(y_i-y_m)\exp(-||y_i-y_m||^2)}{\sum_{k\neq l} \exp(-||y_k - y_l||^2)}- \frac{\exp(-||y_i-y_m||^2)(\sum_{k \neq i,l=i} 2(y_k-y_i) \exp(-||y_k - y_i||^2) - \sum_{k=i,l\neq i} 2(y_i - y_l)\exp(-||y_i - y_l||^2))}{(\sum_{k\neq l} \exp(-||y_k - y_l||^2))^2}\bigg)\\<br/>
+&amp;= -\sum_{m\neq i}\frac{p_{mi}}{q_{mi}} \bigg(-2q_{mi}(y_i-y_m) - q_{mi}\frac{\sum_{k \neq i} 2(y_k-y_i) \exp(-||y_k - y_i||^2) - \sum_{l\neq i} 2(y_i - y_l)\exp(-||y_i - y_l||^2)}{\sum_{k\neq l} \exp(-||y_k - y_l||^2)}\bigg)\\<br/>
+&amp;= -\sum_{m\neq i}{p_{mi}}\ \bigg(-2(y_i-y_m) - \frac{\sum_{k \neq i} 2(y_k-y_i) \exp(-||y_k - y_i||^2) - \sum_{l\neq i} 2(y_i - y_l)\exp(-||y_i - y_l||^2)}{\sum_{k\neq l} \exp(-||y_k - y_l||^2)}\bigg)\\<br/>
+&amp;= -\sum_{m\neq i}{p_{mi}}\ \bigg(-2(y_i-y_m) - \frac{\sum_{j \neq i} 2(y_j-y_i) \exp(-||y_j - y_i||^2) - \sum_{j\neq i} 2(y_i - y_j)\exp(-||y_i - y_j||^2)}{\sum_{k\neq l} \exp(-||y_k - y_l||^2)}\bigg)\\<br/>
+&amp;= -\sum_{m\neq i}{p_{mi}}\ \bigg(-2(y_i-y_m) - \frac{\sum_{j \neq i} 2(y_j-y_i-y_i + y_j) \exp(-||y_j - y_i||^2)}{\sum_{k\neq l} \exp(-||y_k - y_l||^2)}\bigg)\\<br/>
+&amp;= -\sum_{m\neq i}{p_{mi}}\ \bigg(-2(y_i-y_m) - {\sum_{j \neq i} 4(y_j-y_i) q_{ij}}\bigg)\\<br/>
+&amp;= 2\sum_{m\neq i}{p_{mi}} (y_i-y_m) + \sum_{m\neq i}{p_{mi}} {\sum_{j \neq i} 4(y_j-y_i) q_{ij}}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>再看第三项：<br/>
+\[<br/>
+\begin{align*}<br/>
+-\sum_{m=i}\sum_{n\neq i} \frac{p_{in}}{q_{in}} \frac{\partial q_{in}}{\partial y_i} &amp;=-\sum_{n\neq i}\frac{p_{in}}{q_{in}} \frac{\partial \big[{\exp(-||y_i-y_n||^2)}/{\sum_{k\neq l} \exp(-||y_k - y_l||^2)}\big]}{\partial y_i}\\<br/>
+&amp;= -\sum_{n\neq i}\frac{p_{in}}{q_{in}} \bigg(\frac{-2(y_i-y_n)\exp(-||y_i-y_n||^2)}{\sum_{k\neq l} \exp(-||y_k - y_l||^2)}- \frac{\exp(-||y_i-y_n||^2)(\sum_{k \neq i,l=i} 2(y_k-y_i) \exp(-||y_k - y_i||^2) - \sum_{k=i,l\neq i} 2(y_i - y_l)\exp(-||y_i - y_l||^2))}{(\sum_{k\neq l} \exp(-||y_k - y_l||^2))^2}\bigg)\\<br/>
+&amp;= -\sum_{n\neq i}\frac{p_{in}}{q_{in}} \bigg(-2q_{in}(y_i-y_n) - q_{in}\frac{\sum_{k \neq i} 2(y_k-y_i) \exp(-||y_k - y_i||^2) - \sum_{l\neq i} 2(y_i - y_l)\exp(-||y_i - y_l||^2)}{\sum_{k\neq l} \exp(-||y_k - y_l||^2)}\bigg)\\<br/>
+&amp;= -\sum_{n\neq i}{p_{in}}\ \bigg(-2(y_i-y_n) - \frac{\sum_{k \neq i} 2(y_k-y_i) \exp(-||y_k - y_i||^2) - \sum_{l\neq i} 2(y_i - y_l)\exp(-||y_i - y_l||^2)}{\sum_{k\neq l} \exp(-||y_k - y_l||^2)}\bigg)\\<br/>
+&amp;= -\sum_{n\neq i}{p_{in}}\ \bigg(-2(y_i-y_n) - \frac{\sum_{j \neq i} 2(y_j-y_i) \exp(-||y_j - y_i||^2) - \sum_{j\neq i} 2(y_i - y_j)\exp(-||y_i - y_j||^2)}{\sum_{k\neq l} \exp(-||y_k - y_l||^2)}\bigg)\\<br/>
+&amp;= -\sum_{n\neq i}{p_{in}}\ \bigg(-2(y_i-y_n) - \frac{\sum_{j \neq i} 2(y_j-y_i-y_i + y_j) \exp(-||y_j - y_i||^2)}{\sum_{k\neq l} \exp(-||y_k - y_l||^2)}\bigg)\\<br/>
+&amp;= -\sum_{n\neq i}{p_{in}}\ \bigg(-2(y_i-y_n) - {\sum_{j \neq i} 4(y_j-y_i) q_{ij}}\bigg)\\<br/>
+&amp;= 2\sum_{n\neq i}{p_{in}} (y_i-y_n) + \sum_{n\neq i}{p_{in}} {\sum_{j \neq i} 4(y_j-y_i) q_{ij}}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>代入式 \ref{mnf} 得：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial C}{\partial y_i} &amp;= -\sum_{m\neq i}\sum_{n\neq i} \frac{p_{mn}}{q_{mn}} \frac{\partial q_{mn}}{\partial y_i}-\sum_{m\neq i}\sum_{n=i} \frac{p_{mi}}{q_{mi}} \frac{\partial q_{mi}}{\partial y_i}<br/>
+-\sum_{m=i}\sum_{n\neq i} \frac{p_{in}}{q_{in}} \frac{\partial q_{in}}{\partial y_i}\\<br/>
+&amp;= \sum_{m\neq i}\sum_{n\neq i} {p_{mn}} \sum_{j \neq i} 4(y_j-y_i) q_{ij} + 2\sum_{m\neq i}{p_{mi}} (y_i-y_m) + \sum_{m\neq i}{p_{mi}} {\sum_{j \neq i} 4(y_j-y_i) q_{ij}} + 2\sum_{n\neq i}{p_{in}} (y_i-y_n) + \sum_{n\neq i}{p_{in}} {\sum_{j \neq i} 4(y_j-y_i) q_{ij}}\\<br/>
+&amp;= \sum_{m\neq i}\sum_{n} {p_{mn}} \sum_{j \neq i} 4(y_j-y_i) q_{ij} + 2\sum_{m\neq i}{p_{mi}} (y_i-y_m) + 2\sum_{n\neq i}{p_{in}} (y_i-y_n) + \sum_{n\neq i}{p_{in}} {\sum_{j \neq i} 4(y_j-y_i) q_{ij}}\\<br/>
+&amp;\because \quad p_{ii} = 0 \quad\Rightarrow\quad \sum_{n\neq i}p_{in} = \sum_{n}p_{in}\\<br/>
+&amp;= \sum_{m\neq i}\sum_{n} {p_{mn}} \sum_{j \neq i} 4(y_j-y_i) q_{ij} + 2\sum_{m\neq i}{p_{mi}} (y_i-y_m) + 2\sum_{n\neq i}{p_{in}} (y_i-y_n) + \sum_{n}{p_{in}} {\sum_{j \neq i} 4(y_j-y_i) q_{ij}}\\<br/>
+&amp;= \sum_{m}\sum_{n} {p_{mn}} \sum_{j \neq i} 4(y_j-y_i) q_{ij} + 2\sum_{m\neq i}{p_{mi}} (y_i-y_m) + 2\sum_{n\neq i}{p_{in}} (y_i-y_n) \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>考虑到：<br/>
+\[<br/>
+\begin{align*}<br/>
+\sum_{m} \sum_{n} p_{mn} &amp;= \sum_{m}\sum_{n} \frac{\exp(-||x_m-x_n||^2/2\sigma^2)}{\sum_{k \neq l} \exp(-||x_k - x_l||^2/2\sigma^2)}\\<br/>
+&amp;= \sum_{m\neq n} \frac{\exp(-||x_m-x_n||^2/2\sigma^2)}{\sum_{k \neq l} \exp(-||x_k - x_l||^2/2\sigma^2)} + \sum_{m=n} \frac{\exp(-||x_m-x_n||^2/2\sigma^2)}{\sum_{k \neq l} \exp(-||x_k - x_l||^2/2\sigma^2)}\\<br/>
+&amp;= \sum_{m\neq n} \frac{\exp(-||x_m-x_n||^2/2\sigma^2)}{\sum_{k \neq l} \exp(-||x_k - x_l||^2/2\sigma^2)}\\<br/>
+&amp;= 1<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>所以：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial C}{\partial y_i} &amp;= \sum_{m}\sum_{n} {p_{mn}} \sum_{j \neq i} 4(y_j-y_i) q_{ij} + 2\sum_{m\neq i}{p_{mi}} (y_i-y_m) + 2\sum_{n\neq i}{p_{in}} (y_i-y_n)\\<br/>
+&amp;= \sum_{j \neq i} 4(y_j-y_i) q_{ij} + 2\sum_{m\neq i}{p_{mi}} (y_i-y_m) + 2\sum_{n\neq i}{p_{in}} (y_i-y_n)\\<br/>
+&amp;= \sum_{j \neq i} 4(y_j-y_i) q_{ij} + 2\sum_{j\neq i}{p_{ij}} (y_i-y_j) + 2\sum_{j\neq i}{p_{ij}} (y_i-y_j)\\<br/>
+&amp;= \sum_{j\neq i} 4(y_i-y_j)(p_{ij} - q_{ij})\\<br/>
+&amp;= \sum_{j} 4(y_i-y_j)(p_{ij} - q_{ij})\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>推导结束。</p>
+
+<p>在初步实验中，我们观察到对称 SNE 产生的映射和非对称 SNE 的一样好，有时候甚至会略好一点。</p>
+
+<h4 id="toc_6">拥挤问题 crowding problem</h4>
+
+<p>考虑一组嵌在高维空间里的二维曲线流形上的数据点，在小范围内可以近似于线形。它可以很好地在二维图上模拟数据点之间小的成对距离，这通常有个经典的“Swiss roll”的例子。现在设想一下一个具有10个维度的流形，它嵌在一个更高维的空间中。有几个原因导致在二维空间里的成对距离不能如实地模拟在10维空间里的数据点的距离。例如，在10维中可能有11个数据点之间的距离相等，在二维空间里无法得到可信的映射（二维空间最多就3个距离相等的点）。以数据点 \(i\) 为中心的球体体积是 \(r^m\) ，其中 \(r\) 是半径，\(m\) 是球体的维度，假设球体中数据点是均匀分布在 \(i\) 的周围的，看一下从 \(i\) 到其他点的距离随维度增加参生的变化：</p>
+
+<p>代码如下：</p>
+
+<pre><code class="language-python"># -*- coding: utf-8 -*-
+import matplotlib.pyplot as plt
+import numpy as np
+from numpy.linalg import norm
+
+npoints = 1000 # 抽取1000个m维球内均匀分布的点
+plt.figure(figsize=(20, 4))
+for i, m in enumerate((2, 3, 5, 10)):
+    # 这里模拟m维球中的均匀分布用到了拒绝采样，即先生成m维立方中的均匀分布，再剔除m维球外部的点
+    accepts = []
+    while len(accepts) &lt; 1000:
+        points = np.random.rand(500, m)
+        accepts.extend([d for d in norm(points, axis=1) if d &lt;= 1.0]) # 拒绝采样
+    accepts = accepts[:npoints]
+    ax = plt.subplot(1, 4, i+1)
+    ax.set_xlabel(&#39;distance&#39;) # x轴表示点到圆心的距离
+    if i == 0:
+        ax.set_ylabel(&#39;count&#39;) # y轴表示点的数量
+    ax.hist(accepts, bins=np.linspace(0., 1., 50), color=&#39;green&#39;)
+    ax.set_title(&#39;m={0}&#39;.format(str(m)), loc=&#39;left&#39;)
+plt.show()
+</code></pre>
+
+<p>效果如下：</p>
+
+<div align="center">
+    <img width="700" src="media/15042890159558/15333754587813.jpg" />
+</div>
+
+<p>图中可以看出随着维度 \(m\) 的增大，大多数数据点都分布在球体的表面，与点 \(x_i\) 的距离分布极不平衡。如果将这种距离保留到低维空间中，肯定会出现拥挤问题。注意，拥挤问题并非只会出现在 SNE 中，实际上很多维度缩放技术上都会出现。</p>
+
+<h4 id="toc_7">t 分布 Student-t distribution</h4>
+
+<p>由于对称 SNE 实际上匹配高维空间和低维空间数据点的联合概率而不是它们的距离，因此我们有更自然的方式去缓解拥挤问题。在高维空间中，我们使用高斯分布将距离转换为概率，在低维映射中，我们使用比高斯分布更重尾部的 \(t\) 分布来转换距离为概率，这允许高维空间中低等距离在映射后有一个较大的距离。</p>
+
+<p>假设 \(X\) 服从标准正态分布</p>
+
+<p>在 t-SNE 中，我们使用有一个自由度的 t 分布(n=1)作为低维映射中的重尾分布，使用这个分布，联合概率分布 \(q_{ij}\) 可以被定义为：<br/>
+\[<br/>
+q_{ij} = \frac{(1+||y_i-y_j||^2)^{-1}}{\sum_{k\neq l} (1+||y_k-y_l||^2)^{-1}}<br/>
+\]</p>
+
+<p>此外，t分布是无限多个高斯分布的叠加，计算上不是指数的，会方便很多。优化的梯度如下：<br/>
+\[<br/>
+\frac{\partial C}{\partial y_i} = 4\sum_{j} (p_{ij}-q_{ij}) (y_i-y_j) (1+||y_i-y_j||^2)^{-1}<br/>
+\]</p>
+
+<p>推导过程如下：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial C}{\partial y_i} &amp;= \frac{\partial \sum_{i} \sum_{j} p_{ij} \log (p_{ij} / q_{ij})}{\partial y_i} \\<br/>
+&amp;= -\sum_{i}\sum_{j} \frac{p_{ij}}{q_{ij}} \frac{\partial q_{ij}}{\partial y_i}\\<br/>
+&amp;= -\sum_{m}\sum_{m} \frac{p_{mn}}{q_{mn}} \frac{\partial q_{mn}}{\partial y_i}\\<br/>
+&amp;= -\sum_{m\neq i}\sum_{n\neq i} \frac{p_{mn}}{q_{mn}} \frac{\partial q_{mn}}{\partial y_i} - \sum_{m \neq i}\sum_{n=i} \frac{p_{mi}}{q_{mi}} \frac{\partial q_{mi}}{\partial y_i} - \sum_{m=i}\sum_{n \neq i} \frac{p_{in}}{q_{in}} \frac{\partial q_{in}}{\partial y_i}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>先看第一项：<br/>
+\[<br/>
+\begin{align*}<br/>
+-\sum_{m\neq i}\sum_{n\neq i} \frac{p_{mn}}{q_{mn}} \frac{\partial q_{mn}}{\partial y_i} &amp;= -\sum_{m\neq i}\sum_{n\neq i} \frac{p_{mn}}{q_{mn}} \frac{\partial [(1+||y_m-y_n||^2)^{-1}]/[\sum_{k\neq l} (1+||y_k-y_l||^2)^{-1}]}{\partial y_i}\\<br/>
+&amp;= -\sum_{m\neq i}\sum_{n\neq i} \frac{p_{mn}}{q_{mn}} \frac{-(1+||y_m-y_n||^2)^{-1}[2\sum_{k\neq i}\sum_{l=i} (y_k-y_i) (1+||y_k-y_i||^2)^{-2} - 2\sum_{k=i} \sum_{l\neq i} (y_i - y_l)( 1+ ||y_i - y_l||^2)^{-2}]}{[\sum_{k\neq l} (1+||y_k-y_l||^2)^{-1}]^2}\\<br/>
+&amp;= \sum_{m\neq i}\sum_{n\neq i} p_{mn} \frac{2\sum_{k\neq i} (y_k-y_i) (1+||y_k-y_i||^2)^{-2} - 2 \sum_{l\neq i} (y_i - y_l)( 1+ ||y_i - y_l||^2)^{-2}}{\sum_{k\neq l} (1+||y_k-y_l||^2)^{-1}}\\ <br/>
+&amp;= \sum_{m\neq i}\sum_{n\neq i} p_{mn} \big[2\sum_{k\neq i} q_{ki} (y_k-y_i) (1+||y_k-y_i||^2)^{-1} -2 \sum_{l\neq i} q_{li} (y_i - y_l)( 1+ ||y_i - y_l||^2)^{-1}\big]\\<br/>
+&amp;= \sum_{m\neq i}\sum_{n\neq i} p_{mn} \big[2\sum_{k\neq i} q_{ki} (y_k-y_i) (1+||y_k-y_i||^2)^{-1} -2 \sum_{k\neq i} q_{ki} (y_i - y_k)( 1+ ||y_i - y_k||^2)^{-1}\big]\\<br/>
+&amp;= 4\sum_{m\neq i}\sum_{n\neq i} p_{mn} \sum_{k\neq i} q_{ki} (y_k-y_i) (1+||y_k-y_i||^2)^{-1} \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>再看第二项：<br/>
+\[<br/>
+\begin{align*}<br/>
+- \sum_{m \neq i}\sum_{n=i} \frac{p_{mi}}{q_{mi}} \frac{\partial q_{mi}}{\partial y_i} &amp;= -\sum_{m\neq i}\frac{p_{mi}}{q_{mi}} \frac{\partial [(1+||y_m-y_i||^2)^{-1}]/[\sum_{k\neq l} (1+||y_k-y_l||^2)^{-1}]}{\partial y_i}\\<br/>
+&amp;=-\sum_{m\neq i}\frac{p_{mi}}{q_{mi}} \bigg(\frac{2(y_m-y_i)[(1+||y_m-y_i||^2)^{-2}]}{\sum_{k\neq l} (1+||y_k-y_l||^2)^{-1}} -\frac{(1+||y_m-y_i||^2)^{-1}[2\sum_{k\neq i}\sum_{l=i} (y_k-y_i) (1+||y_k-y_i||^2)^{-2} - 2\sum_{k=i} \sum_{l\neq i} (y_i - y_l)( 1+ ||y_i - y_l||^2)^{-2}]}{[\sum_{k\neq l} (1+||y_k-y_l||^2)^{-1}]^2}\bigg)\\<br/>
+&amp;= -\sum_{m\neq i}\frac{p_{mi}}{q_{mi}} \bigg(2 q_{mi} (y_m-y_i)(1+||y_m-y_i||^2)^{-1}- q_{mi} \frac{2\sum_{k\neq i} (y_k-y_i) (1+||y_k-y_i||^2)^{-2} - 2\sum_{l\neq i} (y_i - y_l)( 1+ ||y_i - y_l||^2)^{-2}}{\sum_{k\neq l} (1+||y_k-y_l||^2)^{-1}}\bigg)\\<br/>
+&amp;= -\sum_{m\neq i} {p_{mi}} \bigg(2(y_m-y_i)(1+||y_m-y_i||^2)^{-1}- \frac{2\sum_{k\neq i} (y_k-y_i) (1+||y_k-y_i||^2)^{-2} - 2\sum_{l\neq i} (y_i - y_l)( 1+ ||y_i - y_l||^2)^{-2}}{\sum_{k\neq l} (1+||y_k-y_l||^2)^{-1}}\bigg)\\<br/>
+&amp;= -\sum_{m\neq i} {p_{mi}} \bigg(2(y_m-y_i)(1+||y_m-y_i||^2)^{-1}- \frac{2\sum_{k\neq i} (y_k-y_i) (1+||y_k-y_i||^2)^{-2} - 2\sum_{k\neq i} (y_i - y_k)( 1+ ||y_i - y_k||^2)^{-2}}{\sum_{k\neq l} (1+||y_k-y_l||^2)^{-1}}\bigg)\\<br/>
+&amp;= -\sum_{m\neq i} {p_{mi}} \bigg(2(y_m-y_i)(1+||y_m-y_i||^2)^{-1}- \frac{4\sum_{k\neq i} (y_k-y_i) (1+||y_k-y_i||^2)^{-2}}{\sum_{k\neq l} (1+||y_k-y_l||^2)^{-1}}\bigg)\\<br/>
+&amp;= -\sum_{m\neq i}{p_{mi}} \bigg(2(y_m-y_i)(1+||y_m-y_i||^2)^{-1}- {4\sum_{k\neq i} q_{ki} (y_k-y_i) (1+||y_k-y_i||^2)^{-1}}\bigg)\\<br/>
+&amp;= -2\sum_{m\neq i}{p_{mi}} (y_m-y_i)(1+||y_m-y_i||^2)^{-1} + 4\sum_{m\neq i}\sum_{n=i} {p_{mi}} {\sum_{k\neq i} q_{ki} (y_k-y_i) (1+||y_k-y_i||^2)^{-1}}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>再看第三项：<br/>
+\[<br/>
+\begin{align*}<br/>
+- \sum_{m= i}\sum_{n\neq i} \frac{p_{in}}{q_{in}} \frac{\partial q_{in}}{\partial y_i} &amp;= -\sum_{n\neq } \frac{p_{in}}{q_{in}} \frac{\partial [(1+||y_n-y_i||^2)^{-1}]/[\sum_{k\neq l} (1+||y_k-y_l||^2)^{-1}]}{\partial y_i}\\<br/>
+&amp;=-\sum_{n\neq i} \frac{p_{in}}{q_{in}} \bigg(\frac{2(y_n-y_i)[(1+||y_n-y_i||^2)^{-2}]}{\sum_{k\neq l} (1+||y_k-y_l||^2)^{-1}} -\frac{(1+||y_n-y_i||^2)^{-1}[2\sum_{k\neq i}\sum_{l=i} (y_k-y_i) (1+||y_k-y_i||^2)^{-2} - 2\sum_{k=i} \sum_{l\neq i} (y_i - y_l)( 1+ ||y_i - y_l||^2)^{-2}]}{[\sum_{k\neq l} (1+||y_k-y_l||^2)^{-1}]^2}\bigg)\\<br/>
+&amp;= -\sum_{n\neq i} \frac{p_{in}}{q_{in}} \bigg(2 q_{in} (y_n-y_i)(1+||y_n-y_i||^2)^{-1}- q_{in} \frac{2\sum_{k\neq i} (y_k-y_i) (1+||y_k-y_i||^2)^{-2} - 2\sum_{l\neq i} (y_i - y_l)( 1+ ||y_i - y_l||^2)^{-2}}{\sum_{k\neq l} (1+||y_k-y_l||^2)^{-1}}\bigg)\\<br/>
+&amp;= -\sum_{n\neq i} {p_{in}} \bigg(2(y_n-y_i)(1+||y_n-y_i||^2)^{-1}- \frac{2\sum_{k\neq i} (y_k-y_i) (1+||y_k-y_i||^2)^{-2} - 2\sum_{l\neq i} (y_i - y_l)( 1+ ||y_i - y_l||^2)^{-2}}{\sum_{k\neq l} (1+||y_k-y_l||^2)^{-1}}\bigg)\\<br/>
+&amp;= -\sum_{n\neq i} {p_{in}} \bigg(2(y_n-y_i)(1+||y_n-y_i||^2)^{-1}- \frac{2\sum_{k\neq i} (y_k-y_i) (1+||y_k-y_i||^2)^{-2} - 2\sum_{k\neq i} (y_i - y_k)( 1+ ||y_i - y_k||^2)^{-2}}{\sum_{k\neq l} (1+||y_k-y_l||^2)^{-1}}\bigg)\\<br/>
+&amp;= -\sum_{n\neq i} {p_{in}} \bigg(2(y_n-y_i)(1+||y_n-y_i||^2)^{-1}- \frac{4\sum_{k\neq i} (y_k-y_i) (1+||y_k-y_i||^2)^{-2}}{\sum_{k\neq l} (1+||y_k-y_l||^2)^{-1}}\bigg)\\<br/>
+&amp;= -\sum_{n\neq i} {p_{in}} \bigg(2(y_n-y_i)(1+||y_n-y_i||^2)^{-1}- {4\sum_{k\neq i} q_{ki} (y_k-y_i) (1+||y_k-y_i||^2)^{-1}}\bigg)\\<br/>
+&amp;= -2\sum_{n\neq i} {p_{in}} (y_n-y_i)(1+||y_n-y_i||^2)^{-1} + 4\sum_{n\neq i}{p_{in}} {\sum_{k\neq i} q_{ki} (y_k-y_i) (1+||y_k-y_i||^2)^{-1}}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>三项相加，所以：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial C}{\partial y_i} &amp;= -\sum_{m\neq i}\sum_{n\neq i} \frac{p_{mn}}{q_{mn}} \frac{\partial q_{mn}}{\partial y_i} - \sum_{m \neq i}\sum_{n=i} \frac{p_{mi}}{q_{mi}} \frac{\partial q_{mi}}{\partial y_i} - \sum_{m=i}\sum_{n \neq i} \frac{p_{in}}{q_{in}} \frac{\partial q_{in}}{\partial y_i}\\<br/>
+&amp;= 4\sum_{m\neq i}\sum_{n\neq i} p_{mn} \sum_{k\neq i} q_{ki} (y_k-y_i) (1+||y_k-y_i||^2)^{-1}  -2\sum_{m\neq i}{p_{mi}} (y_m-y_i)(1+||y_m-y_i||^2)^{-1} + 4\sum_{m\neq i}{p_{mi}} {\sum_{k\neq i} q_{ki} (y_k-y_i) (1+||y_k-y_i||^2)^{-1}} -2\sum_{n\neq i} {p_{in}} (y_n-y_i)(1+||y_n-y_i||^2)^{-1} + 4\sum_{n\neq i}{p_{in}} {\sum_{k\neq i} q_{ki} (y_k-y_i) (1+||y_k-y_i||^2)^{-1}}\\<br/>
+&amp;= 4\sum_{m\neq i}\sum_{n} p_{mn} \sum_{k\neq i} q_{ki} (y_k-y_i) (1+||y_k-y_i||^2)^{-1}  -2\sum_{m\neq i}{p_{mi}} (y_m-y_i)(1+||y_m-y_i||^2)^{-1} -2\sum_{n\neq i} {p_{in}} (y_n-y_i)(1+||y_n-y_i||^2)^{-1} + 4\sum_{n\neq i}{p_{in}} {\sum_{k\neq i} q_{ki} (y_k-y_i) (1+||y_k-y_i||^2)^{-1}}\\<br/>
+&amp;\because \quad p_{ii} = 0 \quad\Rightarrow\quad \sum_{n\neq i}{p_{in}}  = \sum_{n}{p_{in}} \\<br/>
+&amp;= 4\sum_{m\neq i}\sum_{n} p_{mn} \sum_{k\neq i} q_{ki} (y_k-y_i) (1+||y_k-y_i||^2)^{-1}  -2\sum_{m\neq i} {p_{mi}} (y_m-y_i)(1+||y_m-y_i||^2)^{-1} -2\sum_{n\neq i} {p_{in}} (y_n-y_i)(1+||y_n-y_i||^2)^{-1} + 4\sum_{n}{p_{in}} {\sum_{k\neq i} q_{ki} (y_k-y_i) (1+||y_k-y_i||^2)^{-1}}\\<br/>
+&amp;= 4\sum_{m}\sum_{n} p_{mn} \sum_{k\neq i} q_{ki} (y_k-y_i) (1+||y_k-y_i||^2)^{-1}  -2\sum_{m\neq i}\sum_{n=i} {p_{mi}} (y_m-y_i)(1+||y_m-y_i||^2)^{-1} -2\sum_{n\neq i} {p_{in}} (y_n-y_i)(1+||y_n-y_i||^2)^{-1} \\<br/>
+&amp;= 4\sum_{k\neq i} q_{ki} (y_k-y_i) (1+||y_k-y_i||^2)^{-1} \sum_{m}\sum_{n} p_{mn}  -4\sum_{m\neq i}\sum_{n=i} {p_{mi}} (y_m-y_i)(1+||y_m-y_i||^2)^{-1} \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>考虑到（证明如对称 SNE）：<br/>
+\[<br/>
+\sum_m \sum_n p_{mn} = 1<br/>
+\]</p>
+
+<p>所以：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial C}{\partial y_i} &amp;= 4\sum_{k\neq i} q_{ki} (y_k-y_i) (1+||y_k-y_i||^2)^{-1} \sum_{m}\sum_{n} p_{mn}  -4\sum_{m\neq i} {p_{mi}} (y_m-y_i)(1+||y_m-y_i||^2)^{-1} \\<br/>
+&amp;= 4\sum_{k\neq i} q_{ki} (y_k-y_i) (1+||y_k-y_i||^2)^{-1} -4\sum_{m\neq i}{p_{mi}} (y_m-y_i)(1+||y_m-y_i||^2)^{-1} \\<br/>
+&amp;= 4\sum_{j\neq i} q_{ij} (y_j-y_i) (1+||y_i-y_j||^2)^{-1} -4\sum_{j\neq i}{p_{ij}} (y_j-y_i)(1+||y_i-y_j||^2)^{-1} \\<br/>
+&amp;= 4\sum_{j\neq i} (p_{ij}  - q_{ij})(y_i-y_j)(1+||y_i-y_j||^2)^{-1} \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>推导结束。</p>
+
+<p>t-sne的有效性，也可以从上图中看到：横轴表示距离，纵轴表示相似度, 可以看到，对于较大相似度的点，t分布在低维空间中的距离需要稍小一点；而对于低相似度的点，t分布在低维空间中的距离需要更远。这恰好满足了我们的需求，即同一簇内的点(距离较近)聚合的更紧密，不同簇之间的点(距离较远)更加疏远。</p>
+
+<p>总结一下，t-SNE的梯度更新有两大优势：</p>
+
+<ol>
+<li>对于不相似的点，用一个较小的距离会产生较大的梯度来让这些点排斥开来。</li>
+<li>这种排斥又不会无限大(梯度中分母)，避免不相似的点距离太远。</li>
+</ol>
+
+<h3 id="toc_8">算法步骤</h3>
+
+<p><b>输入</b>：数据集 \(\mathcal X = \{x_1,x_2,...,x_n\}\)，困惑度 \(\text{Perplexity}\)，迭代次数 \(T\) ，学习速率 \(\eta\) ，动量 \(\alpha^{(t)}\)<br/>
+<b>输出</b>：在低维空间的表现 \(\mathcal Y= \{y_1,y_2,...,y_n\}\)<br/>
+<b>算法过程</b>：</p>
+
+<ul>
+<li>计算在给定困惑度 \(\text{Perplexity}\) 下的 \(p_{j|i}\)</li>
+<li>计算 \(p_{ij} = \frac{1}{2n}(p_{j|i} + p_{i|j}) \)</li>
+<li>使用 (0,10<sup>{-4}I)</sup> 随机初始化 \(\mathcal Y\)</li>
+<li><p>迭代，从 \(t = 1\) 到 \(T\)， 做如下操作:</p>
+
+<ul>
+<li>计算低维空间的 \(q_{ij}\) </li>
+<li>计算梯度</li>
+<li>更新 \(Y^{(t)}=Y^{(t−1)}+ \eta \frac{\partial C}{\partial Y}+ \alpha^{(t)}(Y^{(t−1)}−Y^{(t−2)})\)</li>
+<li>结束</li>
+</ul></li>
+<li><p>结束</p></li>
+</ul>
+
+<p>优化过程中可以尝试的两个trick:</p>
+
+<ol>
+<li>提前压缩 (early compression) :开始初始化的时候，各个点要离得近一点。这样小的距离，方便各个聚类中心的移动。可以通过引入 L2 正则项(距离的平方和)来实现。</li>
+<li>提前夸大 (early exaggeration) ：在开始优化阶段，\(p_{ij}\) 乘以一个大于1的数进行扩大，来避免因为 \(q_{ij}\) 太小导致优化太慢的问题。比如前50次迭代，\(p_{ij}\) 乘以4。</li>
+</ol>
+
+<h4 id="toc_9">不足</h4>
+
+<p>主要不足有四个:</p>
+
+<ol>
+<li>主要用于可视化，很难用于其他目的。比如测试集合降维，因为他没有显式的预估部分，不能在测试集合直接降维；比如降维到10维，因为t分布偏重长尾，1个自由度的t分布很难保存好局部特征，可能需要设置成更高的自由度。</li>
+<li>t-SNE倾向于保存局部特征，对于本征维数(intrinsic dimensionality)本身就很高的数据集，是不可能完整的映射到2-3维的空间</li>
+<li>t-SNE没有唯一最优解，且没有预估部分。如果想要做预估，可以考虑降维之后，再构建一个回归方程之类的模型去做。但是要注意，t-sne中距离本身是没有意义，都是概率分布问题。</li>
+<li>训练太慢。有很多基于树的算法在t-sne上做一些改进</li>
+</ol>
+
+<hr/>
+
+<p><a href="http://www.jmlr.org/papers/volume9/vandermaaten08a/vandermaaten08a.pdf">Visualizing Data Using T-SNE</a><br/>
+<a href="http://www.datakit.cn/blog/2017/02/05/t_sne_full.html">t-SNE完整笔记</a> <br/>
+<a href="http://bindog.github.io/blog/2016/06/04/from-sne-to-tsne-to-largevis/?from=timeline&amp;isappinstalled=0">从SNE到t-SNE再到LargeVis</a><br/>
+<a href="https://nlml.github.io/in-raw-numpy/in-raw-numpy-t-sne/">t-SNE原生numpy实现</a><br/>
+<a href="https://www.oreilly.com/learning/an-illustrated-introduction-to-the-t-sne-algorithm">t-SNE介绍与实现</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+  
+	<div class="pagination">
+	
+<a href="archives.html">Blog Archives</a>
+	 
+	    
+	</div>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

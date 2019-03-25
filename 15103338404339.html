@@ -1,0 +1,513 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  基于划分的聚类算法-KMean算法与KMean++及优化 - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">基于划分的聚类算法-KMean算法与KMean++及优化</h1>
+				<p class="meta"><time datetime="2017-11-11T01:10:40+08:00" pubdate data-updated="true">2017/11/11</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<blockquote>
+<p>聚类就是按照某个特定标准(如距离准则)把一个数据集分割成不同的类或簇，使得同一个簇内的数据对象的相似性尽可能大，同时不在同一个簇中的数据对象的差异性也尽可能地大。即聚类后同一类的数据尽可能聚集到一起，不同数据尽量分离。</p>
+</blockquote>
+
+<p>聚类算法还算比较常用的算法之一，我们在实际开发中，也经常需要用到。聚类算法的种类有很多，在后续遇到的时候再好好学习，这里来学习一种比较简单的聚类算法，<code>k-means</code>算法（<code>k-means</code>算法是距离准则的一种），以及它的几个变种算法。</p>
+
+<h3 id="toc_0">k-means 算法</h3>
+
+<p><code>k-means</code>是聚类方法中最常用的之一，该算法是以<code>k</code>为参数，将对象分成<code>k</code>个簇，使同一个簇中的元素尽可能的相似，不同簇的元素有很大的差异性。<code>k-means</code>的算法过程如下：</p>
+
+<ol>
+<li>随机在数据集中选出<code>k</code>个元素，假定为簇中心</li>
+<li>对数据集中的每一个元素，找出离自己最近的那个簇中心，比如<code>k1</code>，那么这个元素便属于<code>k1</code>簇</li>
+<li>遍历完所有的簇后，此时，每一个簇<code>k1,k2,k3...k</code>都包含若干元素，分别计算这些簇的平均值，作为新的簇中心</li>
+<li>重复<code>2</code>,<code>3</code>直到所有数据点所属的簇不再发生变化，停止。至此，数据集划分成了<code>k</code>个簇。</li>
+</ol>
+
+<p>这个过程看起来十分简单，下面用代码实现，首先加载数据集：</p>
+
+<pre><code class="language-python">import numpy as np
+from matplotlib import pyplot as plt
+
+
+# 加载数据集
+def load_data_set():
+    fr = open(file)
+    data = []
+    for line in fr.readlines():
+        data.append(list(map(float, line.strip().split(&quot;\t&quot;))))
+    return data
+
+# 聚类
+def split_group(data, center, k):
+    group = {}
+    cluster_change = False
+    if isinstance(data, list):  # 如果是一个list，也就是第一次传入，默认假设分类为-1的
+        data = {-1: data}
+    for index, arr in data.items():
+        for ele in arr:
+            ele_arr = np.tile(ele, k).reshape(-1, 2)
+            distance = np.sum((ele_arr - center) ** 2, axis=1)
+            min_p = np.argmin(distance)
+            if group.get(min_p) is None:
+                group[min_p] = []
+            group[min_p].append(ele)
+            if cluster_change is False and min_p != index:
+                cluster_change = True
+    return group, cluster_change
+
+
+def random_select(data,k):
+    column_num = np.shape(data)[1]
+    min_n = np.min(data, axis=0)
+    max_n = np.max(data, axis=0)
+    return np.random.uniform(min_n, max_n, (k,column_num))
+
+
+if __name__ == &#39;__main__&#39;:
+    file = &quot;/Users/Fei/Desktop/testSet.txt&quot;
+    k = 4
+    data = load_data_set()
+    # 画出所有的点
+    plt.subplot(111)
+    # 从数据集中随机获取四个点，作为簇中心
+    center = random_select(data,k)
+    # center = np.random.uniform(random.choices(data, k=k))
+    cluster = data.copy()
+    cluster_change = True
+    while cluster_change:
+        # 循环每一个数据集找出离自己最近的簇中心，加入这个簇
+        cluster, cluster_change = split_group(cluster, center, k)
+        # 获取新的簇中心点
+        center = np.array([np.sum(np.array(y), axis=0) / 20 for (x, y) in cluster.items()])
+    # 绘制最终位置
+    plt.scatter(np.array(cluster[0])[:, 0], np.array(cluster[0])[:, 1], c=&quot;black&quot;)
+    plt.scatter(np.array(cluster[1])[:, 0], np.array(cluster[1])[:, 1], c=&quot;green&quot;)
+    plt.scatter(np.array(cluster[2])[:, 0], np.array(cluster[2])[:, 1], c=&quot;blue&quot;)
+    plt.scatter(np.array(cluster[3])[:, 0], np.array(cluster[3])[:, 1], c=&quot;yellow&quot;)
+    plt.scatter(center[:, 0], center[:, 1], c=&quot;red&quot;)
+    plt.show()
+
+</code></pre>
+
+<p>效果如下：</p>
+
+<div align=center>
+    <img width=450 src="media/15103338404339/15176316411276.jpg" />
+</div>
+
+<p>可以看到整个聚类还是比较成功的，当然其实这种方式还是有些缺点的</p>
+
+<p>不足：<br/>
+1、很多数据集我们事先并不知道到底分成多少个类比较合适，也就是<code>k</code>的值难以确定。<br/>
+2、聚类的效果很大程度是需要依靠第一次随机<code>k</code>个簇中心的选择。如果第一次选择的<code>k</code>个簇中心的位置不好，比如两个簇中心相距很近，后面聚类效果可能并不理想。</p>
+
+<h3 id="toc_1">k-means++ 算法</h3>
+
+<p>为了上述解决第二个问题，我们直观上也应该觉得两个簇中心的距离应该越远越好，于是<code>k-means++</code>算法就出现了。<code>k-means++</code>算法首先会随机选出一个数据中的一个点做为簇中心，然后后面的几个簇中心的选择方法是：首先计算所有点和距离最近的簇中心的距离，距离越大的点作为簇中心的概率越大，重复执行多次，选出<code>k</code>个簇中心，然后使用<code>k-means</code>方法聚类。</p>
+
+<p>该算法中关键点在于怎么选出<code>k</code>个簇中心。</p>
+
+<pre><code class="language-python">data = load_data_set()
+    # 随机选择一个点作为簇中心点
+    centroids = random.choices(data,k=1)
+    dists = {}
+    # 遍历所有的点，找出与这个点最近的簇中心之间的距离
+    data_len = len(data)
+    for i in range(k-1):
+        cent = centroids[i]
+        # 绝对的最大最小
+        dists[i] = np.sum(np.power(np.tile(cent, data_len).reshape((-1, 2)) - data,2),axis=1)
+        centroids.append(random.choices(data, np.min([y for x,y in dists.items()],axis=0))[0])
+</code></pre>
+
+<p>上面代码虽然很少但是做的事情很多。关键点在于</p>
+
+<pre><code class="language-python">random.choices(data, np.min([y for x,y in dists.items()],axis=0))[0]
+</code></pre>
+
+<p>这里先使用<code>np.min([y for x,y in dists.items()],axis=0)</code>方法求出每个点距离它最近的簇中心的距离，因为<code>[y for x,y in dists.items()]</code>第一行的元素表示每一个点距离第一个簇中心的距离，第二行的元素表示每个点距离第二个簇中心的距离......以此类推，以此对每一列求最小值既可得到每一个点距离最近的簇中心的距离。<br/>
+然后我们将这个距离作为选择每一个点的概率，通过<code>random.choices()</code>方法即可实现。</p>
+
+<p>完整代码如下：</p>
+
+<pre><code class="language-python">import numpy as np
+import random
+from matplotlib import pyplot as plt
+
+def load_data_set():
+    data = []
+    with open(file) as fr:
+        for line in fr.readlines():
+            data.append(list(map(float,line.strip().split(&#39;\t&#39;))))
+    return data
+
+def split_group(data, center, k):
+    group = {}
+    cluster_change = False
+    if isinstance(data, list):  # 如果是一个list，也就是第一次传入，默认假设分类为-1的
+        data = {-1: data}
+    for index, arr in data.items():
+        for ele in arr:
+            ele_arr = np.tile(ele, k).reshape(-1, 2)
+            distance = np.sum((ele_arr - center) ** 2, axis=1)
+            min_p = np.argmin(distance)
+            if group.get(min_p) is None:
+                group[min_p] = []
+            group[min_p].append(ele)
+            if cluster_change is False and min_p != index:
+                cluster_change = True
+    return group, cluster_change
+
+if __name__ == &#39;__main__&#39;:
+    file = u&quot;/Users/Fei/Desktop/testSet.txt&quot;
+    k = 4
+    data = load_data_set()
+    # 随机选择一个点作为簇中心点
+    centroids = random.sample(data,1)
+    dists = {}
+    # 遍历所有的点，找出与这个点最近的簇中心之间的距离
+    data_len = len(data)
+    for i in range(k-1):
+        cent = centroids[i]
+        # 绝对的最大最小
+        dists[i] = np.sum(np.power(np.tile(cent, data_len).reshape((-1, 2)) - data,2),axis=1)
+        centroids.append(random.choices(data, weights=np.min([y for x,y in dists.items()],axis=0))[0])
+    # 用得到的四个簇中心点来计算划分簇
+    cluster = data.copy()
+    cluster_change = True
+    while cluster_change:
+        # 循环每一个数据集找出离自己最近的簇中心，加入这个簇
+        cluster, cluster_change = split_group(cluster, centroids, k)
+        # 获取新的簇中心点
+        centroids = np.array([np.sum(np.array(y), axis=0) / 20 for (x, y) in cluster.items()])
+    # 绘制最终位置
+    plt.scatter(np.array(cluster[0])[:, 0], np.array(cluster[0])[:, 1], c=&quot;black&quot;)
+    plt.scatter(np.array(cluster[1])[:, 0], np.array(cluster[1])[:, 1], c=&quot;green&quot;)
+    plt.scatter(np.array(cluster[2])[:, 0], np.array(cluster[2])[:, 1], c=&quot;blue&quot;)
+    plt.scatter(np.array(cluster[3])[:, 0], np.array(cluster[3])[:, 1], c=&quot;yellow&quot;)
+    plt.scatter(np.array(centroids)[:, 0], np.array(centroids)[:, 1], c=&quot;red&quot;)
+    plt.show()
+</code></pre>
+
+<p>效果如下：</p>
+
+<div align=center>
+    <img width=450 src="media/15103338404339/15176479650413.jpg" />
+</div>
+
+<p>效果看上去和<code>k-means</code>一致，而在某些时候虽然只是改变了簇中心的选择，但是这十分有效。</p>
+
+<h3 id="toc_2">KMean算法优化——elkan KMeans</h3>
+
+<p>在传统的KMean算法中，每一次迭代需要求出所有样本点到所有质心间的距离，这样做会比较耗时。elkan KMeans利用了两边之和大于等于第三边,以及两边之差小于第三边的三角形性质，来减少距离的计算。</p>
+
+<div align=center>
+    <img width=450 src="media/15103338404339/15319350436275.jpg" />
+</div>
+
+<p>如上图，由三角形性质（两边之差小于第三边）可知：</p>
+
+<p>\[<br/>
+AB - AC \le BC<br/>
+\]</p>
+
+<p>当我们计算出质心A和质心B之间的距离AB后，当需要判断C与A和B哪个更近时，只需要再计算C与A之间的距离AC，如果<br/>
+\[<br/>
+2AC \le AB \quad \Rightarrow \quad AC \le AB - AC \le BC \quad \Rightarrow \quad AC \le BC<br/>
+\]</p>
+
+<p>那么便省去了计算B与C的距离BC。</p>
+
+<h3 id="toc_3">KMeans算法优化——Mini Batch KMeans</h3>
+
+<p>在统的K-Means算法中，要计算所有的样本点到所有的质心的距离。如果样本量非常大，比如达到10万以上，特征有100以上，此时用传统的K-Means算法非常的耗时，就算加上elkan KMeans优化也依旧。在大数据时代，这样的场景越来越多。此时Mini Batch K-Means应运而生。</p>
+
+<p>顾名思义，Mini Batch，也就是用样本集中的一部分的样本来做传统的K-Means，这样可以避免样本量太大时的计算难题，算法收敛速度大大加快。当然此时的代价就是我们的聚类的精确度也会有一些降低。一般来说这个降低的幅度在可以接受的范围之内。</p>
+
+<p>在Mini Batch K-Means中，我们会选择一个合适的批样本大小batch size，我们仅仅用batch size个样本来做K-Means聚类。那么这batch size个样本怎么来的？一般是通过无放回的随机采样得到的。</p>
+
+<p>为了增加算法的准确性，我们一般会多跑几次Mini Batch K-Means算法，用得到不同的随机采样集来得到聚类簇，选择其中最优的聚类簇。</p>
+
+<hr/>
+
+<p><a href="http://www.cnblogs.com/pinard/p/6164214.html">K-means聚类算法原理</a></p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html'>聚类问题</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15103700734723.html" 
+	        title="Previous Post: 基于层次的聚类算法-自下向上-Rock算法">&laquo; 基于层次的聚类算法-自下向上-Rock算法</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15097627425135.html" 
+	        title="Next Post: KNN 算法 与 KD树">KNN 算法 与 KD树 &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

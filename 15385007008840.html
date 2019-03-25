@@ -1,0 +1,353 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  次梯度 subgradient - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">次梯度 subgradient</h1>
+				<p class="meta"><time datetime="2018-10-03T01:18:20+08:00" pubdate data-updated="true">2018/10/3</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>次梯度方法是传统梯度下降算法的拓展，传统梯度下降算法是为了解决可导凸函数的问题，而次梯度方法主要是为了解决不可导梯度的问题。但是其算法收敛速度会相对较慢。</p>
+
+<h3 id="toc_0">次梯度的定义</h3>
+
+<p>次梯度是指对于函数 \(f\) 上的点 \(x\) 满足一下条件的 \(g\in\mathbb R^n\)： <br/>
+\[<br/>
+f(y) \geq f(x) + g^T(y-x)  <br/>
+\]</p>
+
+<p>即 </p>
+
+<ol>
+<li><p>若 \(f\) 是一个凸函数，若 \(f\) 在 \(x\) 处可导，则由一阶泰勒展开式：<br/>
+\[ <br/>
+f(y) \geq f(x) + \nabla  f(x)^T(y-x)  <br/>
+\]</p></li>
+<li><p>若 \(f\) 在 \(x\) 处不可导，则仍可得到一个下届： <br/>
+\[<br/>
+f(y) \geq f(x) + g^T(y-x) <br/>
+\]</p>
+
+<p>这个 \(g\) 就是 \(f\) 的子梯度。</p></li>
+</ol>
+
+<p>注意：虽然次梯度是针对不可导函数而设计的，但是可导函数也仍然可以使用，因此 \(f\) 是非凸函数也是可以的。</p>
+
+<p>对于一个给定的点，可能不止一个这样的次梯度存在，而是一个次梯度的集合，这样的集合就叫做次微分（次导数），表示为 \(\partial f(x)\)。注意，如果微分存在的情况下，这样的次微分集合只包含一个元素，就是该点的梯度值，也就是蜕化为正常的梯度方式，所以说这是梯度的一种扩展。</p>
+
+<h3 id="toc_1">次梯度的计算公式</h3>
+
+<p>在点 \(x_0\) 的次导数的集合是一个非空闭区间 \([a,b]\) ，其中 \(a\) 和 \(b\) 是单侧极限<br/>
+\[<br/>
+a = lim_{x\rightarrow x_0^-} \frac{f(x) - f(x_0)}{x-x_0} \\<br/>
+b = lim_{x\rightarrow x_0^+} \frac{f(x) - f(x_0)}{x-x_0} \\<br/>
+\]</p>
+
+<p>\(a\) 和 \(b\) 一定存在，且 \(a\le b\)。所有次导数的集合 \([a,b]\) 称为函数 \(f\) 在\(x_0\) 的次微分。</p>
+
+<p>假设 \(f(x)=|x|\) 在 \(x=0\) 的次梯度为 \([-1, 1]\)。这是因为<br/>
+\[<br/>
+\begin{align*}<br/>
+a &amp;= \lim_{x-&gt;0^-}\frac{|x|-0}{x}=\frac{-x}{x}=-1\\<br/>
+b &amp;= \lim_{x-&gt;0^+}\frac{|x|-0}{x}=\frac{x}{x}=1\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>因此 \(f(x)\) 在 \(x=0\) 的次微分为 \([-1,1]\)。</p>
+
+<h3 id="toc_2">次梯度的性质</h3>
+
+<ol>
+<li><strong>数乘不变性</strong>：\(\forall \alpha \ge 0, \partial(\alpha f)(x)=\alpha \partial f(x)\)</li>
+<li><strong>加法不变性</strong>：\(\partial(f_1(x)+f_2(x)+...+f_m(x))=\partial f_1(x)+...+\partial f_m(x)\)</li>
+<li><strong>放射特性</strong>：如果 \(f\) 是凸函数，那么 \(\partial f(Ax+b)=A^T\partial f(Ax+b)\)</li>
+</ol>
+
+<h3 id="toc_3">次梯度算法</h3>
+
+<p>次梯度算法与梯度下降类似，仅仅是使用次梯度代替梯度，即： <br/>
+\[<br/>
+x^{(k)}=x^{(k-1)}-t_k  \cdot g^{(k-1)}, k=1,2,3... <br/>
+\]</p>
+
+<p>其中，\(g^{(k-1)} \in \partial f(x^{(k-1)})\) 为 \(f(x)\) 在 \(x\) 处的次梯度。 <br/>
+与梯度下降算法不同的地方在于，次梯度算法并不是下降算法，每次对于参数的更新并不能保证代价函数是呈单调递减的趋势。</p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html'>数学基础</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15396209035459.html" 
+	        title="Previous Post: 矩阵求导">&laquo; 矩阵求导</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15378797300710.html" 
+	        title="Next Post: 强化学习 Reinforcement Learning">强化学习 Reinforcement Learning &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

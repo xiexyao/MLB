@@ -1,0 +1,2667 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  集成学习 - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div class="blog-index">
+
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15230159235437.html">算法稳定性 stability</a></h1>
+			<p class="meta"><time datetime="2018-04-06T19:58:43+08:00" 
+			pubdate data-updated="true">2018/4/6</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>无论是基于 VC 维还是 Rademacher 复杂度来推导泛化误差界，所得到的结果均与具体学习算法无关，对所有学习算法都适用。这使得人们能够脱离具体学习算法的设计来考虑学习问题本身的性质，但在另一方面，若希望获得与算法有关的分析结果，则需另辟蹊径。稳定性分析是这方面的一个值得关注的方向。</p>
+
+<p>顾名思义，算法的“稳定性”考察的是算法在输入发生变化时，输出是否会随之发生较大的变化。学习算法的输入是训练集，因此下面我们先定义训练集的两种变化。</p>
+
+<p>给定 \(D=\{z_1=(x_1,y_1),z_2=(x_2,y_2),...,z_m=(x_m,y_m)\}\)，\(x_i\in\mathcal X\) 是来自分布 \(\mathcal D\) 的独立同分布示例，\(y_i=\{-1,+1\}\)。对假设空间 \(\mathcal H:\mathcal X\rightarrow\{-1,+1\}\) 和学习算法 \(\mathcal L\)，令 \(\mathcal L_D\in\mathcal H\) 表示基于训练集 \(D\) 从假设空间 \(\mathcal H\) 中学得的假设。考虑 \(D\) 的以下变化：</p>
+
+<ul>
+<li><p>\(D^{\backslash i}\) 表示移除 \(D\) 中第 \(i\) 个样例得到的集合<br/>
+\[<br/>
+D^{\backslash i} = \{z_1,z_2,...,z_{i-1},z_{i+1},...,z_m\},<br/>
+\]</p></li>
+<li><p>\(D^i\) 表示替换 \(D\) 中第 \(i\) 个样例得到的集合<br/>
+\[<br/>
+D^i = \{z_1,z_2,...,z_{i-1},z&#39;_i,z_{i+1},...,z_m\},<br/>
+\]</p></li>
+</ul>
+
+<p>其中 \(z&#39;_i=(x&#39;_i,y&#39;_i)\)，\(x&#39;_i\) 服从分布 \(\mathcal D\) 并独立于 \(D\)。</p>
+
+<p>损失函数 \(\ell(\mathcal L_D(x),y):\mathcal Y\times \mathcal Y\rightarrow \mathbb R^{+}\) 刻画了假设 \(\mathcal L_D\) 的预测标记 \(\mathcal L_D(x)\) 与真实标记 \(y\) 之间的差别，简记为 \(\ell(\mathcal L_D,z)\)。下面定义关于假设 \(\mathcal L_D\) 的几种损失。</p>
+
+<ul>
+<li><p>泛化损失<br/>
+\[<br/>
+\ell(\mathcal L_D,\mathcal D) = \mathbb E_{x\in\mathcal X,z=(x,y)}[\ell(\mathcal L_D,z)]<br/>
+\]</p></li>
+<li><p>经验损失<br/>
+\[<br/>
+\hat \ell(\mathcal L,D) = \frac 1 m\sum_{i=1}^m \ell(\mathcal L_D,z_i)<br/>
+\]</p></li>
+<li><p>留一 (leave-one-out) 损失<br/>
+\[<br/>
+\ell_{loo}(\mathcal L,D) = \frac 1 m \sum_{i=1}^m \ell(\mathcal L_{D^{\backslash i}},z_i)<br/>
+\]</p></li>
+</ul>
+
+<p>下面定义算法的均匀稳定性（uniform stability)：<br/>
+<strong>均匀稳定性</strong>：对任何 \(x\in\mathcal X\)，\(z=(x,y)\)，若学习算法 \(\mathcal L\) 满足<br/>
+\[<br/>
+|\ell(\mathcal L_D,z) - \ell(\mathcal L_{D^{\backslash i},z})| \le \beta,\quad i=1,2,...,m<br/>
+\]</p>
+
+<p>则称 \(\mathcal L\) 关于损失函数 \(\ell\) 满足 \(\beta\)-均匀稳定性。</p>
+
+<p>显然，若算法 \(\mathcal L\) 关于损失函数 \(\ell\) 满足 \(\beta\)-均匀稳定性，则有：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;|\ell(\mathcal L_D,z) - \ell(\mathcal L_{D^{i}},z)|\\<br/>
+&amp;\le |\ell(\mathcal L_D,z) - \ell(\mathcal L_{D^{\backslash i}},z)| + |\ell(\mathcal L_{D^i},z) - \ell(\mathcal L_{D^{\backslash i}},z)|\\<br/>
+&amp;\le 2\beta<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>也就是说移除示例的稳定性包含替换示例的稳定性。</p>
+
+<p>再来看几个稍弱一点的概念：</p>
+
+<p><strong>误差稳定性</strong>：对任意 \(D\)，对于所有 \(i\in [0,m]\)，都有：<br/>
+\[<br/>
+\begin{align*}<br/>
+|\ell(\mathcal L_D,\mathcal D) - \ell(\mathcal L_{D^{\backslash i}},\mathcal D)| &amp;=  \Big|\mathbb E\big[\ell(\mathcal L_D,z)\big] - \mathbb E\big[\ell(\mathcal L_{D^{\backslash i}},z)\big]\Big| \\<br/>
+&amp;= \Big|\mathbb E\big[\ell(\mathcal L_D,z) - \ell(\mathcal L_{D^{\backslash i}},z)\big]\Big|\\<br/>
+&amp;\le \beta<br/>
+\end{align*}<br/>
+\] </p>
+
+<p><strong>假设稳定性</strong>：对于任意 \(i\in [0,m]\)，当训练数据集 \(D\) 被移除后有：<br/>
+\[<br/>
+\begin{align*}<br/>
+|\hat \ell(\mathcal L,D) - \hat \ell(\mathcal L,D^{\backslash i}) | &amp;= \frac 1 m\sum_{j\neq i}\Big| \ell(\mathcal L_{D},z_j) - \ell(\mathcal L_{D^{\backslash i}},z_j)\Big| + \frac 1 m \ell(\mathcal L_{D},z_i)\\<br/>
+&amp;\le \frac{(m-1)\beta}{m} + \frac{M}{m}\\<br/>
+&amp;\le \beta + \frac M m<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>若损失函数 \(\ell\) 有界，即对所有 \(D\) 和 \(z=(x,y)\) 有 \(0\le \ell(\mathcal L_D,z) \le M\)，则有</p>
+
+<p><strong>定理1</strong>：给定从分布 \(\mathcal D\) 上独立同分布采样得到的大小为 \(m\) 的示例集 \(D\)，若学习算法 \(\mathcal L\) 满足关于损失函数 \(L\) 的 \(\beta\)-均匀稳定性，且损失函数 \(L\) 的上界为 \(M\)，\(0\lt \delta\lt 1\)，则对任意 \(m\ge 1\)，以至少 \(1-\delta\) 的概率有<br/>
+\[<br/>
+\begin{align}<br/>
+\ell(\mathcal L_D,\mathcal D) &amp;\le \hat \ell(\mathcal L,D) + 2\beta + (4m\beta + M)\sqrt{\frac{\ln(1/\delta)}{2m}}\label{lmlm1}\\<br/>
+\ell(\mathcal L_D,\mathcal D) &amp;\le \ell_{loo}(\mathcal L,D) + \beta + (4m\beta + M)\sqrt{\frac{\ln(1/\delta)}{2m}}\label{lmlm2}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>证明：类比<strong>误差稳定性</strong>，我们可以通过三角不等式得出：<br/>
+\[<br/>
+\begin{align*}<br/>
+|\ell(\mathcal L_D,\mathcal D) - \ell(\mathcal L_{D^{i}},\mathcal D)| &amp;= \Big|\mathbb E\big[\ell(\mathcal L_D,z) - \ell(\mathcal L_{D^{i}},z) \big]\Big| \\<br/>
+&amp;\le \Big|\mathbb E\big[\ell(\mathcal L_D,z) - \ell(\mathcal L_{D^{\backslash i}},z) \big]\Big| + \Big|\mathbb E\big[\ell(\mathcal L_{D^i},z) - \ell(\mathcal L_{D^{\backslash i}},z) \big]\Big|\\<br/>
+&amp;\le 2\beta\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>而使用<strong>假设稳定性</strong>，我们可以得出<br/>
+\[<br/>
+\begin{align*}<br/>
+|\hat \ell(\mathcal L,D) - \hat \ell(\mathcal L,D^{i}) | &amp;\le |\hat \ell(\mathcal L,D) - \hat \ell(\mathcal L,D^{\backslash i})| + |\hat \ell(\mathcal L,D^{\backslash i}) - \hat \ell(\mathcal L,D^{i})|\\<br/>
+&amp;\le 2(\beta + \frac M m)\\<br/>
+&amp;= 2\beta + 2\frac M m\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>实际上我们还有更好的上界表示：<br/>
+\[<br/>
+\begin{align*}<br/>
+|\hat \ell(\mathcal L,D) - \hat \ell(\mathcal L,D^{i}) |&amp;= \frac 1 m\sum_{j\neq i}\Big| \ell(\mathcal L_{D},z_j) - \ell(\mathcal L_{D^{i}},z_j)\Big| + \frac 1 m \Big(\ell(\mathcal L_{D},z_i) - \ell(\mathcal L_{D},z&#39;_i)\Big)\\<br/>
+&amp;\le \frac 1 m \sum_{j\neq i}\Big(|\ell(\mathcal L_{D},z_j) - \ell(\mathcal L_{D^{\backslash i}},z_j)| + |\ell(\mathcal L_{D^{\backslash i}},z_j) - \ell(\mathcal L_{D^{i}},z_j)| \Big)+ \frac 1 m \Big(\ell(\mathcal L_{D},z_i) - \ell(\mathcal L_{D},z&#39;_i)\Big)\\<br/>
+&amp;= \frac 1 m \sum_{j\neq i}|\ell(\mathcal L_{D},z_j) - \ell(\mathcal L_{D^{\backslash i}},z_j)| +\frac 1 m \sum_{j\neq i} |\ell(\mathcal L_{D^{\backslash i}},z_j) - \ell(\mathcal L_{D^{i}},z_j)|+ \frac 1 m \Big(\ell(\mathcal L_{D},z_i) - \ell(\mathcal L_{D},z&#39;_i)\Big)\\<br/>
+&amp;\le 2\beta + \frac M m<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>定义随机变量 \(Z\) 为<br/>
+\[<br/>
+Z = \ell(\mathcal L_D,\mathcal D) - \hat \ell(\mathcal L,D)<br/>
+\]</p>
+
+<p>则 \(Z^i\) 是 \(D\) 被替换为 \(D^{i}\) 的随机变量<br/>
+\[<br/>
+Z^i = \ell(\mathcal L_{D^i},\mathcal D) - \hat \ell(\mathcal L,D^i)<br/>
+\]</p>
+
+<p>所以有<br/>
+\[<br/>
+\begin{align*}<br/>
+|Z-Z^{i}| &amp;= \Big|\big(\ell(\mathcal L_D,\mathcal D) - \hat \ell(\mathcal L,D)\big) - \big(\ell(\mathcal L_{D^{i}},\mathcal D) - \hat \ell(\mathcal L,D^{i})\big) \Big|\\<br/>
+&amp;= \Big|\big(\ell(\mathcal L_D,\mathcal D) -\hat \ell(\mathcal L_{D^{i}},\mathcal D)\big) + \big(\ell(\mathcal L,D^{i}) -  \hat \ell(\mathcal L,D)\big) \Big|\\<br/>
+&amp;\le \Big|\ell(\mathcal L_D,\mathcal D) -\ell(\mathcal L_{D^{i}},\mathcal D)\Big| + \Big|\hat \ell(\mathcal L,D^{i}) -  \hat \ell(\mathcal L,D)\Big|\\<br/>
+&amp;\le 2\beta + 2\beta + \frac M m\\<br/>
+&amp;\le 4\beta + \frac M m\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>在 Mcdiarmid 不等式中有 \(c_i = 4\beta + \frac M m\)。</p>
+
+<p>为了求随机变量期望值的边界，我们需要两个特性：</p>
+
+<ul>
+<li>\(\mathbb E_D[\ell(\mathcal L_D,z_i)] = \mathbb E_{D,z&#39;}[\ell(\mathcal L_{D^{j}},z&#39;)]\)：这个特性成立是因为 \(z_i\) 是从 \(\mathcal D\) 中取样的，\(P(D) = P(D^j)\)。</li>
+<li>\(\mathbb E_{D,z&#39;}[\ell(\mathcal L_{D^j},z&#39;)] = \mathbb E_{D,z&#39;}[\ell(\mathcal L_{D^{i}},z&#39;)]\)：为了看这个特性成立，我们令 \(D&#39;\) 是一个和 \(D\) 包含相同元素的集合，但是交换 \(z_i\) 和 \(z_j\) 的位置。因为学习算法是顺序要求的，所以 \(\mathcal L_D = \mathcal L_{D&#39;}\)，结合 \(P(D) = P(D&#39;)\) 和上一个特性可以得到此特性。</li>
+</ul>
+
+<p>用这两个特性，我们有<br/>
+\[<br/>
+\begin{align}<br/>
+\mathbb E(Z) &amp;= \mathbb E_D[\ell(\mathcal L_D,\mathcal D) - \hat \ell(\mathcal L,D)]\nonumber\\<br/>
+&amp;= \mathbb E_{D,z&#39;}[\ell(\mathcal L_D,z&#39;) - \hat \ell(\mathcal L,D)]\nonumber\\<br/>
+&amp;= \mathbb E_{D,z&#39;}[\ell(\mathcal L_D,z&#39;)] - \mathbb E_{D}[\hat \ell(\mathcal L,D)]\nonumber\\<br/>
+&amp;= \mathbb E_{D,z&#39;}[\ell(\mathcal L_D,z&#39;)] - \mathbb E_{D}[\frac 1 m \sum_{i=1}^m \ell(\mathcal L_D,z_i)]\nonumber\\<br/>
+&amp;= \mathbb E_{D,z&#39;}[\ell(\mathcal L_D,z&#39;)] - \frac 1 m \sum_{i=1}^m \mathbb E_{D}[\ell(\mathcal L_D,z_i)]\nonumber\\<br/>
+&amp;= \mathbb E_{D,z&#39;}[\ell(\mathcal L_D,z&#39;)] - \frac 1 m \sum_{i=1}^m \mathbb E_{D,z&#39;}[\ell(\mathcal L_{D^j},z&#39;)]\nonumber\\<br/>
+&amp;= \mathbb E_{D,z&#39;}[\ell(\mathcal L_D,z&#39;)] - \frac 1 m m \mathbb E_{D,z&#39;}[\ell(\mathcal L_{D^j},z&#39;)]\nonumber\\<br/>
+&amp;= \mathbb E_{D,z&#39;}[\ell(\mathcal L_D,z&#39;)] - \mathbb E_{D,z&#39;}[\ell(\mathcal L_{D^i},z&#39;)]\nonumber\\<br/>
+&amp;= \mathbb E_{D,z&#39;}[\ell(\mathcal L_D,z&#39;) - \ell(\mathcal L_{D^i},z&#39;)]\nonumber\\<br/>
+&amp;\le 2\beta\label{mb2b}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>通过 Mcdiarmid 不等式，有<br/>
+\[<br/>
+\begin{align*}<br/>
+P\big[Z - \mathbb E[Z] \le \epsilon\big] &amp;\ge 1- \exp\bigg(\frac{-2\epsilon^2}{\sum_{i=1}^m c_i^2 } \bigg)\\<br/>
+&amp;= 1- \exp\bigg(\frac{-2\epsilon^2}{\sum_{i=1}^m (4\beta+\frac M m)^2 } \bigg)\\<br/>
+&amp;= 1- \exp\bigg(\frac{-2\epsilon^2}{m (4\beta+\frac M m)^2 } \bigg)\\<br/>
+&amp;= 1- \exp\bigg(\frac{-2m\epsilon^2}{(4m\beta+M)^2 } \bigg)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令<br/>
+\[<br/>
+\delta = \exp\bigg(\frac{-2m\epsilon^2}{(4m\beta+M)^2 } \bigg)<br/>
+\]</p>
+
+<p>如果我们用 \(\delta\) 来表示 \(\epsilon\) 便有<br/>
+\[<br/>
+\epsilon = (4m\beta + M)\sqrt{\frac{\ln(1/\delta)}{2m}}<br/>
+\]</p>
+
+<p>所以我们知<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;Z - \mathbb E[Z] \le (4m\beta + M)\sqrt{\frac{\ln(1/\delta)}{2m}}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>以至少 \(1-\delta\) 的概率成立。</p>
+
+<p>结合(\ref{mb2b})可得<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;Z \le \mathbb E[Z] + (4m\beta + M)\sqrt{\frac{\ln(1/\delta)}{2m}}\le 2\beta + (4m\beta + M)\sqrt{\frac{\ln(1/\delta)}{2m}}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>以至少 \(1-\delta\) 的概率成立。再将 \(Z\) 的定义代入，便可以证明式(\ref{lmlm1})。</p>
+
+<p>类比可以得出式(\ref{lmlm2})的证明，这里不再叙述。</p>
+
+<p>本文<strong>定理1</strong>给出了基于稳定性分析推导出的学习算法 \(\mathcal L\) 学得假设的泛化误差界。从(\ref{lmlm1})可以看出，经验损失与泛化损失之间差别的收敛率为 \(\beta\sqrt{m}\)；若令 \(\beta=O(\frac 1 m)\)，则可保证收敛率为 \(O(\frac{1}{\sqrt{m}})\)，这与VC维(该文章中的<strong>定理1</strong>)和Rademacher复杂度(该文章中的<strong>定理1</strong>)得到的收敛率一致。</p>
+
+<p>需注意，学习算法稳定性分析所关注的是 \(|\hat\ell(\mathcal L,D)-\ell(\mathcal L,\mathcal D)|\)，而假设空间复杂度分析所关注的是 \(\sup_{h\in \mathcal H}|\hat E(h) - E(h)|\)；也就是说稳定性分析不必考虑假设空间所有可能的假设，只需根据自身的特性（稳定性）来讨论输出假设 \(\mathcal L_D\) 的泛化误差界。那么稳定性与可学习性之间有什么关系呢？</p>
+
+<p>首先，必须假设 \(\beta\sqrt{m} \rightarrow 0\)，这样才能保证稳定的学习算法 \(\mathcal L\) 具有一定的泛化能力，即经验损失等于泛化损失，否则可学习性无从谈起。为了方便计算，假定 \(\beta = \frac 1 m\)，代入式(\ref{lmlm1})可得：<br/>
+\[<br/>
+\begin{equation}<br/>
+\ell(\mathcal L,\mathcal D) \le \hat \ell(\mathcal L,D) + \frac 2 m + (4+M)\sqrt{\frac{\ln(1/\delta)}{2m}}\label{lmlm3}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>对损失函数 \(\ell\) ，若学习算法 \(\mathcal L\) 所输出的假设满足经验损失最小化，则称算法 \(\mathcal L\) 满足经验损失最小化原则，简称算法是 ERM 的。关于学习算法的稳定性和可学习性，有如下定理：</p>
+
+<p><strong>定理2</strong>：若学习算法 \(\mathcal L\) 是 ERM 且稳定的，则假设空间 \(\mathcal H\) 可学习。</p>
+
+<p>证明：令 \(g\) 表示 \(\mathcal H\) 中具有最小泛化损失的假设，即<br/>
+\[<br/>
+\ell(g,\mathcal D) = \min_{h\in\mathcal H}\ell(h,\mathcal D)<br/>
+\]</p>
+
+<p>再令<br/>
+\[<br/>
+\begin{align*}<br/>
+\epsilon&#39; &amp;= \frac{\epsilon}{2},\\<br/>
+\frac{\delta}{2} &amp;= 2\exp\Big(-2m(\epsilon&#39;)^2 \Big)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>由 Hoeffding 不等式可知，当 \(m\le \frac{2}{\epsilon^2}\ln\frac 4 \delta\) 时<br/>
+\[<br/>
+|\ell(g,\mathcal D) - \hat \ell(g,D) | \le \frac \epsilon 2<br/>
+\]</p>
+
+<p>以至少 \(1-\delta/2\) 的概率成立。令式(\ref{lmlm3})中<br/>
+\[<br/>
+\frac 2 m + (4+M)\sqrt{\frac{\ln(2/\delta)}{2m}} = \frac \epsilon 2<br/>
+\]</p>
+
+<p>解得 \(m=O(\frac{1}{\epsilon^2} \ln \frac 1 \delta)\) 使<br/>
+\[<br/>
+\ell(\mathcal L,\mathcal D) \le \hat\ell(\mathcal L,D) + \frac \epsilon 2<br/>
+\]</p>
+
+<p>以至少 \(1-\delta/2\) 得概率成立，从而可得<br/>
+\[<br/>
+\begin{align*}<br/>
+\ell(\mathcal L,\mathcal D) - \ell(g,\mathcal D) &amp;\le \hat\ell(\mathcal L,D) + \frac{\epsilon}{2} - \bigg(\hat \epsilon(g,D) - \frac \epsilon 2 \bigg)\\<br/>
+&amp;\le \hat\ell(\mathcal L,D) - \hat\ell(g,D) + \epsilon\\<br/>
+&amp;\le \epsilon<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>以至少 \(1-\delta\) 得概率成立。<strong>定理2</strong>成立。</p>
+
+<hr/>
+
+<p><a href="">周志华 机器学习</a><br/>
+<a href="http://www.jmlr.org/papers/volume2/bousquet02a/bousquet02a.pdf">Stability and Generalization</a><br/>
+<a href="https://courses.cs.washington.edu/courses/cse522/11wi/scribes/lecture19.pdf">Algorithmic Stability</a><br/>
+<a href="http://101.96.10.64/www.mit.edu/%7E9.520/spring08/Classes/class14.pdf">Generalization Bounds and Stability</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15218222204104.html">Rademacher 复杂度</a></h1>
+			<p class="meta"><time datetime="2018-03-24T00:23:40+08:00" 
+			pubdate data-updated="true">2018/3/24</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>VC 维的泛化误差是分布无关、数据独立的，也就是对于任何数据分布都成立，这使得基于 VC 维的可学习分析结果具有一定的“普适性”；但从另一方面来说，由于没有考虑数据自身，基于 VC 维得到的泛化误差界通常比较 “松”，对那些与学习问题的典型情况相差甚远的较“坏”分布尤其如此。</p>
+
+<p>Rademacher 复杂度是另一种刻画假设空间复杂度的途径，与 VC 维不同的是，它在一定程度上考虑了数据分布。</p>
+
+<p>给定训练集 \(D=\{(x_1,y_1),(x_2,y_2),...,(x_m,y_m)\}\)，假设 \(h\) 的经验误差为：<br/>
+\[<br/>
+\begin{align*}\\<br/>
+\hat E(h) &amp;= \frac 1 m \sum_{i=1}^m \mathbf I(h(x_i) \neq y_i )\\<br/>
+&amp;= \frac 1 m \sum_{i=1}^m \frac{1-y_ih(x_i)}{2}\\<br/>
+&amp;= \frac 1 {2} - \frac 1{2m} \sum_{i=1}^m y_i h(x_i)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(\frac 1 m \sum_{i=1}^m y_ih(x_i)\) 体现了预测值 \(h(x_i)\) 和样例真实标记 \(y_i\) 之间的一致性，若对于所有的 \(i\in\{1,2,...,m\}\) 都有 \(y_i = h(x_i)\) ，则 \(\frac 1 m \sum_{i=1}^m y_ih(x_i)\) 取最大值 1 。也就是说，经验误差最小的假设是：<br/>
+\[<br/>
+\begin{equation}<br/>
+{\arg\min}_{h\in \mathcal H}\frac 1 m \sum_{i=1}^m y_i h(x_i)\label{ahm}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>在现实任务中，样本标记可能受到噪音影响，即对某些样例 \((x_i,y_i)\)，\(y_i\) 可能或许已经受到影响，不再是 \(x_i\) 的真实标记，在此情形下，选择假设空间 \(\mathcal H\) 中表现最好的假设，有时还不如选择 \(\mathcal H\) 中事先考虑了随机噪声影响的假设。</p>
+
+<p>考虑随机变量 \(\sigma_i\) ，它以 0.5 的概率取值 -1，以 0.5 的概率取值 +1，称为 Radermacher 随机变量：<br/>
+\[<br/>
+P(\sigma_i = 1) = P(\sigma_i = -1) = 0.5<br/>
+\]</p>
+
+<p>基于 \(\sigma_i\)，可将式 \ref{ahm} 重写为：<br/>
+\[<br/>
+\begin{equation}<br/>
+\sup_{h\in\mathcal H} \frac 1 m \sum_{i=1}^m \sigma_i h(x_i) \label{shm}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>\(\mathcal H\) 是无限假设空间，有可能取不到最大值，因此使用上确界带条最大值。</p>
+
+<p>考虑 \(\mathcal H\) 中的所有假设，对 \ref{shm} 式取期望可得：<br/>
+\[<br/>
+\begin{equation}<br/>
+\mathbb E_\sigma\bigg[\sup_{h\in\mathcal H} \frac 1 m \sum_{i=1}^m \sigma_i h(x_i) \bigg] \label{eshm}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>其中 \(\mathbb \sigma=\{\sigma_1,\sigma_2,...,\sigma_m\}\) ，式 \ref{eshm} 的取值范围为 \([0,1]\)，它体现了假设空间 \(\mathcal H\) 的表达能力，例如当 \(|\mathcal H| =1 \) 时，\(\mathcal H\) 中仅有一个假设，这时可计算出式 \ref{eshm} 的值为0：<br/>
+\[<br/>
+\mathbb E_\sigma\bigg[\sup_{h\in\mathcal H} \frac 1 m \sum_{i=1}^m \sigma_i h(x_i) \bigg] = 0.5 \cdot h(x_i) - 0.5\cdot h(x_i) = 0<br/>
+\]</p>
+
+<p>当 \(|\mathcal H|=2^m\) 且 \(\mathcal H\) 能打散 \(D\) 时，对于任意的 \(\mathbb \sigma\) 都存在一个假设 \(h(x_i) = \sigma_i;i=1,2,...,m\)，这时可计算出式 \ref{eshm} 的值为1：<br/>
+\[<br/>
+\mathbb E_\sigma\bigg[\sup_{h\in\mathcal H} \frac 1 m \sum_{i=1}^m \sigma_i h(x_i) \bigg] =  \frac 1 m\bigg(\sum_{h(x_i)=1} 1\cdot h(x_i) + \sum_{h(x_i) = -1} (-1)\cdot h(x_i)\bigg) = \frac 1 m \sum_{i=1}^m |h(x_i)| = 1<br/>
+\]</p>
+
+<p>考虑实值函数空间 \(\mathcal F:\mathcal Z\rightarrow \mathbb R\)。令 \(Z=\{z_1,z_2,...,z_m \}\)，其中 \(z_i \in \mathcal Z\)，将 \ref{eshm} 中的 \(\mathcal X\) 和 \(\mathcal H\) 替换为 \(\mathcal Z\) 和 \(\mathcal F\) 可得</p>
+
+<p><strong>定义1</strong>：函数空间 \(\mathcal F\) 关于 \(Z\) 的经验 Rademacher 复杂度：<br/>
+\[<br/>
+\begin{equation}<br/>
+\hat R_Z(\mathcal F) = \mathbb E_\sigma\bigg[\sup_{f\in\mathcal F} \frac 1 m \sum_{i=1}^m \sigma_i f(z_i) \bigg]\label{hrme}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>经验 Rademacher 复杂度衡量了函数空间 \(\mathcal F\) 与随机噪声在集合 \(Z\) 中的相关性。通常我们希望了解函数空间 \(\mathcal F\) 在 \(\mathcal Z\) 上关于 \(\mathcal D\) 的相关性，因此，对所有从 \(\mathcal D\) 独立同分布采样而得的大小为 \(m\) 的集合 \(Z\) 求期望可得：</p>
+
+<p><strong>定义2</strong>：函数空间 \(\mathcal F\) 关于 \(\mathcal Z\) 上分布 \(\mathcal D\) 的 Rademacher 复杂度：<br/>
+\[<br/>
+\begin{equation}<br/>
+R_m(\mathcal F) = \mathbb E_{Z\subset \mathcal Z:|Z|=m}\bigg[ \hat R_Z(\mathcal F) \bigg] \label{rmmm}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>基于 Rademacher 复杂度可得关于函数空间 \(\mathcal F\) 的泛化误差界。</p>
+
+<p><strong>定理1</strong> 对实数函数空间 \(\mathcal F:\mathcal Z\rightarrow[0,1]\)，根据分布 \(\mathcal D\) 从 \(\mathcal Z\) 中独立同分布采样得到示例集集 \(Z=\{z_1,z_2,...,z_m\}\)，\(z_i \in \mathcal Z\)，\(0\lt \delta \lt 1\)，对任意的 \(f\in \mathcal F\)，以至少 \(1-\delta\) 的概率有：<br/>
+\[<br/>
+\begin{align}<br/>
+\mathbb E[f(z)] \le \frac 1 m \sum_{i=1}^m f(z_i) + 2R_m(\mathcal F) + \sqrt{\frac{\ln(1/\delta)}{2m}}\label{mdl1}\\<br/>
+\mathbb E[f(z)] \le \frac 1 m \sum_{i=1}^m f(z_i) + 2\hat R_Z(\mathcal F) + 3\sqrt{\frac{\ln(1/\delta)}{2m}}\label{mdl2}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>证明：令<br/>
+\[<br/>
+\begin{align}<br/>
+\hat E_Z(f) &amp;= \frac 1 m \sum_{i=1}^m f(z_i)\label{hate}\\<br/>
+\Phi(Z) &amp;= \sup_{f\in\mathcal F}\mathbb E[f] - \hat E_Z(f)\label{phiz}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>同时令 \(Z&#39;\) 为只与 \(Z\) 有一个示例不同的训练集，不妨设 \(z_m\in Z\) 和 \(z_m&#39;\in Z&#39;\) 为不同示例，可得：<br/>
+\[<br/>
+\begin{align*}<br/>
+\Phi(Z&#39;) - \Phi(Z) = \bigg(\sup_{f\in \mathcal F}\mathbb E[f] - \hat E_{Z&#39;}(f) \bigg) - \bigg (\sup_{f \in \mathcal F} \mathbb E[f] - \hat E_Z(f) \bigg)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令 \(f&#39; = {\arg\max}_{f\in \mathcal F} E[f] - \hat E_{Z&#39;}(f)\) 代入上式：<br/>
+\[<br/>
+\begin{align*}<br/>
+\Phi(Z&#39;) - \Phi(Z) &amp;= \bigg(\sup_{f\in \mathcal F}\mathbb E[f] - \hat E_{Z&#39;}(f) \bigg) - \bigg (\sup_{f \in \mathcal F} \mathbb E[f] - \hat E_Z(f) \bigg)\\<br/>
+&amp;\le \bigg(\mathbb E[f&#39;] - \hat E_{Z&#39;}(f&#39;) \bigg) - \bigg(\mathbb E[f&#39;] - \hat E_Z(f&#39;) \bigg)\\<br/>
+&amp;\le \hat E_Z(f&#39;) - \hat E_{Z&#39;}(f&#39;)\\<br/>
+&amp;\le \sup_{f\in \mathcal F} \hat E_Z(f) - \hat E_{Z&#39;}(f)\\<br/>
+&amp;= \sum_{f\in\mathcal F} \frac {f(z_m) - f(z&#39;_m)}{m}\\<br/>
+&amp;\le \frac 1 m<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>同理可得：<br/>
+\[<br/>
+\begin{align*}<br/>
+\Phi(Z) - \Phi(Z&#39;) &amp;\le \frac 1 m\\<br/>
+|\Phi(Z) - \Phi(Z&#39;)| &amp;\le \frac 1 m\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>根据 McDiarmid 不等式可知，对任意的 \(\delta \in (0,1)\)，<br/>
+\[<br/>
+\begin{align}<br/>
+\Phi(Z) \le \mathbb E_Z[\Phi(Z)] + \sqrt{\frac{\ln(1/\delta)}{2m}}\label{phil}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>以至少 \(1-\delta\) 的概率成立，下面来估计 \(\mathbb E_Z[\Phi(Z)]\) 的上界：<br/>
+\[<br/>
+\begin{align}<br/>
+\mathbb E_Z[\Phi(Z)] &amp;= \mathbb E_Z\bigg[\sup_{f \in \mathcal F}\mathbb E[f] - \hat E_Z(f) \bigg]\label{mep1}\\<br/>
+&amp;= \mathbb E_Z\bigg[ \sup_{f\in \mathcal F} \mathbb E_{Z&#39;}[\hat E_{Z&#39;}(f) - \hat E_Z(f)] \bigg]\label{mep2}\\<br/>
+&amp;\le \mathbb E_{Z,Z&#39;} \bigg[\sup_{f\in \mathcal F} \hat E_{Z&#39;}(f) - \hat E_Z(f) \bigg] \label{mep3}\\<br/>
+&amp;= \mathbb E_{Z,Z&#39;} \bigg[\sup_{f\in \mathcal F} \frac 1 m \sum_{i=1}^m (f(z&#39;_i) - f(z_i))\bigg]\label{mep4}\\<br/>
+&amp;= \mathbb E_{\mathbf \sigma,Z,Z&#39;} \bigg[\sup_{f\in \mathcal F} \frac 1 m \sum_{i=1}^m \sigma_i(f(z&#39;_i) - f(z_i))\bigg]\label{mep5}\\<br/>
+&amp;\le \mathbb E_{\mathbf \sigma,Z&#39;} \bigg[\sup_{f\in\mathcal F} \frac 1 m \sum_{i=1}^m \sigma_i f(z&#39;_i) \bigg] + \mathbb E_{\mathbf \sigma,Z} \bigg[\sup_{f\in\mathcal F} \frac 1 m \sum_{i=1}^m -\sigma_i f(z_i) \bigg]\label{mep6}\\<br/>
+&amp;= 2\mathbb E_{\mathbf \sigma,Z} \bigg[\sup_{f\in\mathcal F} \frac 1 m \sum_{i=1}^m \sigma_i f(z_i) \bigg] = 2R_m(\mathcal F) \label{mep7}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>等式 \ref{mep1} 变成 \ref{mep2} 是因为 \(Z&#39;\) 是独立同分布采样于 \(\mathcal Z\) 所以 \(\mathbb E[f] = \mathbb E_{Z&#39;} \bigg[\hat E_{Z&#39;}(f)\bigg]\)。等式 \ref{mep3} 利用 Jensen 不等式和上确界函数的凸性可以得到。在等式 \ref{mep5} 中，我们引入了 Rademacher 变量 \(\sigma_i\) ，它是在 \([-1,1]\) 之间的均匀分布独立随机变量，并不会改变等式 \ref{mep4} 中的期望。当 \(\sigma_i=1\) 时，原式不变；当 \(\sigma_i=-1\) 关联的加数符号翻转，也就相当于交换在 \(Z\) 和 \(Z&#39;\) 中交换 \(z_i\) 和 \(z&#39;_i\)。因为我们是在所有可能的 \(Z\) 和 \(Z&#39;\) 上求期望，因此交换并不会影响最终期望。我们可以利用上确界加法的特性 \(\sup(U+V) \le \sup(U) + \sup(V)\) 得到等式 \ref{mep6}。最后等式 \ref{mep7} 是来源于 Rademacher 复杂度的定义和 \(\sigma_i\) 和 \(-\sigma_i\) 是同一个分布。</p>
+
+<blockquote>
+<p><strong>上确界函数的凸性</strong>：假设 \(X\) 是任意随机变量，对于任意的 \(f\) 都有<br/>
+\[<br/>
+\sup_{y\in Y} \mathbb E[f(X,y)] \le \mathbb E[\sup_{y\in Y} f(X,y)]<br/>
+\]</p>
+
+<p>证明很简单，因为<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\because\quad f(X,y) \le \sup_{y\in Y} f(X,y)\\<br/>
+&amp;\therefore\quad \mathbb E[f(X,y)] \le \mathbb E[\sup_{y\in Y} f(X,y)]\\<br/>
+&amp;\therefore\quad \sup_{y\in Y} \mathbb E[f(X,y)] \le \mathbb E[\sup_{y\in Y} f(X,y)]<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>等式 \ref{mep3} 可以同样由这样得到<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\because\quad \hat E_{Z&#39;}(f) - \hat E_Z(f) \le \sup_{f\in \mathcal F} \hat E_{Z&#39;}(f) - \hat E_Z(f)\\<br/>
+&amp;\therefore\quad \mathbb E_{Z&#39;}[\hat E_{Z&#39;}(f) - \hat E_Z(f)] \le \mathbb E_{Z&#39;}[\sup_{f\in \mathcal F} \hat E_{Z&#39;}(f) - \hat E_Z(f)]\\<br/>
+&amp;\therefore\quad \sup_{f\in \mathcal F}\mathbb E_{Z&#39;}[\hat E_{Z&#39;}(f) - \hat E_Z(f)] \le \mathbb E_{Z&#39;}[\sup_{f\in \mathcal F} \hat E_{Z&#39;}(f) - \hat E_Z(f)]\\<br/>
+\end{align*}<br/>
+\]</p>
+</blockquote>
+
+<p>将式 \ref{mep7} 、\ref{hate} 和 \ref{phiz} 代入式 \ref{phil} 可得：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\sup_{f\in\mathcal F}\mathbb E[f] - \frac 1 m \sum_{i=1}^m f(z_i) \le 2R_m(\mathcal F) + \sqrt{\frac{\ln(1/\delta)}{2m}}\\<br/>
+&amp;\Rightarrow \sup_{f\in\mathcal F}\mathbb E[f] \le \frac 1 m \sum_{i=1}^m f(z_i) + 2R_m(\mathcal F) + \sqrt{\frac{\ln(1/\delta)}{2m}}\\<br/>
+&amp;\Rightarrow \mathbb E[f] \le \frac 1 m \sum_{i=1}^m f(z_i) + 2R_m(\mathcal F) + \sqrt{\frac{\ln(1/\delta)}{2m}}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>至此，式 \ref{mdl1} 得证。</p>
+
+<p>由<strong>定义2</strong>可知，改变 \(Z\) 中的一个示例对 \(\hat R_Z(\mathcal F)\) 的值所造成的改变最多为 \(1/m\)。由 McDiarmid 不等式可知：<br/>
+\[<br/>
+\begin{equation}<br/>
+R_m(\mathcal F) \le \hat R_Z(\mathcal F) + \sqrt{\frac{\ln(2/\delta)}{2m}}\label{rmmf}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>以至少 \(1-\delta/2\) 的概率成立。再由 \ref{phil} 可知：<br/>
+\[<br/>
+\begin{equation}<br/>
+\Phi(Z) \le \mathbb E_Z[\Phi(Z)] + \sqrt{\frac{\ln(2/\delta)}{2m}}\label{plme}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>以至少 \(1-\delta/2\) 的概率成立。</p>
+
+<p>将式 \ref{mep7} 代入式 \ref{plme} 可得：<br/>
+\[<br/>
+\begin{align}<br/>
+\Phi(Z) &amp;\le 2R_m(\mathcal F) + \sqrt{\frac{\ln(2/\delta)}{2m}}\nonumber\\<br/>
+&amp;\le 2\big( \hat R_Z(\mathcal F) + \sqrt{\frac{\ln(2/\delta)}{2m}} \big) + \sqrt{\frac{\ln(2/\delta)}{2m}}\nonumber\\<br/>
+&amp;= 2\hat R_Z(\mathcal F) + 3\sqrt{\frac{\ln(2/\delta)}{2m}}\label{2hrz}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>以至少 \(1-\delta\) 的概率成立。</p>
+
+<p>将 \ref{2hrz} 、\ref{hate} 和 \ref{phiz} 代入式 \ref{phil} 得式 \ref{mdl2} 得证。</p>
+
+<p>上面证明的<strong>定理1</strong>的函数空间 \(\mathcal F\) 是区间 \([0,1]\) 上的实值函数，因此该定理只适用于回归问题。对二分类问题，我们有下面的定理：</p>
+
+<p><strong>定理2</strong>：对假设空间 \(\mathcal H:\mathcal X\rightarrow \{-1,+1\}\)，根据分布 \(\mathcal D\) 从 \(\mathcal X\) 中独立同分布采样得到示例集 \(D=\{x_1,x_2,...,x_m \}\)，\(x_i\in \mathcal X\)，\(0\lt \delta \lt 1\)，对任意 \(h \in \mathcal H\)，以至少 \(1-\delta\) 的概率有：<br/>
+\[<br/>
+\begin{align}<br/>
+E(h) &amp;\le \hat E(h) + R_m(\mathcal H) + \sqrt{\frac{\ln(1/\delta)}{2m}}\label{elhe1}\\<br/>
+E(h) &amp;\le \hat E(h) + R_D(\mathcal H) + 3\sqrt{\frac{\ln(1/\delta)}{2m}}\label{elhe2}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>证明：对二分类问题的假设空间 \(\mathcal H\)，令\(\mathcal Z=\mathcal X\times \{-1,+1\}\)，对 \(\mathcal H\) 中假设 \(h\) 变形为：<br/>
+\[<br/>
+f_h(z) = f_h(x,y) = \mathbf I(h(x) \neq y)<br/>
+\]</p>
+
+<p>于是就可以将值域在 \(\{-1,1\}\) 的假设空间 \(\mathcal H\) 转换为值域为 \([0,1]\) 的函数空间 \(\mathcal F_{\mathcal H} = \{f_h:h\in \mathcal H\}\)，由Radermacher 复杂度的<strong>定义1</strong> 有：<br/>
+\[<br/>
+\begin{align}<br/>
+\hat R_Z(\mathcal F_{\mathcal H}) &amp;= \mathbb E_\sigma\bigg[\sup_{f_h\in\mathcal F_{\mathcal H}} \frac 1 m \sum_{i=1}^m \sigma_i f_h(x_i,y_i) \bigg]\nonumber\\<br/>
+&amp;= \mathbb E_\sigma\bigg[\sup_{h\in\mathcal H} \frac 1 m \sum_{i=1}^m \sigma_i \mathbf I(h(x_i)\neq y_i) \bigg]\nonumber\\<br/>
+&amp;= \mathbb E_\sigma\bigg[\sup_{h\in\mathcal H} \frac 1 m \sum_{i=1}^m \sigma_i \frac{1-y_i h(x_i)}{2} \bigg]\nonumber\\<br/>
+&amp;= \frac 1 2\mathbb E_\sigma\bigg[ \frac 1 m \sum_{i=1}^m \sigma_i + \sup_{h\in \mathcal H} \frac 1 m \sum_{i=1}^m(-y_i\sigma_i h(x_i)) \bigg]\nonumber\\<br/>
+&amp;= \frac 1 2\mathbb E_\sigma\bigg[\sup_{h\in \mathcal H} \frac 1 m \sum_{i=1}^m(-y_i\sigma_i h(x_i)) \bigg]\label{f12m}\\<br/>
+&amp;= \frac 1 2\mathbb E_\sigma\bigg[\sup_{h\in \mathcal H} \frac 1 m \sum_{i=1}^m(\sigma_i h(x_i)) \bigg]\label{f12m2}\\<br/>
+&amp;= \frac 1 2 \hat R_D(\mathcal H)\label{f12m3}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>在式 \ref{f12m} 中由于 \(-y_i\sigma_i\) 与 \(\sigma_i\) 的分布相同，所以可以转换成式 \ref{f12m2} 结果不变。</p>
+
+<p>对上式取期望后可得<br/>
+\[<br/>
+\begin{align}<br/>
+R_m(\mathcal F_{\mathcal H}) = \frac 1 2R_m(\mathcal H)\label{rmmfm}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>由<strong>定理1</strong>和式(\ref{f12m3})和(\ref{rmmfm})可知<strong>定理2</strong>成立。</p>
+
+<p><strong>定理2</strong>给出了基于 Rademacher 复杂度的泛化误差界。我们知道VC维的泛化误差界式分布无关、数据独立的，而基于 Rademacher 复杂度的泛化误差界(\ref{mdl1})与分布 \(\mathcal D\) 有关，式(\ref{mdl2})与数据 \(D\) 有关。换言之，基于 Rademacher 复杂度的泛化误差界依赖于具体学习问题上的数据分布，有点类似于为该学习问题“量身定制”的，因此它通常比基于VC维的泛化误差界更紧一些。</p>
+
+<p><strong>Massart引理</strong>：用 \(A\subseteq \mathbb R^m\) 是一个有限集，有 \(R=\max_{x\in A}||x||_2\)，然后满足下式：<br/>
+\[<br/>
+E_{\sigma} \bigg[\frac 1 m \sup_{x\in A} \sum_{i=1}^m \sigma_i x_i \bigg] \le \frac{R\sqrt{2\ln|A|}}{m}<br/>
+\]</p>
+
+<p>其中 \(\sigma_i\) 是一系列在 \(\{−1,+1\}\) 上取值的独立的符合平均分布的随机变量。</p>
+
+<p>证明：<br/>
+\[<br/>
+\begin{align*}<br/>
+\exp\bigg(t E_{\sigma} \bigg[\sup_{x\in A} \sum_{i=1}^m \sigma_i x_i  \bigg]\bigg) &amp;\le E_{\sigma} \bigg[\exp\bigg(t\sup_{x\in A} \sum_{i=1}^m \sigma_i x_i  \bigg)\bigg]\quad\big(\text{Jensen Inequality}\big)\\<br/>
+&amp;= E_{\sigma} \bigg[\sup_{x\in A} \exp\bigg(t\sum_{i=1}^m \sigma_i x_i  \bigg)\bigg]\\<br/>
+&amp;\le \sum_{x\in A} E_{\sigma} \bigg[\exp\bigg(t\sum_{i=1}^m \sigma_i x_i  \bigg)\bigg]\\ <br/>
+&amp;= \sum_{x\in A} \prod_{i=1}^m E_{\sigma} \big[\exp\big(t\sigma_i x_i  \big)\big]\\ <br/>
+&amp;\le \sum_{x\in A} \prod_{i=1}^m \exp\bigg( \frac{t^2(2x_i)^2}{8} \bigg)\quad\big(\text{Hoeffding Inequality}\big)\\<br/>
+&amp;= \sum_{x\in A} \exp\bigg(\frac{4\sum_{i=1}^m t^2(x_i)^2}{8} \bigg)\\<br/>
+&amp;= \sum_{x\in A} \exp\bigg(\frac{t^2}{2} \sum_{i=1}^m (x_i)^2\bigg)\\<br/>
+&amp;\le |A| \exp\bigg(\frac{t^2R^2}{2} \bigg)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>对两边取对数<br/>
+\[<br/>
+\begin{align*}<br/>
+E_{\sigma} \bigg[\sup_{x\in A} \sum_{i=1}^m \sigma_i x_i  \bigg] &amp;\le \frac 1 t\log\bigg[|A| \exp\bigg(\frac{t^2R^2}{2} \bigg) \bigg]\\<br/>
+&amp;= \frac{\ln|A|}{t} + \frac{tR^2}{2}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>对上式右边对 \(t\) 取导数，并令其等于 0，可得令不等式最小的 \(t\)<br/>
+\[<br/>
+t = \frac{\sqrt{2\ln|A|}}{R}<br/>
+\]</p>
+
+<p>所以不等式<br/>
+\[<br/>
+E_{\sigma} \bigg[\sup_{x\in A} \sum_{i=1}^m \sigma_i x_i  \bigg] \le R\sqrt{2\ln|A|}<br/>
+\]</p>
+
+<p><strong>Massart引理</strong>得证。</p>
+
+<p><strong>定理3</strong>：假设空间 \(\mathcal H\)的 Ramacher 复杂度 \(R_m(\mathcal H)\) 与增长函数 \(\Pi_\mathcal H(m)\) 满足<br/>
+\[<br/>
+R_m(\mathcal H) \le \sqrt{\frac{2\ln\Pi_\mathcal H(m)}{m}}<br/>
+\]</p>
+
+<p>证明：<br/>
+\[<br/>
+\begin{align*}<br/>
+\hat R_Z(\mathcal H) &amp;= \mathbb E_\sigma\bigg[\sup_{f\in\mathcal H} \frac 1 m \sum_{i=1}^m \sigma_i f(z_i) \bigg]\\<br/>
+&amp;\le \frac{\sqrt{m} \sqrt{2\ln|\{(h(x_i),...,h(x_m)):h\in \mathcal H|\}}}{m}\quad\big(\text{Massart Lemma}\big)\\<br/>
+&amp;= \frac{\sqrt{m} \sqrt{2\ln \Pi_\mathcal H(m)}}{m}\\<br/>
+&amp;= \sqrt{\frac{2\ln \Pi_\mathcal H(m)}{m}}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>式中 \(R=\sqrt{m}\) 是因为 \(R=\max_{h\in \mathcal H}||h||_2\)，因为 \(h\) 的取值是 \(\{-1,+1\}\)，所以 \(||h||_2 = \sqrt{m}\)。</p>
+
+<p>由式(\ref{elhe1}) 和<strong>定理3</strong>可得<br/>
+\[<br/>
+E(h) \le \hat E(h) + \sqrt{\frac{2d\ln(em/d)}{m}} + \sqrt{\frac{\ln(1/\delta)}{2m}}<br/>
+\]</p>
+
+<p>也就是说，我们从 Rademacher 复杂度和增长函数就能推导出基于 VC 维的泛化误差界。</p>
+
+<hr/>
+
+<p><a href="">周志华 机器学习</a><br/>
+<a href="https://math.stackexchange.com/questions/2230255/supremum-of-expectation-le-expectation-of-supremum">supremum of expectation and expectation of supremum</a><br/>
+<a href="http://www.it610.com/article/1342038.htm">FML 学习笔记三</a><br/>
+<a href="https://cs.nyu.edu/%7Emohri/mls/ml_learning_with_infinite_hypothesis_sets.pdf">Foundations of Machine Learning</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15181958451732.html">随机森林 Random Forest</a></h1>
+			<p class="meta"><time datetime="2018-02-10T01:04:05+08:00" 
+			pubdate data-updated="true">2018/2/10</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>随机森林，英文名为 Random Forest，后面简称 RF，它是 Bagging 算法的进化版，它在 Bagging 的基础上改进了一些内容：</p>
+
+<ol>
+<li>随机森林就是由多棵 CART 树构成的。</li>
+<li>对于普通的决策树，我们会在节点上所有的 \(n\) 个样本特征中选择一个最优的特征来做决策树的左右子树划分，但是 RF 通过随机选择节点上的一部分样本特征。假设特征总数目为 \(n\) ，每次随机选择 \(n_{sub}\) 个样本特征，在其中选择一个最优的特征来做决策树的左右子树划分。这样进一步增强了模型的泛化能力。如果 \(n_{sub}=n\) ，则此时 RF 的 CART 决策树和普通的 CART 决策树没有区别。\(n_{sub}\) 越小，则模型越健壮，当然此时对于训练集的拟合程度会变差。在实际案例中，一般会通过交叉验证调参获取一个合适的 \(n_{sub}\) 的值。</li>
+</ol>
+
+<h3 id="toc_0">随机森林算法步骤</h3>
+
+<p><b>输入</b>：样本集 \(D=\{(x_1,y_1),(x_2,y_2),...,(x_m,y_m)\}\)，弱分类器迭代次数 \(T\)<br/>
+<b>输出</b>：最终的强分类器 \(f(x)\)<br/>
+<b>算法过程</b>：</p>
+
+<ul>
+<li><p>对于\(t=1,2,...,T\)：</p>
+
+<ul>
+<li>对训练集进行第 \(t\) 次随机采样，共采集 \(m\) 次，得到包含 \(m\) 个样本的采样集 \(D_t\)；</li>
+<li>用采样集 \(D_t\) 训练第 \(t\) 个决策树模型 \(G_t(x)\) ，在训练决策树模型的节点的时候，在节点上所有的样本特征中选择一部分样本特征， 在这些随机选择的部分样本特征中选择一个最优的特征来做决策树的左右子树划分；</li>
+</ul></li>
+<li><p>如果是分类算法预测，则 \(T\) 个弱学习器投出最多票数的类别或者类别之一为最终类别。如果是回归算法，\(T\) 个弱学习器得到的回归结果进行算术平均得到的值为最终的模型输出。</p></li>
+</ul>
+
+<h3 id="toc_1">随机森林扩展</h3>
+
+<p>由于 RF 在实际应用中的良好特性，基于 RF ，有很多变种算法，应用也很广泛，不光可以用于分类回归，还可以用于特征转换，异常点检测等。下面对于这些RF家族的算法中有代表性的做一个总结。</p>
+
+<h5 id="toc_2">Extra-Trees 极端随机树</h5>
+
+<p>ET 或 Extra-Trees（Extremely randomized trees，极端随机树）是由PierreGeurts等人于2006年提出。该算法与随机森林算法十分相似，都是由许多决策树构成。但该算法与随机森林有两点主要的区别：</p>
+
+<ol>
+<li><p>随机森林应用的是 Bagging 模型，而 ET 是使用所有的训练样本得到每棵决策树，也就是每棵决策树应用的是相同的全部训练样本；</p></li>
+<li><p>随机森林是在一个随机子集内得到最佳分叉属性，而 ET 是完全随机的得到分叉值，从而实现对决策树进行分叉的。</p></li>
+</ol>
+
+<p>从第二点可以看出，由于随机选择了特征值的划分点位，而不是最优点位，这样会导致生成的决策树的规模一般会大于 RF 所生成的决策树。也就是说，模型的方差相对于RF进一步减少，但是偏倚相对于 RF 进一步增大。在某些时候，Extra-Trees 的泛化能力比 RF 更好。</p>
+
+<h5 id="toc_3">Totally Random Trees Embedding</h5>
+
+<p>Totally Random Trees Embedding(以下简称 TRTE)是一种非监督学习的数据转化方法。它将低维的数据集映射到高维，从而让映射到高维的数据更好的运用于分类回归模型。我们知道，在支持向量机中运用了核方法来将低维的数据集映射到高维，此处TRTE提供了另外一种方法。</p>
+
+<p>TRTE 在数据转化的过程也使用了类似于 RF 的方法，建立 \(T\) 个决策树来拟合数据。当决策树建立完毕以后，数据集里的每个数据在T个决策树中叶子节点的位置也定下来了。比如我们有3颗决策树，每个决策树有5个叶子节点，某个数据特征 \(x\) 划分到第一个决策树的第2个叶子节点，第二个决策树的第3个叶子节点，第三个决策树的第5个叶子节点。则 \(x\) 映射后的特征编码为 \((0,1,0,0,0,\qquad 0,0,1,0,0,\qquad 0,0,0,0,1)\)，有15维的高维特征。这里特征维度之间加上空格是为了强调三颗决策树各自的子编码。</p>
+
+<p>映射到高维特征后，可以继续使用监督学习的各种分类回归算法了。　　　　</p>
+
+<h5 id="toc_4">Isolation Forest　　　　</h5>
+
+<p>Isolation Forest（以下简称IForest）是一种异常点检测的方法。它也使用了类似于RF的方法来检测异常点。</p>
+
+<p>对于在 \(T\) 个决策树的样本集，IForest 也会对训练集进行随机采样,但是采样个数不需要和 RF 一样，对于 RF，需要采样到采样集样本个数等于训练集个数。但是 IForest 不需要采样这么多，一般来说，采样个数要远远小于训练集个数？为什么呢？因为我们的目的是异常点检测，只需要部分的样本我们一般就可以将异常点区别出来了。</p>
+
+<p>对于每一个决策树的建立， IForest 采用随机选择一个划分特征，对划分特征随机选择一个划分阈值。这点也和 RF 不同。</p>
+
+<p>外，IForest 一般会选择一个比较小的最大决策树深度 max_depth ,原因同样本采集，用少量的异常点检测一般不需要这么大规模的决策树。</p>
+
+<p>对于异常点的判断，则是将测试样本点 \(x\) 拟合到 \(T\) 颗决策树。计算在每颗决策树上该样本的叶子节点的深度 \(h_t(x)\) ，从而可以计算出平均高度 \(h(x)\)。此时我们用下面的公式计算样本点 \(x\) 的异常概率:<br/>
+\[<br/>
+s(x,m)=2^{−\frac{h(x)}{c(m)}}<br/>
+\]</p>
+
+<p>其中，\(m\) 为样本个数。\(c(m)\) 的表达式为：<br/>
+\[<br/>
+c(m)=2\ln(m−1)+\xi−2\frac{m−1}{m},\quad \xi\text{ 为欧拉常数}<br/>
+\]</p>
+
+<p>\(s(x,m)\) 的取值范围是 \([0,1]\) ,取值越接近于1，则是异常点的概率也越大。</p>
+
+<h5 id="toc_5">优缺点</h5>
+
+<p>RF的主要优点有：</p>
+
+<ol>
+<li>训练可以高度并行化，对于大数据时代的大样本训练速度有优势。个人觉得这是的最主要的优点。</li>
+<li>由于可以随机选择决策树节点划分特征，这样在样本特征维度很高的时候，仍然能高效的训练模型。</li>
+<li>在训练后，可以给出各个特征对于输出的重要性</li>
+<li>由于采用了随机采样，训练出的模型的方差小，泛化能力强。</li>
+<li>相对于Boosting系列的Adaboost和GBDT， RF实现比较简单。</li>
+<li>对部分特征缺失不敏感。</li>
+</ol>
+
+<p>RF的主要缺点有：</p>
+
+<ol>
+<li>在某些噪音比较大的样本集上，RF模型容易陷入过拟合。</li>
+<li>取值划分比较多的特征容易对RF的决策产生更大的影响，从而影响拟合的模型的效果。</li>
+</ol>
+
+<hr/>
+
+<p><a href="https://www.cnblogs.com/pinard/p/6156009.html">Bagging与随机森林算法原理小结</a><br/>
+<a href="https://blog.csdn.net/xbmatrix/article/details/69488867?locationNum=10&amp;fps=1">Extra-Trees原理</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15175826339606.html">Bagging 方法</a></h1>
+			<p class="meta"><time datetime="2018-02-02T22:43:53+08:00" 
+			pubdate data-updated="true">2018/2/2</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>在集成学习中，除了 Boosting 方法，各个弱学习器中有依赖关系。另一个就是 Bagging 方法，各个弱学习器中间没有依赖关系，可以并行拟合。同一个学习算法在来自同一分布的多个不同的训练数据集上训练得到的模型偏差可能较大，即模型的方差（variance）较大，为了解决这个问题，可以综合多个模型的输出结果，对于回归问题可以取平均值，对于分类问题可以采取多数投票的方法。这就是Bagging的核心思想。</p>
+
+<p>Bagging 需要同一分布的多个不同的训练集，关键之处在于“随机取样“。固定从训练集中采集固定个数的样本，但是这种采集是一种有放回的采集，对于每一次采集，我们都将这一次采集到的样本放回，也就是说我们可能采集到重复的样本，对于这个算法我们一般会随机采集与样本训练样本数目相同的样本，这样得到的采样集和训练集合样本数目相同，但是内容不同，对于数据集m个样本的进行T次随机采样，得到训练T个训练器的训练集。 </p>
+
+<p>注意到这和GBDT的子采样是不同的。GBDT的子采样是无放回采样，而Bagging的子采样是放回采样。</p>
+
+<p>对于一个样本，它在某一次含m个样本的训练集的随机采样中，每次被采集到的概率是 \(1/m\) 。不被采集到的概率为 \(1−1/m\) 。如果 \(m\) 次采样都没有被采集中的概率是 \((1−1/m)^m\) 。当m→∞时，\((1−1/m)^m \rightarrow \frac 1 e \approx 0.368\) 。也就是说，在 Bagging 的 \(m\) 轮随机采样中，训练集中大约有 36.8% 的数据没有被采样集采集中。</p>
+
+<blockquote>
+<p>高等数学中两个重要的极限性质：<br/>
+\[<br/>
+\lim_{x\rightarrow 0} \frac{\sin x}{x} = 1\\<br/>
+\lim_{x\rightarrow +\infty} (1+\frac r x)^x = e^r\\<br/>
+\]</p>
+</blockquote>
+
+<p>对于这部分大约36.8%的没有被采样到的数据，我们常常称之为袋外数据(Out Of Bag, 简称OOB)。这些数据没有参与训练集模型的拟合，因此可以用来检测模型的泛化能力。</p>
+
+<p>与 Adaboost 算法一样，一般 Bagging 算法的基础学习器是神经网络或者决策树。</p>
+
+<p>Bagging 的集合策略也比较简单，对于分类问题，通常使用简单投票法，得到最多票数的类别或者类别之一为最终的模型输出。对于回归问题，通常使用简单平均法，对T个弱学习器得到的回归结果进行算术平均得到最终的模型输出。</p>
+
+<p>由于 Bagging 算法每次都进行采样来训练模型，因此泛化能力很强，对于降低模型的方差很有作用。当然对于训练集的拟合程度就会差一些，也就是模型的偏倚会大一些。</p>
+
+<h3 id="toc_0">Bagging 算法步骤</h3>
+
+<p><b>输入</b>：样本集 \(D=\{(x_1,y_1),(x_2,y_2),...,(x_m,y_m)\}\)，弱学习器算法, 弱分类器迭代次数 \(T\) <br/>
+<b>输出</b>：最终的强分类器 \(f(x)\)<br/>
+<b>算法过程</b>：</p>
+
+<ul>
+<li><p>对于 \(t=1,2...,T\) :</p>
+
+<ul>
+<li>对训练集进行第 \(t\) 次随机采样，共采集 \(m\) 次，得到包含 \(m\) 个样本的采样集 \(D_t\)</li>
+<li>用采样集 \(D_t\) 训练第 \(t\) 个弱学习器 \(G_t(x)\)</li>
+</ul></li>
+<li><p>如果是分类算法预测，则 \(T\) 个弱学习器投出最多票数的类别或者类别之一为最终类别。如果是回归算法，\( T\) 个弱学习器得到的回归结果进行算术平均得到的值为最终的模型输出。</p></li>
+</ul>
+
+<hr/>
+
+<p><a href="https://www.cnblogs.com/pinard/p/6156009.html">Bagging与随机森林算法原理小结</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15170125982743.html">XgBoost 算法</a></h1>
+			<p class="meta"><time datetime="2018-01-27T08:23:18+08:00" 
+			pubdate data-updated="true">2018/1/27</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15167212454767.html">提升树与GBDT</a></h1>
+			<p class="meta"><time datetime="2018-01-23T23:27:25+08:00" 
+			pubdate data-updated="true">2018/1/23</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>从提升方法学习中可以知道提升方法是采用加法模型和前向分布算法，提升树是以决策树为基函数的提升方法。对于分类问题决策树是二叉分类树，对于回归问题决策树是二叉回归树。提升树可以表示为决策树的加法模型：<br/>
+\[<br/>
+f_M(x) = \sum_{m=1}^M T(x;\Theta_m)<br/>
+\]</p>
+
+<p>其中 \(T(x;\Theta_m)\) 表示决策树；\(\Theta_m\) 表示决策树的参数；M 为树的个数。</p>
+
+<h4 id="toc_0">前向分布算法</h4>
+
+<p>由前向分布算法，可知第 \(m\) 轮模型 \(f_m(x)\) 为：<br/>
+\[<br/>
+f_m(x) = f_{m-1}(x) + T(x;\Theta_m)<br/>
+\]</p>
+
+<p>其中 \(f_{m-1}(x)\) 为当前模型，可以通过经验风险最小化来确定下一棵决策树参数 \(\Theta_m\) ，即：<br/>
+\[<br/>
+\hat \Theta_m = arg \min_{\Theta_m} \sum_{i=1}^N L(y_i, f_{m-1}(x_i) + T(x_i;\Theta_m))<br/>
+\]</p>
+
+<p>不同问题的提升树学习算法的主要区别是使用的损失函数不同，包括用平方误差损失函数的回归问题，用指数损失函数的分类问题，以及使用一般损失函数的一般决策问题。</p>
+
+<p>对于二类分类问题，提升树算法可以算是 AdaBoost 算法的特殊情况，下面主要叙述回归问题的提升树：</p>
+
+<p>已知一个训练数据集 \(T=\{(x_1,y_1),(x_2,y_2),...,(x_N,y_N)\}\)，\(x_i\in \mathcal X\subseteq R^n\)，\(\mathcal X\) 为输入空间，\(y_i\in \mathcal Y\subseteq R\)，\(\mathcal Y\) 为输出空间。如果将输入空间 \(\mathcal X\) 划分为 \(J\) 个互不相交的区域 \(R_1,R_2,...,R_J\)，并且在每一个区域上确定输出常量 \(c_j\) ，那么树可以表示为：<br/>
+\[<br/>
+T(x;\Theta) = \sum_{j=1}^J c_j I(x\in R_j)<br/>
+\]</p>
+
+<p>其中，参数 \(\Theta = \{(R_1,C_1),(R_2,c_2),...,(R_J,c_J)\}\) 表示树的区域划分和各区域上的常数。\(J\) 是回归树的复杂度即叶节点的个数。回归树使用以下的前向分步算法：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;f_0(x) = 0\\<br/>
+&amp;f_m(x) = f_{m-1}(x) + T(x;\Theta_m), \quad m = 1,2,...,M\\<br/>
+&amp;f_M(x) = \sum_{m=1}^M T(x;\Theta_m)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>在前向分布算法的第 \(m\) 步，给定当前模型 \(f_{m-1}(x)\) ，需求解：<br/>
+\[<br/>
+\hat\Theta_m = arg \min_{\Theta_m} \sum_{i=1}^N L(y_i,f_{m-1}(x_i) + T(x_i;\Theta_m))<br/>
+\]</p>
+
+<p>得到 \(\hat\Theta_m\) ，即第 \(m\) 棵树的参数。</p>
+
+<p>当采用平方误差损失函数时：<br/>
+\[<br/>
+L(y,f(x)) = (y-f(x))^2<br/>
+\]</p>
+
+<p>其损失变为：<br/>
+\[<br/>
+\begin{align*}<br/>
+L(y,f_{m-1}(x) + T(x;\Theta_m)) &amp;= [y-f_{m-1}(x) - T(x;\Theta_m)]^2\\<br/>
+&amp;= [r-T(x;\Theta_m)]^2<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>这里：<br/>
+\[<br/>
+r = y - f_{m-1}(x)<br/>
+\]</p>
+
+<p>是当前模型拟合数据的残差（residual）。所以，对回归问题的提升树来说，只需简单的拟合当前模型的残差。这样，算法是相当简单的。</p>
+
+<h4 id="toc_1">算法过程</h4>
+
+<p><b>输入</b>：训练数据集 \(T=\{(x_1,y_1),(x_2,y_2),...,(x_n,y_n)\}\)，其中 \(x_i\in \mathcal X\subseteq R^n\)，\(y_i \in\mathcal Y \subseteq R\)；<br/>
+<b>输出</b>：提升树 \(f_M(x)\)<br/>
+<b>算法过程</b>：</p>
+
+<ul>
+<li>初始化 \(f_0(x) = 0\)</li>
+<li><p>对 \(m=1,2,...,M\)</p>
+
+<ul>
+<li><p>计算当前残差<br/>
+\[<br/>
+r_{mi} = y_i - f_{m-1}(x_i), \quad i=1,2,...,N<br/>
+\]</p></li>
+<li><p>拟合残差 \(r_{mi}\) 学习回归树，得到 \(T(x;\Theta_m)\) </p></li>
+<li><p>更新 \(f_m(x) = f_{m-1}(x) + T(x, \Theta_m)\)</p></li>
+</ul></li>
+<li><p>得到回归问题提升树<br/>
+\[<br/>
+f_M(x) = \sum_{m=1}^M T(x,\Theta_m)<br/>
+\]</p></li>
+</ul>
+
+<p>接下来先介绍一下决策树桩，然后举例说明提升树实例。</p>
+
+<h4 id="toc_2">决策树桩 decision stump</h4>
+
+<p>决策树桩，也可以称之为单层决策树，只对一列属性做一次判断决定最终的分类结果，比如只根据瓜的根蒂是否蜷缩来判断是否是好瓜，这提现的是单一特征起作用。显然 decision stump 仅可作为一个弱基本分类器，它的结果仅会比瞎猜 \(1/2\) 稍好一点点，在集成学习中，常可以作为基本分类器。</p>
+
+<p>决策树桩仅可以对一个属性的一次判断获取结果，我们需要找到最低错误率的决策树桩，即优化目标函数：<br/>
+\[<br/>
+arg \min_{1\le c\le \text{d}} \frac 1 N \sum_{i=1}^N I(y_i \neq T_c(x_i))<br/>
+\] </p>
+
+<p>其中 \(c\) 表示属性值，\(d\) 表示属性列个数，\(N\) 表示样本数量。</p>
+
+<h4 id="toc_3">提升树实例</h4>
+
+<p>如下图的训练数据， \(x\) 的取值范围是区间 [0.5,10.5]，\(y\) 的取值范围是区间 [5.0,10.0]，学习这个回归问题的提升树模型，考虑只用决策树桩作为基函数<br/>
+\[<br/>
+\begin{array}{ccccccccccc}\\\hline<br/>
+x_i &amp; 1 &amp;  2 &amp;  3 &amp; 4 &amp; 5 &amp; 6 &amp; 7 &amp; 8 &amp; 9 &amp; 10\\\hline<br/>
+y_i &amp; 5.56 &amp; 5.70 &amp; 5.91 &amp; 6.40 &amp; 6.80 &amp; 7.05 &amp; 8.90 &amp; 8.70 &amp; 9.00 &amp; 9.05 \\\hline<br/>
+\end{array}<br/>
+\]</p>
+
+<p>按照算法，第一步要求 \(f_1(x)\) 即第一个树桩 \(T_1(x)\)：<br/>
+在本例中只有一个属性 \(x\) ，我们只需要找到在属性 \(x\) 上找到为最佳切分点 \(s\) ，切分点将样本分成了 \(R_1\) 和 \(R_2\) 两部分，两部分的属性值为 \(c_1\) 和 \(c_2\) ：<br/>
+\[<br/>
+\min m(s) = \min_s\bigg[ \min_{c_1} \sum_{x_i \in R_1}(y_i - c_1)^2 + \min_{c_2} \sum_{x_i \in R_2}(y_i - c_2)^2 \bigg]<br/>
+\]</p>
+
+<p>求解最佳切分点 \(s\) ：<br/>
+\[<br/>
+R_1 = {x|x\le s} ,\quad R_2 = {x|x \gt s}<br/>
+\]</p>
+
+<p>容易求得在 \(R_1\) 和 \(R_2\) 两区域使平方误差最小的 \(c_1\) 和 \(c_2\) 为：<br/>
+\[<br/>
+c_1 = \frac 1 {|R_1|} \sum_{x_i \in R_1}y_i , \quad c_2 = \frac 1 {|R_2|} \sum_{x_i \in R_2} y_i<br/>
+\]</p>
+
+<p>当 \(s=1.5\) 时，\(R_1=\{1\}\)，\(R_2 = \{2,3,4,5,6,7,8,9,10\}\)，此时：<br/>
+\[<br/>
+c_1 = 5.56,\quad c_2 = 67.51/9 = 7.50\\<br/>
+m(s) = \min_{c_1} \sum_{x_i \in R_1}(y_i - c_1)^2 + \min_{c_2} \sum_{x_i \in R_2}(y_i - c_2)^2 = 15.72<br/>
+\]</p>
+
+<p>当 \(s=2.5\)，\(s=3.5\)，...，\(s=9.5\)，会求出不同的 \(m(s)\) ，找到令 \(m(s)\) 最小的切分点 \(s\)，本例中 \(s=6.5\) 时，\(m(s)\) 达到最小值。此时 \(R_1(x) = \{1,2,3,4,5,6\}\)，\(R_2(x) = \{7,8,9,10\}\)，\(c_1=6.24\)，\(c_2=8.91\)。所以回归树为：<br/>
+\[<br/>
+T_1(x) = \left \{ \begin{array}\\<br/>
+6.24&amp;\quad x \le 6.5\\<br/>
+8.91&amp;\quad x \gt 6.5\\<br/>
+\end{array} \right .\\<br/>
+f_1(x) = T_1(x)<br/>
+\]</p>
+
+<p>计算残差 \(r_{2i} = y_i - f_1(x_i),\quad i=1,2,...,10\)，可得:<br/>
+\[<br/>
+\begin{array}{ccccccccccc}\\\hline<br/>
+ x_i  &amp; 1 &amp;  2 &amp;  3 &amp;  4 &amp;  5 &amp;  6 &amp;  7 &amp;  8 &amp;  9 &amp;  10 \\\hline<br/>
+ y_i &amp;  -0.68 &amp;  -0.54 &amp;  -0.33 &amp;  0.16 &amp;  0.56 &amp; 0.81 &amp;  -0.01 &amp;  -0.21 &amp;  0.09 &amp;  0.14 &amp; \\\hline<br/>
+\end{array}<br/>
+\]</p>
+
+<p>用 \(f_1(x)\) 拟合训练集平方损失误差为：<br/>
+\[<br/>
+L(y,f_1(x)) = \sum_{i=1}^10 (y_i - f_1(x_i))^2 = \sum_{i=1}^10 r_{1i}^2 = 1.93<br/>
+\]</p>
+
+<p>建立第二棵树拟合残差，可以得到：<br/>
+\[<br/>
+T_2(x) = \left \{ \begin{array}\\<br/>
+-0.52&amp;\quad x\le 3.5\\<br/>
+0.22 &amp;\quad x \gt 3.5\\<br/>
+\end{array} \right .<br/>
+\]</p>
+
+<p>所以回归树：<br/>
+\[<br/>
+f_2(x) = f_1(x) + T_2(x) = \left \{ \begin{array}\\<br/>
+6.24-0.52=5.72 &amp; \quad x \le 3.5\\<br/>
+6.24+0.22=6.46 &amp; \quad 3.5 \lt x \le 6.5\\<br/>
+8.91+0.22=9.13 &amp; \quad x \gt 6.5\\<br/>
+\end{array} \right .<br/>
+\]</p>
+
+<p>如果用 \(f_2(x)\) 拟合训练数据，平方损失误差为：<br/>
+\[<br/>
+L(y,f_2(x)) = \sum_{i=1}^10 (y_i - f_2(x_i))^2 = 0.79\\<br/>
+\]</p>
+
+<p>继续前向分步算法直到平方损失误差满足条件结束。</p>
+
+<h3 id="toc_4">梯度提升树 GBDT</h3>
+
+<p>提升树使用加法模型和前向分步算法，当损失函数是平方损失和指数损失函数时，很容易求解。但当损失函数是一般损失函数而言，往往每一步优化都不容易。针对这一问题，Freidman 提出了梯度提升技术，所以有了梯度提升树 GBDT。</p>
+
+<p>GBDT (Gradient Boosting Decision Tree) 又叫 MART(Multiple Additive Regression Tree)，是一种迭代的决策树算法，该算法由多棵决策树组成，所有树的结论累加起来做最终答案。它在被提出之初就和SVM一起被认为是泛化能力较强的算法。</p>
+
+<p>GBDT 的树是回归树，不是分类树，GBDT用来做回归预测，调整后也可以用于分类。</p>
+
+<p>它利用最速下降的近似方法，其关键是利用损失函数的负梯度在当前模型的值：<br/>
+\[<br/>
+-\bigg[\frac{\partial L(y,f(x_i))}{\partial f(x_i)} \bigg]_{f(x) = f_{m-1}(x)}<br/>
+\]</p>
+
+<p>作为回归问题提升树算法中的残差的近似值，拟合一个回归树。</p>
+
+<h4 id="toc_5">梯度提升算法</h4>
+
+<p><b>输入</b>：训练数据集 \(T = \{(x_1,y_1),(x_2,y_2),...,(x_N,y_N)\}\)，\(x_i \in \mathcal X \subseteq R^n\)，\(y_i\in \mathcal Y\subseteq R\)；损失函数 \(L(y,f(x))\)；<br/>
+<b>输出</b>：回归树 \(\hat{f(x)}\)<br/>
+<b>算法过程</b>：</p>
+
+<ul>
+<li>初始化
+\[
+f_0(x) = arg \min_c \sum_{i=1}^N L(y_i,c)
+\]</li>
+</ul>
+
+<blockquote>
+<p>当损失函数为平方损失函数时，平方损失函数是一个下凸函数，可以直接求导获得：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\frac{\partial L(y_i,c)}{\partial c} = \frac{\partial \sum_{i=1}^N \frac 1 2 (y_i-c)^2}{\partial c} = \sum_{i=1}^N -(y_i-c) = 0\\<br/>
+&amp;c = \frac 1 N \sum_{i=1}^N y_i<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>所以：<br/>
+\[<br/>
+f_0(x) = c = \frac 1 N \sum_{i=1}^N y_i<br/>
+\]</p>
+</blockquote>
+
+<ul>
+<li><p>对 \(m=1,2,...,M\) </p>
+
+<ul>
+<li><p>对 \(i=1,2,...,N\)，计算<br/>
+\[<br/>
+r_{mi} = -\bigg[ \frac{\partial L(y_i,f(x_i))}{\partial f(x_i)} \bigg ]_{f(x) = f_{m-1}(x)}<br/>
+\]</p></li>
+<li><p>对 \(r_{mi}\) 拟合一个回归树，得到第 \(m\) 棵树的叶节点区域 \(R_{mj}\)，\(j=1,2,...,J\)</p></li>
+<li><p>对 \(j=1,2,...,J\) 计算<br/>
+\[<br/>
+c_{mj} = arg \min_c \sum_{x_i\in R_{mj}} L(y_i,f_{m-1}(x_i) + c)<br/>
+\]</p></li>
+</ul>
+
+<blockquote>
+<p>当损失函数为平方损失函数时，计算 \(r_{mj}\) ：<br/>
+\[<br/>
+\begin{align*}<br/>
+r_{mi} = -\frac{\partial L(y_i,f_0(x_i))}{\partial f_{m-1}(x_i)} = -\frac{\partial \frac 1 2 (y_i - f_{m-1}(x_i))^2}{\partial f_{m-1}(x_i)} = y_i - f_{m-1}(x_i) <br/>
+\end{align*}<br/>
+\]</p>
+
+<p>计算 \(c_{mj}\)：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial \sum_{x_i\in R_{mj}} L(y_i,f_{m-1}(x_i) + c)}{\partial c} &amp;= \frac{\partial \sum_{x_i\in R_{mj}} \frac 1 2 (y_i - f_{m-1}(x_i) -c)^2}{\partial c}\\<br/>
+&amp;= \sum_{x_i\in R_{mj}} (y_i - f_{m-1}(x_i) -c)\\<br/>
+&amp;= \sum_{x_i\in R_{mj}} (y_i - f_{m-1}(x_i)) - |R_{mj}|c = 0\\<br/>
+\therefore \quad c &amp;= \frac 1 {|R_{mj}|} \sum_{x_i\in R_{mj}} (y_i - f_{m-1}(x_i))\\<br/>
+&amp;= \frac 1 {|R_{mj}|} \sum_{x_i \in R_{mj}} r_{mi}<br/>
+\end{align*}<br/>
+\]</p>
+</blockquote>
+
+<ul>
+<li>更新 \(f_m(x) = f_{m-1}(x) + \sum_{j=1}^J c_{mj}I(x\in R_{mj})\)</li>
+</ul></li>
+<li><p>得到回归树<br/>
+\[<br/>
+\hat{f(x)} = f_M(x) = \sum_{m=1}^M \sum_{j=1}^J c_{mj} I(x\in R_{mj})<br/>
+\]</p></li>
+</ul>
+
+<h4 id="toc_6">梯度提升树实例</h4>
+
+<p>还是以前面的训练数据集为例，损失函数设为平方损失函数。</p>
+
+<ol>
+<li><p>首先初始学习器为：<br/>
+\[<br/>
+f_0(x) = c = \frac 1 N \sum_{i=1}^N y_i = 7.307<br/>
+\]</p></li>
+<li><p>当迭代轮数 \(m=1\) : <br/>
+计算所有样本的残差：<br/>
+\[<br/>
+r_{1i} = -\frac{\partial L(y_i,f_0(x_i))}{\partial f_0(x_i)} = -\frac{\partial \frac 1 2 (y_i - f_0(x_i))^2}{\partial f_0(x_i)} = y_i - f_0(x_i)<br/>
+\]</p>
+
+<p>第一个样本的残差为 \(5.56 - 7.307 = -1.747\)<br/>
+同理可以求得第 \(i=2,3,...,m\) 个样本的残差，然后使用残差作为样本的真实值训练 \(f_1(x)\)，残差如下：<br/>
+\[<br/>
+\begin{array}{ccccccccccc}\\\hline<br/>
+x_i &amp; 1 &amp; 2 &amp; 3 &amp; 4 &amp; 5 &amp;  6 &amp; 7 &amp; 8 &amp; 9 &amp; 10 \\\hline<br/>
+y_i &amp; -1.747 &amp; -1.607 &amp; -1.397 &amp; -0.907 &amp; -0.507 &amp; -0.257 &amp; 1.593 &amp; 1.393 &amp; 1.693 &amp; 1.743 \\\hline<br/>
+\end{array}<br/>
+\]</p>
+
+<p>当切分点 \(s = -1.677\)，此时 \(R_1 = \{1\}\)，\(R_2 = \{2,3,4,5,6,7,8,9,10\}\)，此时：<br/>
+\[<br/>
+c_1 = -1.747,\quad c_2 = 0.194\\<br/>
+m(s) = \min_{c_1} \sum_{x_i \in R_1}(y_i - c_1)^2 + \min_{c_2} \sum_{x_i \in R_2}(y_i - c_2)^2 = 15.72<br/>
+\]</p>
+
+<p>同理可以再算出其他切分点 \(s\) 对应的 \(m(s)\) ，找到令 \(m(s)\) 最小的切分点 \(s\)，此时划分的区域为 \(c_{1j}\)，\(j=1,2,...,J\)，回归树表示为：<br/>
+\[<br/>
+f_1(x) = f_0(x) + \sum_{j=1}^J c_{1j}I(x\in R_{1j})<br/>
+\]</p></li>
+<li><p>继续迭代 \(m=2,3,...,M\) 。</p></li>
+</ol>
+
+<h3 id="toc_7">GBDT 分类问题</h3>
+
+<p>GBDT的分类算法从思想上和GBDT的回归算法没有区别，但是由于样本输出不是连续的值，而是离散的类别，导致我们无法直接从输出类别去拟合类别输出的误差。为了解决这个问题，主要有两个方法，一个是用指数损失函数，此时GBDT退化为Adaboost算法。另一种方法是用类似于逻辑回归的对数似然损失函数的方法。也就是说，我们用的是类别的预测概率值和真实概率值的差来拟合损失。</p>
+
+<h4 id="toc_8">GBDT 二分类问题</h4>
+
+<p>对于二分类，将真实值 \(y\) 和预测值 \(f(x)\) 的乘积，通过sigmoid处理成概率，再使用对数似然损失函数，损失函数为：<br/>
+\[<br/>
+\begin{align*}<br/>
+L(y,f(x)) = -\log P(y|x) = -\log[\text{sigmod}(yf(x))] = -\log(\frac{1}{1 + \exp(-yf(x))}) = \log(1+\exp(-yf(x)))<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(y\in \mathcal Y = \{-1,1\}\)</p>
+
+<p>此时负梯度误差为：<br/>
+\[<br/>
+\begin{align*}<br/>
+r_{mi} &amp;= -\bigg[\frac{\partial L(y,f(x_i))}{\partial f(x_i)} \bigg]_{f(x) = f_{m-1}(x)}\\<br/>
+&amp;=-\frac{\partial L(y_i,f_{m-1}(x_i))}{\partial f_{m-1}(x_i)} \\<br/>
+&amp;= -\frac{\partial \log(1+\exp(-yf_{m-1}(x_i)))}{\partial f_{m-1}(x_i)}\\<br/>
+&amp;= \frac{y\exp(-yf_{m-1}(x_i))}{1+\exp(-yf_{m-1}(x_i))} \\<br/>
+&amp;= \frac{y\exp(-yf_{m-1}(x_i)) \exp(yf_m(x_i))}{(1+\exp(-yf_{m-1}(x_i))) \exp(yf_{m-1}(x_i))} \\<br/>
+&amp;= \frac{y}{\exp(yf_{m-1}(x_i))+1} \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>用 \(r_{mi}\) 拟合一个回归树，得到第 \(m\) 棵树的叶节点区域 \(R_{mj}\)，\(j=1,2,...,J\)，各个叶子节点的最佳残差拟合值为：<br/>
+\[<br/>
+\begin{align*}<br/>
+c_{mj} &amp;= arg \min_c \sum_{x_i\in R_{mj}} L(y_i,f_{m-1}(x_i) + c) = arg \min_c \sum_{x_i \in R_{mj}} \log(1+\exp(-y_i(f(x_i) + c)))<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>由于上式比较难优化，我们一般使用近似值代替：<br/>
+\[<br/>
+c_{mj} = \sum_{x_i \in R_{mj}} r_{mi} / \sum_{x_i\in R_{mj}} |r_{mi}|(1−|r_{mi}|)<br/>
+\]</p>
+
+<p>除了负梯度计算和叶子节点的最佳残差拟合的线性搜索，二元GBDT分类和GBDT回归算法过程相同。</p>
+
+<h4 id="toc_9">GBDT 多分类问题</h4>
+
+<p>多分类 GBDT 要比二分类更复杂一下，对应的是多元逻辑回归和二元逻辑回归的复杂度差别。假设类别数为 \(K\)，则此时我们的对数似然损失函数为：<br/>
+\[<br/>
+L(y,f(x)) = -\sum_{k=1}^K y_k \log p_k(x)<br/>
+\]</p>
+
+<p>如果输出样本为 \(k\) ，则 \(y_k=1\) ，第 \(k\) 类的概率 \(p_k(x)\) 的表达式为：<br/>
+\[<br/>
+p_k(x) = \frac{\exp(f_k(x))}{\sum_{l=1}^K \exp(f_l(x))} <br/>
+\]</p>
+
+<p>集合上面两式可以计算第 \(m\) 轮的第 \(i\) 个样本对应类别 \(k\) 的负梯度误差为：<br/>
+\[<br/>
+\begin{align*}<br/>
+r_{mik} &amp;= -\bigg[\frac{\partial L(y_i,f(x_i))}{\partial f_k(x_i)}\bigg]_{f_l(x) = f_{l,m-1}(x)}\\<br/>
+&amp;= -\bigg[\frac{\partial -\sum_{k=1}^K y_{ik} \log \big[{\exp(f_k(x_i))}/{\sum_{l=1}^K \exp(f_l(x_i))}\big]}{\partial f_k(x_i)} \bigg]_{f_l(x) = f_{l,m-1}(x)}\\<br/>
+&amp;= -\bigg[\frac{\partial -\sum_{k=1}^K y_{ik} \log \big[{\exp(f_{k,m-1}(x_i))}/{\sum_{l=1}^K \exp(f_{l,m-1}(x_i))}\big]}{\partial f_{k,m-1}(x_i)} \bigg]\\<br/>
+&amp;= \frac{y_{ik} \frac{\exp(f_{k,m-1}(x_i))}{{\sum_{l=1}^K \exp(f_{l,m-1}(x_i))}}- \frac{\exp(f_{k,m-1}(x_i))\exp(f_{k,m-1}(x_i))}{({\sum_{l=1}^K \exp(f_{l,m-1}(x_i))})^2}}{{\exp(f_{k,m-1}(x_i))}/{\sum_{l=1}^K \exp(f_{l,m-1}(x_i))}}\\<br/>
+&amp;= \frac{y_{ik} p_{k,m-1}(x_i)- (p_{k,m-1})^2}{p_{k,m-1}(x_i)}\\<br/>
+&amp;= y_{ik} - p_{k,m-1}(x_i)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>观察上式可以看出，其实这里的误差就是样本 \(i\) 对应类别 \(k\) 的真实概率和 \(m−1\) 轮预测概率的差值。用 \(r_{mi}\) 拟合一个回归树，得到第 \(m\) 棵树的叶节点区域 \(R_{mj}\)，\(j=1,2,...,J\)，各个叶子节点的最佳残差拟合值为：<br/>
+\[<br/>
+\begin{align*}<br/>
+c_{mjk} = arg \min_{c_{jk}} \sum_{x_i\in R_{mj}} \sum_{k=1}^K L(y_k,f_{m-1,k}(x_i)+\sum_{j=1}^J c_{jk}) \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>由于上式比较难优化，我们一般使用近似值代替：<br/>
+\[<br/>
+c_{mjk} = \frac{K-1}{K} \frac{\sum_{x_i \in R_{mj}} r_{mil}}{\sum_{x_i\in R_{mj}} |r_{mik}|(1-|r_{mik}|)}<br/>
+\]</p>
+
+<p>除了负梯度计算和叶子节点的最佳残差拟合的线性搜索，多元GBDT分类和二元GBDT分类以及GBDT回归算法过程相同。</p>
+
+<h3 id="toc_10">GBDT常见损失函数</h3>
+
+<p>对于分类算法，其损失函数一般有对数损失函数和指数损失函数两种:</p>
+
+<ol>
+<li><p>如果是指数损失函数，则损失函数表达式为<br/>
+\[<br/>
+L(y,f(x))=\exp(−yf(x))<br/>
+\]</p>
+
+<p>其负梯度计算和叶子节点的最佳残差拟合可以参考Adaboost自适应提升方法。</p></li>
+<li><p>如果是对数损失函数，分为二元分类和多元分类两种，参加上面的讲解。</p></li>
+</ol>
+
+<p>对于回归算法，常用损失函数有如下4种:</p>
+
+<ol>
+<li><p>均方差，这个是最常见的回归损失函数了<br/>
+\[<br/>
+L(y,f(x))=\frac 1 2 (y−f(x))^2<br/>
+\]</p></li>
+<li><p>绝对损失，这个损失函数也很常见：</p>
+
+<p>\[<br/>
+L(y,f(x) = |y-f(x)|<br/>
+\]</p>
+
+<p>对于负梯度误差为：<br/>
+\[<br/>
+\mathrm {sign}(y_i-f(x_i))<br/>
+\]</p></li>
+<li><p>Huber损失，它是均方差和绝对损失的折衷产物，对于远离中心的异常点，采用绝对损失，而中心附近的点采用均方差。这个界限一般用分位数点度量。损失函数如下：<br/>
+\[<br/>
+L(y,f(x))=\left \{\begin{array}\\<br/>
+\frac 1 2 (y−f(x))^2\quad &amp;|y−f(x)|\le \delta\\<br/>
+\delta (|y−f(x)|− \frac \delta 2)\quad &amp;|y−f(x)|&gt;\delta\\<br/>
+\end{array} \right .<br/>
+\]</p>
+
+<p>对应的负梯度为：<br/>
+\[<br/>
+r(y_i,f(x_i))=\left \{\begin{array}\\<br/>
+y_i−f(x_i)\quad &amp; |y_i−f(x_i)|\le\delta\\<br/>
+\delta\text{ sign}(y_i−f(x_i))\quad &amp; |yi−f(xi)|&gt;\delta\\<br/>
+\end{array} \right .<br/>
+\]</p></li>
+<li><p>分位数损失。它对应的是分位数回归的损失函数，表达式为<br/>
+\[<br/>
+L(y,f(x))= \sum_{y\ge f(x)}\theta|y−f(x)|+\sum_{y&lt;f(x)}(1−\theta)|y−f(x)|<br/>
+\]</p>
+
+<p>其中 \(\theta\) 为分位数，需要我们在回归前指定。对应的负梯度误差为：<br/>
+\[<br/>
+r(y_i,f(x_i))=\left \{\begin{array}\\<br/>
+\theta\quad&amp; y_i\ge f(x_i)\\<br/>
+\theta-1\quad &amp;y_i&lt;f(x_i)\\<br/>
+\end{array}\right .<br/>
+\]</p></li>
+</ol>
+
+<p>对于Huber损失和分位数损失，主要用于健壮回归，也就是减少异常点对损失函数的影响。</p>
+
+<h3 id="toc_11">GBDT 的正则化</h3>
+
+<p>和 Adaboost 一样，我们也需要对 GBDT 进行正则化，防止过拟合。GBDT的正则化主要有三种方式。</p>
+
+<ol>
+<li><p>和Adaboost类似的正则化项，即步长(learning rate)。定义为 \(v\)，对于前面的弱学习器的迭代<br/>
+\[<br/>
+f_m(x) = f_{m-1}(x) + G_m(x)<br/>
+\]</p>
+
+<p>如果我们加上了正则化项，则有：<br/>
+\[<br/>
+f_m(x) = f_{m-1}(x) + v\text{ }G_m(x)<br/>
+\]</p>
+
+<p>\(v\) 的取值范围为 \(0&lt;v\le 1\)。对于同样的训练集学习效果，较小的 \(v\) 意味着我们需要更多的弱学习器的迭代次数。通常我们用步长和迭代最大次数一起来决定算法的拟合效果。</p></li>
+<li><p>通过子采样比例（subsample）。取值为 \((0,1]\) 。注意这里的子采样和随机森林不一样，随机森林使用的是放回抽样，而这里是不放回抽样。如果取值为1，则全部样本都使用，等于没有使用子采样。如果取值小于 1 ，则只有一部分样本会去做GBDT的决策树拟合。选择小于 1 的比例可以减少方差，即防止过拟合，但是会增加样本拟合的偏差，因此取值不能太低。推荐在 \([0.5, 0.8]\) 之间。</p>
+
+<p>使用了子采样的GBDT有时也称作随机梯度提升树(Stochastic Gradient Boosting Tree, SGBT)。由于使用了子采样，程序可以通过采样分发到不同的任务去做boosting的迭代过程，最后形成新树，从而减少弱学习器难以并行学习的弱点。</p></li>
+<li><p>对于弱学习器即CART回归树进行正则化剪枝。</p></li>
+</ol>
+
+<h3 id="toc_12">GBDT 优缺点</h3>
+
+<p>GBDT主要的优点有：</p>
+
+<ol>
+<li>可以灵活处理各种类型的数据，包括连续值和离散值。</li>
+<li>在相对少的调参时间情况下，预测的准备率也可以比较高。这个是相对SVM来说的。</li>
+<li>使用一些健壮的损失函数，对异常值的鲁棒性非常强。比如 Huber损失函数和Quantile损失函数。</li>
+</ol>
+
+<p>GBDT的主要缺点有：</p>
+
+<ol>
+<li>由于弱学习器之间存在依赖关系，难以并行训练数据。不过可以通过自采样的SGBT来达到部分并行。</li>
+</ol>
+
+<hr/>
+
+<p>李航【统计学习方法】<br/>
+<a href="https://blog.csdn.net/lanchunhui/article/details/50980635">决策树桩</a><br/>
+<a href="https://www.cnblogs.com/pinard/p/6140514.html">梯度提升树 GBDT</a><br/>
+<a href="https://statweb.stanford.edu/%7Ejhf/ftp/trebst.pdf">Greedy Function Approximation:A Gradient Booting Machine</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15158019416874.html">自适应提升方法 Adaboost</a></h1>
+			<p class="meta"><time datetime="2018-01-13T08:05:41+08:00" 
+			pubdate data-updated="true">2018/1/13</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>Adaboost，英文全称是 Adapter Boosting（自适应增强）的缩写，由 Yoav Freund 和 Robert Schapire 在1995年提出。Adaboost 是属于 Boosting （提升）方法中具有代表性的一种。Boosting 方法是一种常见的统计学习方法，一种能提高任意给定学习算法准确率的方法。在分类问题上，它通过改变训练样本的权重，学习多个分类器，并将这些分类器进行线性组合，来提高分类的性能。历史上，首先 Valiant 和 Kearns 提出了“弱可学习”和“强可学习”的概念：</p>
+
+<blockquote>
+<h5 id="toc_0">强可学习</h5>
+
+<p>在概率近似正确（Probably approximate correct，PAC）学习的框架中，一个概念（一个类），如果存在一个多项式的学习算法可以学习它，并且正确率很高，那么就称这个概念是强可学习的。</p>
+
+<h5 id="toc_1">弱可学习</h5>
+
+<p>而一个概念存在一个多项式的学习算法可以学习它，但是正确率仅比随机猜测略好，那么称这个概念是弱可学习的。</p>
+</blockquote>
+
+<p>同时，Valiant 和 Kearns 首次提出了PAC学习模型中弱可学习和强可学习等价性的问题，即任意弱可学习问题都可以提升为强可学习问题。后来 Schapire 最先对这个问题作出了肯定的证明，也就是最初的 Boosting 方法，也就是如果已经学习了“弱可学习算法”，便可以通过这个方法将其提升为“强可学习算法”，而显然，学习一个“弱可学习算法”比“强可学习算法”要容易很多。</p>
+
+<p>在1995年 Freund 对Schapire 提出的最初的 Boosting 算法做出了改进，提高了算法的效率，但是这两个算法都有一个天生的缺陷，都是需要知道“弱学习算法”学习正确率的下界，这在实际问题中难以做到；在1996年，Freund 和 Schapire 提出了 Adaboost 算法，效率与 Freund 之前的算法效率接近，却没有了事先知道“弱学习算法”正确率下界的限制条件，容易运用到实际问题中，因此该算法得到普遍应用。</p>
+
+<h3 id="toc_2">Boosting 算法</h3>
+
+<p>Boosting 算法是将”弱学习算法“提升到”强学习算法“的过程，主要是涉及两个部分：加法模型和前向分布算法。加法模型是指针对训练数据集学习一系列弱分类器，再将其线性相加的过程。</p>
+
+<h4 id="toc_3">加法模型</h4>
+
+<p>考虑加法模型(additive model)：<br/>
+\[<br/>
+f(x) = \sum_{m=1}^M \beta_m b(x;\gamma_m)<br/>
+\]</p>
+
+<p>其中 \(b(x;\gamma_m)\) 为基函数，\(\gamma_m\) 为基函数的参数，\(\beta_m\) 为基函数的系数。显然这是一个加法模型。</p>
+
+<p>在给定训练数据及损失函数 \(L(y,f(x))\) 的条件下，学习加法模型 \(f(x)\) 成为经验风险极小化即损失函数极小化问题：<br/>
+\[<br/>
+\min_{\beta_m,\gamma_m} \sum_i^N L(y_i,\sum_{m=1}^M \beta_m b(x_i;\gamma_m))<br/>
+\]</p>
+
+<h4 id="toc_4">前向分布算法</h4>
+
+<p>极小化上面的损失函数这是一个复杂的优化问题，前向分布算法（Forward stagewise Algorithm）解决这类问题的一个思路是：因为学习的是加法模型，如果能从前往后，每一步只学习一个基函数及其系数，逐步极小化损失函数，那么就可以简化优化的复杂度，每步只需优化如下损失函数：<br/>
+\[<br/>
+\min_{\beta,\gamma} \sum_{i=1}^N L(y_i,\beta b(x_i;\gamma))<br/>
+\]</p>
+
+<p>给定训练数据集 \(T = {(x_1,y_1),(x_2,y_2),...,(x_N,y_N)}\)，\(x_i\in \mathcal X \subseteq R^n\) ，\(y_i \in mathcal Y = \{-1,1\}\)，损失函数为 \(L(y,f(x))\)，基函数的集合 \(\{b(x;\gamma)\}，学习加法模型 \)f(x)\( 的前向分布算法如下：<br/>
+(1) 初始化 \)f_0(x)=0\(<br/>
+(2) 对 \)m=1,2,...,M<br/>
+　　(a) 极小化损失函数：<br/>
+\[<br/>
+(\beta_m,\gamma_m) = \arg \min_{\beta,\gamma} \sum_{i=1}^N L(y_i,f_{m-1}(x_i) + \beta f(x_i;\gamma))<br/>
+\]</p>
+
+<p>　　得到参数 \(\beta_m\)，\(\gamma_m\)<br/>
+　　(b) 更新：<br/>
+\[<br/>
+f_m(x) = f_{m-1}(x) + \beta_m b(x;\gamma_m)<br/>
+\]</p>
+
+<p>(3) 得到加法模型：<br/>
+\[<br/>
+f(x) = f_M(x) = \sum_{m=1}^M \beta_m b(x;\gamma_m)<br/>
+\]</p>
+
+<p>这样前向分布算法将同时求解从 \(m=1\) 到 \(M\) 所有参数 \(\beta_m\)、\(\gamma_m\) 的问题化为逐次求解各个 \(\beta_m\) 、\(\gamma_m\) 的优化问题。</p>
+
+<p>Boosting 算法采用不同的损失函数会得到不同的模型，AdaBoost 是损失函数为指数函数的 Boosting 算法。</p>
+
+<h3 id="toc_5">AdaBoost算法</h3>
+
+<p>AdaBoost是一种迭代算法，它通过提高前一轮被错误分类的样本的权值，降低被正确分类样本的权值，这样没有被正确分类的样本由于权值的增大，会得到下一轮弱分类器的更大关注。它能在学习的过程中不断减少训练误差，即在训练数据集上的分类误差率。假设给定一个二类分类的训练数据集：<br/>
+\[<br/>
+T = {(x_1,y_1),(x_2,y_2),...,(x_N,y_N)}<br/>
+\]</p>
+
+<p>其中，每一个样本都是由实例和标签组成，实例 \(x_i\in \mathcal X \subseteq R^n\) ，标记 \(y_i \in \mathcal Y = \{-1,1\}\)，\(\mathcal X\) 是实例空间，\(\mathcal Y\) 是标记空间。</p>
+
+<p>前面说到 AdaBoost 是损失函数为指数函数的 Boosting 算法，定义最终分类器的训练误差为指数形式：<br/>
+\[<br/>
+\begin{align*}<br/>
+L(y,f(x)) &amp;= \sum_{i=1}^N \exp(-y_i f(x_i))\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>假设前 \(m-1\) 轮迭代前向分步算法以及得到 \(f_{m-1}(x)\)，在第 \(m\) 轮迭代要得到 \(\alpha_m\)，\(G_m(x)\) 和 \(f_m(x)\)<br/>
+\[<br/>
+f_m(x) = f_{m-1}(x) + \alpha_m G_m(x)<br/>
+\]</p>
+
+<p>目标是使前向分步算法得到的 \(\alpha_m\) 和 \(G_m(x)\) 使 \(f_m(x)\) 在训练数据上的误差最小，即：<br/>
+\[<br/>
+\begin{align*}<br/>
+(\alpha_m,G_m(x)) &amp;= \arg \min_{\alpha,G} L(y,f_m(x))\\<br/>
+&amp;= \arg\min_{\alpha,G} \sum_{i=1}^N \exp(-y_i f_m(x_i))\\<br/>
+&amp;= \arg\min_{\alpha,G} \sum_{i=1}^N \exp[-y_i (f_{m-1}(x_i) + \alpha G(x_i))]\\<br/>
+&amp;= \arg\min_{\alpha,G} \sum_{i=1}^N \exp[f_{m-1}(x_i)] \exp[-y_i \alpha G(x_i)]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令 \(w_{mi} = \exp[-y_i f_{m-1}(x_i)]\). 上式可以表示为：<br/>
+\[<br/>
+\begin{equation}<br/>
+(\alpha_m,G_m(x)) = \arg \min_{\alpha,G} \sum_{i=1} w_{mi} \exp[-y_i \alpha G(x_i)] \\\label{ag}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>容易看出 \(w_{mi}\) 与 \(\alpha\)，\(G(x)\) 无关，只依赖于 \(f_{m-1}(x)\)，随着每一轮的迭代而发生变化。\(w_{mi}\) 可以表示每一个样本的权值。初始时设样本的权值都设为 \(1/N\)，即：<br/>
+\[<br/>
+w_{1i} = \frac 1 N, \quad i=1,2,...,N<br/>
+\]</p>
+
+<p>定义第 \(m\) 轮基本分类器 \(G_m(x)\) 在训练数据集上加权分类误差率 \(e_m\) 等于样本权重乘上错误分类：<br/>
+\[<br/>
+e_m = \sum_{i=1}^N P(G_m(x_i) \neq y_i) = \sum_{i=1}^N w_{mi} I(G_m(x_i) \neq y_i)<br/>
+\]</p>
+
+<p>对于式 \ref{ag} ，我们来求解 \(G(x)\) 和 \(\alpha\) ，设最优解为 \(G(x)^*\)，\(\alpha^*\)。先求 \(G(x)^*\)，由前向分布算法可知，每一轮只需要求解令当前分类误差率最小的 \(G_(x)\) ：<br/>
+\[<br/>
+G(x)^* = \arg\min e_m = \arg\min \sum_{i=1}^N w_{mi} I(G_m(x_i) \neq y_i)<br/>
+\]</p>
+
+<p>再求 \(\alpha*\) ，先化简一下式 \ref{ag} ：<br/>
+\[<br/>
+\begin{align*}<br/>
+\sum_{i=1} w_{mi} \exp[-y_i \alpha G(x)] &amp;= \sum_{y_i=G_m(x_i)} w_{mi} e^{-\alpha} + \sum_{y_i\neq G_m(x_i)} w_{mi} e^{\alpha} \\<br/>
+&amp;= \sum_{y_i=G_m(x_i)} w_{mi} e^{-\alpha} + \sum_{y_i\neq G_m(x_i)} w_{mi} e^{-\alpha} + \sum_{y_i\neq G_m(x_i)} w_{mi} e^{\alpha} - \sum_{y_i\neq G_m(x_i)} w_{mi} e^{-\alpha}\\<br/>
+&amp;= \sum_{i=1}^N w_{mi} e^{-\alpha} + (e^{\alpha} - e^{-\alpha}) \sum_{i=1}^N w_{mi} I(y_i\neq G_m(x_i))\\<br/>
+&amp;= e^{-\alpha}\sum_{i=1}^N w_{mi} + (e^{\alpha} - e^{-\alpha}) e_m\\<br/>
+&amp;= e^{-\alpha} + (e^{\alpha} - e^{-\alpha}) e_m\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>对 \(\alpha\) 求导可得：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial e^{-\alpha} + (e^{\alpha} - e^{-\alpha}) e_m}{\partial \alpha} &amp;= -e^{-\alpha} + (e^{\alpha} + e^{-\alpha}) e_m \\<br/>
+&amp;= -e^{-\alpha} (1+e_m) + e^{\alpha} e_m \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令求导结果为 0，得：<br/>
+\[<br/>
+\alpha^* = \frac 1 2 log \frac {1-e_m}{e_m}<br/>
+\]</p>
+
+<p>现在再来看看每一轮分类器的迭代：<br/>
+\[<br/>
+f_m(x) = f_{m-1}(x) + \alpha_m G_m(x)<br/>
+\]</p>
+
+<p>以及 \(w_{mi} = \exp[-y_i f_{m-1}(x_i)]\)，所以对于任何样本 \(x_i\) 都有：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;f_m(x_i) = f_{m-1}(x_i) + \alpha_m G_m(x_i)\\<br/>
+\Rightarrow \quad &amp; -y_i f_m(x_i) = -y_i f_{m-1}(x_i) - y_i \alpha_m G_m(x_i)\\<br/>
+\Rightarrow \quad &amp; \exp[-y_i f_m(x_i)] = \exp[-y_i f_{m-1}(x_i) - y_i \alpha_m G_m(x_i)]\\<br/>
+\Rightarrow \quad &amp; \exp[-y_i f_m(x_i)] = \exp[-y_i f_{m-1}(x_i)] \exp[-y_i \alpha_m G_m(x_i)]\\<br/>
+\Rightarrow \quad &amp; w_{m+1,i} = w_{mi} \exp[-y_i \alpha_m G_m(x_i)]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>这样就得到了每一轮权值的更新，为了使权值和等于1，需要进行归一化处理。定义归一化因子 \(Z_m\)： <br/>
+\[<br/>
+Z_m = \sum_{i=1}^N w_{mi} \exp(-\alpha_m y_i G_m(x_i))<br/>
+\]</p>
+
+<p>权值更新函数为：<br/>
+\[<br/>
+w_{m+1,i} = \frac{w_{mi}}{Z_m} \exp[-y_i \alpha_m G_m(x_i)]<br/>
+\]</p>
+
+<h3 id="toc_6">训练误差分析</h3>
+
+<p>最终分类器在训练数据上的训练误差为：<br/>
+\[<br/>
+L(y,f_M(x)) = \sum_{i=1}^N \exp(-y_i f_M(x_i))\\<br/>
+\]</p>
+
+<p>样本在最终分类器上的样本分类误差定义为：<br/>
+\[<br/>
+err = \sum_{i=1}^N I(G_M(x_i) \neq y_i)<br/>
+\]</p>
+
+<p>现在证明可以通过减少训练误差的方式减小分类误差率。考虑到：<br/>
+\[<br/>
+I(G(x_i) \neq y_i) \le \exp(-y_i f(x_i)), \quad i = 1,2,...,N <br/>
+\]</p>
+
+<p>当 \(G(x_i) = y_i\) 时，\(I(G(x_i) \neq y_i) = 0\)，\(\exp(-y_i f(x_i)) &gt; 0\)，上式成立。<br/>
+当 \(G(x_i) \neq y_i\) 时，\(I(G(x_i) \neq y_i) = 1\)，而 \(- y_i f(x_i) &gt; 0\)，所以 \(\exp(-y_i f(x_i)) &gt; e^0 = 1\) ，上式成立。</p>
+
+<p>得证。</p>
+
+<p>现在继续来化简一下最终分类器的训练误差：<br/>
+\[<br/>
+\begin{align*}<br/>
+L(y,f_M(x_i)) &amp;= \sum_{i=1}^N \exp(-y_i f_M(x_i)) \\<br/>
+&amp;= \sum_{i=1}^N \exp(-y_i \sum_{m=1}^M \alpha_m G_m(x_i)) \\<br/>
+&amp;= \sum_{i=1}^N \prod_{m=1}^M \exp(-y_i \alpha_m G_m(x_i))\\<br/>
+&amp;= N \sum_{i=1}^N \frac 1 N \prod_{m=1}^M \exp(-y_i \alpha_m G_m(x_i))\\<br/>
+&amp;= N \sum_{i=1}^N \frac 1 N \exp(-y_i \alpha_1 G_1(x_i)) \prod_{m=2}^M \exp(-y_i \alpha_m G_m(x_i))\\<br/>
+&amp;= N \sum_{i=1}^N w_{1i} \exp(-y_i \alpha_1 G_1(x_i)) \prod_{m=2}^M \exp(-y_i \alpha_m G_m(x_i))\\<br/>
+&amp;= N \sum_{i=1}^N Z_1 w_{2,i} \prod_{m=2}^M \exp(-y_i \alpha_m G_m(x_i))\\<br/>
+&amp;= N Z_1 \sum_{i=1}^N w_{2,i} \prod_{m=2}^M \exp(-y_i \alpha_m G_m(x_i))\\<br/>
+&amp;= N Z_1 Z_2 ... Z_{m-1} \sum_{i=1}^N w_{Mi} \exp(-y_i \alpha_M G_M(x_i)) \\<br/>
+&amp;= N Z_1 Z_2 ... Z_{m-1} Z_M \sum_{i=1}^N w_{m+1,i}\\<br/>
+&amp;= N \prod_{m=1}^M Z_m<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>这一定理说明，可以在每一轮选择适当的 \(G_m(x)\) 使 \(Z_m\) 最小，从而使训练误差减小最快。而实际 \(Z_m\) 还依赖 \(\alpha_m\) 的选择，实际并不可操作。</p>
+
+<p>再来看一下 \(Z_m\) 的表达式：<br/>
+\[<br/>
+\begin{align}<br/>
+Z_m &amp;= \sum_{i=1}^N w_{mi} \exp(-\alpha_m y_i G_m(x_i)) \nonumber\\<br/>
+&amp;= \sum_{G_m(x_i) = y_i} w_{mi} \exp(-\alpha_m) + \sum_{G_m(x_i) \neq y_i} w_{mi} \exp(\alpha_m)  \nonumber\\<br/>
+&amp;= \sum_{G_m(x_i) = y_i} w_{mi} e^{-\alpha_m} + \sum_{G_m(x_i) \neq y_i} w_{mi} e^{-\alpha_m} + \sum_{G_m(x_i) \neq y_i} w_{mi}  e^{\alpha_m} - \sum_{G_m(x_i) \neq y_i} w_{mi} e^{-\alpha_m} \nonumber\\<br/>
+&amp;= e^{-\alpha_m} \sum_{i=1} ^N w_{mi} + e^{\alpha_m} e_m - e^{-\alpha_m} e_m \nonumber\\<br/>
+&amp;= e^{-\alpha_m} + e^{\alpha_m} e_m - e^{-\alpha_m}e_m  \nonumber\\<br/>
+&amp;= (1-e_m) e^{-\alpha_m} + e_m e^{\alpha_m} \label{zm}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>由 \(\alpha=\frac 1 2 log \frac {1-e_m}{e_m}\) 可得 ：<br/>
+\[<br/>
+e^{\alpha} = \sqrt{\frac{1-e_m}{e_m}}\\<br/>
+e^{-\alpha} = \sqrt{\frac{e_m}{1-e_m}}<br/>
+\]</p>
+
+<p>将上式代入 \ref{zm} 中得：<br/>
+\[<br/>
+\begin{align*}<br/>
+Z_m &amp;= 2\sqrt{e_m(1-e_m)}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令 \(\gamma_m = \frac 1 2 - e_m\)：<br/>
+\[<br/>
+Z_m = \sqrt{1-4\gamma_m^2}<br/>
+\]</p>
+
+<p>比较 \(\sqrt{1-4\gamma_m^2}\) 与 \(\exp(-2\gamma_m^2)\) 的大小：<br/>
+\(e^x\) 在 \(x_0=0\) 处泰勒展开：<br/>
+\[<br/>
+\begin{align*}<br/>
+e^x &amp;= {e^{x_0}}+\frac{e^{x_0}}{1!}(x-x_0) + \frac{e^{x_0}}{2!}(x-x_0)^2\\<br/>
+&amp;= 1 + x + \frac{x^2}{2}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令 \(x=-2\gamma_m^2\)，所以：\(\exp(-2\gamma_m^2) = 1 - 2\gamma^2 + 2\gamma_m^4\)</p>
+
+<p>\(\sqrt{1-x}\) 在 \(x_0=0\) 处泰勒展开：<br/>
+\[<br/>
+\begin{align*}<br/>
+\sqrt{1-x} &amp;= {(1-{x_0})^{1/2}} - \frac 1 2 \frac{(1-{x_0})^{-1/2}}{1!} (x-x_0) - \frac{1}{2*2} \frac{(1-{x_0})^{-3/2}}{2!}(x-x_0)^2\\<br/>
+&amp;= 1 - \frac{x}{2} - \frac{x^2}{8}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令 \(x=4\gamma_m^2\)，所以：\(\sqrt{1-4\gamma_m^2} = 1 - 2\gamma^2 - 2\gamma^4\)</p>
+
+<p>显然 \(\sqrt{1-4\gamma_m^2} \le \exp(-2\gamma_m^2)\)</p>
+
+<p>所以最终分类其的训练误差：<br/>
+\[<br/>
+\begin{align*}<br/>
+L(y,f_M(x_i)) &amp;= \sum_{i=1}^N \exp(-y_i f_M(x_i) \\<br/>
+&amp;= N\prod_{m=1}^M Z_m \\<br/>
+&amp;= N\prod_{m=1}^M \sqrt{1-4\gamma_m^2} \\<br/>
+&amp;\le \prod_{m=1}^M \exp(-2\gamma_m^2)\\<br/>
+&amp;= \exp\big (-2\sum_{m=1}^M \gamma_m^2\big )\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>这表明当 \(\gamma_m &gt; 0\) 时， AdaBoost 的训练误差是以指数速率下降的。</p>
+
+<h3 id="toc_7">算法步骤</h3>
+
+<p><b>输入</b>：训练数据集 \(T = {(x_1,y_1),(x_2,y_2),...,(x_N,y_N)}\)， \(x_i\in \mathcal X \subseteq R^n\)，\(y_i \in mathcal Y = \{-1,1\}\)。<br/>
+<b>输出</b>：最终分类器 \(G(x)\)。<br/>
+<b>算法过程</b>：<br/>
+(1) 初始化训练数据的权值初始值：<br/>
+\[<br/>
+D_1 = (w_{11},...,w_{1i},...,w_{1N})<br/>
+\]</p>
+
+<p>(2) 对 \(m=1,2,...,M\)，迭代次数为 \(M\)：<br/>
+(a) 在具有权值分布 \(D_m\) 的训练数据集上学习，得到基本分类器：<br/>
+\[<br/>
+G_m(x):\mathcal X \rightarrow \{-1,1\}<br/>
+\]</p>
+
+<p>(b) 计算 \(G_m(x)\) 在训练数据集上的分类误差率：<br/>
+\[<br/>
+e_m = P(G_m(x_i) \neq y_i) = \sum_{i=1}^N w_{mi} I(G_m(x_i)\neq y_i)<br/>
+\]</p>
+
+<p>(c) 计算 \(G_m(x)\) 的系数，也就是在最终分类器中的重要程度（对数为自然对数）：<br/>
+\[<br/>
+\alpha_m = \frac 1 2 \log \frac{1-e_m}{e_m}<br/>
+\]</p>
+
+<p>(d) 更新训练数据的权值分布：<br/>
+\[<br/>
+D_{m+1} = {w_{m+1,1},w_{m+1,2},...,w_{m+1,i},...,w_{m+1,N}}\\<br/>
+w_{m+1,i} = \frac{w_{mi}}{Z_m} \exp(-\alpha_m y_i G_m(x_i)),\quad i=1,2,...,N<br/>
+\]</p>
+
+<p>这里的 \(Z_m\) 是规范因子，为了是样本概率分布和为1：<br/>
+\[<br/>
+Z_m = \sum_{i=1}^N w_{mi} \exp(-\alpha_m y_i G_m(x_i))<br/>
+\]</p>
+
+<p>它使 \(D_{m+1}\) 成为一个概率分布。<br/>
+(3) 构建基本分类器的线性组合<br/>
+\[<br/>
+F_M(x) = \sum_{m=1}^M \alpha_m G_m(x)<br/>
+\]</p>
+
+<p>得到最终分类器<br/>
+\[<br/>
+G(x) = sign(F_M(x)) = sign(\sum_{m=1}^M \alpha_m G_m(x))<br/>
+\]</p>
+
+<h3 id="toc_8">AdaBoost举例</h3>
+
+<p>如下图的数据：<br/>
+\[<br/>
+\begin{array}{ccccccccccc}\hline<br/>
+\text{No}&amp;1 &amp; 2 &amp; 3 &amp; 4 &amp; 5 &amp; 6 &amp; 7 &amp; 8 &amp; 9 &amp; 10 \\\hline<br/>
+\text{x} &amp; 0 &amp; 1 &amp; 2 &amp; 3 &amp; 4 &amp; 5 &amp; 6 &amp; 7 &amp; 8 &amp; 9  \\\hline<br/>
+\text{y} &amp; 1 &amp; 1 &amp; 1 &amp; -1&amp; -1&amp; -1&amp; 1 &amp; 1 &amp; 1 &amp; -1 \\\hline<br/>
+\end{array}<br/>
+\]</p>
+
+<p>首先初始化样本权重 \(D_1 = (w_{11},...,w_{1i},...,w_{1N})\)，其中<br/>
+\[<br/>
+w_{1i} = 0.1, \quad i=1,2,...,10<br/>
+\]</p>
+
+<p>在具有权值分布 \(D_1\) 的训练数据集上学习，当阈值取 2.5 时样本误差率最小：<br/>
+\[<br/>
+G_1(x) = \left \{ \begin{array}\\ 1 &amp;\quad x \le 2.5 \\ 0 &amp;\quad x \gt 2.5 \\\end{array}\right .<br/>
+\]</p>
+
+<p>计算 \(G_1(x)\) 在训练集上的分类误差率为：<br/>
+\[<br/>
+e_1 = \sum_{i=1}^N w_{1i} I(G_1(x_i) \neq y_i) = 0.3<br/>
+\]</p>
+
+<p>计算 \(G_1(x)\) 的系数为：<br/>
+\[<br/>
+\alpha_1 = \frac 1 2 \log \frac{1-e_1}{e_1} = 0.4236<br/>
+\]</p>
+
+<p>更新数据集的权值分布：<br/>
+\[<br/>
+D_2 = (w_{21},w_{22},...,w_{2i},...,w_{2N})\\<br/>
+Z_1 = \sum_{i=1}^N w_{1i} \exp(-\alpha_1 y_i G_1(x_i))\\<br/>
+w_{2i} = \frac{w_{1i}}{Z_1} \exp[-y_i \alpha_1 G_1(x_i)]\\<br/>
+\]</p>
+
+<p>得 \(D_2 = (0.0715,0.0715,0.0715,0.0715,0.0715,0.0715,0.1666,0.1666,0.166,0.0715)\)，\(f_1(x) = sign(0.4236 G_1(x))\)。分类器 \(sign(f_1(x))\) 在训练集上有三个误分点。</p>
+
+<p>继续 \(m=2,...,M\) ，这里不再叙述。</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15151569041850.html">概率近似正确学习 PAC Learning</a></h1>
+			<p class="meta"><time datetime="2018-01-05T20:55:04+08:00" 
+			pubdate data-updated="true">2018/1/5</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>在计算机学习理论中，PAC 是英文 probably approximately correct 的缩写，是机器学习数学分析的框架，它由 Leslie Valiant 在 1994 年提出。</p>
+
+<h3 id="toc_0">前置知识</h3>
+
+<p>在学习 PAC 之前先看一下相关的概念：假设空间、版本空间、泛化误差和经验误差。</p>
+
+<h5 id="toc_1">假设空间 hypothesis space</h5>
+
+<p>所有属性可能取值组成的假设的集合称为假设空间，学习的过程可以看作是在假设空间中进行搜索的过程，搜索目标是找到与训练集“匹配”的假设，即能够将训练集中数据正确表示的假设。假设的表示一旦确定，假设空间规模大小就确定了。如以下的例子：<br/>
+\[<br/>
+\begin{array}{ccccc}\\\hline<br/>
+\text{编号}\quad&amp;\quad\text{色泽}\quad&amp;\text{根蒂}\quad&amp;\quad\text{敲声}\quad&amp;\quad\text{好瓜}\quad\\\hline<br/>
+\text{1}\quad&amp;\quad\text{青绿}\quad&amp;\text{蜷缩}\quad&amp;\quad\text{浊响}\quad&amp;\quad\text{是}\quad\\<br/>
+\text{2}\quad&amp;\quad\text{乌黑}\quad&amp;\text{蜷缩}\quad&amp;\quad\text{浊响}\quad&amp;\quad\text{是}\quad\\<br/>
+\text{3}\quad&amp;\quad\text{青绿}\quad&amp;\text{硬挺}\quad&amp;\quad\text{清脆}\quad&amp;\quad\text{否}\quad\\<br/>
+\text{4}\quad&amp;\quad\text{乌黑}\quad&amp;\text{稍蜷}\quad&amp;\quad\text{沉闷}\quad&amp;\quad\text{否}\quad\\\hline<br/>
+\end{array}<br/>
+\]</p>
+
+<p>这里我们的假设空间由“色泽=？”、“根蒂=”、“敲声=？”三个属性的所有可能取值所形成的假设组成。例如，色泽的三个可能取值是“青绿”、“乌黑”、“浅白”，根蒂的三个可能取值是“蜷缩”、“稍蜷”、“硬挺”，敲声的三个取值是“浊响”，“清脆”，“沉闷”。还有可能不论色泽和根蒂是什么，只要是敲声是浊响的都是好瓜，即“色泽=* ” \(\land\) “根蒂=* ” \(\land\) “敲声=浊响” \(\leftrightarrow\) “好瓜”，所以每一种属性都要加上通配符 * ，所以每种属性都有4种可能，总共是 \(4^3=64\) 种可能。还有可能好瓜根本不存在，所以总共假设空间的规模大小是65。有了假设空间之后，要根据已获取的信息（数据集）来对假设空间进行剪枝。即要找到一个与训练集匹配的假设空间子集。</p>
+
+<h5 id="toc_2">版本空间 version space</h5>
+
+<p>在现实问题中我们常面临很大的假设空间，但学习的过程是给予有限样本训练集进行的，因此，可能有多个假设与训练集一致，即存在着一个与训练集一致的“假设集合”，我们称之为“版本空间”。如上面的例子中，假设空间的规模大小是65，删除与正例不一致的假设和与反例一致的假设即可得到版本空间。假设空间里如果有“色泽=青绿，根蒂=*，敲声=* ”的瓜是好瓜的假设，由编号3的训练集可知假设是不正确的，需要从假设空间里删除，最终留下来的就是版本空间。版本空间<font color=red><strong>不一定</strong></font>是正确的，也可能只是在训练集上是正确的，因此，要想判断的正确，就要全面、大量的训练，以排除更多假设空间中的错误假设。错误假设越少，剩下的假设越少，就越有可能是正确假设，我们判断的结果的正确概率越大。因为最终的假设会随着版本（数据集）变化而变化，所以叫做版本空间。</p>
+
+<h5 id="toc_3">经验误差</h5>
+
+<p>学习器在训练集上产生的误差叫做经验误差，由于这个误差是针对训练集的，因此又叫训练误差。训练数据也可以称之为经验，这就是经验误差的由来。</p>
+
+<h5 id="toc_4">泛化误差</h5>
+
+<p>机器学习的目标是使学得的模型能很好地适用于“新样本”，而不仅仅是在训练样本上工作很好，学得模型适用于新样本的能力我们称为“泛化（generalization）“能力，具有强泛化能力的模型能更好的适应于整个样本空间。这里泛化能力的度量便是泛化误差，泛化误差越小，也就是越能适用于新样本。一般来说，训练样本越多，经验误差可以越小，但是泛化误差不一定，可能会出现过拟合的情况。</p>
+
+<h3 id="toc_5">PAC 学习理论 PAC learning theory</h3>
+
+<p>计算学习理论中最基本的是概率近似正确学习理论，来研究什么时候一个问题是可以被学习的。</p>
+
+<p>首先我们来考虑一下机器学习算法的目的，机器学习算法是通过希望学习一个模型能很好地完成从样本空间 \(\mathcal X\) 到标记空间 \(\mathcal Y\) 的映射。这样的每一个映射，我们称之为概念 concept ，用 \(c\) 表示。若对于样例 \((x,y)\) 有 \(c(x)=y\) 成立，则称 \(c\) 为目标概念。所有我们希望学得的目标概念所构成的集合称为“概念类（concept class）”，用符号 \(\mathcal C\) 表示。</p>
+
+<p>对于给定的算法 \(\Phi\) ，它所考虑的所有可能概念的集合被称为“假设空间”，用符号 \(\mathcal H\) 表示，其中单个的概念称之为假设。</p>
+
+<p>若目标概念 \(c \in \mathcal H\)，则 \(\mathcal H\) 中存在假设能将所有示例按与真实标记一致的方式完全分开，我们称该问题对学习算法 \(\mathcal L\) 是“可分的（separable）”，亦称“一致的（consistent）”。 反之，若算法的假设空间中不包含目标概念，则称该数据集对算法是“不可分的”或称“不一致的”。</p>
+
+<p>举个简单的例子：对于非线性分布的数据集，若使用一个线性分类器，则该线性分类器对应的假设空间就是空间中所有可能的超平面，显然假设空间不包含该数据集的目标概念，所以称数据集对该学习器是不可分的。给定一个数据集D，我们希望模型学得的假设 \(h\) 尽可能地与目标概念一致，这便是概率近似正确 (Probably Approximately Correct，简称PAC)的来源，即以较大的概率学得误差满足预设上限的模型。这就是“概率”“近似正确”的含义，形式化地说，令 \(\delta\) 表示置信度，可定义：</p>
+
+<p><b>PAC辨识（PAC Identify）</b>：对 \(\epsilon &gt; 0\)，\(\delta &lt; 1\)，所有 \(c\in \mathcal C\) 和分布 \(\mathcal D\)，若存在学习算法 \(\mathcal L\) ，其输出假设 \(h \in \mathcal H\) 满足：<br/>
+\[<br/>
+P(\mathrm{E}(h) \le \epsilon) \ge 1 - \delta<br/>
+\]</p>
+
+<p>其中\(\mathrm{E}(h)\) 表示泛化误差，则称学习算法 \(\mathcal L\) 能从假设空间 \(\mathcal H\) 中PAC辨识出概念类 \(\mathcal C\)，这样的学习算法 \(\mathcal L\) 能以较大的概率（至少 \(1-\delta\)）学得学习目标概念 \(c\) 的近似（误差最多为 \(\epsilon\)）。</p>
+
+<p>PAC 辨识也可以写成如下形式：<br/>
+\[<br/>
+\begin{align*}<br/>
+P(\mathrm{E}(h) \gt \epsilon) &amp;= 1 - P(\mathrm{E}(h) \le \epsilon) \\<br/>
+&amp;\le 1 - (1-\delta) \\<br/>
+&amp;= \delta\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>表示泛化误差大于 \(\epsilon\) 的概率不大于 \(\delta\)。在此基础上可以定义：</p>
+
+<p><b>PAC可学习性（PAC Learnable）</b>：令 \(m\) 表示从分布 \(\mathcal D\) 中独立同分布采样得到的样本数目，\(\epsilon &gt; 0\)，\(\delta &lt; 1\)，对所有分布 \(\mathcal D\)，若存在学习算法 \(\mathcal L\) 和多项式函数 \(\text{poly}(\cdot,\cdot,\cdot,\cdot)\) ，使得对于任何 \(m\ge \text{poly}(1/\epsilon,1/\delta,\text{size(}\mathbf x\text{),size(c)})\)，\(\mathcal L\) 能从假设空间 \(\mathcal H\) 中PAC 辨识概念类 \(\mathcal C\)，则称概念类 \(\mathcal C\) 对假设空间 \(\mathcal H\) 而言是 PAC 可学习的，有时候也称概念类 \(\mathcal C\) 是 PAC 可学习的。其中 \(\text{size(}x)\) 数据本身的复杂度，\(\text{size}(c)\) 为目标概念的复杂度。</p>
+
+<p>对于计算机而言，必然要考虑时间复杂性，于是：</p>
+
+<p><b>PAC学习算法（PAC Learning Algorithm）</b>：若学习算法 \(\mathcal L\) 使概念类 \(\mathcal C\) 可学习的，且 \(\mathcal L\) 的运行时间也是多项式函数 \(\text{poly(}1/\epsilon,1/\delta,\text{size(}\mathbf x\text{),size(c)})\)，则称概念类 \(\mathcal C\) 是高效PAC可学习的（efficiently PAC learnable）的，称 \(\mathcal L\) 为概念类 \(\mathcal C\) 的 PAC 学习算法。</p>
+
+<p>假设学习算法 \(\mathcal L\) 处理每一个样本的时间为常数，则 \(\mathcal L\) 的时间复杂度等价于样本的时间复杂度。于是，我们对算法时间复杂度的关心就转变为对样本复杂度的关系：</p>
+
+<p><b>样本复杂度（Sample Complexity）</b>：满足 PAC 学习算法 \(\mathcal L\) 所需要的 \(m \ge \text{poly(}1/\epsilon,1/\delta,\text{size(}\mathbf x),\text{size(c))}\) 中的最小的 \(m\)，称之为学习算法 \(\mathcal L\) 的样本复杂度。</p>
+
+<p>PAC 学习中一个关键因素是假设空间 \(\mathcal H\) 的复杂度。\(\mathcal H\) 包含了学习算法 \(\mathcal L\) 所有可能输出的假设，若在 PAC 学习中假设空间与概念类完全相同，即 \(\mathcal H=\mathcal C\)，这称为 “恰 PAC 可学习”；直观上看，这意味着学习算法的能力与学习任务 ”恰好匹配“ 。然而，通常我们目标概念 \(\mathcal C\) 一无所知，显然，更重要的是研究假设空间和目标概念不一样的情况，即 \(\mathcal H \ne C\) 。一般而言，\(\mathcal H\) 越大，其包含任意目标概念的可能性越大，但从中找到某个具体目标概念的难度也越大。 \(\mathcal H\) 有限时，我们称 \(\mathcal  H\) 为“有限假设空间”，否则称为“无限假设空间”。</p>
+
+<h3 id="toc_6">有限假设空间</h3>
+
+<h5 id="toc_7">可分情形</h5>
+
+<p>可分情形意味着目标概念 \(c\) 属于假设空间 \(\mathcal H\)，即 \(c\in \mathcal H\)，若给定包含 \(m\) 个数据集的训练样本 \(D\)，如何找出满足误差参数的假设呢？既然 \(D\) 中样例标记都是有目标概念 \(c\) 赋予的，并且 \(c\) 存在于假设空间 \(\mathcal H\) 中，那么，任何在训练集 \(D\) 上出现的标记错误的假设肯定不是目标概念 \(c\) 。于是，我们只需要保留与 \(D\) 一致的假设，剔除与 \(D\) 不一致的假设即可，若训练集 \(D\) 足够大，则可不断借助 \(D\) 中样例剔除不一致的假设，直到 \(\mathcal H\) 中仅剩下一个假设为止，这个假设就是目标概念 \(c\) 。通常情况下，由于训练集规模有限，假设空间 \(\mathcal H\) 中可能存在不止一个与 \(D\) 一致的“等效”假设，对于这些等效假设，无法根据 \(D\) 来对它们做进一步的区分。</p>
+
+<p>到底需要多少样例才能学得目标概念 \(c\) 得有效近似呢？对 PAC 学习而言，只要训练集 \(D\) 的规模能使学习算法 \(\mathcal L\) 以概率 \(1-\delta\) 找到目标假设的 \(\epsilon\) 近似即可。</p>
+
+<p>我们先估计泛化误差大于 \(\epsilon\) 但在训练集上仍表现完美的假设出现的概率。假定 \(h\) 的泛化误差大于 \(\epsilon\) ，即\(\mathrm{E}(h) \gt \epsilon\)，对分布 \(D\) 上随机采样而得的任何样例 \((x,y)\)，有：<br/>
+\[<br/>
+\begin{align*}<br/>
+P(h(x) = y) &amp;= 1-P(h(x) \neq y)\\<br/>
+&amp;= 1- \mathrm{E}(h)\\<br/>
+&amp;\lt 1 - \epsilon<br/>
+\end{align*}<br/>
+\] </p>
+
+<p>由于 \(D\) 包含 \(m\) 个从 \(\mathcal D\) 中独立同分布采样而得的样例，因此，\(h\) 与 \(D\) 表现一致的概率为：<br/>
+\[<br/>
+P(h(x_1) = y_1) \land P(h(x_2) = y_2) \land ... \land P(h(x_m) = y_m) = (1-P(h(x)\neq y)^m \lt (1-\epsilon)^m<br/>
+\]</p>
+
+<p>我们事先并不知道学习算法 \(\mathcal L\) 会输出 \(\mathcal H\) 中的那个假设，但仅需保证泛化误差大于 \(\epsilon\) ，且在训练集上表现完美的所有假设出现概率之和不大于 \(\delta\) 即可：<br/>
+\[<br/>
+\begin{equation}<br/>
+P(h\in \mathcal H:\mathrm{E}(h) &gt; \epsilon \land \hat {\mathrm{E}}(h) = 0) \lt \sum_{i=1}^{|\mathcal H|}  (1-\epsilon)^m \lt |\mathcal H|(1-\epsilon)^m\\\label{hiH}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>考虑到 \(1-x &lt; e^{-x}\) ，证明：<br/>
+令 \(F(x) = e^{-x} - 1 + x\)，当 \(x \ge 0\) 时有： <br/>
+\[<br/>
+F&#39;(x) = -e^{-x} + 1 \ge 0<br/>
+\]</p>
+
+<p>所以 \(F(x)\) 在 \(x \ge 0\) 时单调递增，\(F(x) \ge F(0) = 0 \)，所以得证。</p>
+
+<p>所以式(\ref{hiH})可以写为：<br/>
+\[<br/>
+P(h\in \mathcal H:\mathrm{E}(h) &gt; \epsilon \land \hat {\mathrm{E}}(h) = 0) \lt |\mathcal H|(1-\epsilon)^m\lt |\mathcal H|e^{-m\epsilon}<br/>
+\]</p>
+
+<p>令上式不大于 \(\delta\) ，即：<br/>
+\[<br/>
+|\mathcal H|e^{-m\epsilon} \le \delta<br/>
+\]</p>
+
+<p>可得：<br/>
+\[<br/>
+\begin{equation}<br/>
+m \ge \frac 1 \epsilon (\ln{|\mathcal H| + \ln{\frac 1 \delta}}) \label{yxm}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>由此可知，有限假设空间 \(\mathcal H\) 都是 PAC 可学习的，所需的样例数目如(\ref{yxm})所示，输出假设 \(h\) 的泛化误差随样本数目的增多而收敛到 0，收敛速度为 \(O(\frac 1 m)\) 。</p>
+
+<h5 id="toc_8">不可分情形</h5>
+
+<p>对于目标概念不存在于假设空间中 \(\mathcal H\) 中，假定对于任何的 \(h\in\mathcal H\)，\(\mathrm{\hat E(h)}\ne 0\)，也就是 \(\mathcal H\) 中的任意一个假设都会在训练集上产生或多或少的错误。由泛化误差 \(\mathrm{E}(h)\) 与经验误差 \(\mathrm{\hat E(h)}\) 的定义易知 \(\mathbb E(\mathrm{\hat E(h)})=\mathrm{E(h)}\) ，因此由霍夫丁不等式理论一可得出定义。</p>
+
+<p><b>若训练集 \(D\) 中包含 \(m\) 个从分布 \(\mathcal D\) 上独立同分布采样而得的样例，\(0\lt \epsilon\lt 1\)，则对任意 \(h\in\mathcal H\)，有：</b></p>
+
+<p>\[<br/>
+\begin{align}<br/>
+&amp;P\big(\mathrm{\hat E(h)- E(h)}\ge \epsilon\big)\leq e^{-2m\epsilon^{2}}\label{dbo1}\\<br/>
+&amp;P\big(\mathrm{E(h)-\hat E(h)}\ge \epsilon\big)\leq e^{-2m\epsilon^{2}}\label{dbo2}\\<br/>
+&amp;P\big(\big|\mathrm{\hat E(h)- E(h)}\big|\ge \epsilon\big)\leq 2e^{-2m\epsilon^{2}}\label{dbo3}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>上面各式可以用霍夫丁不等式定理一得到，等式中 \(\mathrm{E}(h)\) 可以看成 \(\mathbb E\big[\mathrm{\hat E}(h)\big]\)，所以 \(\mathrm{\hat E}(h) - \mathrm{E}(h)\) 可以写成 \(\mathrm{\hat E}(h) - \mathbb E\big[\mathrm{\hat E}(h)\big]\)，再运用霍夫丁不等式即可。</p>
+
+<p><strong>推论：若训练集 \(D\) 包含 \(m\) 个从 \(\mathcal D\) 中 i.i.d 采样而得的样本，\(0\lt \epsilon \lt 1\)，则对 \(h\in \mathcal H\) ，式(\ref{tl})以至少 \(1-\delta\) 的概率成立：</strong><br/>
+\[<br/>
+\begin{equation}<br/>
+\mathrm{\hat E}(h) - \sqrt{\frac{\ln(2/\delta)}{2m}} \lt \mathrm{E}(h) \lt \mathrm{\hat E}(h) + \sqrt{\frac{\ln(2/\delta)}{2m}} \label{tl}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<blockquote>
+<p>下面简单证明一下这个推论：由(\ref{dbo3})式可知 \(P\big(\big|\mathrm{\hat E(h)- E(h)}\big|\gt \epsilon\big)\leq 2e^{-2m\epsilon^{2}}\)，该式子可以写成：<br/>
+\[<br/>
+\begin{align}<br/>
+P \big(\big|\mathrm{\hat E(h)- E(h)}\big|\le \epsilon\big)\ge 1-2e^{-2m\epsilon^{2}}\label{dbo4}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>令 \(\delta = 2\exp({-2m\epsilon^2})\)，所以：<br/>
+\[<br/>
+\epsilon = \sqrt{\frac{\ln(2/\delta)}{2m}}<br/>
+\]</p>
+
+<p>所以由(\ref{dbo4})式可知 \(\big|\mathrm{\hat E(h)- E(h)}\big|\le\sqrt{\frac{\ln(2/\delta)}{2m}}\) 的概率不小于 \(1-\delta\)，整理可得推论。</p>
+</blockquote>
+
+<p>推论说明样本数目 \(m\) 较大时，\(h\) 的经验误差是其泛化误差很好的近似。对于有限假设空间我们有：<br/>
+\[<br/>
+P\Bigg( \Big| \mathrm{E}(h) - \mathrm{\hat E}(h)\Big| \le \sqrt{\frac{\ln|\mathcal H| + \ln(2/\delta)}{2m}}  \Bigg) \ge 1 - \delta<br/>
+\]</p>
+
+<blockquote>
+<p>证明：令 \(h_1,h_2,...,h_{|\mathcal H}\) 是假设空间 \(\mathcal H\) 中的假设，有：<br/>
+\[<br/>
+\begin{align}<br/>
+P \big(\big|\mathrm{E(h)- \hat E(h)}\big|\gt \epsilon\big) &amp;= P \big(\exists h \in \mathcal H:\big|\mathrm{E(h)- \hat E(h)}\big|\gt \epsilon\big)\nonumber\\<br/>
+&amp;= P\Big(\big(\big| \mathrm{E(h_1)- \hat E(h_1)} \big| \gt \epsilon \big) \vee \cdots \vee \big(\big| \mathrm{E(h_{|\mathcal H|}) -\hat E(h_{|\mathcal H|})} \big| \gt \epsilon \big) \Big )\nonumber\\<br/>
+&amp;\le \sum_{i=1}^{|\mathcal H|} \sup_{h\in \mathcal H}P \big(\big|\mathrm{E(h)- \hat E(h)}\big|\gt \epsilon\big)\nonumber\\<br/>
+&amp;= |\mathcal H| \sup_{h\in \mathcal H}P \big(\big|\mathrm{E(h)- \hat E(h)}\big|\gt \epsilon\big)\label{mshp}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>由式(\ref{dbo3})可得：<br/>
+\[<br/>
+\sup_{h\in \mathcal H}P \big(\big|\mathrm{E(h)- \hat E(h)}\big|\gt \epsilon\big) = 2e^{-2m\epsilon^{2}}<br/>
+\]</p>
+
+<p>上式代入(\ref{mshp})可得：<br/>
+\[<br/>
+P \big(\big|\mathrm{E(h)- \hat E(h)}\big|\gt \epsilon\big) \le 2|\mathcal H|e^{-2m\epsilon^{2}}<br/>
+\]</p>
+
+<p>令 \(\delta = 2|\mathcal H|e^{-2m\epsilon^{2}} \) 求出 \(\epsilon\) 得表达式，便能很容易证明。</p>
+</blockquote>
+
+<p>而显然当 \(c\notin \mathcal H\) 时学习算法 \(\mathcal L\) 无法学得目标概率的 \(\mathcal c\) 的 \(\epsilon\) 近似。当时当假设空间 \(\mathcal H\) 给定时，必定存在一个泛化误差最好的假设，找到此假设的 \(\epsilon\) 近似也不失为一个较好的目标。\(\mathcal H\) 中训泛化差最好的假设是 \(\min_{h\in\mathcal H} \mathrm{E}(h)\)，于是以此目标可以将 PAC 学习推广到 \(\mathcal c \notin \mathcal H\) 的情况，这称为不可知学习（agnostic learning）。相应的，我们有：</p>
+
+<p><strong>不可知 PAC 可学习（agnostic PAC learnable）</strong>：令 \(m\) 表示从 \(\mathcal H\) 中独立同分布（i.i.d.） 采样的样本个数，\(0\lt \epsilon\)，\(\delta \lt 1\)，对于所有分布 \(\mathcal H\) ，若存在学习算法 \(\mathcal L\) 和多项式 \(poly(\cdot,\cdot,\cdot,\cdot)\)，使得对于任意的 \(m\ge poly(1/\epsilon,1/\delta,\text{size}(\mathbf x),\text{size}(c))\)，\(\mathcal L\) 能从假设空间 \(\mathcal H\) 输出满足下式的假设 \(h\)：<br/>
+\[<br/>
+P\Big(\mathrm{E(h) - \min_{h&#39;\in\mathcal H}\hat E(h&#39;)} \le \epsilon\Big) \ge 1 - \delta<br/>
+\]</p>
+
+<p>则称假设空间 \(\mathcal H\) 是不可知 PAC 可学习的。</p>
+
+<blockquote>
+<p>对 \(\mathcal c \in \mathcal H\) 的情况称为<strong>可实现学习 realization learning</strong></p>
+</blockquote>
+
+<p>与 PAC 可学习类似，若学习算法的 \(\mathcal L\) 的运行时间也是多项式函数 \(poly(1/\epsilon,1/\delta,\text{size}(\mathbf x),\text{size}(c))\)，则称 \(\mathcal H\) 是高效不可知 PAC 可学习的，学习算法 \(\mathcal L\) 则称假设空间 \(\mathcal H\) 的不可知 PAC 学习算法，满足上述条件的最小的 \(m\) 称为学习算法 \(\mathcal L\) 的样本复杂度。</p>
+
+<h3 id="toc_9">VC 维 Vapnik-Chervonenkis dimension</h3>
+
+<p>现实学习任务所面临的通常是无限假设空间，例如实数域中的所有区间、\(\mathcal R^d\) 空间中的所有线性超平面。欲对此种情形的可学习性进行研究，需度量假设空间的复杂度。最常见的办法是考虑假设空间的“VC维”。</p>
+
+<p>介绍 VC 维之前，我们先引入几个概念：增长函数（growth function）、对分（dichotomy）和打散（shattering）。</p>
+
+<h4 id="toc_10">增长函数 growth function</h4>
+
+<p>有些文献中将增长函数称为打散系数（shatter coefficient），其实是一样的。给定假设空间 \(\mathcal H\) 和示例集 \(D=\{x_1,x_2,...,x_m\}\)，\(\mathcal H\) 中每个假设 \(h\) 都能对 \(D\) 中示例赋予标记，标记结果可表示为：<br/>
+\[<br/>
+h|_D = \{(h(x_1),h(x_2),...,h(x_m))\}<br/>
+\]</p>
+
+<p>随着 \(m\) 的增大，\(\mathcal H\) 中所有假设对 \(D\) 中的示例所能赋予标记的可能结果数也会增大。</p>
+
+<p><b>所有的 \(m \in \mathbf N\)，假设空间 \(\mathcal H\) 的增长函数 \(\Pi_{\mathcal H}(m)\) 为：<br/>
+\[<br/>
+\Pi_{\mathcal H}(m) = \max_{\{x_1,...,x_m\}\subseteq \mathcal X}\big|\{(h(x_1),...,h(x_m))\}|h\in \mathcal H\big|<br/>
+\]<br/>
+</b></p>
+
+<p>增长函数 \(\Pi_{\mathcal H}(m)\) 表示假设空间 \(\mathcal H\) 对 \(m\) 个示例所能赋予标记的最大可能结果数。例如一个二分类问题，当 \(D\) 中只有两个示例 \(\{a,b\}\) ，\(h\) 对 \(D\) 中的示例所能赋予标记的可能为 \(\{(a=0,b=0),(a=0,b=1),(a=1,b=0),(a=1,b=1)\}\) ，当有三个示例时，赋予的标记有 8 种可能，对于 \(m\) 个示例最多有 \(2^m\) 种可能，即：<br/>
+\[<br/>
+\Pi_{\mathcal H}(m) \le 2^m<br/>
+\]</p>
+
+<p>显然，\(\mathcal H\) 对示例所能赋予标记的可能结果数越大，\(\mathcal H\) 的表示能力越强，对学习任务的适应能力也越强。因此，增长函数描述了假设空间 \(\mathcal H\) 的表示能力，由此反应出假设空间的复杂度。</p>
+
+<h5 id="toc_11">对分 dichotomy</h5>
+
+<p>假设空间 \(\mathcal H\) 中不同的假设对于 \(D\) 中示例赋予标记的结果可能相同，也可能不同；尽管 \(\mathcal H\) 中可能包含无穷多个假设，单其对 \(D\) 中示例赋予标记的可能结果数是有限的。对于二分类问题来说，\(\mathcal H\) 中假设对 \(D\) 中示例赋予标记的每种可能称为对 \(D\) 的一次“对分”。</p>
+
+<h5 id="toc_12">打散 shatter</h5>
+
+<p>对于二分类而言，若假设空间 \(\mathcal H\) 能实现示例集 \(D\) 的所有对分，即存在：<br/>
+\[<br/>
+\Pi_{\mathcal H}(m) = 2^m<br/>
+\]</p>
+
+<p>称示例集 \(D\) 能被假设空间“打散”，这也就是“打散系数”的由来。</p>
+
+<h3 id="toc_13">VC 维</h3>
+
+<p><b><br/>
+假设空间 \(\mathcal H\) 的 VC 维定义为：<br/>
+\[<br/>
+V_{\mathcal H} = \max\{m|\Pi_{\mathcal H}(m) = 2^m\}<br/>
+\]</p>
+
+<p></b></p>
+
+<p>\(V_{\mathcal H} = d\) 表明存在大小为 \(d\) 的示例集能被假设空间 \(\mathcal H\) 打散，这并不意味着所有大小为 \(d\) 的示例都能被假设空间 \(\mathcal H\) 打散。VC 维的定义与数据分布 \(D\) 无关，这意味着在数据分布未知的情况下仍能计算假设空间 \(\mathcal H\) 的VC维。</p>
+
+<p>若存在大小为 \(d\) 的示例集能被 \(\mathcal H\) 打散，但是不存在 \(d+1\) 的示例集能被 \(\mathcal H\) 打散，则 \(\mathcal H\) 的 VC 维是 \(d\) 。如果对于所有的 \(m\) 有 \(\Pi_{\mathcal H} = 2^m\) ，那么有 \(V_{\mathcal H} = \infty\)。</p>
+
+<p>我们可利用增长函数来估计经验误差与泛化误差之间的关系：</p>
+
+<p><b>VC 不等式：对假设空间 \(\mathcal H\)，\(m\in \mathcal N\)，\(0\lt \epsilon \lt 1\) 和任意 \(h\in \mathcal H\) 有：<br/>
+\[<br/>
+P\bigg(\sup_{h\in \mathcal H}|\mathrm E(h) - \mathrm{\hat E(h)}|\gt \epsilon\bigg) \le 4\Pi_{\mathcal H}(2m)\exp(-\frac{m\epsilon^2}{8})<br/>
+\]</p>
+
+<p></b></p>
+
+<p>我们现在来尝试证明这个公式，为了证明这个定理，我们需要引入一个 “ghost sample” ，它是一个和训练数据 \(D\) 相同的数据，它只是为了帮我们证明结论，并不会在最后的结果中出现。设 \(D&#39; = \{(X&#39;_1,Y&#39;_1),..., (X&#39;_n , Y&#39;_n )\}\)，是独立于 \(D\) 外的以 i.i.d 形式从 \(\mathcal D\) 中采样出来的随机变量。定义这个样本上的经验损失为：<br/>
+\[<br/>
+\mathrm {\hat E&#39;(h)} = \frac 1 m \sum_{i=1}^m \mathbf{I}(h(x&#39;_i) \neq y&#39;_i)<br/>
+\]</p>
+
+<p>其中 \(\mathbf{I}\)是指示函数。</p>
+
+<p>在下面的证明中，我们不失一般性地假设 \(m\epsilon^2\ge 2\)，否则定理中的边界会小。首先我们看 <b>Symmetrization 引理</b>：</p>
+
+<p>对于任意的 \(\epsilon\)，且 \(m\epsilon^2 \ge 2\)，有：<br/>
+\[<br/>
+\begin{equation}<br/>
+P\bigg(\sup_{h\in \mathcal H}|\mathrm E(h) - \mathrm{\hat E(h)}|\gt \epsilon\bigg) \le 2P\bigg(\sup_{h\in\mathcal H}|\mathrm {\hat E(h)} - \mathrm{\hat E&#39;(h)}|\gt \frac \epsilon 2 \bigg) \label{psmm}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>注意右边涉及两个不同的经验误差（empirical risk）的绝对值项是对称的，且这两个经验误差都是建立在有限的数据集合上，这样我们就避开了无限集的问题。现在我们假设不等式左边的上确界可以达到，并在 \(\widetilde{h}(D)\equiv \widetilde{h} \in \mathcal H\) 时达到。尽管因为 \(\mathcal H\) 是无限空间，不太容易定义出 \(\mathcal H\) 中达到最大值的元素，我们还是可以定义 \(\widetilde{h}\) 为：<br/>
+\[<br/>
+\widetilde{h} \approx \arg \max_{h\in \mathcal H}|\mathrm E(h) - \mathrm{\hat E(h)}|<br/>
+\]</p>
+
+<p>现在我们来看一下(\ref{psmm})式的右边：<br/>
+\[<br/>
+\begin{align}<br/>
+P\bigg(\sup_{h\in\mathcal H}|\mathrm {\hat E(h)} - \mathrm{\hat E&#39;(h)}| \gt \frac\epsilon 2\bigg) &amp;\ge P\bigg( |\mathrm{\hat E(\widetilde h) - \hat E&#39;(\widetilde h)} | \gt \frac \epsilon 2\bigg)\label{pbs1}\\<br/>
+&amp;\ge P\bigg( \Big|\mathrm{\hat E(\widetilde h) - E(\widetilde h) \Big| &gt; \epsilon \text{ and } \Big|\hat E&#39;(\widetilde h) - E(\widetilde h)} \Big| \lt \frac \epsilon 2\bigg)\label{pbs2}\\<br/>
+&amp;= \mathbb E\bigg[\mathbf{I}\Big\{\Big|\mathrm{\hat E(\widetilde h) - E(\widetilde h) \Big| &gt; \epsilon\Big\} \mathbf{I}\Big\{\Big|\hat E&#39;(\widetilde h) - E(\widetilde h)} \Big| \lt \frac \epsilon 2\Big\} \bigg]\label{pbs3}\\<br/>
+&amp;= \mathbb E\bigg\{\mathbf{I}\Big\{\Big|\mathrm{\hat E(\widetilde h) - E(\widetilde h) }\Big| &gt; \epsilon\Big\} \mathbb E\Big[\mathbf{I}\Big\{\Big|\mathrm{\hat E&#39;(\widetilde h) - E(\widetilde h)} \Big| \lt \frac \epsilon 2\Big\}\Big| D&#39;\Big] \bigg\}\label{pbs4}\\<br/>
+&amp;= \mathbb E\bigg[\mathbf{I}\Big\{\Big|\mathrm{\hat E(\widetilde h) - E(\widetilde h) }\Big| &gt; \epsilon\Big\} P\Big[\Big|\mathrm{\hat E&#39;(\widetilde h) - E(\widetilde h)}\Big| \lt \frac \epsilon 2 \Big | D&#39;\Big]\bigg]\label{pbs5}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>式子从(\ref{pbs1})到式子(\ref{pbs2})是因为对于任意实数 \(x\)，\(y\) 和 \(z\)，有：<br/>
+\[<br/>
+|x-z|\gt \epsilon\text{ and }|y-z| \gt \frac \epsilon 2 \Rightarrow |x-y| \gt \frac \epsilon 2<br/>
+\]</p>
+
+<p>在 \(D&#39;\) 的条件下：<br/>
+\[<br/>
+\mathrm{\hat E&#39;(\widetilde h)} - \mathrm{E(\widetilde h)} = \frac 1 m \sum_{i=1}^m U_i(\widetilde h)<br/>
+\]</p>
+
+<p>其中 \(U_i(\widetilde h) = \mathbf{I}(\widetilde h(x&#39;_i) \neq y&#39;_i) - \mathbb E\big[\mathbf{I}(\widetilde h(x&#39;_i) \neq y&#39;_i)|D&#39;\big]\)，它是一个平均值为 0 的独立同分布的随机变量。使用切比雪夫不等式：<br/>
+\[<br/>
+\begin{align*}<br/>
+P\Big[\Big|\mathrm{\hat E&#39;(\widetilde h) - E(\widetilde h)}\Big| \lt \frac \epsilon 2\bigg | D&#39;\Big] &amp;= P\Big[\Big|\frac 1 m \sum_{i=1}^m U_i(\widetilde h)\Big| \lt \frac \epsilon 2 \bigg| D&#39;\Big]\\<br/>
+&amp;= P\Big[\Big|\sum_{i=1}^m U_i(\widetilde h)\Big| \lt \frac{m\epsilon}{2} \bigg| D&#39;\Big]\\<br/>
+&amp;\ge 1 - \frac {\text{var}\Big[|\sum_{i=1}^m U_i(\widetilde h)|\Big|D&#39;\Big]}{(m\epsilon/2)^2}\\<br/>
+&amp;= 1 - \frac{4}{m^2\epsilon^2} \text{var}\Big[|\sum_{i=1}^m U_i(\widetilde h)|\Big|D&#39;\Big]\\<br/>
+&amp;= 1 - \frac{4m}{m^2\epsilon^2}\text{var}\Big[|U_i(\widetilde h)|\Big|D&#39;\Big]\\<br/>
+&amp;= 1 - \frac{4}{m\epsilon^2}\text{var}\Big[|U_i(\widetilde h)|\Big|D&#39;\Big]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<blockquote>
+<p>若随机变量 \(X\) 的范围为 \([a,b]\)，则：<br/>
+\[<br/>
+\mathbb{D}(X) \le \frac{(b-a)^2}{4}<br/>
+\]</p>
+
+<p>证明：<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbb{D}(X) &amp;= \mathbb{E}\{[X-\mathbb{E}(X)]^2\} \\<br/>
+&amp;= \mathbb E\{X^2 - 2X\mathbb{E}(X) + [\mathbb{E}(X)]^2\} \\<br/>
+&amp;= \mathbb{E}(X^2) - 2[\mathbb{E}(X)]^2 + [\mathbb{E}(X)]^2 \\<br/>
+&amp;= \mathbb{E}(X^2) - [\mathbb{E}(X)]^2<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>考虑到 \(a \le X \le b\)，即 \(\mathbb{E}(a) \le \mathbb{E}(X) \le \mathbb{E}(b)\)，也就是 \(a\le \mathbb{E}(X) \le b\)，令 \(Y=\frac{X-a}{b-a}\)，可知 \(0\le Y \le 1\)，<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\mathbb{D}(Y) = \mathbb{D}(\frac{X-a}{b-a}) = \frac{\mathbb{D}(X)}{b-a}\\<br/>
+&amp;\Rightarrow \quad \mathbb{D}(X) = \mathbb{D}(Y)\cdot (b-a) = \{\mathbb{E}(Y^2) - [\mathbb{E}(Y)]^2\}\cdot (b-a)\\<br/>
+&amp;\because \quad Y \le 1 \\<br/>
+&amp;\therefore \quad Y^2 \le Y \\<br/>
+&amp;\therefore \quad \mathbb{D}(Y^2) &lt; \mathbb{D}(Y)\\<br/>
+&amp;\Rightarrow \quad \mathbb{D}(X) = \{\mathbb{E}(Y^2) - [\mathbb{E}(Y)]^2\}\cdot (b-a) \le \{\mathbb{E}(Y) - [\mathbb{E}(Y)]^2\}\cdot (b-a)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>由均值不等式可知：<br/>
+\[<br/>
+\mathbb{E}(Y) - [\mathbb{E}(Y)]^2 = \mathbb{E}(Y)[1-\mathbb{E}(Y)] \le \frac{\big\{\mathbb{E}(Y)+[1-\mathbb{E}(Y)] \big\}^2}{4}= \frac 1 4<br/>
+\]</p>
+
+<p>所以：\(\mathbb{D}(X) \le {(b-a)^2}/{4}\)，得证</p>
+</blockquote>
+
+<p>由 \(U_i(\widetilde h)\) 的定义知 \(|U_i(\widetilde h)|\) 的区间为 \([0,1]\)，所以 \(\text{var}\Big[|U_i(\widetilde h)|\Big|D&#39;\Big] \le \frac 1 4\)，所以：<br/>
+\[<br/>
+\begin{align*}<br/>
+P\Big(\Big|\mathrm{\hat E&#39;(\widetilde h) - E(\widetilde h)}\Big| \lt \frac \epsilon 2\bigg | D&#39;\Big) &amp;\ge 1 - \frac{4}{m\epsilon^2}\text{var}\Big[|U_i(\widetilde h)|\Big|D&#39;\Big]\\<br/>
+&amp;\ge 1- \frac{4}{m\epsilon^2}\cdot \frac 1 4 = 1- \frac{1}{m\epsilon^2}\\<br/>
+\because\quad &amp; m\epsilon^2 &gt; 2\\<br/>
+\therefore \quad &amp; -\frac{1}{m\epsilon^2} &gt; -\frac 1 2\\<br/>
+\Rightarrow \quad P\Big(\Big|\mathrm{\hat E&#39;(\widetilde h) - E(\widetilde h)}\Big| \lt \frac \epsilon 2\bigg | D&#39;\Big) &amp;\ge 1- \frac{1}{m\epsilon^2} \ge \frac 1 2<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>现在再看式(\ref{pbs5})，可以知道：<br/>
+\[<br/>
+\begin{align*}<br/>
+P\bigg(\sup_{h\in\mathcal H}|\mathrm {\hat E(h)} - \mathrm{\hat E&#39;(h)}| \gt \frac\epsilon 2\bigg) &amp;\ge \mathbb E\bigg[\mathbf{I}\Big\{\Big|\mathrm{\hat E(\widetilde h) - E(\widetilde h) }\Big| &gt; \epsilon\Big\} P\Big[\Big|\mathrm{\hat E&#39;(\widetilde h) - E(\widetilde h)}\Big| \lt \frac \epsilon 2\bigg | D&#39;\Big]\bigg]\\<br/>
+&amp;\ge \frac 1 2 \mathbb E\bigg[\mathbf{I}\Big\{\Big|\mathrm{\hat E(\widetilde h) - E(\widetilde h) }\Big| &gt; \epsilon\Big\}\bigg]\\<br/>
+&amp;= \frac 1 2 P\Big[\Big|\mathrm{\hat E(\widetilde h) - E(\widetilde h) }\Big| &gt; \epsilon\Big]\\<br/>
+&amp;= \frac 1 2 P\Big[\sup_{h\in \mathcal H}\Big|\mathrm{\hat E(h) - E(h) }\Big| &gt; \epsilon \Big]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>上面推导过程中最后一个不等式，是由于 \(\widetilde h\) 的定义是此时 \(\mathrm{\hat E(\widetilde h) - E(\widetilde h)}\) 能得到最大值，此时也就等价于 \(\mathrm{\hat E(h) - E(h) }\) 达到上确界。所以引理得证。</p>
+
+<p>Symmetrization 引理一个很大的好处是我们将无限假设空间的问题边界问题转换成有限假设空间边界问题，现在我们来考虑有限假设空间上的<br/>
+\[<br/>
+\mathrm {\hat E(h)} - \mathrm{\hat E&#39;(h)} = \frac 1 m \sum_{i=1}^m \mathbf{I}[h(x_i) \neq y_i]-\frac 1 m \sum_{i=1}^m \mathbf{I}[h(x&#39;_i) \neq y&#39;_i] = \frac 1 m \sum_{i=1}^m \{\mathbf{I}[h(x_i) \neq y_i]-\mathbf{I}[h(x&#39;_i) \neq y&#39;_i]\}<br/>
+\]</p>
+
+<p>注意上面的等式，令 \(\mathbf h=(h_1,h_2,...,h_m,h&#39;_1,h&#39;_2,...,h&#39;_m)\)，这里 \(h_1\) 表示 \(h(x_1)\) ，\(h&#39;_1\) 表示 \(h(x&#39;_1)\) ，\(\mathbf h\) 只取决于训练样本和 “ghost sample”，因此考虑 \(\mathcal H\) 在两个样本 \(DD&#39;\) 的投影 \(\mathcal H_{D\cup D&#39;}\)，便有：<br/>
+\[<br/>
+\begin{eqnarray}<br/>
+\sup_{h\in\mathcal H}|\mathrm {\hat E(h)} - \mathrm{\hat E&#39;(h)}| = \sup_{\mathbf h \in \mathcal H_{D\cup D&#39;}}\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\label{hmc}\\<br/>
+\end{eqnarray}<br/>
+\]</p>
+
+<blockquote>
+<p>现在我们仅考虑经验损失边界 ，如果很多假设有着相同的经验损失（也就是在各数据点上都产生相同的 labels/values 对），我们可以取出一个作为代表，称之为“有效假设”，将其他的都去除。在数据集 \(D\) 上仅选择那些不同的有效假设，我们可以将假设空间限制到一个更小的子集 \(\mathcal H_D\)。 同理，如果考虑 \(\mathcal H\) 在训练样本和 ”ghost sample“ 的限制，即 \(\mathcal H_{D\cup D&#39;}\)。</p>
+</blockquote>
+
+<p>因为上限值很大，所以至少存在一个 \(\mathbf h\) 能使  \(\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\) 很大：<br/>
+\[<br/>
+\begin{align*}<br/>
+P\bigg(\sup_{h\in\mathcal H}|\mathrm {\hat E(h)} - \mathrm{\hat E&#39;(h)}| \gt \frac\epsilon 2\bigg) &amp;= P\bigg(\sup_{\mathbf h \in \mathcal H_{D\cup D&#39;}}\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\gt \frac\epsilon 2\bigg)\\<br/>
+&amp;= P\bigg(\exists \mathbf h \in \mathcal H_{D\cup D&#39;}:\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\gt \frac\epsilon 2\bigg)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>由于 \(\mathcal H_{DD&#39;}\) 是可数的，我们可以对这个特殊 \(\mathbf h\) 的概率用联合概率的一致性：<br/>
+\[<br/>
+\begin{align*}<br/>
+P\bigg(\exists \mathbf h \in \mathcal H_{D\cup D&#39;}:\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\gt \frac\epsilon 2\bigg)&amp;\le \sum_{ \mathbf h \in \mathcal H_{D\cup D&#39;}}P\bigg(\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\gt \frac\epsilon 2\bigg)\\<br/>
+&amp;\le |\mathcal H_{D\cup D&#39;}| P\bigg(\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\gt \frac\epsilon 2\bigg)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<blockquote>
+<p>一致限（union bound）：若 \(A_1,A_2,...,A_k\) 为k个不同的事件（不一定相互独立），那么有：<br/>
+\[<br/>
+P(A_1\cup A_2 \cup ... \cup A_k) = P(A_1) + P(A_2) + ... + P(A_n)<br/>
+\]</p>
+
+<p>一致限说明：k个事件中任一个事件发生的概率小于等于这k个事件发生的概率和（等号成立的条件为这k个事件相两两互斥）</p>
+</blockquote>
+
+<p>用增长函数的定义我们知道 \(|\mathcal H_{D\cup D&#39;}| \le \Pi_\mathcal H(2m)\)，代入得：<br/>
+\[<br/>
+\begin{align*}<br/>
+P\bigg(\exists \mathbf h \in \mathcal H_{D\cup D&#39;}:\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\gt \frac\epsilon 2\bigg) &amp;\le |\mathcal H_{D\cup D&#39;}| P\bigg(\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\gt \frac\epsilon 2\bigg)\\<br/>
+&amp;\le \Pi_\mathcal H(2m) P\bigg(\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\gt \frac\epsilon 2\bigg)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>这里我们令 \(L_i = \mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\)，它的期望值为：<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbb E(L_i) &amp;= \mathbb E\big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i) \big]\\<br/>
+&amp;= \mathbb E\big[\mathbf{I}(h_i \neq y_i)\big]-\mathbb E\big[\mathbf{I}(h&#39;_i \neq y&#39;_i) \big]\\<br/>
+&amp;= \mathrm{E}(h) - \mathrm{E}(h) = 0<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>我们允许我们表示 \(\hat {\mathrm{E}}(h) - \mathrm{E&#39;}(h)\)：<br/>
+\[<br/>
+\begin{align*}<br/>
+\hat {\mathrm{E}}(h) - \mathrm{E&#39;}(h) &amp;= \frac 1 m \sum_{i=1}^m \big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\big]\\<br/>
+&amp;= \frac 1 m \sum_{i=1}^m L_i\\<br/>
+&amp;= \frac 1 m \sum_{i=1}^m \big [L_i-\mathbb{E}(L_i)\big]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>除此之外我们注意到 \(L_i\) 的取值范围是 \([-1,1]\) ，我们可以运用霍夫丁不等式理论二：<br/>
+\[<br/>
+\begin{align*}<br/>
+P\bigg(\bigg|\frac 1 m \sum_{i=1}^m \big [L_i - \mathbb{E}(L_i)\big ]\bigg|\gt t\bigg) \le 2\exp(-\frac{2t^2m^2}{\sum_{i=1}^{m}(1+1)^2}) = 2\exp(-\frac{2t^2m^2}{4m}) = 2\exp(-\frac{mt^2}{2})<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令 \(t=\frac \epsilon 2\) ，得：<br/>
+\[<br/>
+P\bigg(\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\gt \frac\epsilon 2\bigg) \le 2\exp(-\frac{m\epsilon^2}{8})<br/>
+\]</p>
+
+<p>最终结果可得：<br/>
+\[<br/>
+\begin{align*}<br/>
+P\bigg(\sup_{h\in\mathcal H}|\mathrm {\hat E(h)} - \mathrm{\hat E&#39;(h)}| \gt \frac\epsilon 2\bigg) &amp;\le \Pi_\mathcal H(2m) \sup_{\mathbf h \in \mathcal H_{D,D&#39;}} P\bigg(\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\gt \frac\epsilon 2\bigg)\\<br/>
+&amp;= 2\Pi_\mathcal H(2m) \exp(-\frac{m\epsilon^2}{8})\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>结合 Symmetrization 引理可以得到：<br/>
+\[<br/>
+P\bigg(\sup_{h\in \mathcal H}|\mathrm E(h) - \mathrm{\hat E(h)}|\gt \epsilon\bigg) \le 2P\bigg(\sup_{h\in\mathcal H}|\mathrm {\hat E(h)} - \mathrm{\hat E&#39;(h)}|\gt \frac \epsilon 2 \bigg) \le 4\Pi_\mathcal H(2m) \exp(-\frac{m\epsilon^2}{8})<br/>
+\]</p>
+
+<p>所以 VC 不等式可证。</p>
+
+<h4 id="toc_14">VC 维举例</h4>
+
+<p><b>实数域举例</b>：实数域的区间 \([a,b]\) ，令 \(\mathcal H\) 表示实数域中的所有闭区间构成的集合 \(\{h_{[a,b]}:a,b\in \mathbb R,a\le b\}\)，\(\mathcal X = \mathbb R\)，对 \(x \in \mathcal X\)，若 \(x \in [a,b]\)，则 \(h_{[a,b]}(x) = +1\)，否则 \(h_{[a,b]}(x) = -1\)。若 \(D=\{x_1,x_2\} = \{0.5,1.5\}\)，则假设空间中 \(\mathcal H\) 中存在假设 \(\{h_{[0,1]},h_{[0,2]},h_{[1,2]},h_{[2,3]}\}\) 将 \(\{x_1,x_2\}\) 打散，所以假设空间 \(\mathcal H\) 的 VC 维至少为2；对任意大小为 3 的示例集 \(\{x_3,x_4,x_5\}\)，不妨设 \(x_3\lt x_4 \lt x_5\)，则 \(\mathcal H\) 中不存在任意假设 \(h_{[a,b]}\) 能实现对分结果 \(\{(x_3,+1),(x_4,-1),(x_5,+1)\}\) ，于是 VC 维为2.</p>
+
+<p><b>二维平面举例</b>：令 \(\mathcal H\) 表示二维实平面上所有线性划分构成的集合，\(\mathcal X=\mathbb R^2\)。</p>
+
+<div align="center">
+    <img width="600" src="media/15151569041850/15338602041302.jpg" />
+</div>
+
+<p>如上图所示，存在大小为 3 的示例集可被 \(\mathcal H\) 打散，但不存在大小为 4 的示例集可被 \(\mathcal H\) 打散。于是，二维平面上所有线性划分构成的假设空间 \(\mathcal H\) 的 VC 维为 3 。</p>
+
+<h4 id="toc_15">Sauer 引理</h4>
+
+<p>Sauer 引理基于 VC 维提供一类二分类增长函数的多项式约束。若假设空间 \(\mathcal H\) 的 VC 维为 \(d\)，则对任意的 \(m\in \mathbb N\) 有：<br/>
+\[<br/>
+\Pi_\mathcal H(m) \le \sum_{i=0}^d\bigg(\begin{array}{c}m\\i\\\end{array}\bigg) <br/>
+\]</p>
+
+<blockquote>
+<p>其中<br/>
+\[<br/>
+\bigg( \begin{array}{c}m\\n\\\end{array} \bigg) = \frac{m!}{n!(n-m)!} <br/>
+\]</p>
+
+<p>表示组合数，又可以简写为 \(C_n^m\) ，物理意义表示为从 \(m\) 个不同元素中取出 \(n\) 个元素的组合数。规定 \(C_0^m = 1\)、\(C_m^m = 1\) 和 \(C_0^0 = 1\)。</p>
+</blockquote>
+
+<p>证明：由数学归纳法证明。当 \(m=1\)，\(d=0\) 或 \(d=1\) 时：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\Pi_\mathcal H(m) = \left \{ \begin{array}{c}<br/>
+2^0 = 1\quad&amp;m=1,d=0\\<br/>
+2^1 = 2\quad&amp;m=1,d=1\\<br/>
+\end{array} \right .\\<br/>
+&amp;\sum_{i=0}^d \left(\begin{array}{c}m\\i\\\end{array}\right ) = \left \{ \begin{array}\\ \left (\begin{array}{c}1\\0\\\end{array}\right ) = 1;\quad &amp;m=1,d=0\\<br/>
+\left (\begin{array}{c}1\\0\\\end{array}\right ) + \left ( \begin{array}{c}1\\1\\\end{array}\right ) = 2;\quad &amp;m=1,d=1\\<br/>
+\end{array}\right .<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>定理成立。</p>
+
+<p>假设定理对 \((m-1,d-1)\) 和 \((m-1,d)\) 成立。令 \(D=\{x_1,x_2,...,x_m\}\)，\(D&#39;=\{x_1,x_2,...,x_{m-1}\}\)，<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathcal H_{|D}  &amp;= \{(h(x_1),h(x_2),...,h(x_m))|h\in\mathcal H\},\\<br/>
+\mathcal H_{|D&#39;} &amp;= \{(h(x_1),h(x_2),...,h(x_{m-1}))|h\in\mathcal H\}.\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>任何假设 \(h\in \mathcal H\) 对 \(x_m\) 的分类结果或为 \(+1\) 或为 \(-1\)，因此任何出现 \(\mathcal H_{|D&#39;}\) 中的串都会在 \(\mathcal H_{|D}\) 中出现一次或两次，令 \(\mathcal H_{D&#39;|D}\) 表示在 \(\mathcal H_{|D}\) 中出现两次的 \(\mathcal H_{|D&#39;}\) 中串组成的集合，即：<br/>
+\[<br/>
+\mathcal H_{D&#39;|D} = \{(y_1,y_2,...,y_{m-1})\in \mathcal H_{|D&#39;} | \exists h,h&#39;\in \mathcal H,(h(x_i)=h&#39;(x_i) = y_i)\land(h(x_m)\neq h&#39;(x_m)),1\le i\le m-1\}<br/>
+\]</p>
+
+<p>考虑到 \(\mathcal H_{D&#39;|D}\) 中的串在 \(\mathcal H_{|D}\) 中出现了两次，但在 \(\mathcal H_{|D&#39;}\) 中仅出现了一次，有：<br/>
+\[<br/>
+\begin{align}<br/>
+|\mathcal H_{|D}| = |\mathcal H_{|D&#39;}| + |\mathcal H_{D&#39;|D}|\label{mmm}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>\(D&#39;\) 的大小为 \(m-1\) ，由假设可得：<br/>
+\[<br/>
+\begin{align}<br/>
+|\mathcal H_{|D&#39;}| \le \Pi_{\mathcal H}(m-1) \le \sum_{i=0}^d \bigg( \begin{array}{c}m-1\\i\\\end{array}\bigg )\label{mlp}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>令 \(Q\) 表示能被 \(\mathcal H_{D|D&#39;}\) 打散的集合，由 \(\mathcal H_{D&#39;|D}\) 定义可知 \(Q\cup\{x_m\}\) 必能被 \(\mathcal H_{|D}\) 打散。由于 \(\mathcal H\) 的 VC 维为 \(d\)，因此 \(\mathcal H_{D&#39;|D}\) 的 VC 维最小为 \(d-1\)，于是有：<br/>
+\[<br/>
+\begin{align}<br/>
+|H_{D&#39;|D}| \le \Pi(m-1) \le \sum_{i=0}^{d-1}\bigg(\begin{array}{c}m-1\\i\\\end{array}\bigg )\label{hll}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>由式(\ref{mmm})、(\ref{mlp})和(\ref{hll})可得：<br/>
+\[<br/>
+\begin{align*}<br/>
+|\mathcal H_{|D}| &amp;\le \sum_{i=0}^d \left(\begin{array}{c}m-1\\i\\\end{array}\right ) + \sum_{i=0}^{d-1} \left(\begin{array}{c} m-1\\i\\\end{array}\right)\\<br/>
+&amp;= \sum_{i=0}^d \left(\begin{array}{c}m-1\\i\\\end{array}\right ) + \sum_{i=0}^{d} \left(\begin{array}{c} m-1\\i-1\\\end{array}\right)\\<br/>
+&amp;= \sum_{i=0}^d \bigg(\left(\begin{array}{c}m-1\\i\\\end{array}\right)+\left(\begin{array}{c}m-1\\i-1\\\end{array}\right )\bigg)\\<br/>
+&amp;= \sum_{i=0}^d \left (\begin{array}{c}m\\i\\\end{array} \right )<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>由集合 \(D\) 的任意性，引理得证。</p>
+
+<p><strong>Sauer推论1：如果 \(d &lt; \infty\) ，对于所有的 \(m \ge 1\) ：<br/>
+\[<br/>
+\Pi_\mathcal H(m) \le \sum_{i=0}^d\bigg(\begin{array}{c}m\\i\\\end{array}\bigg)  \le (m+1)^d<br/>
+\]</strong></p>
+
+<p>推论证明：通过二项式定理：<br/>
+\[<br/>
+\begin{align*}<br/>
+(m+1)^d &amp;= \sum_{i=0}^d m^i \left( \begin{array}\\d\\i\\\end{array}\right ) = \sum_{i=0}^d m^i \frac{d!}{(d-i)!i!}\\<br/>
+&amp;\ge \sum_{i=1}^d \frac{m!}{i!} \ge \sum_{i=1}^d \frac{m!}{(m-i)!i!} = \sum_{i=1}^d \left (\begin{array}{cc}m\\i\\\end{array}\right )<br/>
+\end{align*}<br/>
+\]</p>
+
+<blockquote>
+<p>二项式定理：可以将 \(x+y\) 的任意次幂展开成和的形式<br/>
+\[<br/>
+(x+y)^n = \left(\begin{array}\\ n\\0\\\end{array} \right)x^n y^0 + \left(\begin{array}\\ {n}\\1\\\end{array}\right) x^{n-1} y^1 + \cdots + \left(\begin{array}{cc} n\\{n-1}\\\end{array} \right )x^1 y^{n-1} + \left(\begin{array}\\ n\\n\\\end{array} \right )x^0 y^n\\<br/>
+\]</p>
+</blockquote>
+
+<p><strong>Sauer推论2：对于所有的 \(m\le d\) ，有：<br/>
+\[<br/>
+\Pi_\mathcal H(m) \le \sum_{i=0}^d\bigg(\begin{array}{c}m\\i\\\end{array}\bigg) \le\bigg(\frac{me}{d}\bigg)^d<br/>
+\]</strong></p>
+
+<p>推论证明：如果 \(\frac d m \le 1\) 然后<br/>
+\[<br/>
+\begin{align*}<br/>
+\bigg(\frac d m \bigg)^d \sum_{i=0}^d \left (\begin{array}{cc}m\\i\\\end{array}\right ) &amp;\le \sum_{i=0}^d \bigg(\frac d m \bigg)^i \left (\begin{array}{cc}m\\i\\\end{array}\right ) \le \sum_{i=0}^m \bigg(\frac d m \bigg)^i \left (\begin{array}{cc}m\\i\\\end{array}\right ) \\<br/>
+&amp;= \bigg(1+\frac d m\bigg)^m \le (e^{d/m})^m \le e^d<br/>
+\end{align*}<br/>
+\]</p>
+
+<blockquote>
+<p>上面的推理使用了\[<br/>
+(1+x)&lt;e^x<br/>
+\]</p>
+
+<p>这个不等式在上面已经有证明。</p>
+</blockquote>
+
+<p>因此<br/>
+\[<br/>
+\sum_{i=0}^d \left (\begin{array}{cc}m\\i\\\end{array}\right )  \le e^d \bigg(\frac m d \bigg )^d = \bigg (\frac {me}{d}\bigg)^d<br/>
+\]</p>
+
+<p><strong>Sauer推论3：如果 \(d\gt 2\) ，那么对于所有 \(m \ge d\)：<br/>
+\[<br/>
+\Pi_\mathcal H(m) \le m^d<br/>
+\]</strong></p>
+
+<p>推论证明：如果 \(d \gt 2\)，且 \(d\in \mathcal N\) ，则\(\frac e d \lt 1\)，由上个推论自然可证。</p>
+
+<p>我们现在来根据<strong>VC不等式定理</strong>和推论可得基于 VC 维的泛化误差界</p>
+
+<p><strong>定理1</strong>：若假设空间 \(\mathcal H\) 的VC维为 \(d\)，则对任意 \(m\gt d\)，\(0\lt \delta\lt 1\) 和 \(h\in \mathcal H\) 有<br/>
+\[<br/>
+\begin{align}<br/>
+P\bigg(\Big|\mathrm E(h) - \mathrm{\hat E}(h)\Big|\le \sqrt{\frac{8d\ln\frac{2em}{d} + 8\ln\frac{4}{\delta}}{m}}\bigg) \ge 1 - \delta\label{pbhb}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>证明：由VC不等式可知：<br/>
+\[<br/>
+P\bigg(|\mathrm E(h) - \mathrm{\hat E(h)}|\gt \epsilon\bigg)\le 4\Pi_\mathcal H(2m) \exp(-\frac{m\epsilon^2}{8})\\<br/>
+\Rightarrow P\bigg(|\mathrm E(h) - \mathrm{\hat E(h)}|\le \epsilon\bigg)\ge 1 - 4\Pi_\mathcal H(2m) \exp(-\frac{m\epsilon^2}{8})\ge 1 - 4\bigg(\frac{2me}{d}\bigg)^d \exp(-\frac{m\epsilon^2}{8})\\<br/>
+\]</p>
+
+<p>令 \(\delta = 4\Big(\frac{2me}{d}\Big)^d \exp\Big(-\frac{m\epsilon^2}{8}\Big)\) 得<br/>
+\[<br/>
+\epsilon = \sqrt{\frac{8\ln(4/\delta) + 8d\ln(2em/d)}{m}}<br/>
+\]</p>
+
+<p>得证。</p>
+
+<p>由该定理可知(\ref{pbhb})得泛化误差界只与样例数目 \(m\) 有关，收敛速率为 \(\mathbb O(1/m\) ，与数据分布 \(\mathcal D\) 和样例集 \(D\) 无关。因此基于 VC 维的泛化误差界是分布无关（distribution-free）、数据独立（data-independent）的。</p>
+
+<p>令 \(h\) 表示学习算法 \(\mathcal L\) 输出的假设，若 \(h\) 满足：<br/>
+\[<br/>
+h = \min_{h&#39;\in\mathcal H} \mathrm{\hat E}(h&#39;)<br/>
+\]</p>
+
+<p>则称学习算法 \(\mathcal L\) 满足经验风险最小化（ERM，Empirical Risk Minimization）原则的算法，有下面的定理：</p>
+
+<p><strong>定理2</strong>：任何VC维有限的假设空间 \(\mathcal H\) 都是（不可知）PAC可学习的。</p>
+
+<p>证明：假设 \(\mathcal L\) 是满足经验风险最小化的算法，\(h\) 是算法输出的假设。令 \(g\) 表示 \(\mathcal H\) 中最小泛化误差的假设，即：<br/>
+\[<br/>
+\mathrm{E}(g) = \min_{h\in\mathcal H}\mathrm{E}(h)<br/>
+\]</p>
+
+<p>令 <br/>
+\[<br/>
+\begin{align}<br/>
+\delta&#39;/2 = \delta，\nonumber\\<br/>
+\sqrt{\frac{\ln(\delta&#39;/2)}{2m}} = \frac \epsilon 2\label{sfl}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>由<strong>推论</strong>公式(\ref{tl})可知<br/>
+\[<br/>
+\begin{align}<br/>
+\mathrm{\hat E}(g) - \frac \epsilon 2 \le \mathrm{E}(g) \le \mathrm{\hat E}(g) + \frac \epsilon 2\label{mheg}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>以至少 \(1-\delta/2\) 的概率成立。令<br/>
+\[<br/>
+\begin{align}<br/>
+\sqrt{\frac{8\ln(4/\delta&#39;) + 8d\ln(2em/d)}{m}} = \frac \epsilon 2\label{sf8}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>由<strong>定理1</strong>公式(\ref{pbhb}) 可知<br/>
+\[<br/>
+\begin{align}<br/>
+P\bigg(\Big|\mathrm E(h) - \mathrm{\hat E}(h)\Big|\le \frac \epsilon 2\bigg) \ge 1 - \delta\label{pbbme}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>由(\ref{mheg})知<br/>
+\[<br/>
+\mathrm{E}(g) - \mathrm{\hat E}(g) + \frac \epsilon 2 \ge 0<br/>
+\]</p>
+
+<p>结合(\ref{pbbme})知<br/>
+\[<br/>
+\mathrm E(h) - \mathrm{\hat E}(h) \le \frac \epsilon 2 + \mathrm{E}(g) - \mathrm{\hat E}(g) + \frac \epsilon 2<br/>
+\]</p>
+
+<p>以至少 \(1-\delta/2\) 的概率成立。</p>
+
+<p>所以<br/>
+\[<br/>
+\mathrm{E}(h) - \mathrm{E}(g) \le \mathrm{\hat E}(h) - \mathrm{\hat E}(g) + \epsilon \le \epsilon<br/>
+\]</p>
+
+<p>以至少 \(1-\delta/2\) 的概率成立。由(\ref{sfl})和(\ref{sf8})可以解出 \(m\)，再由 \(\mathcal H\) 的任意性可知定理成立，得证。</p>
+
+<hr/>
+
+<p>周志华 机器学习<br/>
+<a href="https://web.eecs.umich.edu/%7Ecscott/past_courses/eecs598w14/notes/05_vc_theory.pdf">VC Theory</a><br/>
+<a href="http://freemind.pluskid.org/pdf/slt/vc-theory-symmetrization.pdf">VC Symmetrization</a><br/>
+<a href="https://mostafa-samir.github.io/ml-theory-pt2/">ml-theory-pt2</a><br/>
+<a href="https://blog.csdn.net/wangjianguobj/article/details/57413819">30分钟了解PAC学习理论</a><br/>
+<a href="https://blog.csdn.net/icefire_tyh/article/details/52064910">机器学习(周志华西瓜书)参考答案总目录</a><br/>
+<a href="http://mlweb.loria.fr/book/en/SauerShelah.html">Sauer&#39;s Lemma</a><br/>
+<a href="http://mlweb.loria.fr/book/en/VCbound.html">My first VC bound</a><br/>
+<a href="http://mlweb.loria.fr/book/en/symmetrization.html">Symmetrization (where we start seeing ghost samples)</a><br/>
+<a href="https://people.cs.umass.edu/%7Eakshay/courses/cs690m/files/lec4.pdf">Lecture 4: The Vapnik-Chervonenkis Dimension</a><br/>
+<a href="http://nowak.ece.wisc.edu/SLT09/lecture19.pdf">The Proof of the Vapnik-Chervonenkis (VC) Inequality</a><br/>
+<a href="http://www.cs.cmu.edu/%7Ehanxiaol/slides/rademacher_vc_hanxiaol.pdf">Rademacher Complexity and VC Dimension</a><br/>
+<a href="https://web.eecs.umich.edu/%7Ecscott/past_courses/eecs598w14/notes/05_vc_theory.pdf">Vapnik-Chevronenkis Theory</a><br/>
+<a href="https://ocw.mit.edu/courses/sloan-school-of-management/15-097-prediction-machine-learning-and-statistics-spring-2012/lecture-notes/MIT15_097S12_lec14.pdf">Introduction to Statistical Learning Theory</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+  
+	<div class="pagination">
+	
+<a href="archives.html">Blog Archives</a>
+	 
+	    
+	</div>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

@@ -1,0 +1,1148 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  支持向量机 SVM - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">支持向量机 SVM</h1>
+				<p class="meta"><time datetime="2017-08-13T01:27:15+08:00" pubdate data-updated="true">2017/8/13</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>支持向量机（support vector machine，SVM）是一个有监督的机器学习算法，它的基本模型是定义在特征空间的间隔最大的线性分类器。利用核技巧将输入数据映射到高维空间，来实现非线性分类器。</p>
+
+<h2 id="toc_0">支持向量机基础</h2>
+
+<p>为了方便讲明白SVM的工作原理，下面主要结合图片和公式说明，如图1，假设在二维空间里有两类线性可分的数据，直观上看，很容易在中间画出一条线将两类数据分开。</p>
+
+<div align="center">
+    <img src="media/15025588355749/15263132529256.jpg" width="350"></img>
+    <center>图1：二维空间里数据</center>
+    <br/>
+</div>
+
+<p>定义超平面（即分割线）可以通过如下线性方程组来描述：<br/>
+\[<br/>
+\begin{equation}<br/>
+\boldsymbol w^T \boldsymbol x + b = 0<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>其中\(\boldsymbol w=(w_1;w_2;w_3;...;w_d)\,\)为法向量，\(b\,\)是超平面的截距，显然这个划分超平面可以被这两个参数\(\boldsymbol w\,\)和\(\,b\,\)确定，后面此超平面将简称为超平面（\(\boldsymbol w\),\(b\)）。</p>
+
+<p>假设超平面能很好的将训练样本分类，如果定义图1中红色点为正类，即\(y_i=1\)，此时希望\(\boldsymbol w^T \boldsymbol x &gt; 0\)，另一侧蓝色点为负类，即\(y_i=-1\)，此时希望\(\boldsymbol w^T \boldsymbol x &lt; 0\)，易知分类决策函数可以定义为：</p>
+
+<p>\[<br/>
+\begin{equation}<br/>
+y = sign(\boldsymbol w_T \boldsymbol x + b)<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>如图2所示，两个超平面都能满足条件，那到底哪个超平面才是最优的超平面呢？也就是\(\boldsymbol w \)和\(\,b\,\)应该如何确定其最优值。</p>
+
+<div align="center">
+    <img width="350" src="media/15025588355749/15263148208656.jpg" />
+    <p>图2：超平面</p>
+</div>
+
+<h4 id="toc_1">函数间隔（Function Margin）</h4>
+
+<p>对于给定的超平面（\(\boldsymbol w,b\)），定义超平面关于点（\(x_i,y_i\)）的函数间隔为<br/>
+\[<br/>
+\begin{equation}<br/>
+\label{gammahat}<br/>
+    \hat\gamma_i=y_i(\boldsymbol w^T \boldsymbol x_i+b)<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>定义超平面关于整个数据集\(\,T\,\)的函数间隔为数据集内关于所有点函数间隔的最小值：<br/>
+\[<br/>
+    \hat\gamma = \min \hat\gamma_i\,,i=1;2;...;N<br/>
+\]</p>
+
+<p>函数间隔可以表示分类预测的正确性和确信度，但是选择分离超平面仅靠函数间隔是不够的。超平面的选择是希望间隔最大化，如果使用函数间隔表示，那么成比例的增大\(\boldsymbol w\)和\(b\)，比如将它们改为\(2\boldsymbol w\)和\(2b\)，那么就能使函数间隔增大2倍，可是实际我们知道这对超平面的选择没有任何帮助。因此我们需要对函数间隔归一化，这也就变成了几何间隔。</p>
+
+<p>\[<br/>
+\gamma_i = \frac{y_i(\boldsymbol w^T \boldsymbol x_i + b)}{||\boldsymbol w||}<br/>
+\]</p>
+
+<h4 id="toc_2">几何间隔（Geometric Margin)</h4>
+
+<p>如图3，定义点\(A\)与超平面的距离为超平面关于点\(A\)的几何间隔，由距离公式可知<br/>
+\[<br/>
+    \gamma_i = \frac{|\boldsymbol w^T \boldsymbol x_i + b|}{||\boldsymbol w||}<br/>
+\]</p>
+
+<blockquote>
+<p>距离公式：点（\(x_0,y_0\)）到点\(Ax+By+C=0\)的距离为：<br/>
+\[d = \frac{|Ax_0+By_0+C|}{\sqrt{A^2+B^2}}\]</p>
+</blockquote>
+
+<p>当点\(y_i=1\)时，\(\boldsymbol w^T \boldsymbol x_i + b&gt;0\)，有：<br/>
+\[|\boldsymbol w^T \boldsymbol x_i + b| = y_i(\boldsymbol w^T \boldsymbol x_i + b) \]<br/>
+当点\(y_i=-1\)时，\(\boldsymbol w^T \boldsymbol x_i + b&lt;0\)，有：<br/>
+\[|\boldsymbol w^T \boldsymbol x_i + b| = y_i(\boldsymbol w^T \boldsymbol x_i + b) \]</p>
+
+<p>所以超平面关于点\(A\)（\(x_0,y_0\)）的几何间隔可以表示为：<br/>
+\[<br/>
+\begin{equation}<br/>
+\label{gamma}<br/>
+\gamma_i = y_i(\frac{\boldsymbol w^T x_i + b}{||w||})=y_i(\frac{\boldsymbol w^T}{|\boldsymbol w|}x_i+\frac{b}{||\boldsymbol w||})<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>定义超平面关于整个数据集\(\,T\,\)的几何间隔为数据集内关于所有点的几何间隔的最小值：<br/>
+\[<br/>
+    \gamma = \min \gamma_i\,,i=1;2;...;N<br/>
+\]</p>
+
+<p>从公式\((\ref{gammahat})和(\ref{gamma})\)可知函数间隔和几何间隔的关系为：<br/>
+\[<br/>
+    \gamma_i = \frac{\hat\gamma_i}{||\boldsymbol w||}\\<br/>
+    \gamma = \frac{\hat\gamma}{||\boldsymbol w||}<br/>
+\]</p>
+
+<p>如果\(||w||=1\)时，函数间隔和几何间隔相等，当\(\boldsymbol w\)和\(b\)成比例的增大时，函数间隔相应增大，而几何间隔不变。</p>
+
+<p>现在可以知道，最大间隔分离超平面的问题可以表示为如下的方程组：</p>
+
+<p>\[<br/>
+\begin{align}<br/>
+\max_{\boldsymbol w,b}\quad&amp;\gamma \\<br/>
+s.t\quad&amp;y_i(\frac{\boldsymbol w^T}{|\boldsymbol w|}x_i+\frac{b}{||\boldsymbol w||}) \ge \gamma\,,i=1;2;...;N<br/>
+\end{align}<br/>
+\]</p>
+
+<p>考虑到函数间隔和几何间隔的关系式，可将上面方程组改写为：</p>
+
+<p>\[<br/>
+\begin{align*}<br/>
+\max_{\boldsymbol x,b}\quad&amp;\frac{\hat\gamma}{||\boldsymbol w||}\\<br/>
+s.t.\quad&amp;y_i(\boldsymbol w^T x_i+b) \ge \hat\gamma<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>上面已经讨论过函数间隔的取值并不影响几何间隔的变化（将\(\boldsymbol w\)和\(b\)成比例的增大或缩小\(\lambda\)倍，函数间隔就能相应变化\(\lambda\)倍，而此时几何间隔不变）。因此对于求解上面方程，函数间隔\(\hat\gamma\)的取值无关紧要，为方便计算，取\(\hat\gamma=1\)，这样方程组变成求\(\frac 1{||w||}\)的最大值。</p>
+
+<p>可以得到最优化方程组为：<br/>
+\[<br/>
+\begin{align}<br/>
+\max_{\boldsymbol x,b}\quad&amp;\frac{1}{||\boldsymbol w||}\\<br/>
+\label{8}<br/>
+s.t.\quad&amp;y_i(\boldsymbol w^T x_i+b) -1 \ge 0<br/>
+\end{align}<br/>
+\]</p>
+
+<div align="center">
+    <img width="440" src="media/15025588355749/15263213657308.jpg" />
+    <p>图3：支持向量与间隔</p>
+</div>
+
+<h4 id="toc_3">支持向量（Support Vector）</h4>
+
+<p>如图3所示，如果定义超平面为（\(\boldsymbol w,b\)），则有两条过离超平面最近的两个点的平行线，这两条线到超平面的距离都为\(\gamma\)，其中这两个距离超平面最近的点就是支持向量。支持向量是使公式\((\ref{8})\)等号成立的点，也就是：<br/>
+\[<br/>
+    y_i(\boldsymbol w^T \boldsymbol x + b)-1 = 0<br/>
+\]</p>
+
+<p>这里可以注意到过支持向量的两条线形成一个长带，分离超平面位于中间，长带的宽度被称为间隔，定义间隔为\(H\)，则：<br/>
+\[H=2*\gamma=2\frac{\hat\gamma}{||w||}=\frac 2{||w||}\]</p>
+
+<p>在决定分离超平面时只有支持向量起作用，而其他点并不起作用，因此这种分离方法叫做支持向量机。</p>
+
+<h2 id="toc_4">问题求解</h2>
+
+<p>在前面已经提到，找到超平面使间隔最大化相当于求解最优化方程组：</p>
+
+<p>\[<br/>
+\begin{align*}<br/>
+\max_{\boldsymbol w,b}\quad&amp;\frac{1}{||\boldsymbol w||}\\<br/>
+s.t.\quad&amp;y_i(\boldsymbol w^T x_i+b) -1 \ge 0<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>由于求\(\frac 1 {||w||}\)的最大值其实等价于求解\(\frac1 2||w||^2\)的最小值，所以最优化方程组也就从求解最大值变成求解最小值，即：<br/>
+\[<br/>
+\begin{align}<br/>
+\min_{\boldsymbol w,b}\quad&amp;\frac{1}{2}\boldsymbol ||w||^2 \label{m_w_b} \\<br/>
+s.t. \quad &amp; y_i(\boldsymbol w^T \boldsymbol x_i -b) -1 \ge 0 \label{s_t_q_y}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>下面使用拉格朗日乘子法求解这个不等式约束（如果不了解拉格朗日乘子法的，可以看文章后面），定义拉格朗日函数为：<br/>
+\[<br/>
+\begin{equation}<br/>
+\label{svm_L}<br/>
+L(\boldsymbol w,b,\alpha) = \frac{1}{2} ||\boldsymbol w||^2 - \sum_{i=1}^N\alpha_i[y_i(\boldsymbol w^T \boldsymbol x+b)-1] \quad s.t. \alpha_i \ge 0<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>这里将对原始问题的求解变成对拉格朗日对偶问题\(\max_{\alpha} \min_{\boldsymbol w,b}L(\boldsymbol w,b,\alpha)\)求解，这个求解过程可以分成两部分：<br/>
+(1)求\(\min_{\boldsymbol w,b}L(\boldsymbol w,b,\alpha)\)</p>
+
+<p>可以直接对\(L(\boldsymbol w,b,\alpha)\)对\(\boldsymbol w\)和\(b\)求导：<br/>
+\[<br/>
+\begin{align*}<br/>
+    \nabla_{\boldsymbol w}L(\boldsymbol w,b,\alpha) &amp;= \boldsymbol w - \sum_{i=1}^N \alpha_i y_i x_i = 0 \\<br/>
+    \nabla_{\boldsymbol b}L(\boldsymbol w,b,\alpha) &amp;= -\sum_{i=1}^N \alpha_i y_i = 0<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>得：<br/>
+\[<br/>
+\begin{align}<br/>
+    \boldsymbol w = \sum_{i=1}^N \alpha_i y_i x_i \label{x_z_0}\\<br/>
+    \sum_{i=1}^N \alpha_i y_i = 0 \label{x_z_1}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>将上结果代入公式（\ref{svm_L}）中可得：<br/>
+\[<br/>
+\begin{align}<br/>
+    \min_{w,b}L(\boldsymbol w,b,\alpha) &amp;= \frac{1}{2}(\sum_{i=1}^N \alpha_i y_i x_i)^2 - \sum_{i=1}^N \alpha_i[y_i(\sum_{j=1}^N \alpha_j y_j x_j x_i + b) -1] \nonumber\\<br/>
+    &amp;= \frac{1}{2}(\sum_{i=1}^N \alpha_i y_i x_i)^2 - \sum_{i=1}^N \alpha_iy_i(\sum_{j=1}^N \alpha_j y_j x_j x_i + b) +\sum_{i=1}^N \alpha_i \nonumber\\<br/>
+    &amp;= \frac{1}{2}\sum_{i=1}^N \sum_{j=1}^N \alpha_i \alpha_j y_i y_j x_i x_j - \sum_{i=1}^N \sum_{j=1}^N \alpha_i \alpha_j y_i y_j x_i x_j + \sum_{i=1}^N \alpha_i y_i b +\sum_{i=1}^N \alpha_i \nonumber\\<br/>
+    &amp;= -\frac{1}{2}\sum_{i=1}^N \sum_{j=1}^N \alpha_i \alpha_j y_i y_j x_i x_j + \sum_{i=1}^N \alpha_i \\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>(2)求\(\min_{\boldsymbol w,b}L(\boldsymbol w,b,\alpha)\)对\(\alpha\)的最大值，即：<br/>
+\[<br/>
+\begin{align}<br/>
+&amp;\max_{\alpha} -\frac{1}{2}\sum_{i=1}^N \sum_{j=1}^N \alpha_i \alpha_j y_i y_j x_i x_j + \sum_{i=1}^N \alpha_i \\<br/>
+&amp;s.t.\quad\sum_{i=1}^N \alpha_i y_i = 0 \nonumber \\<br/>
+&amp;\qquad\quad \alpha_i \ge 0 :i=1;2;...;N \nonumber \\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>将这个公式变化一下，从求极大值等价转换为求极小值，就可以得到等价最优化方法：<br/>
+\[<br/>
+\begin{align}<br/>
+&amp;\min_{\alpha} \frac{1}{2}\sum_{i=1}^N \sum_{j=1}^N \alpha_i \alpha_j y_i y_j x_i x_j - \sum_{i=1}^N \alpha_i \label{d_o_0}\\<br/>
+&amp;s.t.\quad\sum_{i=1}^N \alpha_i y_i = 0 \label{d_o_1}\\<br/>
+&amp;\qquad\quad \alpha_i \ge 0 :i=1;2;...;N \label{d_o_2}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>现在求解原始问题（\ref{m_w_b}）和（\ref{s_t_q_y}）可以转为求解对偶问题（\ref{d_o_0}）~（\ref{d_o_2}），对于线性可分数据集，假设对偶问题（\ref{d_o_0}）~（\ref{d_o_2}）对\(\alpha\)的解为\(\alpha^*=(\alpha_1^*,\alpha_2^*,...,\alpha_N^*)\)。<br/>
+根据公式（\ref{x_z_0}）可以求出：<br/>
+\[<br/>
+\begin{equation}<br/>
+\boldsymbol w^* = \sum_{i=1}^N \alpha_i^* y_i x_i \label{d_2_y_0}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>其中在KKT条件（\ref{d_o_2}）上要求至少有一个\(\alpha_j^* \gt 0\)，因为如果\(\alpha^* = 0\)，那么得出\(w^*=0\)，原始问题中分割超平面将与输入数据无关，总是将所有数据分到一侧，不符合要求。根据KKT条件的互补松弛条件可知：<br/>
+\[<br/>
+\begin{equation}<br/>
+\alpha_i^*(y_i(w^*.x_i+b^*)-1) = 0:i=1;2;...;N<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>结合至少存在一个\(\alpha^*_j &gt; 0\)，易知：<br/>
+\[<br/>
+\begin{equation}<br/>
+y_j(w^*.x_j+b^*)-1 = 0<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>两边同时乘以\(y_j\)，注意奥\(y_j^2=1\)，所以可得：<br/>
+\[<br/>
+\begin{equation}<br/>
+b^* = y_j-w^*.x_j = y_j - \sum_{i=1}^N \alpha_i^* y_i (x_i.x_j) \label{d_2_y_1}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>至此，可以知道在求得对偶问题的解\(\alpha^*\)后，可以通过（\ref{d_2_y_0}）和（\ref{d_2_y_1}）求得原始问题的解\(w^*\)和\(b^*\)，在这个计算中由于对于每一个符合\(\alpha_j &gt; 0\)条件的\(\alpha_j\)都能求出一个\(b^*\)，所以实际计算过程时可以取所有满足条件的样本点上的平均值。</p>
+
+<h2 id="toc_5">软间隔最大化</h2>
+
+<p>在实际问题中，并不是所有问题都是绝对的线性可分的，比如在一些存在噪音的情况下，此时我们需要分割超平面具有一定的容错性，我们给函数间隔加上一定的松弛变量，这样约束条件变为：<br/>
+\[<br/>
+y_i(\boldsymbol x_i+b)\ge 1-\zeta_i<br/>
+\]</p>
+
+<p>对每一个\(\zeta_i\)都要支付一个代价\(\zeta_i\)，所以目标函数变为：<br/>
+\[<br/>
+\frac{1}{2}||\boldsymbol w||^2+\text{C}\sum_{i=1}^N \zeta_i<br/>
+\]</p>
+
+<p>这里的\(\text{C}\gt 0\)被称为惩罚系数，当\(\text{C}\)越大对误分类的惩罚越大，反之越小。</p>
+
+<p>那么对于软间隔最大化的线性支持向量机问题最优化方程组如下：<br/>
+\[<br/>
+\begin{align}<br/>
+\min_{\boldsymbol w,b,\zeta} \quad &amp; \frac{1}{2}||\boldsymbol w||^2+\text{C}\sum_{i=1}^N \zeta_i \label{o_with_z_0}\\<br/>
+s.t. \quad&amp; y_i(\boldsymbol w x_i + b) \ge 1 - \zeta_i:i=1;2;...;N \label{o_with_z_1}\\<br/>
+\quad&amp;\zeta_i \gt 0:i = 1;2;...;N \label{o_with_z_2}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<h4 id="toc_6">原始问题与对偶问题</h4>
+
+<p>直接求解原始问题比较困难，可以通过对偶问题间接求解，原始问题（\ref{o_with_z_0}）~（\ref{o_with_z_2}）的拉格朗日函数为：<br/>
+\[<br/>
+\begin{equation}<br/>
+L(\boldsymbol w,b,\zeta,\alpha,\mu) = \frac{1}{2}||\boldsymbol w||^2 + \text{C}\sum_{i=1}^N \zeta_i - \sum_{i=1}^N \alpha_i(y_i(\boldsymbol w x_i + b) -1 + \zeta_i) - \sum_{i=1}^N\mu_i \zeta_i<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>其中\(\alpha \ge 0,\mu \ge 0\).<br/>
+对偶问题是求拉格朗日函数的极大极小值，先求\(L(\boldsymbol w,b,\zeta,\alpha,\mu)\)对\(\boldsymbol w\)，\(b\)和\(\zeta\)的极小值：<br/>
+\[<br/>
+\begin{align*}<br/>
+\nabla_{\boldsymbol w}L(\boldsymbol w,b,\zeta,\alpha,\mu) &amp;= \boldsymbol w - \sum_{i=1}^N \alpha_i y_i x_i = 0 \\<br/>
+\nabla_{b}L(\boldsymbol w,b,\zeta,\alpha,\mu) &amp;= -\sum_{i=1}^N \alpha_i y_i = 0 \\<br/>
+\nabla_{\zeta}L(\boldsymbol w,b,\zeta,\alpha,\mu) &amp;= C-\alpha_i-\mu_i = 0<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>得：<br/>
+\[<br/>
+\begin{align}<br/>
+&amp;\boldsymbol w = \sum_{i=1}^N \alpha_i y_i x_i \label{o_with_z_r_0}\\<br/>
+&amp;\sum_{i=1}^N \alpha_i y_i = 0 \label{o_with_z_r_1}\\<br/>
+&amp;\text{C} - \alpha_i - \mu_i = 0 \label{o_with_z_r_2}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>将结果（\ref{o_with_z_r_0}）~（\ref{o_with_z_r_2}）代入到拉格朗日函数中：<br/>
+\[<br/>
+\begin{align*}<br/>
+\min_{\boldsymbol w,b,\zeta} L(\boldsymbol w,b,\zeta,\alpha,\mu) &amp;= \frac{1}{2}||\boldsymbol w||^2 + \text{C}\sum_{i=1}^N \zeta_i - \sum_{i=1}^N \alpha_i(y_i(\boldsymbol w x_i + b) -1 + \zeta_i) - \sum_{i=1}^N\mu_i \zeta_i \\<br/>
+&amp;= \frac{1}{2}(\sum_{i=1}^N \alpha_i y_i x_i)^2 + \text{C}\sum_{i=1}^N \zeta_i - \sum_{i=1}^N \alpha_i(y_i((\sum_{j=1}^N \alpha_j y_j x_j) x_i + b) -1 + \zeta_i) - \sum_{i=1}^N\mu_i \zeta_i \\<br/>
+&amp;= \frac{1}{2}(\sum_{i=1}^N \alpha_i y_i x_i)^2 + \text{C}\sum_{i=1}^N \zeta_i - \sum_{i=1}^N\alpha_i(y_i((\sum_{j=1}^N \alpha_j y_j x_j) x_i + b)) + \sum_{i=1}^N \alpha_i(1-\zeta_i) - \sum_{i=1}^N\mu_i \zeta_i \\<br/>
+&amp;= \frac{1}{2}(\sum_{i=1}^N \alpha_i y_i x_i)^2 + \text{C}\sum_{i=1}^N \zeta_i - \sum_{i=1}^N\alpha_i(y_i((\sum_{j=1}^N \alpha_j y_j x_j) x_i + b)) + \sum_{i=1}^N \alpha_i - \sum_{i=1}^N (\alpha_i + \mu_i) \zeta_i \\<br/>
+&amp;= \frac{1}{2}(\sum_{i=1}^N \alpha_i y_i x_i)^2 + \text{C}\sum_{i=1}^N \zeta_i - \sum_{i=1}^N\alpha_i(y_i((\sum_{j=1}^N \alpha_j y_j x_j) x_i + b)) + \sum_{i=1}^N \alpha_i - \text{C}\sum_{i=1}^N\zeta_i \\<br/>
+&amp;= \frac{1}{2}(\sum_{i=1}^N \alpha_i y_i x_i)^2 - \sum_{i=1}^N\alpha_i(y_i((\sum_{j=1}^N \alpha_j y_j x_j) x_i + b)) + \sum_{i=1}^N \alpha_i \\<br/>
+&amp;= \frac{1}{2}\sum_{i=1}^N \sum_{j=1}^N \alpha_i \alpha_j y_i y_j x_i x_j - \sum_{i=1}^N\alpha_i(y_i((\sum_{j=1}^N \alpha_j y_j x_j) x_i + b)) + \sum_{i=1}^N \alpha_i \\<br/>
+&amp;= \frac{1}{2}\sum_{i=1}^N \sum_{j=1}^N \alpha_i \alpha_j y_i y_j x_i x_j - \sum_{i=1}^N \sum_{j=1}^N \alpha_i \alpha_j y_i y_j x_i x_j - \sum_{i=1}^N \alpha_i y_i b + \sum_{i=1}^N \alpha_i \\<br/>
+&amp;= -\frac{1}{2}\sum_{i=1}^N \sum_{j=1}^N \alpha_i \alpha_j y_i y_j x_i x_j + \sum_{i=1}^N \alpha_i \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>在对\(\min_{\boldsymbol w,b,\zeta}L(\boldsymbol w,b,\zeta,\alpha,\mu)\)求 \(\alpha\) 的极大值：<br/>
+\[<br/>
+\begin{align}<br/>
+\max_{\alpha} \quad &amp;-\frac{1}{2}\sum_{i=1}^N \sum_{j=1}^N \alpha_i \alpha_j y_i y_j x_i x_j + \sum_{i=1}^N \alpha_i \\<br/>
+s.t. \quad &amp;\sum_{i=1}^N \alpha_i y_i = 0 \label{s_t_with_r_1}\\<br/>
+\quad\quad\quad &amp;\alpha_i \ge 0:i=1;2;...;N \label{s_t_with_r_2}\\<br/>
+\quad\quad\quad &amp;\text{C} - \alpha_i - \mu_i = 0:i=1;2;...;N \label{s_t_with_r_3}\\<br/>
+\quad\quad\quad &amp;\mu_i \ge 0:i=1;2;...;N \label{s_t_with_r_4}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>结合（\ref{s_t_with_r_3}）和（\ref{s_t_with_r_4}）可知：<br/>
+\[<br/>
+\mu_i = \text{C} - \alpha_i \ge 0 \Rightarrow \alpha_i \le \text{C}<br/>
+\]</p>
+
+<p>再结合（\ref{s_t_with_r_2}）可得：<br/>
+\[<br/>
+0 \le \alpha_i \le \text{C}<br/>
+\]</p>
+
+<p>所以软间隔原始问题的对偶问题为：<br/>
+\[<br/>
+\begin{align}<br/>
+\max_{\alpha} \quad &amp;\frac{1}{2}\sum_{i=1}^N \sum_{j=1}^N \alpha_i \alpha_j y_i y_j x_i x_j - \sum_{i=1}^N \alpha_i \label{d_t_with_r_0}\\<br/>
+s.t. \quad &amp;\sum_{i=1}^N \alpha_i y_i = 0 \label{d_t_with_r_1}\\<br/>
+\quad\quad\quad &amp;0 \le \alpha_i \le C:i=1;2;...;N \label{d_t_with_r_2}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<h4 id="toc_7">软间隔问题求解</h4>
+
+<p>已经将求解原始问题的最小值转变为求对偶问题 \ref{d_t_with_r_0} 的最大值，，设 \(\alpha^*=(\alpha_1^*,\alpha_2^*,...,\alpha_N^*)\) 是对偶问题的一个解， \(\boldsymbol w^*\)，\(b^*\) 是原始问题的解。由拉格朗日乘子法可知对偶问题等价于原始问题需要满足KKT条件，如下：<br/>
+\[<br/>
+\begin{eqnarray}<br/>
+&amp;\nabla_{\boldsymbol w}L(\boldsymbol w^*,b^*,\zeta^*,\alpha^*,\mu^*) = \boldsymbol w^* - \sum_{i=1}^N \alpha_i^* y_i x_i = 0 \label{d_with_z_kkt_1}\\<br/>
+&amp;\nabla_{b}L(\boldsymbol w^*,b^*,\zeta^*,\alpha^*,\mu^*) = -\sum_{i=1}^N \alpha^*_i y_i = 0 \nonumber\\<br/>
+&amp;\nabla_{\zeta}L(\boldsymbol w^*,b^*,\zeta^*,\alpha^*,\mu^*) = C-\alpha^*_i-\mu^*_i = 0 \label{d_with_z_kkt_2}\\<br/>
+&amp;\sum_{i=1}^N \alpha^*_i(y_i(w^*x_i+b^*) - 1 + \zeta_i^*) = 0 \label{d_with_z_kkt_3}\\<br/>
+&amp;\sum_{i=1}^N \mu^*_i \zeta^*_i = 0 \label{d_with_z_kkt_4}\\<br/>
+&amp;y_i(w^*x_i + b^*) - 1 + \zeta^*_i \ge 0 \label{d_with_z_kkt_5} \\<br/>
+&amp;\zeta_i^* \ge 0 \nonumber \\<br/>
+&amp;\alpha^*_i \ge 0 \nonumber \\<br/>
+&amp;\mu^*_i \ge 0 \nonumber \\<br/>
+\end{eqnarray}<br/>
+\]</p>
+
+<p>由公式（\ref{d_with_z_kkt_1}）易得：<br/>
+\[<br/>
+\begin{equation}<br/>
+\boldsymbol w^* = \sum_{i=1}^N \alpha_i^* y_i x_i \label{d_with_z_r_b_a_1}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>由\(0 \le \alpha_i \le \text{C}\)结合公式（\ref{d_with_z_kkt_2}）可知：<br/>
+\[<br/>
+\begin{equation}<br/>
+\mu_i^* = C - \alpha_i^*<br/>
+\end{equation}<br/>
+\]</p>
+
+<ol>
+<li>当\(\alpha_i^*=0\)时，可知\(w^*=0\)此时样本点对分离超平面的选择没有任何作用，</li>
+<li>当\(\alpha_i^*=C\)时，可知\(\mu_i^* = 0\)，结合公式（\ref{d_with_z_kkt_4}）知存在\(\zeta_i^* \gt 0\)，此时\(y_i y=1-\zeta_i^* \lt 0\)，会出现样本点被误分类。</li>
+<li><p>当\(0 \lt\alpha_i^* \lt C\)时，可知\(\mu_i^* &gt; 0\)，结合公式（\ref{d_with_z_kkt_4}）知任意\(\zeta_i^* = 0\).<br/>
+将\(0 \lt\alpha_i^* \lt C\)和\(\zeta_i^* = 0\)代入公式（\ref{d_with_z_kkt_3}）得：<br/>
+\[<br/>
+\begin{equation}<br/>
+y_j(w^*+b^*)-1 = 0 \Rightarrow b^* = y_j - \sum_{i=1}^N \alpha_i^* y_i x_i x_j  \label{d_with_z_r_b_a_2}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>所以当我们求出对偶问题的结果\(\alpha^*=(\alpha_1^*,\alpha_2^*,...,\alpha_i^*)\)时，可以通过公式（\ref{d_with_z_r_b_a_1}）和（\ref{d_with_z_r_b_a_2}）求出\(w^*\)和\(b^*\).在这个计算中由于对于每一个符合\(0 &lt; \alpha_j^* &lt; C\)条件的\(\alpha_j^*\)都能求出一个\(b^*\)，所以实际计算过程时可以取所有满足条件的样本点上的平均值。</p>
+
+<p>分割超平面为：<br/>
+\[<br/>
+\begin{equation}<br/>
+y = \boldsymbol w^{*T} \boldsymbol x + b^* = \sum_{i=1}^N\alpha^*_i y_i x_i x + b^* \label{with_z_r} <br/>
+\end{equation}<br/>
+\]</p></li>
+</ol>
+
+<h2 id="toc_8">核技巧（Kernel trick）</h2>
+
+<p>首先通过一个简单的例子来了解一下核技巧，如下图是两类数据（用不同颜色区分）：</p>
+
+<div align="center">
+    <img width="350px" src="media/15025588355749/15265669014230.jpg" />
+</div>
+
+<p>显然这两类数据是线性不可分的，需要一个分段函数才能将其分开，但是如果我们通过某种核技巧将数据中的点，映射到高维空间，这两类数据就会变的线性可分，如下图所示：</p>
+
+<div align="center">
+    <img width="350px" src="media/15025588355749/15265668464657.jpg" />
+</div>
+
+<p>在这个例子中，从原空间到新空间的映射函数\(\varphi(x) = (x-a)(x-b) \)。这个例子说明用线性分类方法求解非线性问题通常分为两步，首先使用合适的映射函数将数据点从低维空间映射到新空间（一般是高维空间或无限维空间），使数据线性可分的可能性增大，然后在新空间内用线性分类方法从训练数据中学习分类模型。</p>
+
+<p>在实际问题中，往往直接定义映射函数是难以做到的，所以往往只定义核函数\(K(x,z)\)。在前面对SVM的讲解中，我们可以看到数据点往往都是都是以内积的形式出现的，假设我们定义一个函数\(f(x_i,x_j)\)满足：<br/>
+\[<br/>
+f(x_i,x_j) = &lt;\varphi(x_i),\varphi(x_j)&gt;<br/>
+\]</p>
+
+<p>也就是原样本点数据经过一个函数的输出与原样本点经过一个映射函数之后的新数据点\(\varphi(x_i)\)，\(\varphi(x_j)\)的内积相同。<br/>
+这里举个简单的例子，数据空间里有两个数据点\(x_i=(\eta_1,\eta_2)\)和\(x_j=(\xi_1,\xi_2)\)，设想我们有一个函数：\(f(x_i,x_j)=(&lt;x_i,x_j&gt;)^2\)，映射函数为：\(\varphi(x_i,x_j) = (x_i^2,2x_ix_j,x_j^2)\)，那么：<br/>
+\[<br/>
+\begin{align*}<br/>
+&lt;\varphi(x_i),\varphi(x_j)&gt; &amp;= &lt;(\eta_1^2,\eta_1\eta_2,\eta_2^2),(\xi_1,\xi_1\xi_2,\xi_2^2)&gt; \\&amp;=\eta_1^2\xi_1^2+ +2\eta_1\eta_2\xi_1\xi_2+\eta_2^2 \xi_2^2 \\<br/>
+&amp; = (\eta_1\xi_1+\eta_2\xi_2)^2 \\<br/>
+&amp; = f(x_i,x_j)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>两种计算方式不同但是结果相同，一种是在低维空间直接通过核函数运算结果，一种是在转换后的高维空间进行计算内积。在实际项目中，可能我们需要映射到的高维空间是维度很大，甚至是无限维，所以映射后再计算内积计算量很大，所以我们通常只需要一个核函数计算低维度的数据，这种情况下我们也并不需要知道映射函数，可能也并不能知道具体的映射函数。</p>
+
+<p>那什么样的函数可以被用作核函数呢？开始讨论：</p>
+
+<p>定义一个核矩阵\(K\)，其中\(K_{i,j}=K(x_i,x_j)\)，根据核函数的定义：\(K_{ij}=K(x_i,x_j) = &lt;\varphi(x_i),\varphi(x_j)&gt;=&lt;\varphi(x_j),\varphi(x_i)&gt; = K(x_j,x_i) = K_{ji}\)，矩阵\(K\)是一个对称矩阵。<br/>
+对于任意一个向量\(\boldsymbol z\)，得：<br/>
+\[<br/>
+\begin{align*}<br/>
+\boldsymbol z^TK\boldsymbol z &amp;= \left[\begin{array}{ccc}<br/>
+z_1\\<br/>
+z_2\\<br/>
+...\\<br/>
+z_i\\<br/>
+...\\<br/>
+z_n <br/>
+\end{array}<br/>
+\right]^T \cdot \left[ \begin{array}{ccc}<br/>
+K_{1,1} &amp;&amp; K_{1,2} &amp;&amp; ... &amp;&amp; K_{1,j} &amp;&amp; ... &amp;&amp; K_{1,n} \\<br/>
+K_{2,1} &amp;&amp; K_{2,2} &amp;&amp; ... &amp;&amp; K_{2,j} &amp;&amp; ... &amp;&amp; K_{2,n} \\<br/>
+... &amp;&amp; ... &amp;&amp; ... &amp;&amp; ... &amp;&amp; ... \\<br/>
+K_{i,1} &amp;&amp; K_{i,2} &amp;&amp; ... &amp;&amp; K_{i,j} &amp;&amp; ... &amp;&amp; K_{i,n} \\<br/>
+... &amp;&amp; ... &amp;&amp; ... &amp;&amp; ... &amp;&amp; ... \\<br/>
+K_{n,1} &amp;&amp; K_{n,2} &amp;&amp; ... &amp;&amp; K_{n,j} &amp;&amp; ... &amp;&amp; K_{n,n} \\<br/>
+\end{array}<br/>
+\right] \cdot \left[ \begin{array}{ccc}<br/>
+z_1\\<br/>
+z_2\\<br/>
+...\\<br/>
+z_i\\<br/>
+...\\<br/>
+z_n <br/>
+\end{array}<br/>
+\right] \\<br/>
+&amp;= \left[ \begin{array}{ccc}<br/>
+z_1K_{1,1} + z_2K_{2,1} + ... + z_iK_{i,1} + ... + z_nK_{n,1} \\<br/>
+z_1K_{1,2} + z_2K_{2,2} + ... + z_iK_{i,2} + ... + z_nK_{n,2} \\<br/>
+...\\<br/>
+z_1K_{1,j} + z_2K_{2,j} + ... + z_iK_{i,j} + ... + z_nK_{n,j} \\<br/>
+...\\<br/>
+z_1K_{1,n} + z_2K_{2,n} + ... + z_iK_{i,n} + ... + z_nK_{n,n} \\<br/>
+\end{array} \right] ^T \cdot \left[ \begin{array}{ccc}<br/>
+z_1\\<br/>
+z_2\\<br/>
+...\\<br/>
+z_i\\<br/>
+...\\<br/>
+z_n <br/>
+\end{array}<br/>
+\right] \\<br/>
+&amp;= (z_1K_{1,1} + z_2K_{2,1} + ... + z_iK_{i,1} + ... + z_nK_{n,1}).z_1+(z_1K_{1,2} + z_2K_{2,2} + ... + z_iK_{i,2} + ... + z_nK_{n,2}).z_2\\<br/>
+&amp;\quad\,+...+(z_1K_{1,n} + z_2K_{2,n} + ... + z_iK_{i,n} + ... + z_nK_{n,n}).z_n\\<br/>
+&amp;=\sum_{i=1}^N \sum_{j=1}^N z_iK_{i,j}z_j \\<br/>
+&amp;=\sum_{i=1}^N \sum_{j=1}^N z_i&lt;\varphi(x_i)\cdot\varphi(x_j)&gt;z_j \\<br/>
+&amp;=\sum_{i=1}^N \sum_{j=1}^N z_i\sum_{k=1}^N ([\varphi(x_i)]_k[\varphi(x_j)]_k) z_j \\<br/>
+&amp;=\sum_{k=1}^N \sum_{i=1}^N \sum_{j=1}^N z_i[\varphi(x_i)]_k[\varphi(x_j)]_k z_j \\<br/>
+&amp;=\sum_{k=1}^N \sum_{i=1}^N z_i [\varphi(x_i)]_k \sum_{j=1}^N z_j [\varphi(x_j)]_k\\<br/>
+&amp;=\sum_{k=1}^N (\sum_{i=1}^N z_i [\varphi(x_i)]_k)^2\\<br/>
+&amp;\ge 0<br/>
+\end{align*} <br/>
+\]</p>
+
+<p>所以核函数矩阵\(K\)应该是半正定矩阵，这里证明了核函数矩阵的一个必要条件，核函数矩阵是对称半正定矩阵。</p>
+
+<p>以下证明核函数矩阵的充分条件，假设\(K(x_i,x_j)\)是空间里的对称函数，考虑矩阵\(K = [K(x_i,x_j)]^n_{i,j}\)，因为\(K_{i,j}=K(x_i,x_j)=K(x_j,x_i)=K_{j,i}\)易知矩阵\(K\)是对称矩阵。</p>
+
+<p>由同济大学线性代数第二版P128定理5可知，对于n阶对称矩阵\(K\)，则必有正交矩阵\(P\)，使\(P^{-1}KP=P^TKP=\Lambda\)，其中\(\Lambda\)是以\(K\)的n个特征值为对角元的对角矩阵：<br/>
+\[<br/>
+\begin{align*}<br/>
+P^{-1} K P &amp;= \Lambda \Rightarrow K = P\Lambda P^{-1} = P\Lambda P^T<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>将\(P\)的用其列向量表示为：<br/>
+\[<br/>
+P = (p_1,p_2,...,p_n)<br/>
+\]</p>
+
+<p>由\(P^{-1}KP = \Lambda\)，得\(\,KP = P\Lambda\,\)，即：<br/>
+\[<br/>
+\begin{align*}<br/>
+K(p_1,p_2,...,p_n) &amp;= (p_1,p_2,...,p_n)\left (\begin{array}<br/>
+\lambda\lambda_1 &amp;&amp;           &amp;&amp;        &amp;&amp; \\<br/>
+          &amp;&amp; \lambda_2 &amp;&amp;        &amp;&amp; \\<br/>
+          &amp;&amp;           &amp;&amp; \ddots &amp;&amp; \\<br/>
+          &amp;&amp;           &amp;&amp;        &amp;&amp; \lambda_n \\<br/>
+\end{array} \right ) \\<br/>
+&amp;=(p_1\lambda_1,p_2\lambda_2,\cdots,p_n\lambda_n)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>于是有：<br/>
+\[<br/>
+Kp_i = \lambda_i p_i \quad(i=1;2;...;n)<br/>
+\]</p>
+
+<p>易知\(\lambda_i\)是\(K\)的特征值，\(P\)的列\(p_i\)是对应的特征向量。</p>
+
+<p>我们先来展开一下\(PKP^T\)，令\(\lambda_t\)对应的特征向量\(\,p_t\,\)的第\(i\)个元素为\(p_{it}\)：<br/>
+\[<br/>
+\begin{align*}<br/>
+P\Lambda P^T &amp;= \left[ \begin{array}{ccc}<br/>
+p_{1,1}&amp;&amp;p_{1,2}&amp;&amp;\cdots&amp;&amp;p_{1,j}&amp;&amp;\cdots \\<br/>
+p_{2,1}&amp;&amp;p_{2,2}&amp;&amp;\cdots&amp;&amp;p_{2,j}&amp;&amp;\cdots\\<br/>
+...    &amp;&amp; ...   &amp;&amp; ...  &amp;&amp;  ...  &amp;&amp; ...  \\<br/>
+p_{i,1}&amp;&amp;p_{i,2}&amp;&amp;\cdots&amp;&amp;p_{i,j}&amp;&amp;\cdots\\<br/>
+...    &amp;&amp; ...   &amp;&amp; ...  &amp;&amp;  ...  &amp;&amp; ...  \\<br/>
+p_{n,1}&amp;&amp;p_{n,2}&amp;&amp;\cdots&amp;&amp;p_{n,j}&amp;&amp;\cdots\\<br/>
+\end{array} \right ] \left [ \begin{array}{ccc}<br/>
+\lambda_{1,1}&amp;&amp;\lambda_{1,2}&amp;&amp;\cdots&amp;&amp;\lambda_{1,j}&amp;&amp;\cdots\\<br/>
+\lambda_{2,1}&amp;&amp;\lambda_{2,2}&amp;&amp;\cdots&amp;&amp;\lambda_{2,j}&amp;&amp;\cdots\\<br/>
+...    &amp;&amp; ...   &amp;&amp; ...  &amp;&amp;  ...  &amp;&amp; ...  \\<br/>
+\lambda_{i,1}&amp;&amp;\lambda_{i,2}&amp;&amp;\cdots&amp;&amp;\lambda_{i,j}&amp;&amp;\cdots\\<br/>
+...    &amp;&amp; ...   &amp;&amp; ...  &amp;&amp;  ...  &amp;&amp; ...  \\<br/>
+\lambda_{n,1}&amp;&amp;\lambda_{n,2}&amp;&amp;\cdots&amp;&amp;\lambda_{n,j}&amp;&amp;\cdots\\<br/>
+\end{array} \right ] P^T \\<br/>
+&amp;= \left[ \begin{array}{ccc}<br/>
+(\sum_{t=1}^N p_{1,t}\lambda_{t,1}) &amp;&amp; (\sum_{t=1}^N p_{1,t}\lambda_{t,2}) &amp;&amp; \cdots &amp;&amp; (\sum_{t=1}^N p_{1,t}\lambda_{t,j}) &amp;&amp; ... \\<br/>
+(\sum_{t=1}^N p_{2,t}\lambda_{t,1}) &amp;&amp; (\sum_{t=1}^N p_{2,t}\lambda_{t,2}) &amp;&amp; \cdots &amp;&amp; (\sum_{t=1}^N p_{2,i}\lambda_{t,j}) &amp;&amp; ... \\<br/>
+... &amp;&amp; ... &amp;&amp; \cdots &amp;&amp; ... &amp;&amp; ... \\<br/>
+(\sum_{t=1}^N p_{i,t}\lambda_{t,1}) &amp;&amp; (\sum_{t=1}^N p_{i,t}\lambda_{t,2}) &amp;&amp; \cdots &amp;&amp; (\sum_{t=1}^N p_{i,t}\lambda_{t,j}) &amp;&amp; ... \\<br/>
+... &amp;&amp; ... &amp;&amp; \cdots &amp;&amp; ... &amp;&amp; ... \\<br/>
+(\sum_{t=1}^N p_{n,t}\lambda_{t,1}) &amp;&amp; (\sum_{t=1}^N p_{n,t}\lambda_{t,2}) &amp;&amp; \cdots &amp;&amp; (\sum_{t=1}^N p_{n,t}\lambda_{t,j}) &amp;&amp; ... \\<br/>
+\end{array} \right] \left[ \begin{array}{ccc}<br/>
+p_{1,1}&amp;&amp;p_{2,1}&amp;&amp;\cdots&amp;&amp;p_{i,1}&amp;&amp;\cdots \\<br/>
+p_{1,2}&amp;&amp;p_{2,2}&amp;&amp;\cdots&amp;&amp;p_{i,2}&amp;&amp;\cdots\\<br/>
+...    &amp;&amp; ...   &amp;&amp; ...  &amp;&amp;  ...  &amp;&amp; ...  \\<br/>
+p_{1,j}&amp;&amp;p_{2,j}&amp;&amp;\cdots&amp;&amp;p_{i,j}&amp;&amp;\cdots\\<br/>
+...    &amp;&amp; ...   &amp;&amp; ...  &amp;&amp;  ...  &amp;&amp; ...  \\<br/>
+p_{1,n}&amp;&amp;p_{2,n}&amp;&amp;\cdots&amp;&amp;p_{i,n}&amp;&amp;\cdots\\<br/>
+\end{array} \right ] \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>整个式子计算起来太长，我们只考虑\((P\Lambda P^T)_{ij}\)：<br/>
+\[<br/>
+\begin{align*}<br/>
+(P\Lambda P^T)_{ij} &amp;= p_{j,1}(\sum_{t=1}^N p_{i,t}\lambda_{t,1}) + p_{j,2}(\sum_{t=1}^N p_{i,t}\lambda_{t,2}) + \cdots + p_{j,i}(\sum_{t=1}^N p_{i,t}\lambda_{t,j}) + ... +  p_{j,n}(\sum_{t=1}^N p_{n,t}\lambda_{t,j}) \\<br/>
+&amp;= \sum_{m=1}^N [p_{j,m}\sum_{t=1}^N p_{i,t}\lambda_{t,m}] \\<br/>
+&amp;= \sum_{t=1}^N \sum_{m=1}^N p_{i,t} \lambda_{t,m} p_{j,m} \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>因为\(\Lambda\)是对角矩阵，所以：<br/>
+\[<br/>
+\begin{align*}<br/>
+\lambda_{t,m} = \left \{ \begin{array}{ccc}<br/>
+\lambda_{t} &amp; t = m \\<br/>
+0 &amp; e \neq m \\<br/>
+\end{array} \right .<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>得：<br/>
+\[<br/>
+K = (P\Lambda P^T)_{ij} = \sum_{t=1}^N \sum_{m=1}^N p_{i,t} \lambda_{t,m} p_{j,m} = \sum_{t=1}^N p_{i,t} \lambda_t p_{j,t}<br/>
+\]</p>
+
+<p>现在假设所有的特征值都是非负的，考虑特征映射：<br/>
+\[<br/>
+\begin{align*}<br/>
+\varphi(x_i) &amp;= (\sqrt{\lambda_t}p_{t,i})^n_{t=1}:i=1;2;...N \\<br/>
+&amp;=(\sqrt{\lambda_1}p_{1,i},\sqrt{\lambda_2}p_{2,i},...,\sqrt{\lambda_t}p_{t,i},...,\sqrt{\lambda_n}p_{n,i}) \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>所以有：<br/>
+\[<br/>
+\begin{align*}<br/>
+&lt;\varphi(x_i)\varphi(x_j)&gt; &amp;= (\sqrt{\lambda_1}p_{1i},\sqrt{\lambda_2}p_{2i},...,\sqrt{\lambda_t}p_{ti},...,\sqrt{\lambda_n}p_{ni})\cdot(\sqrt{\lambda_1}p_{1i},\sqrt{\lambda_2}p_{2i},...,\sqrt{\lambda_t}p_{ti},...,\sqrt{\lambda_n}p_{ni}) \\<br/>
+&amp;= \sum_{t=1}^N \lambda_t p_{t,i} p_{t,j} = (P\Lambda P^T)_{ij} = K_{i,j} = K(x_i,x_j)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>这里已经完成了充分性证明：半正定对称向量是核函数矩阵。之后，我们可以将前面的一些结论写成核函数的方式，如公式（\ref{with_z_r}）分割超平面写成核函数的形式为：<br/>
+\[<br/>
+\begin{equation}<br/>
+y = \sum_{i=1}^N \alpha_i y_i k(x_i,x) + b^* \label{with_z_r_h}<br/>
+\end{equation}<br/>
+\]</p>
+
+<h3 id="toc_9">常见的核函数</h3>
+
+<p>线性核函数（Linear kernel function）：<br/>
+\[<br/>
+K(x,z) = x^tz + c<br/>
+\]</p>
+
+<p>多项式核函数（Polynomial kernel function）：<br/>
+\[<br/>
+K(x,z) = (x\cdot z + 1)^p<br/>
+\]</p>
+
+<p>高斯核函数（Gaussian kernel function）：一个理论上可以将数据从低维空间映射到无穷维空间，使用很广泛。<br/>
+\[<br/>
+K(x,z) = exp(-\frac{||x-z||^2}{2\sigma^2})<br/>
+\] </p>
+
+<h2 id="toc_10">SMO算法</h2>
+
+<p>SMO算法，英文名称：Sequence minimal optimization，中文名称：序列化最小最优算法。它是1996年有Platt发布的一个强大的算法，它将大优化问题分解成多个小优化的问题来求解。这些小优化的方法往往比较容易求解，并且对它们进行顺序求解的结果与将它们作为整体来求解的结果完全一致，在结果相同的情况下，SMO算法的效率会提升很多。</p>
+
+<p>SMO算法的目标是求出一系列的\(\alpha\)和\(b\)，由前面可知，一旦求出\(\alpha\)，就很容易计算出权重向量\(\boldsymbol w\)和\(b\)，并得到分割超平面。SMO算法的工作原理是：每次循环中选择两个\(\alpha\)来进行优化处理。一旦找到一堆合适的\(\alpha\)，那么就增大其中一个同时减小另一个。这里所谓的“合适”就是指两个\(\alpha\)必须满足一定的条件，后面会讨论这个条件。</p>
+
+<p>我们先来回顾一下我们SMO算法要求解的一般方程组：<br/>
+\[<br/>
+\begin{align}<br/>
+\min_{\boldsymbol w,b,\zeta} \quad &amp; \frac{1}{2}||\boldsymbol w||^2+\text{C}\sum_{i=1}^N \zeta_i \label{smo_o_q_0}\\<br/>
+s.t. \quad&amp; y_i(\boldsymbol w x_i + b) \ge 1 - \zeta_i:i=1;2;...;N \label{smo_o_q_1}\\<br/>
+\quad&amp;\zeta_i \gt 0:i = 1;2;...;N \label{smo_o_q_2}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>然后引入拉格朗日方程，根据其对偶问题求出\(\boldsymbol w\)以及\(\alpha_i\)的关系：<br/>
+\[<br/>
+\begin{align}<br/>
+&amp;\boldsymbol w = \sum_{i=1}^N \alpha_i y_i x_i \label{smo_r_0}\\<br/>
+&amp;\sum_{i=1}^N \alpha_i y_i = 0 \label{smo_r_1}\\<br/>
+&amp;\text{C} - \alpha_i - \mu_i = 0 \label{smo_r_2}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>然后将这个结果带入拉格朗日对偶问题，这里使用核函数的形式，直接给出结果：<br/>
+\[<br/>
+\begin{align}<br/>
+\min_{\alpha} \quad &amp;\frac{1}{2}\sum_{i=1}^N \sum_{j=1}^N \alpha_i \alpha_j y_i y_j k(x_i,x_j) - \sum_{i=1}^N \alpha_i \\<br/>
+s.t. \quad &amp;\sum_{i=1}^N \alpha_i y_i = 0 \label{smo_d_r_0}\\<br/>
+\quad\quad\quad &amp;0 \le \alpha_i \le C:i=1;2;...;N \label{smo_d_r_1}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>前面我们已经说明了\(\alpha_i\)的取值范围及其意义，现在继续探究\(\alpha_i\)与\(yy_i\)的关系（这里\(y\)代表预测值\(y=\boldsymbol w^T \boldsymbol x + b\)，\(y_i\)是真实值）：</p>
+
+<ol>
+<li><p>当\(\alpha_i = 0\)时，由公式（\ref{d_with_z_kkt_2}）可知\(\mu_i=C&gt;0\)，由公式（\ref{d_with_z_kkt_4}）可知\(\zeta_i = 0\)，所以公式（\ref{d_with_z_kkt_5}）可以改写为：<br/>
+\[<br/>
+\begin{equation}<br/>
+y_i(\boldsymbol w^{*T}x_i + b^*) - 1 + \zeta_i \ge 0 \Rightarrow y_i y \ge 1 \label{y_i_w_b_z_1} \\<br/>
+\end{equation}<br/>
+\]</p></li>
+<li><p>当\(\alpha_i = C\)时，由公式（\ref{d_with_z_kkt_2}）可知\(\mu_i = 0\)，由公式（\ref{d_with_z_kkt_4}）可知存在\(\zeta_i &gt; 0\)，所以公式（\ref{d_with_z_kkt_3}）可以改写为：<br/>
+\[<br/>
+\begin{equation}<br/>
+y_i(\boldsymbol w^{*T}x_i + b^*) - 1 + \zeta_i = 0 \Rightarrow y_i y = 1 - \zeta_i \le 1 \label{y_i_w_b_z_2} \\<br/>
+\end{equation}<br/>
+\]</p></li>
+<li><p>当\(0 \le \alpha_i \le C\)时，由公式（\ref{d_with_z_kkt_2}）可知\(\mu_i &gt; 0\)，由公式（\ref{d_with_z_kkt_4}）可知存在\(\zeta_i = 0\)，所以公式（\ref{d_with_z_kkt_3}）可以改写为：<br/>
+\[<br/>
+\begin{equation}<br/>
+y_i(\boldsymbol w^{*T}x_i + b^*) - 1 + \zeta_i = 0 \Rightarrow y_i y = 1 - \zeta_i = 1 \label{y_i_w_b_z_3} \\<br/>
+\end{equation}<br/>
+\] </p></li>
+</ol>
+
+<p>在SMO算法中，我们通常要选择不满足上述条件的\(\alpha_i\)来进行更新，下面来讨论不满足这些条件的情况：</p>
+
+<ol>
+<li>\(y_iy \ge 1\)时\(\alpha_i &gt;0 \)，因为原始的\(\alpha_i = 0\)</li>
+<li>\(y_iy \le 1\)时\(\alpha_i &lt;C \)，因为原始的\(\alpha_i = C\)</li>
+<li>\(y_iy =   1\)时\(\alpha_i = 0\)或\(\alpha_i = C\)时，因为原始的\(0 &lt; \alpha_i &lt; C\)</li>
+</ol>
+
+<p>在更新这些不满足条件的\(\alpha_i\)时，还需要满足公式（\ref{d_t_with_r_1}）\(\sum_{i=1}^N \alpha_i = 0\)条件，因此通常我们同时选择两个\(\alpha\)更新，增大其中一个，减小另外一个。假设选择的两个值是\(\alpha_1\)和\(\alpha_2\)，更新前值为\(\alpha_1^{old}\)和\(\alpha_2^{old}\)，更新后值为\(\alpha_1^{new}\)和\(\alpha_2^{new}\)，那么有：<br/>
+\[<br/>
+\begin{equation}<br/>
+\alpha_1^{old}y_1 + \alpha_2^{old}y_2 = \alpha_1^{new}y_1 + \alpha_2^{new}y_2 = - \sum_{k \neq 1,2}^N \alpha_k \label{a_i_j_r}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>令\(- \sum_{k \neq 1,2}^N \alpha_k = \varepsilon\)，这里分两种情况讨论：<br/>
+第一种情况：\(y_1\)与\(y_2\)同号：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\alpha_1^{new} + \alpha_2^{new} = \varepsilon \Leftrightarrow \alpha_1^{new} = \varepsilon - \alpha_2^{new} \\<br/>
+\because \quad&amp;0 \le \alpha_1^{new} \le C \\<br/>
+\therefore \quad&amp;0 \le \varepsilon - \alpha_2^{new} \le C \\<br/>
+\Rightarrow \quad &amp;\varepsilon - C \le \alpha_2^{new} \le \varepsilon \\<br/>
+\Rightarrow \quad &amp;\alpha_1^{old} + \alpha_2^{old} -C \le \alpha_2^{new} \le \alpha_1^{old} + \alpha_2^{old} \\<br/>
+\because \quad &amp; 0 \le \alpha_2^{new} \le C \\<br/>
+\therefore \quad &amp; \max(0,\alpha_1^{old} + \alpha_2^{old} -C) \le \alpha_2^{new} \le \min(C,\alpha_1^{old} + \alpha_2^{old}) \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令\(L = \max(0,\alpha_1^{old} + \alpha_2^{old} -C),\, H = \min(C,\alpha_1^{old} + \alpha_2^{old})\)，则\(L \le \alpha_2^{new} \le H\)</p>
+
+<p>第二种情况：\(y_1\)与\(y_2\)异号：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\alpha_1^{new} - \alpha_2^{new} = \varepsilon \Leftrightarrow \alpha_1^{new} = \alpha_2^{new}  - \varepsilon \\<br/>
+\because \quad&amp;0 \le \alpha_1^{new} \le C \\<br/>
+\therefore \quad&amp;0 \le \alpha_2^{new} - \varepsilon \le C \\<br/>
+\Rightarrow \quad &amp;\varepsilon \le \alpha_2^{new} \le C + \varepsilon \\<br/>
+\Rightarrow \quad &amp;\alpha_1^{old} - \alpha_2^{old} \le \alpha_2^{new} \le C + \alpha_1^{old} - \alpha_2^{old} \\<br/>
+\because \quad &amp; 0 \le \alpha_2^{new} \le C \\<br/>
+\therefore \quad &amp; \max(0,\alpha_1^{old} - \alpha_2^{old}) \le \alpha_2^{new} \le \min(C,C+\alpha_1^{old} - \alpha_2^{old}) \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令\(L = \max(0,\alpha_1^{old} - \alpha_2^{old}),\, H = \min(C,C+\alpha_1^{old} - \alpha_2^{old})\)，则\(L \le \alpha_2^{new} \le H\)</p>
+
+<p>在知道了\(\alpha_2^{new}\)的范围之后，继续探究\(\alpha_2^{new}\)的值，由公式（\ref{a_i_j_r}）知\(\alpha_1 y_1 + \alpha_2 y_2 = \varepsilon \Rightarrow \alpha_1 y_1 = \varepsilon - \alpha_2 y_2 \)，两边同乘上\(y_1\)，因为\(y_1^2 = 1\)，所以得：\(\alpha_1 = y_1(\varepsilon - \alpha_2 y_2)\)，我们将软间隔最大化的对偶问题公式（\ref{d_t_with_r_0}）加上核函数，然后进行推导：<br/>
+\[<br/>
+\begin{align*}<br/>
+\min_{\boldsymbol w, b, \alpha}L(\boldsymbol w,b,\alpha) &amp;= \frac{1}{2}\sum_{i=1}^N \sum_{j=1}^N \alpha_i \alpha_j y_i y_j k(x_i,x_j) - \sum_{i=1}^N \alpha_i \\<br/>
+&amp;= \frac{1}{2}\alpha_1^2y_1^2k(x_1,x_1)+\frac{1}{2}\alpha_2^2y_2^2k(x_2,x_2)+\alpha_1\alpha_2y_1y_2k(x_1,x_2)+\alpha_1y_1\sum_{i=3}^N\alpha_iy_ik(x_1,x_i)\\<br/>
+&amp;+\alpha_2y_2\sum_{i=3}^N\alpha_iy_ik(x_2,x_i)+\frac{1}{2}\sum_{i=3}^N\alpha_i\alpha_jy_iy_jk(x_i,x_j) - \alpha_1 - \alpha_2 - \sum_{i=3}^N\alpha_i<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>将\(\alpha_1=y_1(\varepsilon - \alpha_2y_2)\)代入式：<br/>
+\[<br/>
+\begin{align*}<br/>
+\min_{\boldsymbol w, b, \alpha}L(\boldsymbol w,b,\alpha) &amp;= \frac{1}{2}[y_1(\varepsilon -\alpha_2y_2)]^2y_1^2k(x_1,x_1)+\frac{1}{2}\alpha_2^2y_2^2k(x_2,x_2)+y_1(\varepsilon -\alpha_2y_2)\alpha_2y_1y_2k(x_1,x_2) \\<br/>
+&amp;+y_1(\varepsilon - \alpha_2y_2)y_1\sum_{i=3}\alpha_iy_ik(x_1,x_i) + \alpha_2y_2\sum_{i=3}^N\alpha_iy_ik(x_2,x_i) + \frac{1}{2}\sum_{i=3}^N\alpha_i\alpha_jy_iy_jk(x_i,x_j) \\<br/>
+&amp;- y_1(\varepsilon - \alpha_2y_2) - \alpha_2 - \sum_{i=3}^N\alpha_i \\<br/>
+&amp;=\frac{1}{2}(\varepsilon - \alpha_2y_2)^2k(x_1,x_1) + \frac{1}{2}\alpha_2^2k(x_2,x_2) + (\varepsilon-\alpha_2y_2)\alpha_2y_2k(x_1,x_2) \\<br/>
+&amp;+(\varepsilon-\alpha_2y_2)\sum_{i=3}^N\alpha_iy_ik(x_1,x_i)+ \alpha_2y_2\sum_{i=3}^N\alpha_iy_ik(x_2,x_i) + \frac{1}{2}\sum_{i=3}^N\alpha_i\alpha_jy_iy_jk(x_i,x_j) \\<br/>
+&amp;- y_1(\varepsilon - \alpha_2y_2) - \alpha_2 - \sum_{i=3}^N\alpha_i \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>因为在操作过程中只变化\(\alpha_1\)和\(\alpha_2\)，所以可以将不包含\(\alpha_1\)和\(\alpha_2\)的项看作常数，令\(v_1=\sum_{i=3}^N\alpha_iy_ik(x_1,x_i)\)，\(v_2 = \sum_{i=3}^N\alpha_iy_ik(x_2,x_i)\)，\(const=\frac{1}{2}\sum_{i=3}^N\alpha_i\alpha_jy_iy_jk(x_i,x_j) - \sum_{i=3}^N\alpha_i\)，所以上式可以改写为：<br/>
+\[<br/>
+\begin{align*}<br/>
+\min_{\boldsymbol w, b, \alpha}L(\boldsymbol w,b,\alpha) &amp;= \frac{1}{2}(\varepsilon - \alpha_2y_2)^2k(x_1,x_1) + \frac{1}{2}\alpha_2^2k(x_2,x_2) + (\varepsilon-\alpha_2y_2)\alpha_2y_2k(x_1,x_2) \\<br/>
+&amp;- y_1(\varepsilon - \alpha_2y_2) - \alpha_2 +(\varepsilon-\alpha_2y_2)v_1+ \alpha_2y_2v_2 + const \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>上式可以看成只包含\(\alpha_2\)的函数，令\(W(\alpha_2)=\min_{\boldsymbol w, b, \alpha}L(\boldsymbol w,b,\alpha)\)，然后对\(\alpha_2\)求导数：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial W(\alpha_2)}{\partial \alpha_2} &amp;= -(\varepsilon-\alpha_2y_2)y_2k(x_1,x_1) + \alpha_2k(x_2,x_2)-y_2\alpha_2y_2k(x_1,x_2) + (\varepsilon-\alpha_2y_2)y_2k(x_1,x_2) +y_1y_2 - 1 \\<br/>
+&amp;- y_2v_1 + y_2v_2 \\<br/>
+&amp;=\alpha_2k(x_1,x_1)+\alpha_2k(x_2,x_2)-2\alpha_2k(x_1,x_2) - \varepsilon y_2k(x_1,x_1) + \varepsilon y_2k(x_1,x_2) +y_1y_2 - 1 - y_2v_1 \\<br/>
+&amp;+ y_2 v_2<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令其等于0，并将核函数写成核矩阵形式得：<br/>
+\[<br/>
+\begin{equation}<br/>
+(K_{11}+K_{22}-2K_{12})\alpha_2 = y_2(y_2 - y_1 + \varepsilon K_{11} - \varepsilon K_{12} + v_1 -v_2) \label{kk_2_a}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>在前面化简时，我们曾令\(v_1 = \sum_{i=3}^N\alpha_iy_ik(x_1,x_i)\)，结合公式（\ref{with_z_r_h}）考虑：<br/>
+\[<br/>
+\begin{align*}<br/>
+v_1 &amp;= \sum_{i=1}^N\alpha_iy_ik(x_1,x_i) + b^* - \sum_{i=1}^2\alpha_iy_ik(x_1,x_i) - b^* \\<br/>
+&amp;= f(x_1) -  \alpha_1^{old} y_1 K_{11} - \alpha_2^{old} y_2 K_{12} - b^*<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>同理：\(v_2 =f(x_2) -  \alpha_1^{old} y_1 K_{21} - \alpha_2^{old} y_2 K_{22} - b^*\)<br/>
+将\(v_1\)和\(v_2\)代入式（\ref{kk_2_a}）中得：<br/>
+\[<br/>
+\begin{align*}<br/>
+(K_{11}+K_{22}-2K_{12})\alpha_2 &amp;= y_2(y_2 - y_1 + \varepsilon K_{11} - \varepsilon K_{12} + v_1 -v_2) \\<br/>
+&amp;=y_2(y_2 - y_1 + \varepsilon K_{11} - \varepsilon K_{12} + f(x_1) -  \alpha_1^{old} y_1 K_{11} - \alpha_2^{old} y_2 K_{12} -f(x_2) +  \alpha_1^{old} y_1 K_{21} \\<br/>
+&amp;+ \alpha_2^{old} y_2 K_{22})<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>将\(\varepsilon = \alpha_1^{old}y_1 + \alpha_2^{old}y_2\)代入上式，并用\(E_i\)表示预测值\(f(x_i)\)与真实值\(y_i\)的差：<br/>
+\[<br/>
+\begin{align*}<br/>
+(K_{11}+K_{22}-2K_{12})\alpha_2^{new,unc} &amp;=y_2(y_2 - y_1 + (\alpha_1^{old}y_1 + \alpha_2^{old}y_2) K_{11} - (\alpha_1^{old}y_1 + \alpha_2^{old}y_2) K_{12} \\<br/>
+&amp;+ f(x_1) -  \alpha_1^{old} y_1 K_{11} - \alpha_2^{old} y_2 K_{12} -f(x_2) +  \alpha_1^{old} y_1 K_{21} + \alpha_2^{old} y_2 K_{22}) \\<br/>
+&amp;=y_2(y_2 - y_1 + \alpha_2^{old}y_2 K_{11} - 2\alpha_2^{old}y_2K_{12} + \alpha_2^{old} y_2 K_{22}+ f(x_1) -f(x_2) \\<br/>
+&amp;=(K_{11}-2K_{12}+K_{22})\alpha_2^{old} + y_2[(f(x_1) - y_1)-(f(x_2) - y_2)] \\<br/>
+\Rightarrow \alpha_2^{new,unc} &amp;= \alpha_2^{old} + \frac{y_2(E_1-E_2)}{K_{11}-2K_{12}+K_{22}}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令\(\eta=K_{11}+K_{22}-2K_{12}\)，则\(\alpha_2^{new,unc}=\alpha_2^{old} + \frac{y_2(E_1-E_2)}{\eta}\)，前面我们已经求出了\(\alpha_2^{new}\)的范围，所以经剪辑后：<br/>
+\[<br/>
+\begin{align*}<br/>
+\alpha_2^{new} = \left \{ \begin{array}<br/>
+HH \quad &amp; \alpha_2^{new,unc} &gt; H \\<br/>
+a_2^{new,unc} \quad &amp; L \le a_2^{new,unc} \le H \\<br/>
+L \quad &amp; \alpha_2^{new,unc} &lt; L<br/>
+\end{array} \right .<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>再由\(\alpha_2^{new}\)求解\(\alpha_1^{new}\)得：<br/>
+\[<br/>
+\begin{align*}<br/>
+\because\quad&amp;\alpha_1^{new}y_1 + \alpha_2^{new}y_2 = \alpha_1^{old}y_1 + \alpha_2^{old}y_2 \\<br/>
+\therefore\quad&amp;\alpha_1^{new} = \alpha_1^{old} + y_1y_2(\alpha_2^{old} - \alpha_2^{new})<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>在每次完成\(\alpha\)更新后，接下来重新计算阈值\(b\)，由公式（\ref{with_z_r_h}）可知，当\(0 &lt; \alpha_1^{new} &lt; C\)时：<br/>
+\[<br/>
+\sum_{i=1}^N\alpha_iy_iK_{i1} + b^* = y_i \Rightarrow b^* = y_i - \sum_{i=1}^N\alpha_iy_iK_{i1}\<br/>
+\]</p>
+
+<p>于是：<br/>
+\[<br/>
+b_1^{new} = y_1 - \sum_{i=3}^N\alpha_iy_iK_{i1} - \alpha_1^{new}y_iK_{11} - \alpha_2^{new}y_2K_{21}<br/>
+\]</p>
+
+<p>由\(E_1\)的定义有：<br/>
+\[<br/>
+E_1 = \sum_{i=1}^N \alpha_i y_i K_{i1} = \sum_{i=3}^N \alpha_i y_i K_{i1} + \alpha_1^{old}y_1K_{11} + \alpha_2^{old}y_2K_{21} + b^{old} - y_1<br/>
+\]</p>
+
+<p>前面两项可以结合得：<br/>
+\[<br/>
+b_1^{new} = - E_1 + (\alpha_1^{old}-\alpha_1^{new})y_1K_{11} + (\alpha_2^{old}-\alpha_2^{new})y_2K_{21} + b^{old} <br/>
+\]</p>
+
+<p>那么同理有：\(b_2^{new} = - E_2 + (\alpha_1^{old}-\alpha_1^{new})y_1K_{12} + (\alpha_2^{old}-\alpha_2^{new})y_2K_{22} + b^{old}\)<br/>
+所以\(b\)的更新规则如下：<br/>
+\[<br/>
+\begin{equation}<br/>
+b^* = \left \{ \begin{array}<br/>
+bb_1 \quad&amp; 0 &lt; \alpha_1 &lt; C \\<br/>
+b_2 \quad&amp; 0 &lt; \alpha_2 &lt; C \\<br/>
+\frac{1}{2}(b_1+b_2) \quad&amp; 其他<br/>
+\end{array} \right .<br/>
+\end{equation}<br/>
+\]</p>
+
+<h2 id="toc_11">多分类问题</h2>
+
+<p>对于多分类问题，比如手写数字识别的问题，类别的数量超过2种，此时变出现多分类问题。通常使用的解决方案有两种：一对多训练和多一对一训练。</p>
+
+<h4 id="toc_12">一对多训练 one-versus-the-rest</h4>
+
+<p>这种方法是在K分类的数据集上训练处K个分类器，每个分类器将样本分为\(k_i\)类与非\(k_i\)类。每个样本在测试的时候需要被分类K次，预测出是否属于\(k_i\)数据分类，但是很可能一个数据会被分为到几个类。这时候就需要函数间隔作为分类的确信度，取确信度最大的分类作为预测分类。</p>
+
+<p>这种方法的弊端在于可能出现样本不平衡的情况，一边是1类数据，一边是K-1类数据，这种情况可以通过欠采样解决，但是效果不好。在实际工作中往往不采用，而是采用下面多一对一的分类器。</p>
+
+<h4 id="toc_13">多一对一训练 one-versus-one</h4>
+
+<p>这种方式在K分类的数据集上训练\(\frac{K(K-1)}{2}\)个分类器，也就是在每两个分类上训练处一个分类器，在测试环境，每个样本都需要被分类K-1次，然后采取投票的方式决定最终预测分类。假设有三类数据A类、B类和C类，将会训练A-B分类器，A-C分类器，B-C分类器，对于测试样本x，在A-B分类器上分为A类，在A-C分类器上分为C，在B-C分类器上分为C类，那么C得两票，A得一票，最终x被预测为C。但是这种方法也可能导致分不了类，刚才的例子中，x在B-C分类器上分为B类，那么A、B、C各得一票，x归属哪一类就不好判断了。</p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='SVM.html'>SVM</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15029730205260.html" 
+	        title="Previous Post: 不等式约束问题">&laquo; 不等式约束问题</a>
+	    
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

@@ -1,0 +1,547 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  算法稳定性 stability - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">算法稳定性 stability</h1>
+				<p class="meta"><time datetime="2018-04-06T19:58:43+08:00" pubdate data-updated="true">2018/4/6</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>无论是基于 VC 维还是 Rademacher 复杂度来推导泛化误差界，所得到的结果均与具体学习算法无关，对所有学习算法都适用。这使得人们能够脱离具体学习算法的设计来考虑学习问题本身的性质，但在另一方面，若希望获得与算法有关的分析结果，则需另辟蹊径。稳定性分析是这方面的一个值得关注的方向。</p>
+
+<p>顾名思义，算法的“稳定性”考察的是算法在输入发生变化时，输出是否会随之发生较大的变化。学习算法的输入是训练集，因此下面我们先定义训练集的两种变化。</p>
+
+<p>给定 \(D=\{z_1=(x_1,y_1),z_2=(x_2,y_2),...,z_m=(x_m,y_m)\}\)，\(x_i\in\mathcal X\) 是来自分布 \(\mathcal D\) 的独立同分布示例，\(y_i=\{-1,+1\}\)。对假设空间 \(\mathcal H:\mathcal X\rightarrow\{-1,+1\}\) 和学习算法 \(\mathcal L\)，令 \(\mathcal L_D\in\mathcal H\) 表示基于训练集 \(D\) 从假设空间 \(\mathcal H\) 中学得的假设。考虑 \(D\) 的以下变化：</p>
+
+<ul>
+<li><p>\(D^{\backslash i}\) 表示移除 \(D\) 中第 \(i\) 个样例得到的集合<br/>
+\[<br/>
+D^{\backslash i} = \{z_1,z_2,...,z_{i-1},z_{i+1},...,z_m\},<br/>
+\]</p></li>
+<li><p>\(D^i\) 表示替换 \(D\) 中第 \(i\) 个样例得到的集合<br/>
+\[<br/>
+D^i = \{z_1,z_2,...,z_{i-1},z&#39;_i,z_{i+1},...,z_m\},<br/>
+\]</p></li>
+</ul>
+
+<p>其中 \(z&#39;_i=(x&#39;_i,y&#39;_i)\)，\(x&#39;_i\) 服从分布 \(\mathcal D\) 并独立于 \(D\)。</p>
+
+<p>损失函数 \(\ell(\mathcal L_D(x),y):\mathcal Y\times \mathcal Y\rightarrow \mathbb R^{+}\) 刻画了假设 \(\mathcal L_D\) 的预测标记 \(\mathcal L_D(x)\) 与真实标记 \(y\) 之间的差别，简记为 \(\ell(\mathcal L_D,z)\)。下面定义关于假设 \(\mathcal L_D\) 的几种损失。</p>
+
+<ul>
+<li><p>泛化损失<br/>
+\[<br/>
+\ell(\mathcal L_D,\mathcal D) = \mathbb E_{x\in\mathcal X,z=(x,y)}[\ell(\mathcal L_D,z)]<br/>
+\]</p></li>
+<li><p>经验损失<br/>
+\[<br/>
+\hat \ell(\mathcal L,D) = \frac 1 m\sum_{i=1}^m \ell(\mathcal L_D,z_i)<br/>
+\]</p></li>
+<li><p>留一 (leave-one-out) 损失<br/>
+\[<br/>
+\ell_{loo}(\mathcal L,D) = \frac 1 m \sum_{i=1}^m \ell(\mathcal L_{D^{\backslash i}},z_i)<br/>
+\]</p></li>
+</ul>
+
+<p>下面定义算法的均匀稳定性（uniform stability)：<br/>
+<strong>均匀稳定性</strong>：对任何 \(x\in\mathcal X\)，\(z=(x,y)\)，若学习算法 \(\mathcal L\) 满足<br/>
+\[<br/>
+|\ell(\mathcal L_D,z) - \ell(\mathcal L_{D^{\backslash i},z})| \le \beta,\quad i=1,2,...,m<br/>
+\]</p>
+
+<p>则称 \(\mathcal L\) 关于损失函数 \(\ell\) 满足 \(\beta\)-均匀稳定性。</p>
+
+<p>显然，若算法 \(\mathcal L\) 关于损失函数 \(\ell\) 满足 \(\beta\)-均匀稳定性，则有：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;|\ell(\mathcal L_D,z) - \ell(\mathcal L_{D^{i}},z)|\\<br/>
+&amp;\le |\ell(\mathcal L_D,z) - \ell(\mathcal L_{D^{\backslash i}},z)| + |\ell(\mathcal L_{D^i},z) - \ell(\mathcal L_{D^{\backslash i}},z)|\\<br/>
+&amp;\le 2\beta<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>也就是说移除示例的稳定性包含替换示例的稳定性。</p>
+
+<p>再来看几个稍弱一点的概念：</p>
+
+<p><strong>误差稳定性</strong>：对任意 \(D\)，对于所有 \(i\in [0,m]\)，都有：<br/>
+\[<br/>
+\begin{align*}<br/>
+|\ell(\mathcal L_D,\mathcal D) - \ell(\mathcal L_{D^{\backslash i}},\mathcal D)| &amp;=  \Big|\mathbb E\big[\ell(\mathcal L_D,z)\big] - \mathbb E\big[\ell(\mathcal L_{D^{\backslash i}},z)\big]\Big| \\<br/>
+&amp;= \Big|\mathbb E\big[\ell(\mathcal L_D,z) - \ell(\mathcal L_{D^{\backslash i}},z)\big]\Big|\\<br/>
+&amp;\le \beta<br/>
+\end{align*}<br/>
+\] </p>
+
+<p><strong>假设稳定性</strong>：对于任意 \(i\in [0,m]\)，当训练数据集 \(D\) 被移除后有：<br/>
+\[<br/>
+\begin{align*}<br/>
+|\hat \ell(\mathcal L,D) - \hat \ell(\mathcal L,D^{\backslash i}) | &amp;= \frac 1 m\sum_{j\neq i}\Big| \ell(\mathcal L_{D},z_j) - \ell(\mathcal L_{D^{\backslash i}},z_j)\Big| + \frac 1 m \ell(\mathcal L_{D},z_i)\\<br/>
+&amp;\le \frac{(m-1)\beta}{m} + \frac{M}{m}\\<br/>
+&amp;\le \beta + \frac M m<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>若损失函数 \(\ell\) 有界，即对所有 \(D\) 和 \(z=(x,y)\) 有 \(0\le \ell(\mathcal L_D,z) \le M\)，则有</p>
+
+<p><strong>定理1</strong>：给定从分布 \(\mathcal D\) 上独立同分布采样得到的大小为 \(m\) 的示例集 \(D\)，若学习算法 \(\mathcal L\) 满足关于损失函数 \(L\) 的 \(\beta\)-均匀稳定性，且损失函数 \(L\) 的上界为 \(M\)，\(0\lt \delta\lt 1\)，则对任意 \(m\ge 1\)，以至少 \(1-\delta\) 的概率有<br/>
+\[<br/>
+\begin{align}<br/>
+\ell(\mathcal L_D,\mathcal D) &amp;\le \hat \ell(\mathcal L,D) + 2\beta + (4m\beta + M)\sqrt{\frac{\ln(1/\delta)}{2m}}\label{lmlm1}\\<br/>
+\ell(\mathcal L_D,\mathcal D) &amp;\le \ell_{loo}(\mathcal L,D) + \beta + (4m\beta + M)\sqrt{\frac{\ln(1/\delta)}{2m}}\label{lmlm2}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>证明：类比<strong>误差稳定性</strong>，我们可以通过三角不等式得出：<br/>
+\[<br/>
+\begin{align*}<br/>
+|\ell(\mathcal L_D,\mathcal D) - \ell(\mathcal L_{D^{i}},\mathcal D)| &amp;= \Big|\mathbb E\big[\ell(\mathcal L_D,z) - \ell(\mathcal L_{D^{i}},z) \big]\Big| \\<br/>
+&amp;\le \Big|\mathbb E\big[\ell(\mathcal L_D,z) - \ell(\mathcal L_{D^{\backslash i}},z) \big]\Big| + \Big|\mathbb E\big[\ell(\mathcal L_{D^i},z) - \ell(\mathcal L_{D^{\backslash i}},z) \big]\Big|\\<br/>
+&amp;\le 2\beta\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>而使用<strong>假设稳定性</strong>，我们可以得出<br/>
+\[<br/>
+\begin{align*}<br/>
+|\hat \ell(\mathcal L,D) - \hat \ell(\mathcal L,D^{i}) | &amp;\le |\hat \ell(\mathcal L,D) - \hat \ell(\mathcal L,D^{\backslash i})| + |\hat \ell(\mathcal L,D^{\backslash i}) - \hat \ell(\mathcal L,D^{i})|\\<br/>
+&amp;\le 2(\beta + \frac M m)\\<br/>
+&amp;= 2\beta + 2\frac M m\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>实际上我们还有更好的上界表示：<br/>
+\[<br/>
+\begin{align*}<br/>
+|\hat \ell(\mathcal L,D) - \hat \ell(\mathcal L,D^{i}) |&amp;= \frac 1 m\sum_{j\neq i}\Big| \ell(\mathcal L_{D},z_j) - \ell(\mathcal L_{D^{i}},z_j)\Big| + \frac 1 m \Big(\ell(\mathcal L_{D},z_i) - \ell(\mathcal L_{D},z&#39;_i)\Big)\\<br/>
+&amp;\le \frac 1 m \sum_{j\neq i}\Big(|\ell(\mathcal L_{D},z_j) - \ell(\mathcal L_{D^{\backslash i}},z_j)| + |\ell(\mathcal L_{D^{\backslash i}},z_j) - \ell(\mathcal L_{D^{i}},z_j)| \Big)+ \frac 1 m \Big(\ell(\mathcal L_{D},z_i) - \ell(\mathcal L_{D},z&#39;_i)\Big)\\<br/>
+&amp;= \frac 1 m \sum_{j\neq i}|\ell(\mathcal L_{D},z_j) - \ell(\mathcal L_{D^{\backslash i}},z_j)| +\frac 1 m \sum_{j\neq i} |\ell(\mathcal L_{D^{\backslash i}},z_j) - \ell(\mathcal L_{D^{i}},z_j)|+ \frac 1 m \Big(\ell(\mathcal L_{D},z_i) - \ell(\mathcal L_{D},z&#39;_i)\Big)\\<br/>
+&amp;\le 2\beta + \frac M m<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>定义随机变量 \(Z\) 为<br/>
+\[<br/>
+Z = \ell(\mathcal L_D,\mathcal D) - \hat \ell(\mathcal L,D)<br/>
+\]</p>
+
+<p>则 \(Z^i\) 是 \(D\) 被替换为 \(D^{i}\) 的随机变量<br/>
+\[<br/>
+Z^i = \ell(\mathcal L_{D^i},\mathcal D) - \hat \ell(\mathcal L,D^i)<br/>
+\]</p>
+
+<p>所以有<br/>
+\[<br/>
+\begin{align*}<br/>
+|Z-Z^{i}| &amp;= \Big|\big(\ell(\mathcal L_D,\mathcal D) - \hat \ell(\mathcal L,D)\big) - \big(\ell(\mathcal L_{D^{i}},\mathcal D) - \hat \ell(\mathcal L,D^{i})\big) \Big|\\<br/>
+&amp;= \Big|\big(\ell(\mathcal L_D,\mathcal D) -\hat \ell(\mathcal L_{D^{i}},\mathcal D)\big) + \big(\ell(\mathcal L,D^{i}) -  \hat \ell(\mathcal L,D)\big) \Big|\\<br/>
+&amp;\le \Big|\ell(\mathcal L_D,\mathcal D) -\ell(\mathcal L_{D^{i}},\mathcal D)\Big| + \Big|\hat \ell(\mathcal L,D^{i}) -  \hat \ell(\mathcal L,D)\Big|\\<br/>
+&amp;\le 2\beta + 2\beta + \frac M m\\<br/>
+&amp;\le 4\beta + \frac M m\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>在 Mcdiarmid 不等式中有 \(c_i = 4\beta + \frac M m\)。</p>
+
+<p>为了求随机变量期望值的边界，我们需要两个特性：</p>
+
+<ul>
+<li>\(\mathbb E_D[\ell(\mathcal L_D,z_i)] = \mathbb E_{D,z&#39;}[\ell(\mathcal L_{D^{j}},z&#39;)]\)：这个特性成立是因为 \(z_i\) 是从 \(\mathcal D\) 中取样的，\(P(D) = P(D^j)\)。</li>
+<li>\(\mathbb E_{D,z&#39;}[\ell(\mathcal L_{D^j},z&#39;)] = \mathbb E_{D,z&#39;}[\ell(\mathcal L_{D^{i}},z&#39;)]\)：为了看这个特性成立，我们令 \(D&#39;\) 是一个和 \(D\) 包含相同元素的集合，但是交换 \(z_i\) 和 \(z_j\) 的位置。因为学习算法是顺序要求的，所以 \(\mathcal L_D = \mathcal L_{D&#39;}\)，结合 \(P(D) = P(D&#39;)\) 和上一个特性可以得到此特性。</li>
+</ul>
+
+<p>用这两个特性，我们有<br/>
+\[<br/>
+\begin{align}<br/>
+\mathbb E(Z) &amp;= \mathbb E_D[\ell(\mathcal L_D,\mathcal D) - \hat \ell(\mathcal L,D)]\nonumber\\<br/>
+&amp;= \mathbb E_{D,z&#39;}[\ell(\mathcal L_D,z&#39;) - \hat \ell(\mathcal L,D)]\nonumber\\<br/>
+&amp;= \mathbb E_{D,z&#39;}[\ell(\mathcal L_D,z&#39;)] - \mathbb E_{D}[\hat \ell(\mathcal L,D)]\nonumber\\<br/>
+&amp;= \mathbb E_{D,z&#39;}[\ell(\mathcal L_D,z&#39;)] - \mathbb E_{D}[\frac 1 m \sum_{i=1}^m \ell(\mathcal L_D,z_i)]\nonumber\\<br/>
+&amp;= \mathbb E_{D,z&#39;}[\ell(\mathcal L_D,z&#39;)] - \frac 1 m \sum_{i=1}^m \mathbb E_{D}[\ell(\mathcal L_D,z_i)]\nonumber\\<br/>
+&amp;= \mathbb E_{D,z&#39;}[\ell(\mathcal L_D,z&#39;)] - \frac 1 m \sum_{i=1}^m \mathbb E_{D,z&#39;}[\ell(\mathcal L_{D^j},z&#39;)]\nonumber\\<br/>
+&amp;= \mathbb E_{D,z&#39;}[\ell(\mathcal L_D,z&#39;)] - \frac 1 m m \mathbb E_{D,z&#39;}[\ell(\mathcal L_{D^j},z&#39;)]\nonumber\\<br/>
+&amp;= \mathbb E_{D,z&#39;}[\ell(\mathcal L_D,z&#39;)] - \mathbb E_{D,z&#39;}[\ell(\mathcal L_{D^i},z&#39;)]\nonumber\\<br/>
+&amp;= \mathbb E_{D,z&#39;}[\ell(\mathcal L_D,z&#39;) - \ell(\mathcal L_{D^i},z&#39;)]\nonumber\\<br/>
+&amp;\le 2\beta\label{mb2b}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>通过 Mcdiarmid 不等式，有<br/>
+\[<br/>
+\begin{align*}<br/>
+P\big[Z - \mathbb E[Z] \le \epsilon\big] &amp;\ge 1- \exp\bigg(\frac{-2\epsilon^2}{\sum_{i=1}^m c_i^2 } \bigg)\\<br/>
+&amp;= 1- \exp\bigg(\frac{-2\epsilon^2}{\sum_{i=1}^m (4\beta+\frac M m)^2 } \bigg)\\<br/>
+&amp;= 1- \exp\bigg(\frac{-2\epsilon^2}{m (4\beta+\frac M m)^2 } \bigg)\\<br/>
+&amp;= 1- \exp\bigg(\frac{-2m\epsilon^2}{(4m\beta+M)^2 } \bigg)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令<br/>
+\[<br/>
+\delta = \exp\bigg(\frac{-2m\epsilon^2}{(4m\beta+M)^2 } \bigg)<br/>
+\]</p>
+
+<p>如果我们用 \(\delta\) 来表示 \(\epsilon\) 便有<br/>
+\[<br/>
+\epsilon = (4m\beta + M)\sqrt{\frac{\ln(1/\delta)}{2m}}<br/>
+\]</p>
+
+<p>所以我们知<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;Z - \mathbb E[Z] \le (4m\beta + M)\sqrt{\frac{\ln(1/\delta)}{2m}}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>以至少 \(1-\delta\) 的概率成立。</p>
+
+<p>结合(\ref{mb2b})可得<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;Z \le \mathbb E[Z] + (4m\beta + M)\sqrt{\frac{\ln(1/\delta)}{2m}}\le 2\beta + (4m\beta + M)\sqrt{\frac{\ln(1/\delta)}{2m}}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>以至少 \(1-\delta\) 的概率成立。再将 \(Z\) 的定义代入，便可以证明式(\ref{lmlm1})。</p>
+
+<p>类比可以得出式(\ref{lmlm2})的证明，这里不再叙述。</p>
+
+<p>本文<strong>定理1</strong>给出了基于稳定性分析推导出的学习算法 \(\mathcal L\) 学得假设的泛化误差界。从(\ref{lmlm1})可以看出，经验损失与泛化损失之间差别的收敛率为 \(\beta\sqrt{m}\)；若令 \(\beta=O(\frac 1 m)\)，则可保证收敛率为 \(O(\frac{1}{\sqrt{m}})\)，这与VC维(该文章中的<strong>定理1</strong>)和Rademacher复杂度(该文章中的<strong>定理1</strong>)得到的收敛率一致。</p>
+
+<p>需注意，学习算法稳定性分析所关注的是 \(|\hat\ell(\mathcal L,D)-\ell(\mathcal L,\mathcal D)|\)，而假设空间复杂度分析所关注的是 \(\sup_{h\in \mathcal H}|\hat E(h) - E(h)|\)；也就是说稳定性分析不必考虑假设空间所有可能的假设，只需根据自身的特性（稳定性）来讨论输出假设 \(\mathcal L_D\) 的泛化误差界。那么稳定性与可学习性之间有什么关系呢？</p>
+
+<p>首先，必须假设 \(\beta\sqrt{m} \rightarrow 0\)，这样才能保证稳定的学习算法 \(\mathcal L\) 具有一定的泛化能力，即经验损失等于泛化损失，否则可学习性无从谈起。为了方便计算，假定 \(\beta = \frac 1 m\)，代入式(\ref{lmlm1})可得：<br/>
+\[<br/>
+\begin{equation}<br/>
+\ell(\mathcal L,\mathcal D) \le \hat \ell(\mathcal L,D) + \frac 2 m + (4+M)\sqrt{\frac{\ln(1/\delta)}{2m}}\label{lmlm3}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>对损失函数 \(\ell\) ，若学习算法 \(\mathcal L\) 所输出的假设满足经验损失最小化，则称算法 \(\mathcal L\) 满足经验损失最小化原则，简称算法是 ERM 的。关于学习算法的稳定性和可学习性，有如下定理：</p>
+
+<p><strong>定理2</strong>：若学习算法 \(\mathcal L\) 是 ERM 且稳定的，则假设空间 \(\mathcal H\) 可学习。</p>
+
+<p>证明：令 \(g\) 表示 \(\mathcal H\) 中具有最小泛化损失的假设，即<br/>
+\[<br/>
+\ell(g,\mathcal D) = \min_{h\in\mathcal H}\ell(h,\mathcal D)<br/>
+\]</p>
+
+<p>再令<br/>
+\[<br/>
+\begin{align*}<br/>
+\epsilon&#39; &amp;= \frac{\epsilon}{2},\\<br/>
+\frac{\delta}{2} &amp;= 2\exp\Big(-2m(\epsilon&#39;)^2 \Big)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>由 Hoeffding 不等式可知，当 \(m\le \frac{2}{\epsilon^2}\ln\frac 4 \delta\) 时<br/>
+\[<br/>
+|\ell(g,\mathcal D) - \hat \ell(g,D) | \le \frac \epsilon 2<br/>
+\]</p>
+
+<p>以至少 \(1-\delta/2\) 的概率成立。令式(\ref{lmlm3})中<br/>
+\[<br/>
+\frac 2 m + (4+M)\sqrt{\frac{\ln(2/\delta)}{2m}} = \frac \epsilon 2<br/>
+\]</p>
+
+<p>解得 \(m=O(\frac{1}{\epsilon^2} \ln \frac 1 \delta)\) 使<br/>
+\[<br/>
+\ell(\mathcal L,\mathcal D) \le \hat\ell(\mathcal L,D) + \frac \epsilon 2<br/>
+\]</p>
+
+<p>以至少 \(1-\delta/2\) 得概率成立，从而可得<br/>
+\[<br/>
+\begin{align*}<br/>
+\ell(\mathcal L,\mathcal D) - \ell(g,\mathcal D) &amp;\le \hat\ell(\mathcal L,D) + \frac{\epsilon}{2} - \bigg(\hat \epsilon(g,D) - \frac \epsilon 2 \bigg)\\<br/>
+&amp;\le \hat\ell(\mathcal L,D) - \hat\ell(g,D) + \epsilon\\<br/>
+&amp;\le \epsilon<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>以至少 \(1-\delta\) 得概率成立。<strong>定理2</strong>成立。</p>
+
+<hr/>
+
+<p><a href="">周志华 机器学习</a><br/>
+<a href="http://www.jmlr.org/papers/volume2/bousquet02a/bousquet02a.pdf">Stability and Generalization</a><br/>
+<a href="https://courses.cs.washington.edu/courses/cse522/11wi/scribes/lecture19.pdf">Algorithmic Stability</a><br/>
+<a href="http://101.96.10.64/www.mit.edu/%7E9.520/spring08/Classes/class14.pdf">Generalization Bounds and Stability</a></p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html'>集成学习</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15239854483603.html" 
+	        title="Previous Post: 感知器">&laquo; 感知器</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15225424238056.html" 
+	        title="Next Post: 数学期望与条件期望">数学期望与条件期望 &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

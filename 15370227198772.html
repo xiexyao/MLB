@@ -1,0 +1,682 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  人工神经网络-长短时记忆网络 LSTM - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">人工神经网络-长短时记忆网络 LSTM</h1>
+				<p class="meta"><time datetime="2018-09-15T22:45:19+08:00" pubdate data-updated="true">2018/9/15</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>长短期记忆（ long short-term memory， LSTM）网络是循环神经网络的一个变体，可以有效地解决简单循环神经网络的梯度爆炸或消失问题。</p>
+
+<p><strong>新的内部状态</strong>：LSTM网络引入一个新的内部状态（internal state）\(\mathbf c_t\) 专门进行线性的循环信息传递，同时（非线性）输出信息给隐藏层的外部状态 \(\mathbf h_t\)。<br/>
+\[<br/>
+\begin{align}<br/>
+\mathbf c_t &amp;= \mathbf f_t \odot \mathbf c_{t-1} + \mathbf i_t \odot \widetilde{\mathbf c}_t\label{mctm1}\\<br/>
+\mathbf h_t &amp;= \mathbf o_t \odot \tanh(\mathbf c_t)\label{mctm2}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>其中 \(\mathbf f_t\)，\(\mathbf i_t\) 和 \(\mathbf o_t\) 为三个门（gate）来控制信息传递的路径；\(\odot\) 为向量元素乘积；\(\mathbf c_{t−1}\) 为上一时刻的记忆单元；\(\widetilde{\mathbf c}_t\) 是通过非线性函数得到候选状态，<br/>
+\[<br/>
+\widetilde{\mathbf c}_t = \tanh(W_c \mathbf x_t + U_c \mathbf h_{t−1} + \mathbf b_c)<br/>
+\]</p>
+
+<p>在每个时刻 \(t\)， LSTM网络的内部状态 \(\mathbf c_t\) 记录了到当前时刻为止的历史信息。</p>
+
+<div align="center">
+    <img src="media/15370227198772/15428977728733.jpg" width="260" />
+</div>
+
+<p><strong>门机制</strong>：LSTM 网络引入门机制（gating mechanism）来控制信息传递的路径。公式 ( \ref{mctm1} )和 ( \ref{mctm2} ) 中三个“门”分别为输入门 \(\mathbf i_t\), 遗忘门 \(\mathbf f_t\) 和输出门 \(\mathbf o_t\)，在数字电路中，门（gate）为一个二值变量 \(\{0,1\}\)， 0代表关闭状态，不许任何信息通过； 1代表开放状态，允许所有信息通过。 LSTM网络中的“门”是一种“软”门，取值在 \((0,1)\)之间，表示以一定的比例运行信息通过。 LSTM网络中三个门的作用为</p>
+
+<ul>
+<li>遗忘门 \(\mathbf f_t\) 控制上一个时刻的内部状态 \(\mathbf c_{t−1}\) 需要遗忘多少信息。</li>
+<li>输入门 \(\mathbf i_t\) 控制当前时刻的候选状态 \(\widetilde{\mathbf c}_t\) 有多少信息需要保存。</li>
+<li>输出门 \(\mathbf o_t\) 控制当前时刻的内部状态 \(\mathbf c_t\) 有多少信息需要输出给外部状态 \(\mathbf h_t\)。</li>
+</ul>
+
+<p>当 \(\mathbf f_t = 0\), \(\mathbf i_t = 1\)时，记忆单元将历史信息清空，并将候选状态向量 \(\widetilde c_t\) 写入。但此时记忆单元 \(\mathbf c_t\) 依然和上一时刻的历史信息相关。当 \(\mathbf f_t = 1\),\(\mathbf i_t = 0\) 时，记忆单元将复制上一时刻的内容，不写入新的信息。</p>
+
+<p>第一个开关，负责控制继续保存长期状态 \(c\)；第二个开关，负责控制把即时状态输入到长期状态 \(c\) ；第三个开关，负责控制是否把长期状态 \(c\) 作为当前的LSTM的输出。三个开关的作用如下图所示：</p>
+
+<div align=center>
+    <img width="340" src="media/15370227198772/15428989376472.jpg" />
+</div>
+
+<p>三个门的计算范式为:<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbf i_t &amp;= \sigma(W_i \mathbf x_t + U_i \mathbf h_{t−1} + \mathbf b_i),\\<br/>
+\mathbf f_t &amp;= \sigma(W_f \mathbf x_t + U_f \mathbf h_{t-1} + \mathbf b_f),\\<br/>
+\mathbf o_t &amp;= \sigma(W_o \mathbf x_t + U_o \mathbf h_{t−1} + \mathbf b_o),\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(\sigma(\cdot)\) 为 logistic 函数，其输出区间为 (0, 1)， \(\mathbf x_t\) 为当前时刻的输入， \(\mathbf h_{t−1}\) 为上一时刻的外部状态。</p>
+
+<p>下图给出了 LSTM 网络的循环单元结构，其计算过程为：（1）首先利用上一时刻的外部状态 \(\mathbf h_{t−1}\) 和当前时刻的输入 \(\mathbf x_t\)，计算出三个门，以及候选状态 \(\widetilde{\mathbf c}_t\);（2）结合遗忘门 \(\mathbf f_t\) 和输入门 \(\mathbf i_t\) 来更新记忆单元 \(\mathbf c_t\);（3）结合输出门 \(\mathbf o_t\)，将内部状态的信息传递给外部状态 \(\mathbf h_t\)。</p>
+
+<p><font size=33 color=red>图</font></p>
+
+<p>下面来分开介绍LSTM的各个步骤：下图展示了遗忘门的计算</p>
+
+<div align="center">
+    <img src="media/15370227198772/15429034872510.jpg" width="520" />
+</div>
+
+<p>\(W_f\) 和 \(U_f\) 分别是遗忘门当前输入 \(\mathbf x_i\) 和上一时刻外部状态 \(\mathbf h_i\) 的权重，\(\mathbf b_f\) 是遗忘门的偏置项，\(\sigma\) 是sigmoid函数。<br/>
+\[<br/>
+\mathbf f_t = \sigma(\left [ \begin{array}{cc} W_f &amp; U_f\\ \end{array}\right ] \cdot \left [\begin{array}{c} \mathbf x_t\\\mathbf h_{t-1}\\\end{array}\right ] + \mathbf b_f)<br/>
+\]</p>
+
+<p>接下来看看输入门：</p>
+
+<div align="center">
+    <img src="media/15370227198772/15429037793431.jpg" width="520" />
+</div>
+
+<p>\(W_i\) 和 \(U_i\) 分别是输入门当前输入 \(\mathbf x_i\) 和 上一时刻外部状态 \(\mathbf h_i\) 的权重，\(\mathbf b_i\) 是输入门的偏置项<br/>
+\[<br/>
+\mathbf i_t = \sigma(\left [ \begin{array}{cc} W_i &amp; U_i\\ \end{array}\right ] \cdot \left [\begin{array}{c} \mathbf x_t\\\mathbf h_{t-1}\\\end{array}\right ] + \mathbf b_i)<br/>
+\]</p>
+
+<p>接下来，我们计算用于描述当前输入的单元状态（候选状态）\(\widetilde{\mathbf c}_t\)，它是根据上一次的输出和本次输入来计算的，其中 \(W_c\) 和 \(U_c\) 表示候选状态的权重，\(\mathbf b_c\) 表示偏置项：<br/>
+\[<br/>
+\mathbf i_t = \tanh(\left [ \begin{array}{cc} W_c &amp; U_c\\ \end{array}\right ] \cdot \left [\begin{array}{c} \mathbf x_t\\\mathbf h_{t-1}\\\end{array}\right ] + \mathbf b_c)<br/>
+\]</p>
+
+<p>下图表示 \(\widetilde c_t\) 的计算</p>
+
+<div align="center">
+    <img src="media/15370227198772/15429038909847.jpg" width="520" />
+</div>
+
+<p>现在，我们计算当前时刻的单元状态 \(\mathbf c_t\) 。它是由上一次的单元状态 \(\mathbf c_{t-1}\) 按元素乘以遗忘门 \(\mathbf f_t\)，再用当前输入的候选状态 \(\widetilde{\mathbf c}_t\) 按元素乘以输入门 \(\mathbf i_t\)，再将两个积加和产生的：<br/>
+\[<br/>
+\mathbf c_t = \mathbf c_{t-1} \odot \mathbf f_t + \widetilde{\mathbf c}_t \odot \mathbf i_t<br/>
+\]</p>
+
+<p>下图是 \(\mathbf c_t\) 的计算</p>
+
+<div align="center">
+    <img src="media/15370227198772/15429042137568.jpg" width="520" />
+</div>
+
+<p>这样，我们就把LSTM关于当前的记忆 \(\widetilde{\mathbf c}_t\) 和长期的记忆 \(\mathbf c_{t-1}\) 组合在一起，形成了新的单元状态 \(\mathbf c_t\)。由于遗忘门的控制，它可以保存很久很久之前的信息，由于输入门的控制，它又可以避免当前无关紧要的内容进入记忆。</p>
+
+<p>下面，我们要看看输出门，它控制了长期记忆对当前输出的影响，其中 \(W_o\) 和 \(U_o\) 表示输出门对当前输入 \(\mathbf x_t\) 和上一时刻外部状态 \(\mathbf h_{t-1}\) 的权重，\(\mathbf h_{t-1}\) 是偏置项：<br/>
+\[<br/>
+\mathbf o_t = \sigma(\left [ \begin{array}{cc} W_o &amp; U_o\\ \end{array}\right ] \cdot \left [\begin{array}{c} \mathbf x_t\\\mathbf h_{t-1}\\\end{array}\right ] + \mathbf b_o)<br/>
+\]</p>
+
+<p>下图表示输出门的计算</p>
+
+<div align="center">
+    <img src="media/15370227198772/15429043281567.jpg" width="520" />
+</div>
+
+<p>LSTM最终的输出，是由输出门和单元状态共同确定的：<br/>
+\[<br/>
+h_t = \mathbf o_t \odot \tanh(\mathbf c_t)<br/>
+\]</p>
+
+<p>如下图：</p>
+
+<div align="center">
+    <img src="media/15370227198772/15429043987838.jpg" width="520" />
+</div>
+
+<p>通过 LSTM循环单元，整个网络可以建立较长距离的时序依赖关系。上面公式可以简洁地描述为<br/>
+\[<br/>
+\begin{align*}<br/>
+\left [ \begin{array}{c} \widetilde{\mathbf c}_t \\ \mathbf o_t \\ \mathbf i_t \\ \mathbf f_t \\\end{array} \right ] &amp;= \left [ \begin{array}{c} \tanh \\ \sigma \\ \sigma \\ \sigma \\\end{array}\right ] \Big( \left [ \begin{array}{cc} W &amp; U \\\end{array} \right ] \left [ \begin{array}{c} \mathbf x_t\\\mathbf h_{t-1}\\\end{array} \right ] + b\Big)\\<br/>
+\mathbf c_t &amp;= \mathbf f_t \odot \mathbf c_{t-1} + \mathbf i_t \odot \widetilde{\mathbf c}_t\\<br/>
+\mathbf h_t &amp;= \mathbf o_t \odot \tanh(\mathbf c_t)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p><strong>记忆</strong>：循环神经网络中的隐状态 \(\mathbf h\) 存储了历史信息，可以看作是一种记忆（memory）。在简单循环网络中，隐状态每个时刻都会被重写，因此可以看作是一种短期记忆（short-term memory）。在神经网络中， 长期记忆（long-term memory）可以看作是网络参数，隐含了从训练数据中学到的经验，并更新周期要远远慢于短期记忆。而在 LSTM网络中，记忆单元 \(\mathbf c\) 可以在某个时刻捕捉到某个关键信息，并有能力将此关键信息保存一定的时间间隔。记忆单元 \(\mathbf c\) 中保存信息的生命周期要长于短期记忆 \(\mathbf h\)，但又远远短于长期记忆，因此称为长的短期记忆（long short-term memory）。</p>
+
+<h3 id="toc_0">参数学习</h3>
+
+<p>LSTM的训练算法仍然是反向传播算法，首先我们来看一下前向计算中出现的激活函数，激活函数有两个，分别是sigmoid函数函数和tanh函数<br/>
+\[<br/>
+\begin{align*}<br/>
+\sigma(z) &amp;= y = \frac{1}{1 + e^{-z}} \\<br/>
+\sigma&#39;(z) &amp;= y(1-y) \\<br/>
+\tanh(z) &amp;= y = \frac{e^z - e^{-z}}{e^z + e^{-z}}\\<br/>
+\tanh&#39;(z) &amp;= 1 - y^2\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>从上面可以看出，sigmoid和tanh函数的导数都是原函数的函数。这样，我们一旦计算原函数的值，就可以用它来计算出导数的值。</p>
+
+<p>LSTM需要学习的参数共有8组，分别是：遗忘门的权重矩阵 \(W_f\)、\(U_f\) 和偏置项 \(b_f\) 、输入门的权重矩阵 \(W_i\)、\(U_i\) 和偏置项 \(b_i\)、输出门的权重矩阵 \(W_o\)、\(U_o\) 和偏置项 \(b_o\)，以及计算候选状态的权重矩阵 \(W_c\)、\(U_c\) 和偏置项 \(b_c\)。</p>
+
+<p>我们解释一下按元素乘 \(\odot\) 符号。当 \(\odot\) 作用于两个向量时，运算如下：<br/>
+\[<br/>
+\mathbf a \odot \mathbf b = \left [ \begin{array}{c} a_1 \\ a_2 \\ a_3 \\ \dots \\ a_n \\ \end{array} \right ] \odot \left [ \begin{array}{c} b_1 \\ b_2 \\ b_3 \\ \dots \\ b_n \\ \end{array} \right ] = \left [ \begin{array}{c} a_1 b_1 \\ a_2 b_2 \\ a_3 b_3 \\ \dots \\ a_n b_n \\ \end{array} \right ]<br/>
+\]</p>
+
+<p>当 \(\odot\) 作用于一个<strong>向量</strong>和一个<strong>矩阵</strong>时，运算如下：<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbf a \odot X &amp;= \left [ \begin{array}{c} a_1 \\ a_2 \\ a_3 \\ \dots \\ a_n \\ \end{array} \right ] \odot \left [ \begin{array}{ccccc} x_{11} &amp; x_{12} &amp; x_{13} &amp; \dots &amp; x_{1n} \\ x_{21} &amp; x_{22} &amp; x_{23} &amp; \dots &amp; x_{2n} \\ x_{31} &amp; x_{32} &amp; x_{33} &amp;\dots &amp;x_{3n} \\ \vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\ x_{n1} &amp; x_{n2} &amp; x_{n3} &amp; \dots &amp; x_{nn}\\\end{array} \right ]\\<br/>
+&amp;= \left [ \begin{array}{ccccc} a_1 x_{11} &amp; a_1 x_{12} &amp; a_1 x_{13} &amp; \dots &amp; a_1 x_{1n} \\ a_2 x_{21} &amp; a_2 x_{22} &amp; a_2 x_{23} &amp; \dots &amp; a_2 x_{2n} \\ a_3 x_{31} &amp; a_3 x_{32} &amp; a_3 x_{33} &amp; \dots &amp; a_3 x_{3n} \\ \vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\ a_n x_{n1} &amp; a_n x_{n2} &amp; a_n x_{n3} &amp; \dots &amp; a_n x_{nn} \\\end{array} \right ]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>当 \(\odot\) 作用于两个矩阵时，两个矩阵对应位置的元素相乘。按元素乘可以在某些情况下简化矩阵和向量运算。例如，当一个对角矩阵右乘一个矩阵时，相当于用对角矩阵的对角线组成的向量安元素乘那个矩阵：<br/>
+\[<br/>
+\text{diag}[a] X = a\odot X<br/>
+\]</p>
+
+<p>当一个行向量右乘一个对角矩阵时，相当于这个行向量按元素乘那个矩阵对角线组成的向量：<br/>
+\[<br/>
+a^T \text{diag}[b] = a^T \odot b<br/>
+\]</p>
+
+<p>上面这两点，在我们后续推导中会多次用到。</p>
+
+<p>在t时刻，LSTM的输出值为 \(\mathbf h_t\)。我们定义t时刻的误差项 \(\delta_t\) 为：<br/>
+\[<br/>
+\delta_t = \frac{\partial E}{\partial \mathbf h_t}<br/>
+\]</p>
+
+<p>我们假设误差项是损失函数对输出值的导数，而不是对加权输入 \(\mathbf{net}_t^l\) 的导数。因为LSTM有四个加权输入，分别对于 \(\mathbf f_t\)、\(\mathbf i_t\)、\(\mathbf c_t\) 和 \(\mathbf o_t\)，我们希望往上一层传递一个误差项而不是四个。但我们仍然需要定义出这个四个加权输入，以及对应的误差项。<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbf{net}_{f,t} &amp;= W_f \mathbf h_{t-1} + U_f \mathbf x_t + \mathbf b_f\\<br/>
+\mathbf{net}_{i,t} &amp;= W_i \mathbf h_{t-1} + U_i \mathbf x_t + \mathbf b_i\\<br/>
+\mathbf{net}_{\widetilde c,t} &amp;= W_c \mathbf h_{t-1} + U_c \mathbf x_t + \mathbf b_c\\<br/>
+\mathbf{net}_{o,t} &amp;= W_o \mathbf h_{t-1} + U_o \mathbf x_o + \mathbf b_o\\<br/>
+\delta_{f,t} &amp;= \frac{\partial E}{\partial \mathbf{net}_{f,t}}\\<br/>
+\delta_{i,t} &amp;= \frac{\partial E}{\partial \mathbf{net}_{i,t}}\\<br/>
+\delta_{\widetilde c,t} &amp;= \frac{\partial E}{\partial \text{net}_{\widetilde c,t}}\\<br/>
+\delta_{o,t} &amp;= \frac{\partial E}{\partial \mathbf{net}_{o,t}}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<h3 id="toc_1">误差沿时间反向传递</h3>
+
+<p>沿时间反向传递误差项，就是要计算出 \(t-1\) 时刻的误差项 \(\delta_{t-1}\)。<br/>
+\[<br/>
+\begin{align*}<br/>
+\delta_{t-1}^T &amp;= \frac{\partial E}{\partial \mathbf h_{t-1}}\\<br/>
+&amp;= \frac{\partial E}{\partial \mathbf h_t} \frac{\partial \mathbf h_t}{\partial \mathbf h_{t-1}}\\<br/>
+&amp;= \delta_t^T \frac{\partial \mathbf h_t}{\partial \mathbf h_{t-1}}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>我们知道，\(\frac{\partial \mathbf h_t}{\partial \mathbf h_{t-1}}\) 是一个 Jacbian矩阵。如果隐藏 \(h\) 的维度是 \(N\) 的话，那么它就是一个 \(N\times N\) 矩阵。为了求出它，我们列出 \(\mathbf h_t\) 的计算公式<br/>
+\[<br/>
+\begin{align}<br/>
+\mathbf h_t &amp;= \mathbf o_t \odot \tanh(\mathbf c_t)\label{mhmoo}\\<br/>
+\mathbf c_t &amp;= \mathbf f_t \odot \mathbf c_{t-1} + \mathbf i_t \odot \widetilde{\mathbf c}_t\label{mhmoo2}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>显然，\(\mathbf o_t\)、\(\mathbf f_t\)、\(\mathbf i_t\)、\(\widetilde{\mathbf c}_t\) 都是 \(\mathbf h_{t-1}\) 的函数，那么利用全导数公式可得：<br/>
+\[<br/>
+\begin{align}<br/>
+\delta_t^T \frac{\partial \mathbf h_t}{\partial \mathbf h_{t-1}} &amp;= \delta_t^T \frac{\partial \mathbf h_t}{\partial \mathbf o_t} \frac{\partial \mathbf o_t}{\partial \mathbf{net}_{o,t}} \frac{\partial \mathbf{net}_{o,t}}{\partial \mathbf h_{t-1}} + \delta_t^T \frac{\partial \mathbf h_t}{\partial \mathbf c_t} \frac{\partial \mathbf c_t}{\partial \mathbf f_t} \frac{\partial \mathbf f_t}{\partial \mathbf{net}_{f,t}} \frac{\partial \mathbf{net}_{f,t}}{\partial \mathbf h_{t-1}} + \delta_t^T \frac{\partial \mathbf h_t}{\partial \mathbf c_t} \frac{\partial \mathbf c_t}{\partial \mathbf i_t} \frac{\partial \mathbf i_t}{\partial \mathbf{net}_{i,t}} \frac{\partial \mathbf{net}_{i,t}}{\partial \mathbf h_{t-1}} + \delta_t^T \frac{\partial{\mathbf{h_t}}}{\partial{\mathbf{c}_t}}\frac{\partial{\mathbf{c}_t}}{\partial{\mathbf{\tilde{c}}_{t}}}\frac{\partial{\mathbf{\tilde{c}}_t}}{\partial{\mathbf{net}_{\tilde{c},t}}}\frac{\partial{\mathbf{net}_{\tilde{c},t}}}{\partial{\mathbf{h_{t-1}}}}\nonumber\\<br/>
+&amp;= \delta_{o,t}^T \frac{\partial \mathbf{net}_{o,t}}{\partial \mathbf h_{t-1}} + \delta_{f,t}^T \frac{\partial \mathbf{net}_{f,t}}{\partial \mathbf h_{t-1}}  + \delta_{i,t}^T \frac{\partial \mathbf{net}_{i,t}}{\partial \mathbf h_{t-1}} + \delta_{\widetilde c,t}^T \frac{\partial \mathbf{net}_{\widetilde c,t}}{\partial h_{t-1}}\label{dftpm}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>下面我们求出上式中的每一个偏导数，根据 ( \ref{mhmoo} ) ，我们可以求出：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial \mathbf h_t}{\partial \mathbf o_t} &amp;= \text{diag}[\tanh(\mathbf c_t)]\\<br/>
+\frac{\partial \mathbf h_t}{\partial \mathbf c_t} &amp;= \text{diag}[\mathbf o_t \odot (1 - \tanh(\mathbf c_t)^2 )]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>根据 ( \ref{mhmoo2} )，我们可以求出：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial \mathbf c_t}{\partial \mathbf f_t} &amp;= diag[\mathbf c_{t-1}]\\<br/>
+\frac{\partial \mathbf c_t}{\partial \mathbf i_t} &amp;= diag[\widetilde{\mathbf c}_t] \\<br/>
+\frac{\partial \mathbf c_t}{\partial \widetilde{\mathbf c}_t} &amp;= diag[\mathbf i_t]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>因为：<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbf o_t &amp;= \sigma(\mathbf{net}_{o,t}) \\<br/>
+\mathbf{net}_{o,t} &amp;= W_{oh} \mathbf h_{t-1} + W_{ox} \mathbf x_t + \mathbf b_o\\<br/>
+\\<br/>
+\mathbf f_t &amp;= \sigma(\mathbf{net}_{f,t}) \\<br/>
+\mathbf{net}_{f,t} &amp;= W_{fh} \mathbf h_{t-1} + W_{fx} \mathbf x_t + \mathbf b_f\\<br/>
+\\<br/>
+\mathbf i_t &amp;= \sigma(\mathbf{net}_{i,t}) \\<br/>
+\mathbf{net}_{i,t} &amp;= W_{ih} \mathbf h_{t-1} + W_{ix} \mathbf x_t + \mathbf b_i\\<br/>
+\\<br/>
+\widetilde{\mathbf c}_t &amp;= \tanh(\mathbf{net}_{\widetilde c,t})\\<br/>
+\mathbf{net}_{\widetilde c,t} &amp;= W_{ch} \mathbf h_{t-1} + W_{cx} \mathbf x_t + \mathbf b_c\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>我们容易得出<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial \mathbf o_t}{\partial \mathbf{net}_{o,t}} &amp;= diag[\mathbf o_t \odot (1- \mathbf o_t)]\\<br/>
+\frac{\partial \mathbf{net}_{o,t}}{\partial \mathbf h_{t-1}} &amp;= W_{oh}\\<br/>
+\frac{\partial \mathbf f_t}{\partial \mathbf{net}_{f,t}} &amp;= diag[\mathbf f_t \odot (1 - \mathbf f_t)]\\<br/>
+\frac{\partial \mathbf{net}_{f,t}}{\partial \mathbf h_{t-1}} &amp;= W_{fh}\\<br/>
+\frac{\partial \mathbf i_t}{\partial \mathbf{net}_{i,t}} &amp;= diag[\mathbf i_t \odot (1 - \mathbf i_t)]\\<br/>
+\frac{\partial \mathbf{net}_{i,t}}{\partial \mathbf h_{t-1}} &amp;= W_{ih}\\<br/>
+\frac{\partial \widetilde{\mathbf c}_t}{\partial \mathbf{net}_{\widetilde c,t}} &amp;= diag[1 - \widetilde{\mathbf c}_t^2]\\<br/>
+\frac{\partial \mathbf{net}_{\widetilde c,t}}{\partial \mathbf h_{t-1}} &amp;= W_{ch}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>将上述偏导数代入 ( \ref{dftpm} ) 中，可以得到：<br/>
+\[<br/>
+\begin{align}<br/>
+\delta_{t-1}^T &amp;= \delta_{o,t}^T \frac{\partial \mathbf{net}_{o,t}}{\partial \mathbf h_{t-1}} + \delta_{f,t}^T \frac{\partial \mathbf{net}_{f,t}}{\partial \mathbf h_{t-1}} + \delta_{i,t}^T \frac{\partial \mathbf{net}_{i,t}}{\partial \mathbf h_{t-1}} + \delta_{\widetilde c,t}^T \frac{\partial \mathbf{net}_{\widetilde c,t}}{\partial \mathbf h_{t-1}}\nonumber\\<br/>
+&amp;= \delta_{o,t}^T W_{oh} + \delta_{f,t}^T W_{fh} + \delta_{i,t}^T W_{ih} + \delta_{\widetilde c,t}^T W_{ch}\label{dotwd}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>根据 \(\delta_{o,t}\)、\(\delta_{f,t}\)、\(\delta_{i,t}\) 和 \(\delta_{\widetilde c,t}\) 的定义，可知：<br/>
+\[<br/>
+\begin{align}<br/>
+\delta_{o,t}^T &amp;= \frac{\partial E}{\partial \mathbf{net}_{o,t}} \\<br/>
+&amp;= \frac{\partial E}{\partial \mathbf h_t} \frac{\partial \mathbf h_t}{\partial \mathbf{net}_{o,t}}\nonumber\\<br/>
+&amp;= \delta_t^T \frac{\partial \mathbf h_t}{\partial \mathbf{net}_{o,t}}\nonumber\\<br/>
+&amp;= \delta_t^T \frac{\partial \mathbf h_t}{\partial \mathbf o_t} \frac{\partial \mathbf o_t}{\partial \mathbf{net}_{o,t}}\nonumber\\<br/>
+&amp;= \delta_t^T diag[\tanh(\mathbf c_t)] diag[\mathbf o_t \odot (1- \mathbf o_t)]\nonumber\\<br/>
+&amp;= \delta_t^T diag[\tanh(\mathbf c_t) \odot \mathbf o_t \odot (1 - \mathbf o_t)]\nonumber\\<br/>
+&amp;= \delta_t^T \odot \mathbf \tanh(\mathbf c_t) \odot \mathbf o_t \odot (1 - \mathbf o_t)\label{dotwd1}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>同理<br/>
+\[<br/>
+\begin{align}<br/>
+\delta_{f,t}^T &amp;= \delta_t^T \odot \mathbf o_t \odot (1 - \tanh(\mathbf c_t)^2) \odot \mathbf c_{t-1} \odot \mathbf f_t \odot (1 - \mathbf f_t) \label{dotwd2}\\<br/>
+\delta_{i,t}^T &amp;= \delta_t^T \odot \mathbf o_t \odot (1 - \tanh(\mathbf c_t)^2) \odot \widetilde{\mathbf c}_t \odot \mathbf i_t ( 1- \mathbf i_t)\label{dotwd3}\\<br/>
+\delta_{\widetilde c,t}^T &amp;= \delta_t^T \odot \mathbf o_t \odot ( 1 - \tanh(\mathbf c_t)^2) \odot \mathbf i_t \odot (1 - \widetilde{\mathbf c}^2 ) \label{dotwd4}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>式 ( \ref{dotwd} ) 到式 ( \ref{dotwd4} ) 就是将误差沿时间反向传播一个时刻的公式。有了它，我们可以写出将误差项向前传递到任意时刻 \(k\) 的公式。</p>
+
+<h3 id="toc_2">将误差项传递到上一层</h3>
+
+<p>我们假设当前层为第 \(l\) 层，定义 \(l-1\) 层的误差项是误差函数对 \(l-1\) 层的加权输入的导数，即：<br/>
+\[<br/>
+\delta_t^{l-1} = \frac{E}{\partial \mathbf{net}_t^{l-1}}<br/>
+\]</p>
+
+<p>本次LSTM的输入 \(x_t\) 由下面的公式计算：<br/>
+\[<br/>
+\mathbf x_t^l = f^{l-1}(\mathbf{net}_t^{l-1})<br/>
+\]</p>
+
+<p>上式中，\(f^{l-1}\) 表示第 \(l-1\) 层的激活函数。</p>
+
+<p>因为 \(\mathbf{net}_{f,t}^l\)、\(\mathbf{net}_{i,t}^l\)、\(\mathbf{net}_{\widetilde{c},t}^l\)、\(\mathbf{net}_{o,t}^l\) 都是 \(\mathbf x_t\) 的函数，\(\mathbf{x}_t \) 又是 \(\mathbf{net}_t^{l-1}\) 的函数，因此，要求 \(E\) 对  \(\mathbf{net}_t^{l-1}\) 的导数，就需要用全导数公式：<br/>
+\[<br/>
+\begin{align}<br/>
+\frac{\partial E}{\partial \mathbf{net}_t^{l-1}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{f,t}^l} \frac{\partial \mathbf{net}_{f,t}^l}{\partial \mathbf x_t^l} \frac{\partial \mathbf x_t^l}{\partial \mathbf{net}_t^{l-1}} + \frac{\partial E}{\partial \mathbf{net}_{i,t}^l}\frac{\partial \mathbf{net}_{i,t}^l}{\partial \mathbf x_t^l}\frac{\partial \mathbf x_t^l}{\partial \mathbf{net}_t^{l-1}} + \frac{\partial E}{\partial \mathbf{net}_{\widetilde c,t}^l}\frac{\partial \mathbf{net}_{\widetilde c,t}^l}{\partial \mathbf{net}_{\widetilde c,t}^t}{\partial \mathbf x_t^l} \frac{\partial \mathbf x_t^l}{\partial \mathbf{net}_t^{l-1}} + \frac{\partial E}{\partial \mathbf{net}_{o,t}^l} \frac{\partial \mathbf{net}_{o,t}^l}{\partial \mathbf x_t^l}\frac{\partial \mathbf x_t^l}{\partial \mathbf{net}_t^{l-1}}\nonumber\\<br/>
+&amp;= \delta^T_{f,t} W_{fx} \odot f&#39;(\mathbf{net}_t^{l-1}) + \delta^T_{i,t} W_{ix} \odot f&#39;(\mathbf{net}_t^{l-1}) + \delta^T_{\widetilde c,t} W_{cx}\odot f&#39;(\mathbf{net}_t^{l-1}) + \delta^T_{o,t} W_{ox} \odot f&#39;(\mathbf{net}_t^{l-1})\nonumber\\<br/>
+&amp;= (\delta^T_{f,t} W_{fx} + \delta^T_{i,t} W_{ix} + \delta_{\widetilde{c},t}^T W_{cx} + \delta_{o,t}^T W_{ox}) \odot f&#39;(\mathbf{net}_t^{l-1})\label{dtftw}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>式 ( \ref{dtftw} ) 就是将误差传递到上一层的公式。</p>
+
+<h3 id="toc_3">权重梯度的计算</h3>
+
+<p>对于 \(W_{fh}\)、\(W_{ih}\)、\(W_{ch}\)、\(W_{oh}\) 的权重梯度，我们知道它的梯度式各个时刻的梯度之和，我们首先求出它们在 \(t\) 时刻的梯度，然后再求出他们最终的梯度。</p>
+
+<p>我们已经求得了误差项 \(\delta_{o,t}\)、\(\delta_{f,t}\)、\(\delta_{i,t}\)、\(\delta_{\widetilde{c},t}\)，很容易求出 \(t\) 时刻的 \(W_{fh}\)、\(W_{ih}\)、\(W_{ch}\)、\(W_{oh}\)：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial E}{\partial W_{oh,t}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{o,t}} \frac{\partial \mathbf{net}_{o,t}}{\partial W_{oh,t}}\\<br/>
+&amp;= \delta_{o,t} \mathbf h_{t-1}^T\\<br/>
+\frac{\partial E}{\partial W_{fh,t}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{f,t}} \frac{\partial \mathbf{net}_{f,t}}{\partial W_{fh,t}}\\<br/>
+&amp;= \delta_{f,t} \mathbf h_{t-1}^T\\<br/>
+\frac{\partial E}{\partial W_{ih,t}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{i,t}} \frac{\partial \mathbf{net}_{i,t}}{\partial W_{ih,t}} \\<br/>
+&amp;= \delta_{i,t} \mathbf h_{t-1}^T\\<br/>
+\frac{\partial E}{\partial W_{ch,t}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{\widetilde{c},t}} \frac{\partial \mathbf{net}_{\widetilde{c},t}}{\partial W_{ch,t}}\\<br/>
+&amp;= \delta_{\widetilde{c},t} \mathbf h_{t-1}^T \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>将各个时刻的梯度加在一起，就能得到最终的梯度：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial E}{\partial W_{oh}} = \sum_{j=1}^t \delta_{o,j} \mathbf h_{j-1}^T\\<br/>
+\frac{\partial E}{\partial W_{fh}} = \sum_{j=1}^t \delta_{f,j} \mathbf h_{j-1}^T\\<br/>
+\frac{\partial E}{\partial W_{ih}} = \sum_{j=1}^t \delta_{i,j} \mathbf h_{j-1}^T\\<br/>
+\frac{\partial E}{\partial W_{ch}} = \sum_{j=1}^t \delta_{\widetilde{c},j} \mathbf h_{j-1}^T \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>对于偏置项 \(\mathbf b_{f}\)、\(\mathbf b_{i}\)、\(\mathbf b_{c}\)、\(\mathbf b_{o}\) 的梯度，也是将各个时刻的梯度加在一起。下面是各个时刻的偏置项梯度：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial E}{\partial \mathbf b_{o,t}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{o,t}} \frac{\partial \mathbf{net}_{o,t}}{\partial \mathbf b_{o,t}}\\<br/>
+&amp;= \delta_{o,t}\\<br/>
+\frac{\partial E}{\partial \mathbf b_{f,t}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{f,t}} \frac{\partial \mathbf{net}_{f,t}}{\partial \mathbf b_{f,t}}\\<br/>
+&amp;= \delta_{f,t}\\<br/>
+\frac{\partial E}{\partial \mathbf b_{i,t}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{i,t}} \frac{\partial \mathbf{net}_{i,t}}{\partial \mathbf b_{i,t}}\\<br/>
+&amp;= \delta_{i,t}\\<br/>
+\frac{\partial E}{\partial \mathbf b_{c,t}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{\widetilde{c},t}} \frac{\partial \mathbf{net}_{\widetilde{c},t}}{\partial \mathbf b_{c,t}}\\<br/>
+&amp;= \delta_{\widetilde{c},t}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>下面是最终的偏置项梯度，即将各个时刻的偏置项梯度加在一起：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial E}{\partial \mathbf{b}_o} = \sum_{j=1}^t \delta_{o,j}\\<br/>
+\frac{\partial E}{\partial \mathbf{b}_i} = \sum_{j=1}^t \delta_{i,j}\\<br/>
+\frac{\partial E}{\partial \mathbf{b}_f} = \sum_{j=1}^t \delta_{f,j}\\<br/>
+\frac{\partial E}{\partial \mathbf{b}_c} = \sum_{j=1}^t \delta_{\widetilde{c},j}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>对于 \(W_{fx}\)、\(W_{ix}\)、\(W_{cx}\)、\(W_{ox}\) 的权重梯度，只需要根据相应的误差项直接计算即可：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial E}{\partial W_{ox}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{o,t}}\frac{\partial \mathbf{net}_{o,t}}{\partial W_{ox}}\\<br/>
+&amp;= \delta_{o,t} \mathbf x_t^T \\<br/>
+\frac{\partial E}{\partial W_{fx}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{f,t}} \frac{\partial \mathbf{net}_{f,t}}{\partial W_{fx}} \\<br/>
+&amp;= \delta_{f,t} \mathbf x_t^T \\<br/>
+\frac{\partial E}{\partial W_{ix}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{i,t}} \frac{\partial \mathbf{net}_{i,t}}{\partial W_{ix}} \\<br/>
+&amp;= \delta_{i,t} \mathbf x_t^T \\<br/>
+\frac{\partial E}{\partial W_{cx}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{\widetilde{c},t}} \frac{\partial \mathbf{net}_{\widetilde{c},t}}{\partial W_{cx}} \\<br/>
+&amp;= \delta_{\widetilde{c},t} \mathbf x_t^T\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>以上就是LSTM的训练算法的全部公式。</p>
+
+<hr/>
+
+<p><a href="https://zybuluo.com/hanbingtao/note/581764">零基础入门深度学习(6) - 长短时记忆网络(LSTM)</a></p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html'>神经网络</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15378797300710.html" 
+	        title="Previous Post: 强化学习 Reinforcement Learning">&laquo; 强化学习 Reinforcement Learning</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15357311876395.html" 
+	        title="Next Post: 人工神经网络-递归神经网络">人工神经网络-递归神经网络 &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

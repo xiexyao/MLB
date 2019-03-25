@@ -1,0 +1,1017 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  概率近似正确学习 PAC Learning - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">概率近似正确学习 PAC Learning</h1>
+				<p class="meta"><time datetime="2018-01-05T20:55:04+08:00" pubdate data-updated="true">2018/1/5</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>在计算机学习理论中，PAC 是英文 probably approximately correct 的缩写，是机器学习数学分析的框架，它由 Leslie Valiant 在 1994 年提出。</p>
+
+<h3 id="toc_0">前置知识</h3>
+
+<p>在学习 PAC 之前先看一下相关的概念：假设空间、版本空间、泛化误差和经验误差。</p>
+
+<h5 id="toc_1">假设空间 hypothesis space</h5>
+
+<p>所有属性可能取值组成的假设的集合称为假设空间，学习的过程可以看作是在假设空间中进行搜索的过程，搜索目标是找到与训练集“匹配”的假设，即能够将训练集中数据正确表示的假设。假设的表示一旦确定，假设空间规模大小就确定了。如以下的例子：<br/>
+\[<br/>
+\begin{array}{ccccc}\\\hline<br/>
+\text{编号}\quad&amp;\quad\text{色泽}\quad&amp;\text{根蒂}\quad&amp;\quad\text{敲声}\quad&amp;\quad\text{好瓜}\quad\\\hline<br/>
+\text{1}\quad&amp;\quad\text{青绿}\quad&amp;\text{蜷缩}\quad&amp;\quad\text{浊响}\quad&amp;\quad\text{是}\quad\\<br/>
+\text{2}\quad&amp;\quad\text{乌黑}\quad&amp;\text{蜷缩}\quad&amp;\quad\text{浊响}\quad&amp;\quad\text{是}\quad\\<br/>
+\text{3}\quad&amp;\quad\text{青绿}\quad&amp;\text{硬挺}\quad&amp;\quad\text{清脆}\quad&amp;\quad\text{否}\quad\\<br/>
+\text{4}\quad&amp;\quad\text{乌黑}\quad&amp;\text{稍蜷}\quad&amp;\quad\text{沉闷}\quad&amp;\quad\text{否}\quad\\\hline<br/>
+\end{array}<br/>
+\]</p>
+
+<p>这里我们的假设空间由“色泽=？”、“根蒂=”、“敲声=？”三个属性的所有可能取值所形成的假设组成。例如，色泽的三个可能取值是“青绿”、“乌黑”、“浅白”，根蒂的三个可能取值是“蜷缩”、“稍蜷”、“硬挺”，敲声的三个取值是“浊响”，“清脆”，“沉闷”。还有可能不论色泽和根蒂是什么，只要是敲声是浊响的都是好瓜，即“色泽=* ” \(\land\) “根蒂=* ” \(\land\) “敲声=浊响” \(\leftrightarrow\) “好瓜”，所以每一种属性都要加上通配符 * ，所以每种属性都有4种可能，总共是 \(4^3=64\) 种可能。还有可能好瓜根本不存在，所以总共假设空间的规模大小是65。有了假设空间之后，要根据已获取的信息（数据集）来对假设空间进行剪枝。即要找到一个与训练集匹配的假设空间子集。</p>
+
+<h5 id="toc_2">版本空间 version space</h5>
+
+<p>在现实问题中我们常面临很大的假设空间，但学习的过程是给予有限样本训练集进行的，因此，可能有多个假设与训练集一致，即存在着一个与训练集一致的“假设集合”，我们称之为“版本空间”。如上面的例子中，假设空间的规模大小是65，删除与正例不一致的假设和与反例一致的假设即可得到版本空间。假设空间里如果有“色泽=青绿，根蒂=*，敲声=* ”的瓜是好瓜的假设，由编号3的训练集可知假设是不正确的，需要从假设空间里删除，最终留下来的就是版本空间。版本空间<font color=red><strong>不一定</strong></font>是正确的，也可能只是在训练集上是正确的，因此，要想判断的正确，就要全面、大量的训练，以排除更多假设空间中的错误假设。错误假设越少，剩下的假设越少，就越有可能是正确假设，我们判断的结果的正确概率越大。因为最终的假设会随着版本（数据集）变化而变化，所以叫做版本空间。</p>
+
+<h5 id="toc_3">经验误差</h5>
+
+<p>学习器在训练集上产生的误差叫做经验误差，由于这个误差是针对训练集的，因此又叫训练误差。训练数据也可以称之为经验，这就是经验误差的由来。</p>
+
+<h5 id="toc_4">泛化误差</h5>
+
+<p>机器学习的目标是使学得的模型能很好地适用于“新样本”，而不仅仅是在训练样本上工作很好，学得模型适用于新样本的能力我们称为“泛化（generalization）“能力，具有强泛化能力的模型能更好的适应于整个样本空间。这里泛化能力的度量便是泛化误差，泛化误差越小，也就是越能适用于新样本。一般来说，训练样本越多，经验误差可以越小，但是泛化误差不一定，可能会出现过拟合的情况。</p>
+
+<h3 id="toc_5">PAC 学习理论 PAC learning theory</h3>
+
+<p>计算学习理论中最基本的是概率近似正确学习理论，来研究什么时候一个问题是可以被学习的。</p>
+
+<p>首先我们来考虑一下机器学习算法的目的，机器学习算法是通过希望学习一个模型能很好地完成从样本空间 \(\mathcal X\) 到标记空间 \(\mathcal Y\) 的映射。这样的每一个映射，我们称之为概念 concept ，用 \(c\) 表示。若对于样例 \((x,y)\) 有 \(c(x)=y\) 成立，则称 \(c\) 为目标概念。所有我们希望学得的目标概念所构成的集合称为“概念类（concept class）”，用符号 \(\mathcal C\) 表示。</p>
+
+<p>对于给定的算法 \(\Phi\) ，它所考虑的所有可能概念的集合被称为“假设空间”，用符号 \(\mathcal H\) 表示，其中单个的概念称之为假设。</p>
+
+<p>若目标概念 \(c \in \mathcal H\)，则 \(\mathcal H\) 中存在假设能将所有示例按与真实标记一致的方式完全分开，我们称该问题对学习算法 \(\mathcal L\) 是“可分的（separable）”，亦称“一致的（consistent）”。 反之，若算法的假设空间中不包含目标概念，则称该数据集对算法是“不可分的”或称“不一致的”。</p>
+
+<p>举个简单的例子：对于非线性分布的数据集，若使用一个线性分类器，则该线性分类器对应的假设空间就是空间中所有可能的超平面，显然假设空间不包含该数据集的目标概念，所以称数据集对该学习器是不可分的。给定一个数据集D，我们希望模型学得的假设 \(h\) 尽可能地与目标概念一致，这便是概率近似正确 (Probably Approximately Correct，简称PAC)的来源，即以较大的概率学得误差满足预设上限的模型。这就是“概率”“近似正确”的含义，形式化地说，令 \(\delta\) 表示置信度，可定义：</p>
+
+<p><b>PAC辨识（PAC Identify）</b>：对 \(\epsilon &gt; 0\)，\(\delta &lt; 1\)，所有 \(c\in \mathcal C\) 和分布 \(\mathcal D\)，若存在学习算法 \(\mathcal L\) ，其输出假设 \(h \in \mathcal H\) 满足：<br/>
+\[<br/>
+P(\mathrm{E}(h) \le \epsilon) \ge 1 - \delta<br/>
+\]</p>
+
+<p>其中\(\mathrm{E}(h)\) 表示泛化误差，则称学习算法 \(\mathcal L\) 能从假设空间 \(\mathcal H\) 中PAC辨识出概念类 \(\mathcal C\)，这样的学习算法 \(\mathcal L\) 能以较大的概率（至少 \(1-\delta\)）学得学习目标概念 \(c\) 的近似（误差最多为 \(\epsilon\)）。</p>
+
+<p>PAC 辨识也可以写成如下形式：<br/>
+\[<br/>
+\begin{align*}<br/>
+P(\mathrm{E}(h) \gt \epsilon) &amp;= 1 - P(\mathrm{E}(h) \le \epsilon) \\<br/>
+&amp;\le 1 - (1-\delta) \\<br/>
+&amp;= \delta\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>表示泛化误差大于 \(\epsilon\) 的概率不大于 \(\delta\)。在此基础上可以定义：</p>
+
+<p><b>PAC可学习性（PAC Learnable）</b>：令 \(m\) 表示从分布 \(\mathcal D\) 中独立同分布采样得到的样本数目，\(\epsilon &gt; 0\)，\(\delta &lt; 1\)，对所有分布 \(\mathcal D\)，若存在学习算法 \(\mathcal L\) 和多项式函数 \(\text{poly}(\cdot,\cdot,\cdot,\cdot)\) ，使得对于任何 \(m\ge \text{poly}(1/\epsilon,1/\delta,\text{size(}\mathbf x\text{),size(c)})\)，\(\mathcal L\) 能从假设空间 \(\mathcal H\) 中PAC 辨识概念类 \(\mathcal C\)，则称概念类 \(\mathcal C\) 对假设空间 \(\mathcal H\) 而言是 PAC 可学习的，有时候也称概念类 \(\mathcal C\) 是 PAC 可学习的。其中 \(\text{size(}x)\) 数据本身的复杂度，\(\text{size}(c)\) 为目标概念的复杂度。</p>
+
+<p>对于计算机而言，必然要考虑时间复杂性，于是：</p>
+
+<p><b>PAC学习算法（PAC Learning Algorithm）</b>：若学习算法 \(\mathcal L\) 使概念类 \(\mathcal C\) 可学习的，且 \(\mathcal L\) 的运行时间也是多项式函数 \(\text{poly(}1/\epsilon,1/\delta,\text{size(}\mathbf x\text{),size(c)})\)，则称概念类 \(\mathcal C\) 是高效PAC可学习的（efficiently PAC learnable）的，称 \(\mathcal L\) 为概念类 \(\mathcal C\) 的 PAC 学习算法。</p>
+
+<p>假设学习算法 \(\mathcal L\) 处理每一个样本的时间为常数，则 \(\mathcal L\) 的时间复杂度等价于样本的时间复杂度。于是，我们对算法时间复杂度的关心就转变为对样本复杂度的关系：</p>
+
+<p><b>样本复杂度（Sample Complexity）</b>：满足 PAC 学习算法 \(\mathcal L\) 所需要的 \(m \ge \text{poly(}1/\epsilon,1/\delta,\text{size(}\mathbf x),\text{size(c))}\) 中的最小的 \(m\)，称之为学习算法 \(\mathcal L\) 的样本复杂度。</p>
+
+<p>PAC 学习中一个关键因素是假设空间 \(\mathcal H\) 的复杂度。\(\mathcal H\) 包含了学习算法 \(\mathcal L\) 所有可能输出的假设，若在 PAC 学习中假设空间与概念类完全相同，即 \(\mathcal H=\mathcal C\)，这称为 “恰 PAC 可学习”；直观上看，这意味着学习算法的能力与学习任务 ”恰好匹配“ 。然而，通常我们目标概念 \(\mathcal C\) 一无所知，显然，更重要的是研究假设空间和目标概念不一样的情况，即 \(\mathcal H \ne C\) 。一般而言，\(\mathcal H\) 越大，其包含任意目标概念的可能性越大，但从中找到某个具体目标概念的难度也越大。 \(\mathcal H\) 有限时，我们称 \(\mathcal  H\) 为“有限假设空间”，否则称为“无限假设空间”。</p>
+
+<h3 id="toc_6">有限假设空间</h3>
+
+<h5 id="toc_7">可分情形</h5>
+
+<p>可分情形意味着目标概念 \(c\) 属于假设空间 \(\mathcal H\)，即 \(c\in \mathcal H\)，若给定包含 \(m\) 个数据集的训练样本 \(D\)，如何找出满足误差参数的假设呢？既然 \(D\) 中样例标记都是有目标概念 \(c\) 赋予的，并且 \(c\) 存在于假设空间 \(\mathcal H\) 中，那么，任何在训练集 \(D\) 上出现的标记错误的假设肯定不是目标概念 \(c\) 。于是，我们只需要保留与 \(D\) 一致的假设，剔除与 \(D\) 不一致的假设即可，若训练集 \(D\) 足够大，则可不断借助 \(D\) 中样例剔除不一致的假设，直到 \(\mathcal H\) 中仅剩下一个假设为止，这个假设就是目标概念 \(c\) 。通常情况下，由于训练集规模有限，假设空间 \(\mathcal H\) 中可能存在不止一个与 \(D\) 一致的“等效”假设，对于这些等效假设，无法根据 \(D\) 来对它们做进一步的区分。</p>
+
+<p>到底需要多少样例才能学得目标概念 \(c\) 得有效近似呢？对 PAC 学习而言，只要训练集 \(D\) 的规模能使学习算法 \(\mathcal L\) 以概率 \(1-\delta\) 找到目标假设的 \(\epsilon\) 近似即可。</p>
+
+<p>我们先估计泛化误差大于 \(\epsilon\) 但在训练集上仍表现完美的假设出现的概率。假定 \(h\) 的泛化误差大于 \(\epsilon\) ，即\(\mathrm{E}(h) \gt \epsilon\)，对分布 \(D\) 上随机采样而得的任何样例 \((x,y)\)，有：<br/>
+\[<br/>
+\begin{align*}<br/>
+P(h(x) = y) &amp;= 1-P(h(x) \neq y)\\<br/>
+&amp;= 1- \mathrm{E}(h)\\<br/>
+&amp;\lt 1 - \epsilon<br/>
+\end{align*}<br/>
+\] </p>
+
+<p>由于 \(D\) 包含 \(m\) 个从 \(\mathcal D\) 中独立同分布采样而得的样例，因此，\(h\) 与 \(D\) 表现一致的概率为：<br/>
+\[<br/>
+P(h(x_1) = y_1) \land P(h(x_2) = y_2) \land ... \land P(h(x_m) = y_m) = (1-P(h(x)\neq y)^m \lt (1-\epsilon)^m<br/>
+\]</p>
+
+<p>我们事先并不知道学习算法 \(\mathcal L\) 会输出 \(\mathcal H\) 中的那个假设，但仅需保证泛化误差大于 \(\epsilon\) ，且在训练集上表现完美的所有假设出现概率之和不大于 \(\delta\) 即可：<br/>
+\[<br/>
+\begin{equation}<br/>
+P(h\in \mathcal H:\mathrm{E}(h) &gt; \epsilon \land \hat {\mathrm{E}}(h) = 0) \lt \sum_{i=1}^{|\mathcal H|}  (1-\epsilon)^m \lt |\mathcal H|(1-\epsilon)^m\\\label{hiH}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>考虑到 \(1-x &lt; e^{-x}\) ，证明：<br/>
+令 \(F(x) = e^{-x} - 1 + x\)，当 \(x \ge 0\) 时有： <br/>
+\[<br/>
+F&#39;(x) = -e^{-x} + 1 \ge 0<br/>
+\]</p>
+
+<p>所以 \(F(x)\) 在 \(x \ge 0\) 时单调递增，\(F(x) \ge F(0) = 0 \)，所以得证。</p>
+
+<p>所以式(\ref{hiH})可以写为：<br/>
+\[<br/>
+P(h\in \mathcal H:\mathrm{E}(h) &gt; \epsilon \land \hat {\mathrm{E}}(h) = 0) \lt |\mathcal H|(1-\epsilon)^m\lt |\mathcal H|e^{-m\epsilon}<br/>
+\]</p>
+
+<p>令上式不大于 \(\delta\) ，即：<br/>
+\[<br/>
+|\mathcal H|e^{-m\epsilon} \le \delta<br/>
+\]</p>
+
+<p>可得：<br/>
+\[<br/>
+\begin{equation}<br/>
+m \ge \frac 1 \epsilon (\ln{|\mathcal H| + \ln{\frac 1 \delta}}) \label{yxm}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>由此可知，有限假设空间 \(\mathcal H\) 都是 PAC 可学习的，所需的样例数目如(\ref{yxm})所示，输出假设 \(h\) 的泛化误差随样本数目的增多而收敛到 0，收敛速度为 \(O(\frac 1 m)\) 。</p>
+
+<h5 id="toc_8">不可分情形</h5>
+
+<p>对于目标概念不存在于假设空间中 \(\mathcal H\) 中，假定对于任何的 \(h\in\mathcal H\)，\(\mathrm{\hat E(h)}\ne 0\)，也就是 \(\mathcal H\) 中的任意一个假设都会在训练集上产生或多或少的错误。由泛化误差 \(\mathrm{E}(h)\) 与经验误差 \(\mathrm{\hat E(h)}\) 的定义易知 \(\mathbb E(\mathrm{\hat E(h)})=\mathrm{E(h)}\) ，因此由霍夫丁不等式理论一可得出定义。</p>
+
+<p><b>若训练集 \(D\) 中包含 \(m\) 个从分布 \(\mathcal D\) 上独立同分布采样而得的样例，\(0\lt \epsilon\lt 1\)，则对任意 \(h\in\mathcal H\)，有：</b></p>
+
+<p>\[<br/>
+\begin{align}<br/>
+&amp;P\big(\mathrm{\hat E(h)- E(h)}\ge \epsilon\big)\leq e^{-2m\epsilon^{2}}\label{dbo1}\\<br/>
+&amp;P\big(\mathrm{E(h)-\hat E(h)}\ge \epsilon\big)\leq e^{-2m\epsilon^{2}}\label{dbo2}\\<br/>
+&amp;P\big(\big|\mathrm{\hat E(h)- E(h)}\big|\ge \epsilon\big)\leq 2e^{-2m\epsilon^{2}}\label{dbo3}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>上面各式可以用霍夫丁不等式定理一得到，等式中 \(\mathrm{E}(h)\) 可以看成 \(\mathbb E\big[\mathrm{\hat E}(h)\big]\)，所以 \(\mathrm{\hat E}(h) - \mathrm{E}(h)\) 可以写成 \(\mathrm{\hat E}(h) - \mathbb E\big[\mathrm{\hat E}(h)\big]\)，再运用霍夫丁不等式即可。</p>
+
+<p><strong>推论：若训练集 \(D\) 包含 \(m\) 个从 \(\mathcal D\) 中 i.i.d 采样而得的样本，\(0\lt \epsilon \lt 1\)，则对 \(h\in \mathcal H\) ，式(\ref{tl})以至少 \(1-\delta\) 的概率成立：</strong><br/>
+\[<br/>
+\begin{equation}<br/>
+\mathrm{\hat E}(h) - \sqrt{\frac{\ln(2/\delta)}{2m}} \lt \mathrm{E}(h) \lt \mathrm{\hat E}(h) + \sqrt{\frac{\ln(2/\delta)}{2m}} \label{tl}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<blockquote>
+<p>下面简单证明一下这个推论：由(\ref{dbo3})式可知 \(P\big(\big|\mathrm{\hat E(h)- E(h)}\big|\gt \epsilon\big)\leq 2e^{-2m\epsilon^{2}}\)，该式子可以写成：<br/>
+\[<br/>
+\begin{align}<br/>
+P \big(\big|\mathrm{\hat E(h)- E(h)}\big|\le \epsilon\big)\ge 1-2e^{-2m\epsilon^{2}}\label{dbo4}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>令 \(\delta = 2\exp({-2m\epsilon^2})\)，所以：<br/>
+\[<br/>
+\epsilon = \sqrt{\frac{\ln(2/\delta)}{2m}}<br/>
+\]</p>
+
+<p>所以由(\ref{dbo4})式可知 \(\big|\mathrm{\hat E(h)- E(h)}\big|\le\sqrt{\frac{\ln(2/\delta)}{2m}}\) 的概率不小于 \(1-\delta\)，整理可得推论。</p>
+</blockquote>
+
+<p>推论说明样本数目 \(m\) 较大时，\(h\) 的经验误差是其泛化误差很好的近似。对于有限假设空间我们有：<br/>
+\[<br/>
+P\Bigg( \Big| \mathrm{E}(h) - \mathrm{\hat E}(h)\Big| \le \sqrt{\frac{\ln|\mathcal H| + \ln(2/\delta)}{2m}}  \Bigg) \ge 1 - \delta<br/>
+\]</p>
+
+<blockquote>
+<p>证明：令 \(h_1,h_2,...,h_{|\mathcal H}\) 是假设空间 \(\mathcal H\) 中的假设，有：<br/>
+\[<br/>
+\begin{align}<br/>
+P \big(\big|\mathrm{E(h)- \hat E(h)}\big|\gt \epsilon\big) &amp;= P \big(\exists h \in \mathcal H:\big|\mathrm{E(h)- \hat E(h)}\big|\gt \epsilon\big)\nonumber\\<br/>
+&amp;= P\Big(\big(\big| \mathrm{E(h_1)- \hat E(h_1)} \big| \gt \epsilon \big) \vee \cdots \vee \big(\big| \mathrm{E(h_{|\mathcal H|}) -\hat E(h_{|\mathcal H|})} \big| \gt \epsilon \big) \Big )\nonumber\\<br/>
+&amp;\le \sum_{i=1}^{|\mathcal H|} \sup_{h\in \mathcal H}P \big(\big|\mathrm{E(h)- \hat E(h)}\big|\gt \epsilon\big)\nonumber\\<br/>
+&amp;= |\mathcal H| \sup_{h\in \mathcal H}P \big(\big|\mathrm{E(h)- \hat E(h)}\big|\gt \epsilon\big)\label{mshp}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>由式(\ref{dbo3})可得：<br/>
+\[<br/>
+\sup_{h\in \mathcal H}P \big(\big|\mathrm{E(h)- \hat E(h)}\big|\gt \epsilon\big) = 2e^{-2m\epsilon^{2}}<br/>
+\]</p>
+
+<p>上式代入(\ref{mshp})可得：<br/>
+\[<br/>
+P \big(\big|\mathrm{E(h)- \hat E(h)}\big|\gt \epsilon\big) \le 2|\mathcal H|e^{-2m\epsilon^{2}}<br/>
+\]</p>
+
+<p>令 \(\delta = 2|\mathcal H|e^{-2m\epsilon^{2}} \) 求出 \(\epsilon\) 得表达式，便能很容易证明。</p>
+</blockquote>
+
+<p>而显然当 \(c\notin \mathcal H\) 时学习算法 \(\mathcal L\) 无法学得目标概率的 \(\mathcal c\) 的 \(\epsilon\) 近似。当时当假设空间 \(\mathcal H\) 给定时，必定存在一个泛化误差最好的假设，找到此假设的 \(\epsilon\) 近似也不失为一个较好的目标。\(\mathcal H\) 中训泛化差最好的假设是 \(\min_{h\in\mathcal H} \mathrm{E}(h)\)，于是以此目标可以将 PAC 学习推广到 \(\mathcal c \notin \mathcal H\) 的情况，这称为不可知学习（agnostic learning）。相应的，我们有：</p>
+
+<p><strong>不可知 PAC 可学习（agnostic PAC learnable）</strong>：令 \(m\) 表示从 \(\mathcal H\) 中独立同分布（i.i.d.） 采样的样本个数，\(0\lt \epsilon\)，\(\delta \lt 1\)，对于所有分布 \(\mathcal H\) ，若存在学习算法 \(\mathcal L\) 和多项式 \(poly(\cdot,\cdot,\cdot,\cdot)\)，使得对于任意的 \(m\ge poly(1/\epsilon,1/\delta,\text{size}(\mathbf x),\text{size}(c))\)，\(\mathcal L\) 能从假设空间 \(\mathcal H\) 输出满足下式的假设 \(h\)：<br/>
+\[<br/>
+P\Big(\mathrm{E(h) - \min_{h&#39;\in\mathcal H}\hat E(h&#39;)} \le \epsilon\Big) \ge 1 - \delta<br/>
+\]</p>
+
+<p>则称假设空间 \(\mathcal H\) 是不可知 PAC 可学习的。</p>
+
+<blockquote>
+<p>对 \(\mathcal c \in \mathcal H\) 的情况称为<strong>可实现学习 realization learning</strong></p>
+</blockquote>
+
+<p>与 PAC 可学习类似，若学习算法的 \(\mathcal L\) 的运行时间也是多项式函数 \(poly(1/\epsilon,1/\delta,\text{size}(\mathbf x),\text{size}(c))\)，则称 \(\mathcal H\) 是高效不可知 PAC 可学习的，学习算法 \(\mathcal L\) 则称假设空间 \(\mathcal H\) 的不可知 PAC 学习算法，满足上述条件的最小的 \(m\) 称为学习算法 \(\mathcal L\) 的样本复杂度。</p>
+
+<h3 id="toc_9">VC 维 Vapnik-Chervonenkis dimension</h3>
+
+<p>现实学习任务所面临的通常是无限假设空间，例如实数域中的所有区间、\(\mathcal R^d\) 空间中的所有线性超平面。欲对此种情形的可学习性进行研究，需度量假设空间的复杂度。最常见的办法是考虑假设空间的“VC维”。</p>
+
+<p>介绍 VC 维之前，我们先引入几个概念：增长函数（growth function）、对分（dichotomy）和打散（shattering）。</p>
+
+<h4 id="toc_10">增长函数 growth function</h4>
+
+<p>有些文献中将增长函数称为打散系数（shatter coefficient），其实是一样的。给定假设空间 \(\mathcal H\) 和示例集 \(D=\{x_1,x_2,...,x_m\}\)，\(\mathcal H\) 中每个假设 \(h\) 都能对 \(D\) 中示例赋予标记，标记结果可表示为：<br/>
+\[<br/>
+h|_D = \{(h(x_1),h(x_2),...,h(x_m))\}<br/>
+\]</p>
+
+<p>随着 \(m\) 的增大，\(\mathcal H\) 中所有假设对 \(D\) 中的示例所能赋予标记的可能结果数也会增大。</p>
+
+<p><b>所有的 \(m \in \mathbf N\)，假设空间 \(\mathcal H\) 的增长函数 \(\Pi_{\mathcal H}(m)\) 为：<br/>
+\[<br/>
+\Pi_{\mathcal H}(m) = \max_{\{x_1,...,x_m\}\subseteq \mathcal X}\big|\{(h(x_1),...,h(x_m))\}|h\in \mathcal H\big|<br/>
+\]<br/>
+</b></p>
+
+<p>增长函数 \(\Pi_{\mathcal H}(m)\) 表示假设空间 \(\mathcal H\) 对 \(m\) 个示例所能赋予标记的最大可能结果数。例如一个二分类问题，当 \(D\) 中只有两个示例 \(\{a,b\}\) ，\(h\) 对 \(D\) 中的示例所能赋予标记的可能为 \(\{(a=0,b=0),(a=0,b=1),(a=1,b=0),(a=1,b=1)\}\) ，当有三个示例时，赋予的标记有 8 种可能，对于 \(m\) 个示例最多有 \(2^m\) 种可能，即：<br/>
+\[<br/>
+\Pi_{\mathcal H}(m) \le 2^m<br/>
+\]</p>
+
+<p>显然，\(\mathcal H\) 对示例所能赋予标记的可能结果数越大，\(\mathcal H\) 的表示能力越强，对学习任务的适应能力也越强。因此，增长函数描述了假设空间 \(\mathcal H\) 的表示能力，由此反应出假设空间的复杂度。</p>
+
+<h5 id="toc_11">对分 dichotomy</h5>
+
+<p>假设空间 \(\mathcal H\) 中不同的假设对于 \(D\) 中示例赋予标记的结果可能相同，也可能不同；尽管 \(\mathcal H\) 中可能包含无穷多个假设，单其对 \(D\) 中示例赋予标记的可能结果数是有限的。对于二分类问题来说，\(\mathcal H\) 中假设对 \(D\) 中示例赋予标记的每种可能称为对 \(D\) 的一次“对分”。</p>
+
+<h5 id="toc_12">打散 shatter</h5>
+
+<p>对于二分类而言，若假设空间 \(\mathcal H\) 能实现示例集 \(D\) 的所有对分，即存在：<br/>
+\[<br/>
+\Pi_{\mathcal H}(m) = 2^m<br/>
+\]</p>
+
+<p>称示例集 \(D\) 能被假设空间“打散”，这也就是“打散系数”的由来。</p>
+
+<h3 id="toc_13">VC 维</h3>
+
+<p><b><br/>
+假设空间 \(\mathcal H\) 的 VC 维定义为：<br/>
+\[<br/>
+V_{\mathcal H} = \max\{m|\Pi_{\mathcal H}(m) = 2^m\}<br/>
+\]</p>
+
+<p></b></p>
+
+<p>\(V_{\mathcal H} = d\) 表明存在大小为 \(d\) 的示例集能被假设空间 \(\mathcal H\) 打散，这并不意味着所有大小为 \(d\) 的示例都能被假设空间 \(\mathcal H\) 打散。VC 维的定义与数据分布 \(D\) 无关，这意味着在数据分布未知的情况下仍能计算假设空间 \(\mathcal H\) 的VC维。</p>
+
+<p>若存在大小为 \(d\) 的示例集能被 \(\mathcal H\) 打散，但是不存在 \(d+1\) 的示例集能被 \(\mathcal H\) 打散，则 \(\mathcal H\) 的 VC 维是 \(d\) 。如果对于所有的 \(m\) 有 \(\Pi_{\mathcal H} = 2^m\) ，那么有 \(V_{\mathcal H} = \infty\)。</p>
+
+<p>我们可利用增长函数来估计经验误差与泛化误差之间的关系：</p>
+
+<p><b>VC 不等式：对假设空间 \(\mathcal H\)，\(m\in \mathcal N\)，\(0\lt \epsilon \lt 1\) 和任意 \(h\in \mathcal H\) 有：<br/>
+\[<br/>
+P\bigg(\sup_{h\in \mathcal H}|\mathrm E(h) - \mathrm{\hat E(h)}|\gt \epsilon\bigg) \le 4\Pi_{\mathcal H}(2m)\exp(-\frac{m\epsilon^2}{8})<br/>
+\]</p>
+
+<p></b></p>
+
+<p>我们现在来尝试证明这个公式，为了证明这个定理，我们需要引入一个 “ghost sample” ，它是一个和训练数据 \(D\) 相同的数据，它只是为了帮我们证明结论，并不会在最后的结果中出现。设 \(D&#39; = \{(X&#39;_1,Y&#39;_1),..., (X&#39;_n , Y&#39;_n )\}\)，是独立于 \(D\) 外的以 i.i.d 形式从 \(\mathcal D\) 中采样出来的随机变量。定义这个样本上的经验损失为：<br/>
+\[<br/>
+\mathrm {\hat E&#39;(h)} = \frac 1 m \sum_{i=1}^m \mathbf{I}(h(x&#39;_i) \neq y&#39;_i)<br/>
+\]</p>
+
+<p>其中 \(\mathbf{I}\)是指示函数。</p>
+
+<p>在下面的证明中，我们不失一般性地假设 \(m\epsilon^2\ge 2\)，否则定理中的边界会小。首先我们看 <b>Symmetrization 引理</b>：</p>
+
+<p>对于任意的 \(\epsilon\)，且 \(m\epsilon^2 \ge 2\)，有：<br/>
+\[<br/>
+\begin{equation}<br/>
+P\bigg(\sup_{h\in \mathcal H}|\mathrm E(h) - \mathrm{\hat E(h)}|\gt \epsilon\bigg) \le 2P\bigg(\sup_{h\in\mathcal H}|\mathrm {\hat E(h)} - \mathrm{\hat E&#39;(h)}|\gt \frac \epsilon 2 \bigg) \label{psmm}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>注意右边涉及两个不同的经验误差（empirical risk）的绝对值项是对称的，且这两个经验误差都是建立在有限的数据集合上，这样我们就避开了无限集的问题。现在我们假设不等式左边的上确界可以达到，并在 \(\widetilde{h}(D)\equiv \widetilde{h} \in \mathcal H\) 时达到。尽管因为 \(\mathcal H\) 是无限空间，不太容易定义出 \(\mathcal H\) 中达到最大值的元素，我们还是可以定义 \(\widetilde{h}\) 为：<br/>
+\[<br/>
+\widetilde{h} \approx \arg \max_{h\in \mathcal H}|\mathrm E(h) - \mathrm{\hat E(h)}|<br/>
+\]</p>
+
+<p>现在我们来看一下(\ref{psmm})式的右边：<br/>
+\[<br/>
+\begin{align}<br/>
+P\bigg(\sup_{h\in\mathcal H}|\mathrm {\hat E(h)} - \mathrm{\hat E&#39;(h)}| \gt \frac\epsilon 2\bigg) &amp;\ge P\bigg( |\mathrm{\hat E(\widetilde h) - \hat E&#39;(\widetilde h)} | \gt \frac \epsilon 2\bigg)\label{pbs1}\\<br/>
+&amp;\ge P\bigg( \Big|\mathrm{\hat E(\widetilde h) - E(\widetilde h) \Big| &gt; \epsilon \text{ and } \Big|\hat E&#39;(\widetilde h) - E(\widetilde h)} \Big| \lt \frac \epsilon 2\bigg)\label{pbs2}\\<br/>
+&amp;= \mathbb E\bigg[\mathbf{I}\Big\{\Big|\mathrm{\hat E(\widetilde h) - E(\widetilde h) \Big| &gt; \epsilon\Big\} \mathbf{I}\Big\{\Big|\hat E&#39;(\widetilde h) - E(\widetilde h)} \Big| \lt \frac \epsilon 2\Big\} \bigg]\label{pbs3}\\<br/>
+&amp;= \mathbb E\bigg\{\mathbf{I}\Big\{\Big|\mathrm{\hat E(\widetilde h) - E(\widetilde h) }\Big| &gt; \epsilon\Big\} \mathbb E\Big[\mathbf{I}\Big\{\Big|\mathrm{\hat E&#39;(\widetilde h) - E(\widetilde h)} \Big| \lt \frac \epsilon 2\Big\}\Big| D&#39;\Big] \bigg\}\label{pbs4}\\<br/>
+&amp;= \mathbb E\bigg[\mathbf{I}\Big\{\Big|\mathrm{\hat E(\widetilde h) - E(\widetilde h) }\Big| &gt; \epsilon\Big\} P\Big[\Big|\mathrm{\hat E&#39;(\widetilde h) - E(\widetilde h)}\Big| \lt \frac \epsilon 2 \Big | D&#39;\Big]\bigg]\label{pbs5}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>式子从(\ref{pbs1})到式子(\ref{pbs2})是因为对于任意实数 \(x\)，\(y\) 和 \(z\)，有：<br/>
+\[<br/>
+|x-z|\gt \epsilon\text{ and }|y-z| \gt \frac \epsilon 2 \Rightarrow |x-y| \gt \frac \epsilon 2<br/>
+\]</p>
+
+<p>在 \(D&#39;\) 的条件下：<br/>
+\[<br/>
+\mathrm{\hat E&#39;(\widetilde h)} - \mathrm{E(\widetilde h)} = \frac 1 m \sum_{i=1}^m U_i(\widetilde h)<br/>
+\]</p>
+
+<p>其中 \(U_i(\widetilde h) = \mathbf{I}(\widetilde h(x&#39;_i) \neq y&#39;_i) - \mathbb E\big[\mathbf{I}(\widetilde h(x&#39;_i) \neq y&#39;_i)|D&#39;\big]\)，它是一个平均值为 0 的独立同分布的随机变量。使用切比雪夫不等式：<br/>
+\[<br/>
+\begin{align*}<br/>
+P\Big[\Big|\mathrm{\hat E&#39;(\widetilde h) - E(\widetilde h)}\Big| \lt \frac \epsilon 2\bigg | D&#39;\Big] &amp;= P\Big[\Big|\frac 1 m \sum_{i=1}^m U_i(\widetilde h)\Big| \lt \frac \epsilon 2 \bigg| D&#39;\Big]\\<br/>
+&amp;= P\Big[\Big|\sum_{i=1}^m U_i(\widetilde h)\Big| \lt \frac{m\epsilon}{2} \bigg| D&#39;\Big]\\<br/>
+&amp;\ge 1 - \frac {\text{var}\Big[|\sum_{i=1}^m U_i(\widetilde h)|\Big|D&#39;\Big]}{(m\epsilon/2)^2}\\<br/>
+&amp;= 1 - \frac{4}{m^2\epsilon^2} \text{var}\Big[|\sum_{i=1}^m U_i(\widetilde h)|\Big|D&#39;\Big]\\<br/>
+&amp;= 1 - \frac{4m}{m^2\epsilon^2}\text{var}\Big[|U_i(\widetilde h)|\Big|D&#39;\Big]\\<br/>
+&amp;= 1 - \frac{4}{m\epsilon^2}\text{var}\Big[|U_i(\widetilde h)|\Big|D&#39;\Big]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<blockquote>
+<p>若随机变量 \(X\) 的范围为 \([a,b]\)，则：<br/>
+\[<br/>
+\mathbb{D}(X) \le \frac{(b-a)^2}{4}<br/>
+\]</p>
+
+<p>证明：<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbb{D}(X) &amp;= \mathbb{E}\{[X-\mathbb{E}(X)]^2\} \\<br/>
+&amp;= \mathbb E\{X^2 - 2X\mathbb{E}(X) + [\mathbb{E}(X)]^2\} \\<br/>
+&amp;= \mathbb{E}(X^2) - 2[\mathbb{E}(X)]^2 + [\mathbb{E}(X)]^2 \\<br/>
+&amp;= \mathbb{E}(X^2) - [\mathbb{E}(X)]^2<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>考虑到 \(a \le X \le b\)，即 \(\mathbb{E}(a) \le \mathbb{E}(X) \le \mathbb{E}(b)\)，也就是 \(a\le \mathbb{E}(X) \le b\)，令 \(Y=\frac{X-a}{b-a}\)，可知 \(0\le Y \le 1\)，<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\mathbb{D}(Y) = \mathbb{D}(\frac{X-a}{b-a}) = \frac{\mathbb{D}(X)}{b-a}\\<br/>
+&amp;\Rightarrow \quad \mathbb{D}(X) = \mathbb{D}(Y)\cdot (b-a) = \{\mathbb{E}(Y^2) - [\mathbb{E}(Y)]^2\}\cdot (b-a)\\<br/>
+&amp;\because \quad Y \le 1 \\<br/>
+&amp;\therefore \quad Y^2 \le Y \\<br/>
+&amp;\therefore \quad \mathbb{D}(Y^2) &lt; \mathbb{D}(Y)\\<br/>
+&amp;\Rightarrow \quad \mathbb{D}(X) = \{\mathbb{E}(Y^2) - [\mathbb{E}(Y)]^2\}\cdot (b-a) \le \{\mathbb{E}(Y) - [\mathbb{E}(Y)]^2\}\cdot (b-a)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>由均值不等式可知：<br/>
+\[<br/>
+\mathbb{E}(Y) - [\mathbb{E}(Y)]^2 = \mathbb{E}(Y)[1-\mathbb{E}(Y)] \le \frac{\big\{\mathbb{E}(Y)+[1-\mathbb{E}(Y)] \big\}^2}{4}= \frac 1 4<br/>
+\]</p>
+
+<p>所以：\(\mathbb{D}(X) \le {(b-a)^2}/{4}\)，得证</p>
+</blockquote>
+
+<p>由 \(U_i(\widetilde h)\) 的定义知 \(|U_i(\widetilde h)|\) 的区间为 \([0,1]\)，所以 \(\text{var}\Big[|U_i(\widetilde h)|\Big|D&#39;\Big] \le \frac 1 4\)，所以：<br/>
+\[<br/>
+\begin{align*}<br/>
+P\Big(\Big|\mathrm{\hat E&#39;(\widetilde h) - E(\widetilde h)}\Big| \lt \frac \epsilon 2\bigg | D&#39;\Big) &amp;\ge 1 - \frac{4}{m\epsilon^2}\text{var}\Big[|U_i(\widetilde h)|\Big|D&#39;\Big]\\<br/>
+&amp;\ge 1- \frac{4}{m\epsilon^2}\cdot \frac 1 4 = 1- \frac{1}{m\epsilon^2}\\<br/>
+\because\quad &amp; m\epsilon^2 &gt; 2\\<br/>
+\therefore \quad &amp; -\frac{1}{m\epsilon^2} &gt; -\frac 1 2\\<br/>
+\Rightarrow \quad P\Big(\Big|\mathrm{\hat E&#39;(\widetilde h) - E(\widetilde h)}\Big| \lt \frac \epsilon 2\bigg | D&#39;\Big) &amp;\ge 1- \frac{1}{m\epsilon^2} \ge \frac 1 2<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>现在再看式(\ref{pbs5})，可以知道：<br/>
+\[<br/>
+\begin{align*}<br/>
+P\bigg(\sup_{h\in\mathcal H}|\mathrm {\hat E(h)} - \mathrm{\hat E&#39;(h)}| \gt \frac\epsilon 2\bigg) &amp;\ge \mathbb E\bigg[\mathbf{I}\Big\{\Big|\mathrm{\hat E(\widetilde h) - E(\widetilde h) }\Big| &gt; \epsilon\Big\} P\Big[\Big|\mathrm{\hat E&#39;(\widetilde h) - E(\widetilde h)}\Big| \lt \frac \epsilon 2\bigg | D&#39;\Big]\bigg]\\<br/>
+&amp;\ge \frac 1 2 \mathbb E\bigg[\mathbf{I}\Big\{\Big|\mathrm{\hat E(\widetilde h) - E(\widetilde h) }\Big| &gt; \epsilon\Big\}\bigg]\\<br/>
+&amp;= \frac 1 2 P\Big[\Big|\mathrm{\hat E(\widetilde h) - E(\widetilde h) }\Big| &gt; \epsilon\Big]\\<br/>
+&amp;= \frac 1 2 P\Big[\sup_{h\in \mathcal H}\Big|\mathrm{\hat E(h) - E(h) }\Big| &gt; \epsilon \Big]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>上面推导过程中最后一个不等式，是由于 \(\widetilde h\) 的定义是此时 \(\mathrm{\hat E(\widetilde h) - E(\widetilde h)}\) 能得到最大值，此时也就等价于 \(\mathrm{\hat E(h) - E(h) }\) 达到上确界。所以引理得证。</p>
+
+<p>Symmetrization 引理一个很大的好处是我们将无限假设空间的问题边界问题转换成有限假设空间边界问题，现在我们来考虑有限假设空间上的<br/>
+\[<br/>
+\mathrm {\hat E(h)} - \mathrm{\hat E&#39;(h)} = \frac 1 m \sum_{i=1}^m \mathbf{I}[h(x_i) \neq y_i]-\frac 1 m \sum_{i=1}^m \mathbf{I}[h(x&#39;_i) \neq y&#39;_i] = \frac 1 m \sum_{i=1}^m \{\mathbf{I}[h(x_i) \neq y_i]-\mathbf{I}[h(x&#39;_i) \neq y&#39;_i]\}<br/>
+\]</p>
+
+<p>注意上面的等式，令 \(\mathbf h=(h_1,h_2,...,h_m,h&#39;_1,h&#39;_2,...,h&#39;_m)\)，这里 \(h_1\) 表示 \(h(x_1)\) ，\(h&#39;_1\) 表示 \(h(x&#39;_1)\) ，\(\mathbf h\) 只取决于训练样本和 “ghost sample”，因此考虑 \(\mathcal H\) 在两个样本 \(DD&#39;\) 的投影 \(\mathcal H_{D\cup D&#39;}\)，便有：<br/>
+\[<br/>
+\begin{eqnarray}<br/>
+\sup_{h\in\mathcal H}|\mathrm {\hat E(h)} - \mathrm{\hat E&#39;(h)}| = \sup_{\mathbf h \in \mathcal H_{D\cup D&#39;}}\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\label{hmc}\\<br/>
+\end{eqnarray}<br/>
+\]</p>
+
+<blockquote>
+<p>现在我们仅考虑经验损失边界 ，如果很多假设有着相同的经验损失（也就是在各数据点上都产生相同的 labels/values 对），我们可以取出一个作为代表，称之为“有效假设”，将其他的都去除。在数据集 \(D\) 上仅选择那些不同的有效假设，我们可以将假设空间限制到一个更小的子集 \(\mathcal H_D\)。 同理，如果考虑 \(\mathcal H\) 在训练样本和 ”ghost sample“ 的限制，即 \(\mathcal H_{D\cup D&#39;}\)。</p>
+</blockquote>
+
+<p>因为上限值很大，所以至少存在一个 \(\mathbf h\) 能使  \(\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\) 很大：<br/>
+\[<br/>
+\begin{align*}<br/>
+P\bigg(\sup_{h\in\mathcal H}|\mathrm {\hat E(h)} - \mathrm{\hat E&#39;(h)}| \gt \frac\epsilon 2\bigg) &amp;= P\bigg(\sup_{\mathbf h \in \mathcal H_{D\cup D&#39;}}\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\gt \frac\epsilon 2\bigg)\\<br/>
+&amp;= P\bigg(\exists \mathbf h \in \mathcal H_{D\cup D&#39;}:\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\gt \frac\epsilon 2\bigg)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>由于 \(\mathcal H_{DD&#39;}\) 是可数的，我们可以对这个特殊 \(\mathbf h\) 的概率用联合概率的一致性：<br/>
+\[<br/>
+\begin{align*}<br/>
+P\bigg(\exists \mathbf h \in \mathcal H_{D\cup D&#39;}:\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\gt \frac\epsilon 2\bigg)&amp;\le \sum_{ \mathbf h \in \mathcal H_{D\cup D&#39;}}P\bigg(\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\gt \frac\epsilon 2\bigg)\\<br/>
+&amp;\le |\mathcal H_{D\cup D&#39;}| P\bigg(\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\gt \frac\epsilon 2\bigg)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<blockquote>
+<p>一致限（union bound）：若 \(A_1,A_2,...,A_k\) 为k个不同的事件（不一定相互独立），那么有：<br/>
+\[<br/>
+P(A_1\cup A_2 \cup ... \cup A_k) = P(A_1) + P(A_2) + ... + P(A_n)<br/>
+\]</p>
+
+<p>一致限说明：k个事件中任一个事件发生的概率小于等于这k个事件发生的概率和（等号成立的条件为这k个事件相两两互斥）</p>
+</blockquote>
+
+<p>用增长函数的定义我们知道 \(|\mathcal H_{D\cup D&#39;}| \le \Pi_\mathcal H(2m)\)，代入得：<br/>
+\[<br/>
+\begin{align*}<br/>
+P\bigg(\exists \mathbf h \in \mathcal H_{D\cup D&#39;}:\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\gt \frac\epsilon 2\bigg) &amp;\le |\mathcal H_{D\cup D&#39;}| P\bigg(\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\gt \frac\epsilon 2\bigg)\\<br/>
+&amp;\le \Pi_\mathcal H(2m) P\bigg(\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\gt \frac\epsilon 2\bigg)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>这里我们令 \(L_i = \mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\)，它的期望值为：<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbb E(L_i) &amp;= \mathbb E\big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i) \big]\\<br/>
+&amp;= \mathbb E\big[\mathbf{I}(h_i \neq y_i)\big]-\mathbb E\big[\mathbf{I}(h&#39;_i \neq y&#39;_i) \big]\\<br/>
+&amp;= \mathrm{E}(h) - \mathrm{E}(h) = 0<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>我们允许我们表示 \(\hat {\mathrm{E}}(h) - \mathrm{E&#39;}(h)\)：<br/>
+\[<br/>
+\begin{align*}<br/>
+\hat {\mathrm{E}}(h) - \mathrm{E&#39;}(h) &amp;= \frac 1 m \sum_{i=1}^m \big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\big]\\<br/>
+&amp;= \frac 1 m \sum_{i=1}^m L_i\\<br/>
+&amp;= \frac 1 m \sum_{i=1}^m \big [L_i-\mathbb{E}(L_i)\big]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>除此之外我们注意到 \(L_i\) 的取值范围是 \([-1,1]\) ，我们可以运用霍夫丁不等式理论二：<br/>
+\[<br/>
+\begin{align*}<br/>
+P\bigg(\bigg|\frac 1 m \sum_{i=1}^m \big [L_i - \mathbb{E}(L_i)\big ]\bigg|\gt t\bigg) \le 2\exp(-\frac{2t^2m^2}{\sum_{i=1}^{m}(1+1)^2}) = 2\exp(-\frac{2t^2m^2}{4m}) = 2\exp(-\frac{mt^2}{2})<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令 \(t=\frac \epsilon 2\) ，得：<br/>
+\[<br/>
+P\bigg(\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\gt \frac\epsilon 2\bigg) \le 2\exp(-\frac{m\epsilon^2}{8})<br/>
+\]</p>
+
+<p>最终结果可得：<br/>
+\[<br/>
+\begin{align*}<br/>
+P\bigg(\sup_{h\in\mathcal H}|\mathrm {\hat E(h)} - \mathrm{\hat E&#39;(h)}| \gt \frac\epsilon 2\bigg) &amp;\le \Pi_\mathcal H(2m) \sup_{\mathbf h \in \mathcal H_{D,D&#39;}} P\bigg(\bigg|\frac 1 m \sum_{i=1}^m \Big[\mathbf{I}(h_i \neq y_i)-\mathbf{I}(h&#39;_i \neq y&#39;_i)\Big]\bigg|\gt \frac\epsilon 2\bigg)\\<br/>
+&amp;= 2\Pi_\mathcal H(2m) \exp(-\frac{m\epsilon^2}{8})\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>结合 Symmetrization 引理可以得到：<br/>
+\[<br/>
+P\bigg(\sup_{h\in \mathcal H}|\mathrm E(h) - \mathrm{\hat E(h)}|\gt \epsilon\bigg) \le 2P\bigg(\sup_{h\in\mathcal H}|\mathrm {\hat E(h)} - \mathrm{\hat E&#39;(h)}|\gt \frac \epsilon 2 \bigg) \le 4\Pi_\mathcal H(2m) \exp(-\frac{m\epsilon^2}{8})<br/>
+\]</p>
+
+<p>所以 VC 不等式可证。</p>
+
+<h4 id="toc_14">VC 维举例</h4>
+
+<p><b>实数域举例</b>：实数域的区间 \([a,b]\) ，令 \(\mathcal H\) 表示实数域中的所有闭区间构成的集合 \(\{h_{[a,b]}:a,b\in \mathbb R,a\le b\}\)，\(\mathcal X = \mathbb R\)，对 \(x \in \mathcal X\)，若 \(x \in [a,b]\)，则 \(h_{[a,b]}(x) = +1\)，否则 \(h_{[a,b]}(x) = -1\)。若 \(D=\{x_1,x_2\} = \{0.5,1.5\}\)，则假设空间中 \(\mathcal H\) 中存在假设 \(\{h_{[0,1]},h_{[0,2]},h_{[1,2]},h_{[2,3]}\}\) 将 \(\{x_1,x_2\}\) 打散，所以假设空间 \(\mathcal H\) 的 VC 维至少为2；对任意大小为 3 的示例集 \(\{x_3,x_4,x_5\}\)，不妨设 \(x_3\lt x_4 \lt x_5\)，则 \(\mathcal H\) 中不存在任意假设 \(h_{[a,b]}\) 能实现对分结果 \(\{(x_3,+1),(x_4,-1),(x_5,+1)\}\) ，于是 VC 维为2.</p>
+
+<p><b>二维平面举例</b>：令 \(\mathcal H\) 表示二维实平面上所有线性划分构成的集合，\(\mathcal X=\mathbb R^2\)。</p>
+
+<div align="center">
+    <img width="600" src="media/15151569041850/15338602041302.jpg" />
+</div>
+
+<p>如上图所示，存在大小为 3 的示例集可被 \(\mathcal H\) 打散，但不存在大小为 4 的示例集可被 \(\mathcal H\) 打散。于是，二维平面上所有线性划分构成的假设空间 \(\mathcal H\) 的 VC 维为 3 。</p>
+
+<h4 id="toc_15">Sauer 引理</h4>
+
+<p>Sauer 引理基于 VC 维提供一类二分类增长函数的多项式约束。若假设空间 \(\mathcal H\) 的 VC 维为 \(d\)，则对任意的 \(m\in \mathbb N\) 有：<br/>
+\[<br/>
+\Pi_\mathcal H(m) \le \sum_{i=0}^d\bigg(\begin{array}{c}m\\i\\\end{array}\bigg) <br/>
+\]</p>
+
+<blockquote>
+<p>其中<br/>
+\[<br/>
+\bigg( \begin{array}{c}m\\n\\\end{array} \bigg) = \frac{m!}{n!(n-m)!} <br/>
+\]</p>
+
+<p>表示组合数，又可以简写为 \(C_n^m\) ，物理意义表示为从 \(m\) 个不同元素中取出 \(n\) 个元素的组合数。规定 \(C_0^m = 1\)、\(C_m^m = 1\) 和 \(C_0^0 = 1\)。</p>
+</blockquote>
+
+<p>证明：由数学归纳法证明。当 \(m=1\)，\(d=0\) 或 \(d=1\) 时：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\Pi_\mathcal H(m) = \left \{ \begin{array}{c}<br/>
+2^0 = 1\quad&amp;m=1,d=0\\<br/>
+2^1 = 2\quad&amp;m=1,d=1\\<br/>
+\end{array} \right .\\<br/>
+&amp;\sum_{i=0}^d \left(\begin{array}{c}m\\i\\\end{array}\right ) = \left \{ \begin{array}\\ \left (\begin{array}{c}1\\0\\\end{array}\right ) = 1;\quad &amp;m=1,d=0\\<br/>
+\left (\begin{array}{c}1\\0\\\end{array}\right ) + \left ( \begin{array}{c}1\\1\\\end{array}\right ) = 2;\quad &amp;m=1,d=1\\<br/>
+\end{array}\right .<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>定理成立。</p>
+
+<p>假设定理对 \((m-1,d-1)\) 和 \((m-1,d)\) 成立。令 \(D=\{x_1,x_2,...,x_m\}\)，\(D&#39;=\{x_1,x_2,...,x_{m-1}\}\)，<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathcal H_{|D}  &amp;= \{(h(x_1),h(x_2),...,h(x_m))|h\in\mathcal H\},\\<br/>
+\mathcal H_{|D&#39;} &amp;= \{(h(x_1),h(x_2),...,h(x_{m-1}))|h\in\mathcal H\}.\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>任何假设 \(h\in \mathcal H\) 对 \(x_m\) 的分类结果或为 \(+1\) 或为 \(-1\)，因此任何出现 \(\mathcal H_{|D&#39;}\) 中的串都会在 \(\mathcal H_{|D}\) 中出现一次或两次，令 \(\mathcal H_{D&#39;|D}\) 表示在 \(\mathcal H_{|D}\) 中出现两次的 \(\mathcal H_{|D&#39;}\) 中串组成的集合，即：<br/>
+\[<br/>
+\mathcal H_{D&#39;|D} = \{(y_1,y_2,...,y_{m-1})\in \mathcal H_{|D&#39;} | \exists h,h&#39;\in \mathcal H,(h(x_i)=h&#39;(x_i) = y_i)\land(h(x_m)\neq h&#39;(x_m)),1\le i\le m-1\}<br/>
+\]</p>
+
+<p>考虑到 \(\mathcal H_{D&#39;|D}\) 中的串在 \(\mathcal H_{|D}\) 中出现了两次，但在 \(\mathcal H_{|D&#39;}\) 中仅出现了一次，有：<br/>
+\[<br/>
+\begin{align}<br/>
+|\mathcal H_{|D}| = |\mathcal H_{|D&#39;}| + |\mathcal H_{D&#39;|D}|\label{mmm}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>\(D&#39;\) 的大小为 \(m-1\) ，由假设可得：<br/>
+\[<br/>
+\begin{align}<br/>
+|\mathcal H_{|D&#39;}| \le \Pi_{\mathcal H}(m-1) \le \sum_{i=0}^d \bigg( \begin{array}{c}m-1\\i\\\end{array}\bigg )\label{mlp}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>令 \(Q\) 表示能被 \(\mathcal H_{D|D&#39;}\) 打散的集合，由 \(\mathcal H_{D&#39;|D}\) 定义可知 \(Q\cup\{x_m\}\) 必能被 \(\mathcal H_{|D}\) 打散。由于 \(\mathcal H\) 的 VC 维为 \(d\)，因此 \(\mathcal H_{D&#39;|D}\) 的 VC 维最小为 \(d-1\)，于是有：<br/>
+\[<br/>
+\begin{align}<br/>
+|H_{D&#39;|D}| \le \Pi(m-1) \le \sum_{i=0}^{d-1}\bigg(\begin{array}{c}m-1\\i\\\end{array}\bigg )\label{hll}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>由式(\ref{mmm})、(\ref{mlp})和(\ref{hll})可得：<br/>
+\[<br/>
+\begin{align*}<br/>
+|\mathcal H_{|D}| &amp;\le \sum_{i=0}^d \left(\begin{array}{c}m-1\\i\\\end{array}\right ) + \sum_{i=0}^{d-1} \left(\begin{array}{c} m-1\\i\\\end{array}\right)\\<br/>
+&amp;= \sum_{i=0}^d \left(\begin{array}{c}m-1\\i\\\end{array}\right ) + \sum_{i=0}^{d} \left(\begin{array}{c} m-1\\i-1\\\end{array}\right)\\<br/>
+&amp;= \sum_{i=0}^d \bigg(\left(\begin{array}{c}m-1\\i\\\end{array}\right)+\left(\begin{array}{c}m-1\\i-1\\\end{array}\right )\bigg)\\<br/>
+&amp;= \sum_{i=0}^d \left (\begin{array}{c}m\\i\\\end{array} \right )<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>由集合 \(D\) 的任意性，引理得证。</p>
+
+<p><strong>Sauer推论1：如果 \(d &lt; \infty\) ，对于所有的 \(m \ge 1\) ：<br/>
+\[<br/>
+\Pi_\mathcal H(m) \le \sum_{i=0}^d\bigg(\begin{array}{c}m\\i\\\end{array}\bigg)  \le (m+1)^d<br/>
+\]</strong></p>
+
+<p>推论证明：通过二项式定理：<br/>
+\[<br/>
+\begin{align*}<br/>
+(m+1)^d &amp;= \sum_{i=0}^d m^i \left( \begin{array}\\d\\i\\\end{array}\right ) = \sum_{i=0}^d m^i \frac{d!}{(d-i)!i!}\\<br/>
+&amp;\ge \sum_{i=1}^d \frac{m!}{i!} \ge \sum_{i=1}^d \frac{m!}{(m-i)!i!} = \sum_{i=1}^d \left (\begin{array}{cc}m\\i\\\end{array}\right )<br/>
+\end{align*}<br/>
+\]</p>
+
+<blockquote>
+<p>二项式定理：可以将 \(x+y\) 的任意次幂展开成和的形式<br/>
+\[<br/>
+(x+y)^n = \left(\begin{array}\\ n\\0\\\end{array} \right)x^n y^0 + \left(\begin{array}\\ {n}\\1\\\end{array}\right) x^{n-1} y^1 + \cdots + \left(\begin{array}{cc} n\\{n-1}\\\end{array} \right )x^1 y^{n-1} + \left(\begin{array}\\ n\\n\\\end{array} \right )x^0 y^n\\<br/>
+\]</p>
+</blockquote>
+
+<p><strong>Sauer推论2：对于所有的 \(m\le d\) ，有：<br/>
+\[<br/>
+\Pi_\mathcal H(m) \le \sum_{i=0}^d\bigg(\begin{array}{c}m\\i\\\end{array}\bigg) \le\bigg(\frac{me}{d}\bigg)^d<br/>
+\]</strong></p>
+
+<p>推论证明：如果 \(\frac d m \le 1\) 然后<br/>
+\[<br/>
+\begin{align*}<br/>
+\bigg(\frac d m \bigg)^d \sum_{i=0}^d \left (\begin{array}{cc}m\\i\\\end{array}\right ) &amp;\le \sum_{i=0}^d \bigg(\frac d m \bigg)^i \left (\begin{array}{cc}m\\i\\\end{array}\right ) \le \sum_{i=0}^m \bigg(\frac d m \bigg)^i \left (\begin{array}{cc}m\\i\\\end{array}\right ) \\<br/>
+&amp;= \bigg(1+\frac d m\bigg)^m \le (e^{d/m})^m \le e^d<br/>
+\end{align*}<br/>
+\]</p>
+
+<blockquote>
+<p>上面的推理使用了\[<br/>
+(1+x)&lt;e^x<br/>
+\]</p>
+
+<p>这个不等式在上面已经有证明。</p>
+</blockquote>
+
+<p>因此<br/>
+\[<br/>
+\sum_{i=0}^d \left (\begin{array}{cc}m\\i\\\end{array}\right )  \le e^d \bigg(\frac m d \bigg )^d = \bigg (\frac {me}{d}\bigg)^d<br/>
+\]</p>
+
+<p><strong>Sauer推论3：如果 \(d\gt 2\) ，那么对于所有 \(m \ge d\)：<br/>
+\[<br/>
+\Pi_\mathcal H(m) \le m^d<br/>
+\]</strong></p>
+
+<p>推论证明：如果 \(d \gt 2\)，且 \(d\in \mathcal N\) ，则\(\frac e d \lt 1\)，由上个推论自然可证。</p>
+
+<p>我们现在来根据<strong>VC不等式定理</strong>和推论可得基于 VC 维的泛化误差界</p>
+
+<p><strong>定理1</strong>：若假设空间 \(\mathcal H\) 的VC维为 \(d\)，则对任意 \(m\gt d\)，\(0\lt \delta\lt 1\) 和 \(h\in \mathcal H\) 有<br/>
+\[<br/>
+\begin{align}<br/>
+P\bigg(\Big|\mathrm E(h) - \mathrm{\hat E}(h)\Big|\le \sqrt{\frac{8d\ln\frac{2em}{d} + 8\ln\frac{4}{\delta}}{m}}\bigg) \ge 1 - \delta\label{pbhb}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>证明：由VC不等式可知：<br/>
+\[<br/>
+P\bigg(|\mathrm E(h) - \mathrm{\hat E(h)}|\gt \epsilon\bigg)\le 4\Pi_\mathcal H(2m) \exp(-\frac{m\epsilon^2}{8})\\<br/>
+\Rightarrow P\bigg(|\mathrm E(h) - \mathrm{\hat E(h)}|\le \epsilon\bigg)\ge 1 - 4\Pi_\mathcal H(2m) \exp(-\frac{m\epsilon^2}{8})\ge 1 - 4\bigg(\frac{2me}{d}\bigg)^d \exp(-\frac{m\epsilon^2}{8})\\<br/>
+\]</p>
+
+<p>令 \(\delta = 4\Big(\frac{2me}{d}\Big)^d \exp\Big(-\frac{m\epsilon^2}{8}\Big)\) 得<br/>
+\[<br/>
+\epsilon = \sqrt{\frac{8\ln(4/\delta) + 8d\ln(2em/d)}{m}}<br/>
+\]</p>
+
+<p>得证。</p>
+
+<p>由该定理可知(\ref{pbhb})得泛化误差界只与样例数目 \(m\) 有关，收敛速率为 \(\mathbb O(1/m\) ，与数据分布 \(\mathcal D\) 和样例集 \(D\) 无关。因此基于 VC 维的泛化误差界是分布无关（distribution-free）、数据独立（data-independent）的。</p>
+
+<p>令 \(h\) 表示学习算法 \(\mathcal L\) 输出的假设，若 \(h\) 满足：<br/>
+\[<br/>
+h = \min_{h&#39;\in\mathcal H} \mathrm{\hat E}(h&#39;)<br/>
+\]</p>
+
+<p>则称学习算法 \(\mathcal L\) 满足经验风险最小化（ERM，Empirical Risk Minimization）原则的算法，有下面的定理：</p>
+
+<p><strong>定理2</strong>：任何VC维有限的假设空间 \(\mathcal H\) 都是（不可知）PAC可学习的。</p>
+
+<p>证明：假设 \(\mathcal L\) 是满足经验风险最小化的算法，\(h\) 是算法输出的假设。令 \(g\) 表示 \(\mathcal H\) 中最小泛化误差的假设，即：<br/>
+\[<br/>
+\mathrm{E}(g) = \min_{h\in\mathcal H}\mathrm{E}(h)<br/>
+\]</p>
+
+<p>令 <br/>
+\[<br/>
+\begin{align}<br/>
+\delta&#39;/2 = \delta，\nonumber\\<br/>
+\sqrt{\frac{\ln(\delta&#39;/2)}{2m}} = \frac \epsilon 2\label{sfl}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>由<strong>推论</strong>公式(\ref{tl})可知<br/>
+\[<br/>
+\begin{align}<br/>
+\mathrm{\hat E}(g) - \frac \epsilon 2 \le \mathrm{E}(g) \le \mathrm{\hat E}(g) + \frac \epsilon 2\label{mheg}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>以至少 \(1-\delta/2\) 的概率成立。令<br/>
+\[<br/>
+\begin{align}<br/>
+\sqrt{\frac{8\ln(4/\delta&#39;) + 8d\ln(2em/d)}{m}} = \frac \epsilon 2\label{sf8}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>由<strong>定理1</strong>公式(\ref{pbhb}) 可知<br/>
+\[<br/>
+\begin{align}<br/>
+P\bigg(\Big|\mathrm E(h) - \mathrm{\hat E}(h)\Big|\le \frac \epsilon 2\bigg) \ge 1 - \delta\label{pbbme}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>由(\ref{mheg})知<br/>
+\[<br/>
+\mathrm{E}(g) - \mathrm{\hat E}(g) + \frac \epsilon 2 \ge 0<br/>
+\]</p>
+
+<p>结合(\ref{pbbme})知<br/>
+\[<br/>
+\mathrm E(h) - \mathrm{\hat E}(h) \le \frac \epsilon 2 + \mathrm{E}(g) - \mathrm{\hat E}(g) + \frac \epsilon 2<br/>
+\]</p>
+
+<p>以至少 \(1-\delta/2\) 的概率成立。</p>
+
+<p>所以<br/>
+\[<br/>
+\mathrm{E}(h) - \mathrm{E}(g) \le \mathrm{\hat E}(h) - \mathrm{\hat E}(g) + \epsilon \le \epsilon<br/>
+\]</p>
+
+<p>以至少 \(1-\delta/2\) 的概率成立。由(\ref{sfl})和(\ref{sf8})可以解出 \(m\)，再由 \(\mathcal H\) 的任意性可知定理成立，得证。</p>
+
+<hr/>
+
+<p>周志华 机器学习<br/>
+<a href="https://web.eecs.umich.edu/%7Ecscott/past_courses/eecs598w14/notes/05_vc_theory.pdf">VC Theory</a><br/>
+<a href="http://freemind.pluskid.org/pdf/slt/vc-theory-symmetrization.pdf">VC Symmetrization</a><br/>
+<a href="https://mostafa-samir.github.io/ml-theory-pt2/">ml-theory-pt2</a><br/>
+<a href="https://blog.csdn.net/wangjianguobj/article/details/57413819">30分钟了解PAC学习理论</a><br/>
+<a href="https://blog.csdn.net/icefire_tyh/article/details/52064910">机器学习(周志华西瓜书)参考答案总目录</a><br/>
+<a href="http://mlweb.loria.fr/book/en/SauerShelah.html">Sauer&#39;s Lemma</a><br/>
+<a href="http://mlweb.loria.fr/book/en/VCbound.html">My first VC bound</a><br/>
+<a href="http://mlweb.loria.fr/book/en/symmetrization.html">Symmetrization (where we start seeing ghost samples)</a><br/>
+<a href="https://people.cs.umass.edu/%7Eakshay/courses/cs690m/files/lec4.pdf">Lecture 4: The Vapnik-Chervonenkis Dimension</a><br/>
+<a href="http://nowak.ece.wisc.edu/SLT09/lecture19.pdf">The Proof of the Vapnik-Chervonenkis (VC) Inequality</a><br/>
+<a href="http://www.cs.cmu.edu/%7Ehanxiaol/slides/rademacher_vc_hanxiaol.pdf">Rademacher Complexity and VC Dimension</a><br/>
+<a href="https://web.eecs.umich.edu/%7Ecscott/past_courses/eecs598w14/notes/05_vc_theory.pdf">Vapnik-Chevronenkis Theory</a><br/>
+<a href="https://ocw.mit.edu/courses/sloan-school-of-management/15-097-prediction-machine-learning-and-statistics-spring-2012/lecture-notes/MIT15_097S12_lec14.pdf">Introduction to Statistical Learning Theory</a></p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html'>集成学习</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15158019416874.html" 
+	        title="Previous Post: 自适应提升方法 Adaboost">&laquo; 自适应提升方法 Adaboost</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15145527362267.html" 
+	        title="Next Post: 回归分类树-CART算法">回归分类树-CART算法 &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

@@ -1,0 +1,715 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  线性判别分析 LDA - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">线性判别分析 LDA</h1>
+				<p class="meta"><time datetime="2017-08-31T00:08:28+08:00" pubdate data-updated="true">2017/8/31</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>前面我们讨论过PCA、SVD对数据降维，但是PCA和SVD都是无监督的方法，而在一些有标签的数据中，如果能结合标签对数据降维，效果会更好。因此产生了LDA的方法，LDA英文全称是Linear Discriminant Analysis，线性判别方法，LDA作为一种降维方法，在有效降低维度的同时保证了数据的可分性。</p>
+
+<div align="center">
+    <img src="media/15041093080052/15274469363430.jpg" width="400px" />
+</div>
+如上图如果不考虑数据的标签，采用PCA方法对数据降维到一维空间，由PCA可知将按照最大方差的方向进行映射也就是映射到红线的位置，本来易分的数据将会变得不易分，对于这个例子来说是得不偿失的。而我们如果将所有点都投影到黑线上，效果将非常好，这就是LDA方法所考虑的。
+
+LDA方法的基本思想是将高维数据映射到最佳鉴别空间，达到降维和提取特征的目的，投影后保证在新空间数据点具有最大的类间距离和最小的类内距离。也就是上图中蓝色点之间的距离最小，而蓝色点和绿色点之间的距离最大。在继续讨论LDA之前，先看一些相关的前置知识。
+
+#前置知识
+
+#### 投影
+
+对于一个高维空间里的样本$X_i$投影到一个向量$W$上，如果$X_i$在投影前是在是一个$n$维空间，我们期望投影后降低到$k$维空间，那么$W$将是一个$n\times k$形状的矩阵。设在新空间中（可能是低维）的点为$Z_i$，满足：
+$$
+Z_i = W^T X_i
+$$
+
+其中$Z_{ij}=W_j^TX_i$表示点$X_i$在新坐标空间中第$j$维的坐标。如果我们将$Z_i$还原到原空间，可以通过$X^*_i = WZ_i$，其中$X_{ij} = W_jZ_i$表示新空间点$Z_i$转换回原空间在第j维的坐标。在本文中如果我们将二维空间数据点投影到一条直线上，如下图所示，点$X=(2,4)^T$在向量$w=(-\frac{\sqrt{2}}{2},\frac{\sqrt{2}}{2})^T$上的投影为$Z=W^TX = \sqrt{2}$。
+
+<div align="center">
+    <img src="media/15041093080052/15276993092656.jpg" width="350px" />
+</div>
+
+<p>在SVD的前置知识里，我们已经提到过通过正交矩阵将点可以从一个坐标系转换到另一个坐标系，这是一种\(W\)是正交矩阵的投影特例。</p>
+
+<h4 id="toc_0">Rayleigh商矩阵</h4>
+
+<p>定义Rayleigh商矩阵：<br/>
+\[<br/>
+R(A,x) = \frac{x^HAx}{x^Hx}<br/>
+\]</p>
+
+<p>其中\(x\)是非零向量，而\(A\)是\(n\times n\)的Hermitian矩阵（厄米特矩阵），厄米特矩阵是共轭转置等于本身的矩阵。假设\(A\)的\(n\)个特征值依次为\(\lambda_1\le\lambda_2\le...\le\lambda_n\)，则有：<br/>
+\[<br/>
+\lambda_1 \le R(A,x) \le \lambda_n<br/>
+\]</p>
+
+<p>证明：假设特征值\(\lambda_1,\lambda_2,...,\lambda_n\)对应的单位特征向量为：\(x_1,x_2,...,x_n\)，由于\(A\)是厄米特矩阵，可知\(A\)可以正交对角化，即特征矩阵\(X=(x_1,x_2,...,x_n)\)同时也是个单位正交矩阵，每一个元素都可看成向量空间的一组正交基。将向量\(x\)用这组正交基表示：<br/>
+\[<br/>
+x = a_1x_1+a_2x_2+....a_nx_n=(x_1,x_2,...,x_n)(a_1,a_2,...,a_n)^H = X\boldsymbol a<br/>
+\]</p>
+
+<p>其中\(\boldsymbol a = (a_1,a_2,...,a_n)^H\)，将上式代入Rayleigh矩阵可得：<br/>
+\[<br/>
+\begin{align*}<br/>
+R(A,x) = \frac{x^HAx}{x^Hx} &amp;= \frac{(X\boldsymbol a)^HA(X\boldsymbol a)}{(X\boldsymbol a)^H(X\boldsymbol a)} \\<br/>
+&amp;= \frac{\boldsymbol a^H X^H A X \boldsymbol a}{\boldsymbol a^H X^H X \boldsymbol a}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>由实对称矩阵对角会性质可知：\(X^TAX=\Lambda\)，其中每一个对角线元素都是\(A\)的特征值。且正交矩阵\(X\)满足\(X^HX = 1\)所以：<br/>
+\[<br/>
+\begin{align*}<br/>
+R(A,x) = \frac{x^HAx}{x^Hx} &amp;= \frac{\boldsymbol a^H X^H A X \boldsymbol a}{\boldsymbol a^H X^H X \boldsymbol a} \\<br/>
+&amp;= \frac{\boldsymbol a^H \Lambda \boldsymbol a}{\boldsymbol a^H \boldsymbol a} \\<br/>
+&amp;= \frac{[a_1,a_2,...,a_n] \left[ \begin{array}\\\lambda_1&amp;&amp;&amp;\\&amp;\lambda_2&amp;&amp;\\&amp;&amp;\ddots&amp;\\&amp;&amp;&amp;\lambda_n\\\end{array}\right] \left[\begin{array}\\a_1\\a_2\\...\\a_n\\\end{array}\right]}{\boldsymbol a^H \boldsymbol a} \\<br/>
+&amp;=\frac{\sum_{i=1}^N\lambda_i a_i^2}{\sum_{i=1}^N a_i^2}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>所以我们可以将\(R(A,x)\)看成\(\lambda_n\)的加权平均值，权系数是\(a_i^2\)，假设\(\lambda_1\le\lambda_2\le...\le\lambda_n\)，明显对于任意\(i=(1,2,...,n)\)有\(\lambda_ia_i^2\ge \lambda_1a_i^2\)，所以\(\sum_{i=1}^N\lambda_ia_i^2\ge n\lambda_1a_i^2=\sum_{i=1}^N\lambda_1a_i^2 \)，所以：<br/>
+\[<br/>
+R(A,x) = \frac{\sum_{i=1}^N\lambda_i a_i^2}{\sum_{i=1}^N a_i^2} \ge \frac{\sum_{i=1}^N\lambda_1a_i^2}{\sum_{i=1}^N a_i^2} = \lambda_1<br/>
+\]</p>
+
+<p>同理可证：\(R(A,x) \le \lambda_n\)。综合可知：<br/>
+\[<br/>
+\lambda_1 \le R(A,x) \le \lambda_n<br/>
+\]</p>
+
+<p>当\(R(A,x)\)取最大值或最小值时，令\(R(A,x)=\lambda\)，此时\(\lambda\)是A的特征值：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;R(A,x) = \frac{x^HAx}{x^Hx} = \lambda \\<br/>
+&amp;\Rightarrow x^HAx = \lambda x^Hx<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>两边同时左乘\((x^{H})^{-1}\)得：\(Ax = \lambda x\)，所以此时\(\lambda\)对应的特征向量为\(x\)。</p>
+
+<p>另外当\(x\)是正交矩阵时，\(x^Hx=1\)，\(R(A,x) = x^HAx\)，这个形式在很多理论中都有使用。</p>
+
+<h4 id="toc_1">广义Rayleigh商矩阵</h4>
+
+<p>定义广义Rayleigh商矩阵:<br/>
+\[<br/>
+R(A,B,x) = \frac{x^HAx}{x^HBx}<br/>
+\]</p>
+
+<p>其中A,B都是\(n\times n\)的厄米特矩阵，且B正定，那么这种形式的R(A,B,x)最大值与最小值是多少呢？其实很容易想到，只要我们设\(x^{&#39;}\)，然后能将上式化为R(A,x)形式即可。</p>
+
+<p>首先看分母，我们希望\(x^HBx=x^{&#39;H}x^{&#39;}\)，所以可以分解得：<br/>
+\[<br/>
+x^HBx =x^H(B^{1/2})^2x= x^H(B^{1/2})^HB^{1/2}x=(B^{1/2}x)^H(B^{1/2}x)<br/>
+\]</p>
+
+<p>这样如果令\(x{&#39;} = B^{1/2}x\)，则满足我们期望，此时\(x = B^{-1/2}x^{&#39;}\)，代入得：<br/>
+\[<br/>
+\begin{align*}<br/>
+x^HBx &amp;= (B^{-1/2}x^{&#39;})^HBB^{-1/2}x^{&#39;} = x^{&#39;H}(B^{-1/2})^HBB^{-1/2}x^{&#39;} = x^{&#39;H}B^{-1/2}BB^{-1/2}x^{&#39;}  = x^{&#39;H}x^{&#39;} \\<br/>
+x^HAx &amp;= (B^{-1/2}x^{&#39;})^HAB^{-1/2}x^{&#39;} = x^{&#39;H}(B^{-1/2})^HAB^{-1/2}x^{&#39;} = x^{&#39;H}B^{-1/2}AB^{-1/2}x^{&#39;} <br/>
+\end{align*}<br/>
+\]</p>
+
+<p>所以\(R(A,B,x)\)可以化为\(R(A,B,x{&#39;})\)：<br/>
+\[<br/>
+R(A,B,x&#39;) = \frac{x^{&#39;H}B^{-1/2}AB^{-1/2}x^{&#39;} }{x^{&#39;H}x^{&#39;}}<br/>
+\]</p>
+
+<p>由普通Rayleigh商的性质可知\(R(A,B,x^{&#39;})\)的最大值为\(B^{-1/2}AB^{-1/2}\)特征值的最大值，最小值为\(B^{-1/2}AB^{-1/2}\)特征值的最小值。此时我们考虑假设特征值为\(\lambda\)，对应的特征向量为\(x^{&#39;}\)，有：<br/>
+\[<br/>
+B^{-1/2}AB^{-1/2} x^{&#39;} = \lambda x^{&#39;}<br/>
+\]</p>
+
+<p>两边同左乘上\(B^{-1/2}\)，可得：<br/>
+\[<br/>
+B^{-1}AB^{-1/2} x^{&#39;} = \lambda B^{-1/2} x^{&#39;} \Leftrightarrow B^{-1}A(B^{-1/2} x^{&#39;}) = \lambda (B^{-1/2} x^{&#39;})<br/>
+\]</p>
+
+<p>所以\(B^{-1}AB^{-1/2}\)的特征值等同于\(B^{-1}A\)的特征值，所以\(R(A,B,x)\)的最大值为\(B^{-1}A\)特征值的最大值，最小值为\(B^{-1}A\)特征值的最小值，对应的特征向量为\(B^{-1/2}x^{&#39;}\)，即\(x\)，实现了一个完美的统一。</p>
+
+<h1 id="toc_2">LDA解释</h1>
+
+<p>为什么叫线性判别分析呢？所谓的线性是将高维空间投影到直线上（可能是多条直线），直线的函数解析式叫做线性函数，通常函数解析式如下面的形式：<br/>
+\[<br/>
+y=w^Tx+b<br/>
+\]</p>
+
+<p>由前面可知如果将两个数据点\(x_i\)投影到直线上，那么投影后的点的坐标为\(W^Tx_i\)，LDA希望通过线性函数投影后的数据点可以很好通过一个判别式划分。我们首先来看一下二分类问题，然后将其推广到多分类问题上。</p>
+
+<h2 id="toc_3">二分类问题</h2>
+
+<p>假设我们有数据集\(D = ((x_1,y_1),(x_2,y_2),...,(x_m,y_m))\)，其中任意\(x_i\)一个\(n\)维的向量，\(y_i \in (0,1)\)。我们使用\(X_i(i=0,1)\)表示\(D\)中的两类样本集，\(N_i(i=0,1)\)表示样本集\(X_i\)的数量，\(u_i(i=0,1)\)表示样本集\(X_i\)的均值向量，\(\Sigma_i(i=0,1)\)表示样本集\(X_i\)的方差（没有分母的）。</p>
+
+<p>\(u_i\)方程表示为：<br/>
+\[<br/>
+u_i = \frac{1}{N_i}\sum_{x \in X_i}x\quad(i=0,1)<br/>
+\]<br/>
+\(\Sigma_i\)方程表示：<br/>
+\[<br/>
+\Sigma_{i} = \sum_{x\in X_i}(x-u_i)(x-u_i)^T\quad(i=0,1)<br/>
+\]</p>
+
+<p>由于是二分类问题，当我们将数据投影到一条直线上，假设投影向量为\(W\)，由\(W\)投影后两类样本集的中心点分别为\(W^Tu_0\)和\(W^Tu_1\)，投影后的方差为：<br/>
+\[<br/>
+\begin{align*}<br/>
+\Sigma^{new}_{i} &amp;= \sum_{x\in X_i}(w^Tx-w^Tu_i)^2 = \sum_{x\in X_i}(w^Tx-w^Tu_i)(w^Tx-w^Tu_i)^T \\<br/>
+&amp;= \sum_{x\in X_i} w^T(x-u_i)(x-u_i)^Tw = w^T\Sigma_iw<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>LDA期望投影后的数据易区分，满足同类数据尽可能密集，也就是希望最小化方差\(w^T\Sigma_0w+w^T\Sigma_1w\)。非同类元素尽可能分离，即最大化均值距离\(||w^Tu_0-w^Tu_1||^2\)，综上可以定义优化目标为：<br/>
+\[<br/>
+\begin{equation}<br/>
+J=\frac{||w^Tu_0-w^Tu_1||^2}{w^T\Sigma_0w+w^T\Sigma_1w} = \frac{w^T(u_0-u_1)(u_0-u_1)^Tw}{w^T(\Sigma_0+\Sigma_1)w} \label{J}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>定义类内方差\(S_w\)为：<br/>
+\[<br/>
+S_w = \Sigma_0+\Sigma_1 = \sum_{x\in X_0}(x-u_0)(x-u_0)^T + \sum_{x\in X_1}(x-u_1)(x-u_1)^T<br/>
+\]</p>
+
+<p>定义类间距离\(S_b\)为：<br/>
+\[<br/>
+S_b = (u_0-u_1)(u_0-u_1)^T<br/>
+\]</p>
+
+<p>这样优化目标可以改写为：<br/>
+\[<br/>
+J = \frac{w^TS_bw}{w^TS_ww}<br/>
+\]</p>
+
+<p>对比广义Rayleigh商矩阵，发现形式一模一样，现在利用广义Rayleigh商矩阵的性质可知\(J\)的最大值即为矩阵\(S_w^{-1}S_b\)的最大特征值，此时对应的特征向量为\(w\)。</p>
+
+<p>对于二分类问题来说，设\(\lambda_w = (u_0-u_1)^Tw\)，所以\(S_bw = (u_0-u_1)\lambda_w\)，将其代入特征方程\(S_w^{-1}S_bw = \lambda w\)得\(S_w^{-1} (u_0-u_1)\lambda_w = \lambda w\)，可解得\(w = \frac{\lambda_w}{\lambda}S_w^{-1} (u_0-u_1)\)。</p>
+
+<p>由于\((u_0-u_1)\)是一个\(n\)维数据，并由前面投影的知识\(w\)的形状为\((n \times 1)\)，所以乘积\(\lambda_w=(u_0-u_1)^Tw\)是一个标量。由\(J\)的方程（\ref{J}）可知我们\(w\)的大小增大或缩小多少倍对于结果并没有影响，所以我们并不关心\(w\)的大小，只关心\(w\)的方向，将常数省去可得\(w = S_w^{-1} (u_0-u_1)\)，也就意味着当我们求出二分类的方差和均值就可以确定最佳投影方向\(w\)了。</p>
+
+<h2 id="toc_4">多分类问题</h2>
+
+<p>同样我们假设数据集\(D=((x_0,y_0),(x_1,y_1),...,(x_m,y_m))\)，其中任意的\(x_i\)是一个\(n\)维向量；\(y_i\in (C_1,C_2,...,C_k)\)，也就是数据集包含\(k\)类数据；数据集大小为\(N\)。在二类LDA中，是将原数据投影到一条直线（一维）上，由前置知识中可知\(W\)是一个\((n \times 1)\)的矩阵，而在多分类中，需要将数据投影到低维空间上，假设投影后的维度为 \(d\) ，投影向量\(W\)是一个\((n\times d)\)的矩阵，定义\(u_i\)为第\(\,i\,\)类的均值向量。<br/>
+\[<br/>
+u_i = \frac{1}{N_i}\sum_{x \in X_i} x<br/>
+\]</p>
+
+<p>此时需要将之前我们定义的概念做一下替换，定义类内散度矩阵\(S_W\)替换二分类LDA中的方差，即：<br/>
+\[<br/>
+S_W = \sum_{i=1}^k \Sigma_i = \sum_{i=1}^k \sum_{x\in X_i}(x-u_i)(x-u_i)^T<br/>
+\]</p>
+
+<p>定义投影后的类内距离\(J_W\)，其中点\(x\)投影后为\(W^Tx\)，中心点\(u_i\)投影后为\(W^Tu_i\)，可得：<br/>
+\[<br/>
+J_W = \sum_{i=1}^k \sum_{x\in X_i}(W^Tx-W^Tu_i)(W^Tx-W^Tu_i)^T = W^T\sum_{i=1}^k \sum_{x\in X_i}(x-u_i)(x-u_i)^TW = W^TS_WW<br/>
+\]</p>
+
+<p>定义类间散度矩阵\(S_B\)替换二分类LDA中的类间距离，但是此时已经不能用两个类中心的距离来表示类间散度距离了，考虑下图：</p>
+
+<div align="center">
+    <img width="300px" src="media/15041093080052/15280361373656.jpg" />
+</div>
+
+<p>定义全局中心点 \(u\) ：<br/>
+\[<br/>
+\begin{equation}<br/>
+u = \frac{1}{N}\sum_{i=1}^N x_i = \frac{1}{N} \sum_{i=1}^k \sum_{x\in X_i} x= \frac{1}{N} \sum_{i=1}^k N_i u_i \label{u_u_i}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>定义全局散度矩阵\(S_t\)为每一个点到全局中心点\(u\)的向量距离：<br/>
+\[<br/>
+S_t = \sum_{i=1}^N (x_i-u)(x_i-u)^T<br/>
+\]</p>
+
+<p>考虑到全局散度矩阵\(S_t\)=类内散度矩阵\(S_W\)+类间散度矩阵\(S_B\)，所以：<br/>
+\[<br/>
+\begin{align}<br/>
+S_B &amp;= S_t - S_W = \sum_{i=1}^N (x_i-u)(x_i-u)^T - \sum_{i=1}^k \sum_{x\in X_i}(x-u_i)(x-u_i)^T \nonumber\\<br/>
+&amp;=\sum_{i=1}^k \sum_{x\in X_i}(x - u)(x-u)^T - \sum_{i=1}^k \sum_{x\in X_i}(x-u_i)(x-u_i)^T \nonumber\\<br/>
+&amp;=\sum_{i=1}^k \sum_{x\in X_i}[(x - u)(x-u)^T-(x-u_i)(x-u_i)^T ]\nonumber\\<br/>
+&amp;=\sum_{i=1}^k \sum_{x\in X_i}(xx^T - xu^T-ux^T+uu^T-xx^T+xu_i^T+u_ix^T-u_iu_i^T) \nonumber\\<br/>
+&amp;=\sum_{i=1}^k \sum_{x\in X_i}(- xu^T-ux^T+uu^T+xu_i^T+u_ix^T-u_iu_i^T) \nonumber\\<br/>
+&amp;=\sum_{i=1}^k(-\sum_{x\in X_i}xu^T-\sum_{x\in X_i}ux^T+\sum_{x\in X_i}uu^T+\sum_{x\in X_i}xu_i^T+\sum_{x\in X_i}u_ix^T-\sum_{x\in X_i}u_iu_i^T) \label{S_B_T_W}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>考虑到\(u_i\)为第\(i\)类的均值向量，即：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;u_i = \frac{1}{N_i}\sum_{x\in X_i}x \quad\Rightarrow\quad \sum_{x\in X_i}x = N_iu_i \\<br/>
+&amp;u_i^T = \frac{1}{N_i}\sum_{x\in X_i}x^T \quad\Rightarrow\quad \sum_{x\in X_i}x^T = N_iu_i^T \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>将上式代入公式（\ref{S_B_T_W}）中得：<br/>
+\[<br/>
+\begin{align}<br/>
+S_B &amp;= \sum_{i=1}^k(-\sum_{x\in X_i}xu^T-\sum_{x\in X_i}ux^T+\sum_{x\in X_i}uu^T+\sum_{x\in X_i}xu_i^T+\sum_{x\in X_i}u_ix^T-\sum_{x\in X_i}u_iu_i^T)  \nonumber\\<br/>
+&amp;= \sum_{i=1}^k(-N_iu_iu^T-N_iuu_i^T+N_iuu^T+N_iu_iu_i^T+N_iu_iu_i^T-N_iu_iu_i^T) \nonumber\\<br/>
+&amp;= \sum_{i=1}^kN_i(-u_iu^T-uu_i+uu^T+u_iu_i^T) \nonumber\\<br/>
+&amp;= \sum_{i=1}^kN_i(u_i-u)(u_i-u)^T \label{S_B}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>抛去数学推导，直观上看，观察类间散度矩阵\(S_B\)，其实就是每一个类的中心点到全局中心点\(u\)的向量距离，由于每一个类包含数据数量不同，使用了\({N_i}\)作为第\(i\)类的权重。</p>
+
+<p>定义投影后的类间距离\(J_B\)，局部中心点\(u_i\)投影后为\(W^Tu_i\)，全局中心点\(u\)在投影后为\(W^Tu\)，得：<br/>
+\[<br/>
+J_B = \sum_{i=1}^kN_i(W^Tu_i-W^Tu)(W^Tu_i-W^Tu)^T = W^T\sum_{i=1}^kN_i(u_i-u)(u_i-u)^TW = W^TS_BW<br/>
+\]</p>
+
+<p>则目标函数\(J(W)为\)：<br/>
+\[<br/>
+J(W) = \frac{J_B}{J_W} = \frac{W^TS_BW}{W^TS_WW}<br/>
+\]</p>
+
+<p>我们的目标是最大化\(J(W)\)，而当成比例的放大或缩小\(W\)时，并不影响\(J(W)\)的取值，因此我们关心的是\(W\)的方向，而不在意\(W\)的大小。因此我们可以固定分母为1，那么目标方程组为（这里我将求最大化问题变成了求最小值问题，其实等价）：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;min_W\quad -W^TS_BW \\<br/>
+&amp;s.t. \quad \quad W^TS_WW = 1<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>利用拉格朗日乘子法定义拉格朗日朗日方程：<br/>
+\[<br/>
+L(W,\alpha) = -W^TS_BW + \alpha(W^TS_WW-1)<br/>
+\]</p>
+
+<p>其中\(\lambda\)为乘子，满足\(\lambda \neq 0\)。<br/>
+先求\(L(W,\alpha)\)对\(W\)求导，并令其等于0，即：<br/>
+\[<br/>
+\begin{align}<br/>
+\frac{\nabla L(W,\alpha)}{\nabla W} &amp;= \frac{-W^TS_BW + \lambda(W^TS_WW-1)}{\nabla W} \nonumber\\<br/>
+&amp;= -(S_B+S_B^T)W+\alpha(S_W+S_W^T)W \label{LW}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<blockquote>
+<p>矩阵求导公式，\(\alpha\)是实数，\(\beta\)和\(X\)为向量，\(A\),\(B\),\(C\)是与\(X\)无关的矩阵：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\frac{\partial \beta X}{\partial X^T} = \beta \\<br/>
+&amp;\frac{\partial X^T\beta}{\partial X} = \beta \\<br/>
+&amp;\frac{\partial X^TAX}{\partial X} = (A+A^T)X \\<br/>
+\end{align*}<br/>
+\]</p>
+</blockquote>
+
+<p>因为：<br/>
+\[<br/>
+S_B^T = （\sum_{i=1}^kN_i(u_i-u)(u_i-u)^T)^T = \sum_{i=1}^kN_i(u_i-u)(u_i-u)^T = S_B \\<br/>
+S_W^T = (\sum_{i=1}^k \sum_{x\in X_i}(x-u_i)(x-u_i)^T)^T = \sum_{i=1}^k \sum_{x\in X_i}(x-u_i)(x-u_i)^T = S_W <br/>
+\]</p>
+
+<p>上式带入公式（\ref{LW}）可得：<br/>
+\[<br/>
+\frac{\nabla L(W,\alpha)}{\nabla W} = -2S_BW + 2\lambda S_WW = 0<br/>
+\]</p>
+
+<p>如果\(S_W\)为非奇异，即\(S_W^{-1}\)存在，上式可得：\(S_W^{-1}S_BW = \lambda W\)，也就是\(W\)的每一列都是\(S_W^{-1}S_B\)的特征向量。特征值越大的特征向量包含的信息越丰富，所以首先求出\(S_W^{-1}S_B\)的特征值，\(W\)为前 \(d\) 个非零特征值对应的特征向量组成的特征矩阵。</p>
+
+<h4 id="toc_5">多分类的维度问题</h4>
+
+<p>多分类中我们假设经过\(W\)投影后的数据集在 \(d\) 维空间，那么接下来将讨论 \(d\) 的范围。由于 \(S_B\) 矩阵中的 \(\mu_i-\mu\) 的秩为1，结合（\ref{S_B}）和秩的性质6（见附录：矩阵的秩小于等于各个相加矩阵的秩的和），因此SB的秩最多为k。由公式（\ref{u_u_i}）知\(\mu_k\) 可以用前k-1个 \(\mu_i\) 表示出来，因此 \(S_B\) 的秩最多为k-1，由秩的性质7可知\(R(S_W^{-1}S_B) \le min\{R(S_W^{-1}),R(S_B)\}\) ，所以\(S_W^{-1}S_B\)的秩最大为k-1。</p>
+
+<p>由矩阵的秩与非零特征值的关系：对于任何n阶方阵，都有\(\mu (A) \le R(A)\)，即非零特征值的个数小于矩阵的秩。具体证明见文章最后。所以可以得出\(S_W^{-1}S_B\)非零特征值个数最大为k-1个，所以对应的特征向量最多也为k-1个，即\(W\)的列数最多有\(k-1\)列，那么 \(d\) 也最大为k-1维。</p>
+
+<h2 id="toc_6">LDA算法流程</h2>
+
+<p>输入：同样我们假设数据集\(D=((x_0,y_0),(x_1,y_1),...,(x_m,y_m))\)，其中任意的\(x_i\)是一个\(n\)维向量；\(y_i\in (C_1,C_2,...,C_k)\)，也就是数据集包含\(k\)类数据；<br/>
+输出：降维后的样本集\(D′\)。</p>
+
+<p>1） 计算类内散度矩阵\(S_W\)<br/>
+2） 计算类间散度矩阵\(S_B\)<br/>
+3） 计算矩阵\(S_W^{-1}S_B\)<br/>
+4） 计算\(S_W^{-1}S_B\)的最大的 \(d\) 个特征值和对应的 \(d\) 个特征向量\((w_1,w_2,...,w_d)\),得到投影矩阵\(W\)<br/>
+5） 对样本集中的每一个样本特征\(x_i\)，转化为新的样本\(z_i=W^Tx_i\)<br/>
+6） 得到输出样本集\(D′={(z_1,y_1),(z_2,y_2),...,((z_m,y_m))}\)</p>
+
+<h2 id="toc_7">LDA的局限性</h2>
+
+<ol>
+<li><p>存在秩限制，对于 \(k\) 类问题，至多可生成 \(k-1\) 维子空间。LDA降维后的维度区间在 \([1,k-1]\) ，与原始特征数 \(m\) 无关，对于二值分类，最多投影到1维。</p></li>
+<li><p>类间散度矩阵必须非奇异。在一些小样本数据集中，样本总数可能小于样本维数，此时\(S_W\)奇异，将不能使用上述LDA算法。</p></li>
+</ol>
+
+<h2 id="toc_8">LDA 改进算法</h2>
+
+<h4 id="toc_9">PCA + LDA</h4>
+
+<p>在一些人脸识别等小样本问题上，需要面对的一个小问题是类内散度奇异，这是由于训练图像的个数 N 远小于每一个图像的维度。Belhomecour 等人提出一个解决方案，先做一次PCA降维，解决\(S_W\)的奇异问题，然后再应用LDA将训练集将维到\(k-1\)维度。</p>
+
+<h6 id="toc_10">还有一些其他的改进算法 MLDA 等，相关文献较少，以后需要时再看吧</h6>
+
+<h2 id="toc_11">附录：</h2>
+
+<h4 id="toc_12">秩的性质：</h4>
+
+<p>1） \(0 \le R(A_{m\times n}) \le min\{m,n\}\)<br/>
+2） \(R(A^T) = R(A)\)<br/>
+3） 若A~B，则\(R(A) = R(B)\)<br/>
+4） 若P,Q可逆，则\(R(PAQ) = R(A)\)<br/>
+5） \(max\{R(A),R(B)\} \le R(A,B) \le R(A)+R(B)\)<br/>
+6） \(R(A+B) \le R(A)+R(B)\)<br/>
+7） \(R(AB) \le min\{R(A),R(B)\}\)<br/>
+8） 若\(A_{m\times n}B_{n\times l} = O\)，则\(R(A) + R(B) \le n\)</p>
+
+<h4 id="toc_13">矩阵的秩与非零特征值的关系</h4>
+
+<p>论文看<a href="http://xueshu.baidu.com/s?wd=paperuri%3A%28f0a2034422bc0816eb555fa33cb95b1f%29&amp;filter=sc_long_sign&amp;tn=SE_xueshusource_2kduw22v&amp;sc_vurl=http%3A%2F%2Fwww.doc88.com%2Fp-317741888504.html&amp;ie=utf-8&amp;sc_us=4282568566058718085">这里</a>(Chrome打开)</p>
+
+<h6 id="toc_14">定理：对于任意 \(n\) 阶方阵，都有 \(\mu (A) \le r(A)\)，即矩阵的非零特征值的个数不大于矩阵的秩。</h6>
+
+<p>证明：<br/>
+当\(|A|\neq 0\)时，此时\(A\)可逆，并有\(r(A) = n\)。假设\(\lambda_1,\lambda_2,...,\lambda_n\)是方阵\(A\)的全部特征值，那么\(|A| = \lambda_1\lambda_2...\lambda_n\neq 0\)，所以\(\lambda_i\neq 0(i=1,2,...,n)\)，所以\(\mu(A) = r(A)\)。</p>
+
+<p>当\(|A| = 0\)时，设\(r(A) = r &lt; n\)，对于特征值\(\lambda\)满足：<br/>
+\[<br/>
+|\lambda I-A| = \left ( \begin{array}{cccccc} <br/>
+\lambda-a_{11}&amp;-a_{12}&amp;...&amp;-a_{1r}&amp;...&amp;-a_{1n}\\<br/>
+-a_{21}&amp;\lambda-a_{22}&amp;...&amp;-a_{2r}&amp;...&amp;-a_{2n}\\<br/>
+...&amp;...&amp;...&amp;...&amp;...&amp;...\\<br/>
+-a_{r1}&amp;-a_{r2}&amp;...&amp;\lambda-a_{rr}&amp;...&amp;-a_{rn}\\<br/>
+-a_{r+1,1}&amp;-a_{r+1,2}&amp;...&amp;\lambda-a_{r+1,r}&amp;...&amp;-a_{r+1,n}\\<br/>
+...&amp;...&amp;...&amp;...&amp;...&amp;...\\<br/>
+-a_{n1}&amp;-a_{n2}&amp;...&amp;-a_{nr}&amp;...&amp;\lambda-a_{nn}<br/>
+\end{array} \right )<br/>
+\]</p>
+
+<p>考虑矩阵的行向量组\((a_1,a_2,...,a_n)^T\)，这里不妨设\(a_1,a_2,...,a_r\)为线形无关的 \(r\) 个向量。则\(a_{r+1},a_{r+2},...,a_n\)均可由\(a_1,a_2,...,a_r\)线形表示，设\(a_i=k_{i1}a_1+k_{i2}a_2+...+k_{ir}a_r\)，其中\(i=r+1,r+2,...,n\)，我们现在只看第 \(r+1\) 行的每一个元素，用前 \(r\) 行表示得：<br/>
+\[<br/>
+\begin{align*}<br/>
+a_{r+1,1}&amp;=k_{r+1,1}a_{11}+k_{r+1,2}a_{21}+...+k_{r+1,r}a_{r1}\\<br/>
+a_{r+1,2}&amp;=k_{r+1,1}a_{12}+k_{r+1,2}a_{22}+...+k_{r+1,r}a_{r2}\\<br/>
+&amp;...\\<br/>
+a_{r+1,n}&amp;=k_{r+1,1}a_{1n}+k_{r+1,2}a_{2n}+...+k_{r+1,r}a_{rr}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>现在对\(|\lambda I-A|\)的第\((r+1)\)行做行列式变换，分别用\(k_{r+1,j}\)乘上\(|\lambda I-A|\)的第 \(j\)(\(j=1,2,...,r\)) 行后加上它，我们知道行列式变换结果不变，分开计算每一个元素，先看第一项：</p>
+
+<p>\[<br/>
+\begin{align*}<br/>
+|\lambda I-A|_{r+1,1} &amp;\sim |\lambda I-A|_{r+1,1} + k_{r+1,1}(\lambda-a_{11}) + k_{r+1,2}a_{21}+...+k_{r+1,r}a_{r1} \\<br/>
+&amp;= -a_{r+1,1} + k_{r+1,1}(\lambda-a_{11}) + k_{r+1,2}a_{21}+...+k_{r+1,r}a_{r1} \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>将之前\(a_{r+1,1}\)的线形表示形式带入上式得：</p>
+
+<p>\[<br/>
+\begin{align*}<br/>
+|\lambda I-A|_{r+1,1} &amp;\sim -a_{r+1,1} + k_{r+1,1}(\lambda-a_{11}) + k_{r+1,2}a_{21}+...+k_{r+1,r}a_{r1}\\<br/>
+&amp;= (-k_{r+1,1}a_{11}-k_{r+1,2}a_{21}-...k_{r+1,r}a_{r1}) + k_{r+1,1}(\lambda-a_{11}) + k_{r+1,2}a_{21}+...+k_{r+1,r}a_{r1} = k_{r+1,1}\lambda<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>同理可得其他项，按照这种方式最终可得：<br/>
+\[<br/>
+\begin{align*}<br/>
+|\lambda I-A| &amp;\sim \left ( \begin{array}{cccccc} <br/>
+\lambda-a_{11}&amp;-a_{12}&amp;...&amp;-a_{1r}&amp;-a_{1,r+1}&amp;...&amp;-a_{1n}\\<br/>
+-a_{21}&amp;\lambda-a_{22}&amp;...&amp;-a_{2r}&amp;-a_{2,r+1}&amp;...&amp;-a_{2n}\\<br/>
+...&amp;...&amp;...&amp;...&amp;...&amp;..&amp;...\\<br/>
+-a_{r1}&amp;-a_{r2}&amp;...&amp;\lambda-a_{rr}&amp;a_{r,r+1}&amp;...&amp;-a_{rn}\\<br/>
+k_{r+1,1}\lambda&amp;k_{r+1,2}\lambda&amp;...&amp;k_{r+1,r}\lambda&amp;\lambda&amp;...&amp;0\\<br/>
+...&amp;...&amp;...&amp;...&amp;...&amp;...&amp;...\\<br/>
+k_{n,1}\lambda&amp;k_{n,2}\lambda&amp;...&amp;k_{n,r}\lambda&amp;0&amp;...&amp;\lambda<br/>
+\end{array} \right ) \\<br/>
+&amp;= \lambda^{n-r}\left ( \begin{array}{cccccc} <br/>
+\lambda-a_{11}&amp;-a_{12}&amp;...&amp;-a_{1r}&amp;-a_{1,r+1}&amp;...&amp;-a_{1n}\\<br/>
+-a_{21}&amp;\lambda-a_{22}&amp;...&amp;-a_{2r}&amp;-a_{2,r+1}&amp;...&amp;-a_{2n}\\<br/>
+...&amp;...&amp;...&amp;...&amp;...&amp;..&amp;...\\<br/>
+-a_{r1}&amp;-a_{r2}&amp;...&amp;\lambda-a_{rr}&amp;a_{r,r+1}&amp;...&amp;-a_{rn}\\<br/>
+k_{r+1,1}&amp;k_{r+1,2}&amp;...&amp;k_{r+1,r}&amp;1&amp;...&amp;0\\<br/>
+...&amp;...&amp;...&amp;...&amp;...&amp;...&amp;...\\<br/>
+k_{n,1}&amp;k_{n,2}&amp;...&amp;k_{n,r}&amp;0&amp;...&amp;1<br/>
+\end{array} \right ) \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>由此可见至少\(|\lambda I-A| = 0\)有\((n-r)\)个零特征值，也就是它最多拥有\(n-(n-r)=r\)个非零特征值。结合\(r(A) = r\)，所以\(u(A) \le r(A)\)。<br/>
+得证。</p>
+
+<h6 id="toc_15">其他关于矩阵秩的论文：<a href="https://wenku.baidu.com/view/f0deb94a8762caaedc33d426.html">方阵的秩与特征值的关系</a></h6>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E9%99%8D%E7%BB%B4.html'>降维</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15042890159558.html" 
+	        title="Previous Post: 随机领域嵌入算法 SNE">&laquo; 随机领域嵌入算法 SNE</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15037711738928.html" 
+	        title="Next Post: 奇异值分解 SVD">奇异值分解 SVD &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

@@ -1,0 +1,776 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  提升树与GBDT - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">提升树与GBDT</h1>
+				<p class="meta"><time datetime="2018-01-23T23:27:25+08:00" pubdate data-updated="true">2018/1/23</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>从提升方法学习中可以知道提升方法是采用加法模型和前向分布算法，提升树是以决策树为基函数的提升方法。对于分类问题决策树是二叉分类树，对于回归问题决策树是二叉回归树。提升树可以表示为决策树的加法模型：<br/>
+\[<br/>
+f_M(x) = \sum_{m=1}^M T(x;\Theta_m)<br/>
+\]</p>
+
+<p>其中 \(T(x;\Theta_m)\) 表示决策树；\(\Theta_m\) 表示决策树的参数；M 为树的个数。</p>
+
+<h4 id="toc_0">前向分布算法</h4>
+
+<p>由前向分布算法，可知第 \(m\) 轮模型 \(f_m(x)\) 为：<br/>
+\[<br/>
+f_m(x) = f_{m-1}(x) + T(x;\Theta_m)<br/>
+\]</p>
+
+<p>其中 \(f_{m-1}(x)\) 为当前模型，可以通过经验风险最小化来确定下一棵决策树参数 \(\Theta_m\) ，即：<br/>
+\[<br/>
+\hat \Theta_m = arg \min_{\Theta_m} \sum_{i=1}^N L(y_i, f_{m-1}(x_i) + T(x_i;\Theta_m))<br/>
+\]</p>
+
+<p>不同问题的提升树学习算法的主要区别是使用的损失函数不同，包括用平方误差损失函数的回归问题，用指数损失函数的分类问题，以及使用一般损失函数的一般决策问题。</p>
+
+<p>对于二类分类问题，提升树算法可以算是 AdaBoost 算法的特殊情况，下面主要叙述回归问题的提升树：</p>
+
+<p>已知一个训练数据集 \(T=\{(x_1,y_1),(x_2,y_2),...,(x_N,y_N)\}\)，\(x_i\in \mathcal X\subseteq R^n\)，\(\mathcal X\) 为输入空间，\(y_i\in \mathcal Y\subseteq R\)，\(\mathcal Y\) 为输出空间。如果将输入空间 \(\mathcal X\) 划分为 \(J\) 个互不相交的区域 \(R_1,R_2,...,R_J\)，并且在每一个区域上确定输出常量 \(c_j\) ，那么树可以表示为：<br/>
+\[<br/>
+T(x;\Theta) = \sum_{j=1}^J c_j I(x\in R_j)<br/>
+\]</p>
+
+<p>其中，参数 \(\Theta = \{(R_1,C_1),(R_2,c_2),...,(R_J,c_J)\}\) 表示树的区域划分和各区域上的常数。\(J\) 是回归树的复杂度即叶节点的个数。回归树使用以下的前向分步算法：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;f_0(x) = 0\\<br/>
+&amp;f_m(x) = f_{m-1}(x) + T(x;\Theta_m), \quad m = 1,2,...,M\\<br/>
+&amp;f_M(x) = \sum_{m=1}^M T(x;\Theta_m)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>在前向分布算法的第 \(m\) 步，给定当前模型 \(f_{m-1}(x)\) ，需求解：<br/>
+\[<br/>
+\hat\Theta_m = arg \min_{\Theta_m} \sum_{i=1}^N L(y_i,f_{m-1}(x_i) + T(x_i;\Theta_m))<br/>
+\]</p>
+
+<p>得到 \(\hat\Theta_m\) ，即第 \(m\) 棵树的参数。</p>
+
+<p>当采用平方误差损失函数时：<br/>
+\[<br/>
+L(y,f(x)) = (y-f(x))^2<br/>
+\]</p>
+
+<p>其损失变为：<br/>
+\[<br/>
+\begin{align*}<br/>
+L(y,f_{m-1}(x) + T(x;\Theta_m)) &amp;= [y-f_{m-1}(x) - T(x;\Theta_m)]^2\\<br/>
+&amp;= [r-T(x;\Theta_m)]^2<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>这里：<br/>
+\[<br/>
+r = y - f_{m-1}(x)<br/>
+\]</p>
+
+<p>是当前模型拟合数据的残差（residual）。所以，对回归问题的提升树来说，只需简单的拟合当前模型的残差。这样，算法是相当简单的。</p>
+
+<h4 id="toc_1">算法过程</h4>
+
+<p><b>输入</b>：训练数据集 \(T=\{(x_1,y_1),(x_2,y_2),...,(x_n,y_n)\}\)，其中 \(x_i\in \mathcal X\subseteq R^n\)，\(y_i \in\mathcal Y \subseteq R\)；<br/>
+<b>输出</b>：提升树 \(f_M(x)\)<br/>
+<b>算法过程</b>：</p>
+
+<ul>
+<li>初始化 \(f_0(x) = 0\)</li>
+<li><p>对 \(m=1,2,...,M\)</p>
+
+<ul>
+<li><p>计算当前残差<br/>
+\[<br/>
+r_{mi} = y_i - f_{m-1}(x_i), \quad i=1,2,...,N<br/>
+\]</p></li>
+<li><p>拟合残差 \(r_{mi}\) 学习回归树，得到 \(T(x;\Theta_m)\) </p></li>
+<li><p>更新 \(f_m(x) = f_{m-1}(x) + T(x, \Theta_m)\)</p></li>
+</ul></li>
+<li><p>得到回归问题提升树<br/>
+\[<br/>
+f_M(x) = \sum_{m=1}^M T(x,\Theta_m)<br/>
+\]</p></li>
+</ul>
+
+<p>接下来先介绍一下决策树桩，然后举例说明提升树实例。</p>
+
+<h4 id="toc_2">决策树桩 decision stump</h4>
+
+<p>决策树桩，也可以称之为单层决策树，只对一列属性做一次判断决定最终的分类结果，比如只根据瓜的根蒂是否蜷缩来判断是否是好瓜，这提现的是单一特征起作用。显然 decision stump 仅可作为一个弱基本分类器，它的结果仅会比瞎猜 \(1/2\) 稍好一点点，在集成学习中，常可以作为基本分类器。</p>
+
+<p>决策树桩仅可以对一个属性的一次判断获取结果，我们需要找到最低错误率的决策树桩，即优化目标函数：<br/>
+\[<br/>
+arg \min_{1\le c\le \text{d}} \frac 1 N \sum_{i=1}^N I(y_i \neq T_c(x_i))<br/>
+\] </p>
+
+<p>其中 \(c\) 表示属性值，\(d\) 表示属性列个数，\(N\) 表示样本数量。</p>
+
+<h4 id="toc_3">提升树实例</h4>
+
+<p>如下图的训练数据， \(x\) 的取值范围是区间 [0.5,10.5]，\(y\) 的取值范围是区间 [5.0,10.0]，学习这个回归问题的提升树模型，考虑只用决策树桩作为基函数<br/>
+\[<br/>
+\begin{array}{ccccccccccc}\\\hline<br/>
+x_i &amp; 1 &amp;  2 &amp;  3 &amp; 4 &amp; 5 &amp; 6 &amp; 7 &amp; 8 &amp; 9 &amp; 10\\\hline<br/>
+y_i &amp; 5.56 &amp; 5.70 &amp; 5.91 &amp; 6.40 &amp; 6.80 &amp; 7.05 &amp; 8.90 &amp; 8.70 &amp; 9.00 &amp; 9.05 \\\hline<br/>
+\end{array}<br/>
+\]</p>
+
+<p>按照算法，第一步要求 \(f_1(x)\) 即第一个树桩 \(T_1(x)\)：<br/>
+在本例中只有一个属性 \(x\) ，我们只需要找到在属性 \(x\) 上找到为最佳切分点 \(s\) ，切分点将样本分成了 \(R_1\) 和 \(R_2\) 两部分，两部分的属性值为 \(c_1\) 和 \(c_2\) ：<br/>
+\[<br/>
+\min m(s) = \min_s\bigg[ \min_{c_1} \sum_{x_i \in R_1}(y_i - c_1)^2 + \min_{c_2} \sum_{x_i \in R_2}(y_i - c_2)^2 \bigg]<br/>
+\]</p>
+
+<p>求解最佳切分点 \(s\) ：<br/>
+\[<br/>
+R_1 = {x|x\le s} ,\quad R_2 = {x|x \gt s}<br/>
+\]</p>
+
+<p>容易求得在 \(R_1\) 和 \(R_2\) 两区域使平方误差最小的 \(c_1\) 和 \(c_2\) 为：<br/>
+\[<br/>
+c_1 = \frac 1 {|R_1|} \sum_{x_i \in R_1}y_i , \quad c_2 = \frac 1 {|R_2|} \sum_{x_i \in R_2} y_i<br/>
+\]</p>
+
+<p>当 \(s=1.5\) 时，\(R_1=\{1\}\)，\(R_2 = \{2,3,4,5,6,7,8,9,10\}\)，此时：<br/>
+\[<br/>
+c_1 = 5.56,\quad c_2 = 67.51/9 = 7.50\\<br/>
+m(s) = \min_{c_1} \sum_{x_i \in R_1}(y_i - c_1)^2 + \min_{c_2} \sum_{x_i \in R_2}(y_i - c_2)^2 = 15.72<br/>
+\]</p>
+
+<p>当 \(s=2.5\)，\(s=3.5\)，...，\(s=9.5\)，会求出不同的 \(m(s)\) ，找到令 \(m(s)\) 最小的切分点 \(s\)，本例中 \(s=6.5\) 时，\(m(s)\) 达到最小值。此时 \(R_1(x) = \{1,2,3,4,5,6\}\)，\(R_2(x) = \{7,8,9,10\}\)，\(c_1=6.24\)，\(c_2=8.91\)。所以回归树为：<br/>
+\[<br/>
+T_1(x) = \left \{ \begin{array}\\<br/>
+6.24&amp;\quad x \le 6.5\\<br/>
+8.91&amp;\quad x \gt 6.5\\<br/>
+\end{array} \right .\\<br/>
+f_1(x) = T_1(x)<br/>
+\]</p>
+
+<p>计算残差 \(r_{2i} = y_i - f_1(x_i),\quad i=1,2,...,10\)，可得:<br/>
+\[<br/>
+\begin{array}{ccccccccccc}\\\hline<br/>
+ x_i  &amp; 1 &amp;  2 &amp;  3 &amp;  4 &amp;  5 &amp;  6 &amp;  7 &amp;  8 &amp;  9 &amp;  10 \\\hline<br/>
+ y_i &amp;  -0.68 &amp;  -0.54 &amp;  -0.33 &amp;  0.16 &amp;  0.56 &amp; 0.81 &amp;  -0.01 &amp;  -0.21 &amp;  0.09 &amp;  0.14 &amp; \\\hline<br/>
+\end{array}<br/>
+\]</p>
+
+<p>用 \(f_1(x)\) 拟合训练集平方损失误差为：<br/>
+\[<br/>
+L(y,f_1(x)) = \sum_{i=1}^10 (y_i - f_1(x_i))^2 = \sum_{i=1}^10 r_{1i}^2 = 1.93<br/>
+\]</p>
+
+<p>建立第二棵树拟合残差，可以得到：<br/>
+\[<br/>
+T_2(x) = \left \{ \begin{array}\\<br/>
+-0.52&amp;\quad x\le 3.5\\<br/>
+0.22 &amp;\quad x \gt 3.5\\<br/>
+\end{array} \right .<br/>
+\]</p>
+
+<p>所以回归树：<br/>
+\[<br/>
+f_2(x) = f_1(x) + T_2(x) = \left \{ \begin{array}\\<br/>
+6.24-0.52=5.72 &amp; \quad x \le 3.5\\<br/>
+6.24+0.22=6.46 &amp; \quad 3.5 \lt x \le 6.5\\<br/>
+8.91+0.22=9.13 &amp; \quad x \gt 6.5\\<br/>
+\end{array} \right .<br/>
+\]</p>
+
+<p>如果用 \(f_2(x)\) 拟合训练数据，平方损失误差为：<br/>
+\[<br/>
+L(y,f_2(x)) = \sum_{i=1}^10 (y_i - f_2(x_i))^2 = 0.79\\<br/>
+\]</p>
+
+<p>继续前向分步算法直到平方损失误差满足条件结束。</p>
+
+<h3 id="toc_4">梯度提升树 GBDT</h3>
+
+<p>提升树使用加法模型和前向分步算法，当损失函数是平方损失和指数损失函数时，很容易求解。但当损失函数是一般损失函数而言，往往每一步优化都不容易。针对这一问题，Freidman 提出了梯度提升技术，所以有了梯度提升树 GBDT。</p>
+
+<p>GBDT (Gradient Boosting Decision Tree) 又叫 MART(Multiple Additive Regression Tree)，是一种迭代的决策树算法，该算法由多棵决策树组成，所有树的结论累加起来做最终答案。它在被提出之初就和SVM一起被认为是泛化能力较强的算法。</p>
+
+<p>GBDT 的树是回归树，不是分类树，GBDT用来做回归预测，调整后也可以用于分类。</p>
+
+<p>它利用最速下降的近似方法，其关键是利用损失函数的负梯度在当前模型的值：<br/>
+\[<br/>
+-\bigg[\frac{\partial L(y,f(x_i))}{\partial f(x_i)} \bigg]_{f(x) = f_{m-1}(x)}<br/>
+\]</p>
+
+<p>作为回归问题提升树算法中的残差的近似值，拟合一个回归树。</p>
+
+<h4 id="toc_5">梯度提升算法</h4>
+
+<p><b>输入</b>：训练数据集 \(T = \{(x_1,y_1),(x_2,y_2),...,(x_N,y_N)\}\)，\(x_i \in \mathcal X \subseteq R^n\)，\(y_i\in \mathcal Y\subseteq R\)；损失函数 \(L(y,f(x))\)；<br/>
+<b>输出</b>：回归树 \(\hat{f(x)}\)<br/>
+<b>算法过程</b>：</p>
+
+<ul>
+<li>初始化
+\[
+f_0(x) = arg \min_c \sum_{i=1}^N L(y_i,c)
+\]</li>
+</ul>
+
+<blockquote>
+<p>当损失函数为平方损失函数时，平方损失函数是一个下凸函数，可以直接求导获得：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\frac{\partial L(y_i,c)}{\partial c} = \frac{\partial \sum_{i=1}^N \frac 1 2 (y_i-c)^2}{\partial c} = \sum_{i=1}^N -(y_i-c) = 0\\<br/>
+&amp;c = \frac 1 N \sum_{i=1}^N y_i<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>所以：<br/>
+\[<br/>
+f_0(x) = c = \frac 1 N \sum_{i=1}^N y_i<br/>
+\]</p>
+</blockquote>
+
+<ul>
+<li><p>对 \(m=1,2,...,M\) </p>
+
+<ul>
+<li><p>对 \(i=1,2,...,N\)，计算<br/>
+\[<br/>
+r_{mi} = -\bigg[ \frac{\partial L(y_i,f(x_i))}{\partial f(x_i)} \bigg ]_{f(x) = f_{m-1}(x)}<br/>
+\]</p></li>
+<li><p>对 \(r_{mi}\) 拟合一个回归树，得到第 \(m\) 棵树的叶节点区域 \(R_{mj}\)，\(j=1,2,...,J\)</p></li>
+<li><p>对 \(j=1,2,...,J\) 计算<br/>
+\[<br/>
+c_{mj} = arg \min_c \sum_{x_i\in R_{mj}} L(y_i,f_{m-1}(x_i) + c)<br/>
+\]</p></li>
+</ul>
+
+<blockquote>
+<p>当损失函数为平方损失函数时，计算 \(r_{mj}\) ：<br/>
+\[<br/>
+\begin{align*}<br/>
+r_{mi} = -\frac{\partial L(y_i,f_0(x_i))}{\partial f_{m-1}(x_i)} = -\frac{\partial \frac 1 2 (y_i - f_{m-1}(x_i))^2}{\partial f_{m-1}(x_i)} = y_i - f_{m-1}(x_i) <br/>
+\end{align*}<br/>
+\]</p>
+
+<p>计算 \(c_{mj}\)：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial \sum_{x_i\in R_{mj}} L(y_i,f_{m-1}(x_i) + c)}{\partial c} &amp;= \frac{\partial \sum_{x_i\in R_{mj}} \frac 1 2 (y_i - f_{m-1}(x_i) -c)^2}{\partial c}\\<br/>
+&amp;= \sum_{x_i\in R_{mj}} (y_i - f_{m-1}(x_i) -c)\\<br/>
+&amp;= \sum_{x_i\in R_{mj}} (y_i - f_{m-1}(x_i)) - |R_{mj}|c = 0\\<br/>
+\therefore \quad c &amp;= \frac 1 {|R_{mj}|} \sum_{x_i\in R_{mj}} (y_i - f_{m-1}(x_i))\\<br/>
+&amp;= \frac 1 {|R_{mj}|} \sum_{x_i \in R_{mj}} r_{mi}<br/>
+\end{align*}<br/>
+\]</p>
+</blockquote>
+
+<ul>
+<li>更新 \(f_m(x) = f_{m-1}(x) + \sum_{j=1}^J c_{mj}I(x\in R_{mj})\)</li>
+</ul></li>
+<li><p>得到回归树<br/>
+\[<br/>
+\hat{f(x)} = f_M(x) = \sum_{m=1}^M \sum_{j=1}^J c_{mj} I(x\in R_{mj})<br/>
+\]</p></li>
+</ul>
+
+<h4 id="toc_6">梯度提升树实例</h4>
+
+<p>还是以前面的训练数据集为例，损失函数设为平方损失函数。</p>
+
+<ol>
+<li><p>首先初始学习器为：<br/>
+\[<br/>
+f_0(x) = c = \frac 1 N \sum_{i=1}^N y_i = 7.307<br/>
+\]</p></li>
+<li><p>当迭代轮数 \(m=1\) : <br/>
+计算所有样本的残差：<br/>
+\[<br/>
+r_{1i} = -\frac{\partial L(y_i,f_0(x_i))}{\partial f_0(x_i)} = -\frac{\partial \frac 1 2 (y_i - f_0(x_i))^2}{\partial f_0(x_i)} = y_i - f_0(x_i)<br/>
+\]</p>
+
+<p>第一个样本的残差为 \(5.56 - 7.307 = -1.747\)<br/>
+同理可以求得第 \(i=2,3,...,m\) 个样本的残差，然后使用残差作为样本的真实值训练 \(f_1(x)\)，残差如下：<br/>
+\[<br/>
+\begin{array}{ccccccccccc}\\\hline<br/>
+x_i &amp; 1 &amp; 2 &amp; 3 &amp; 4 &amp; 5 &amp;  6 &amp; 7 &amp; 8 &amp; 9 &amp; 10 \\\hline<br/>
+y_i &amp; -1.747 &amp; -1.607 &amp; -1.397 &amp; -0.907 &amp; -0.507 &amp; -0.257 &amp; 1.593 &amp; 1.393 &amp; 1.693 &amp; 1.743 \\\hline<br/>
+\end{array}<br/>
+\]</p>
+
+<p>当切分点 \(s = -1.677\)，此时 \(R_1 = \{1\}\)，\(R_2 = \{2,3,4,5,6,7,8,9,10\}\)，此时：<br/>
+\[<br/>
+c_1 = -1.747,\quad c_2 = 0.194\\<br/>
+m(s) = \min_{c_1} \sum_{x_i \in R_1}(y_i - c_1)^2 + \min_{c_2} \sum_{x_i \in R_2}(y_i - c_2)^2 = 15.72<br/>
+\]</p>
+
+<p>同理可以再算出其他切分点 \(s\) 对应的 \(m(s)\) ，找到令 \(m(s)\) 最小的切分点 \(s\)，此时划分的区域为 \(c_{1j}\)，\(j=1,2,...,J\)，回归树表示为：<br/>
+\[<br/>
+f_1(x) = f_0(x) + \sum_{j=1}^J c_{1j}I(x\in R_{1j})<br/>
+\]</p></li>
+<li><p>继续迭代 \(m=2,3,...,M\) 。</p></li>
+</ol>
+
+<h3 id="toc_7">GBDT 分类问题</h3>
+
+<p>GBDT的分类算法从思想上和GBDT的回归算法没有区别，但是由于样本输出不是连续的值，而是离散的类别，导致我们无法直接从输出类别去拟合类别输出的误差。为了解决这个问题，主要有两个方法，一个是用指数损失函数，此时GBDT退化为Adaboost算法。另一种方法是用类似于逻辑回归的对数似然损失函数的方法。也就是说，我们用的是类别的预测概率值和真实概率值的差来拟合损失。</p>
+
+<h4 id="toc_8">GBDT 二分类问题</h4>
+
+<p>对于二分类，将真实值 \(y\) 和预测值 \(f(x)\) 的乘积，通过sigmoid处理成概率，再使用对数似然损失函数，损失函数为：<br/>
+\[<br/>
+\begin{align*}<br/>
+L(y,f(x)) = -\log P(y|x) = -\log[\text{sigmod}(yf(x))] = -\log(\frac{1}{1 + \exp(-yf(x))}) = \log(1+\exp(-yf(x)))<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(y\in \mathcal Y = \{-1,1\}\)</p>
+
+<p>此时负梯度误差为：<br/>
+\[<br/>
+\begin{align*}<br/>
+r_{mi} &amp;= -\bigg[\frac{\partial L(y,f(x_i))}{\partial f(x_i)} \bigg]_{f(x) = f_{m-1}(x)}\\<br/>
+&amp;=-\frac{\partial L(y_i,f_{m-1}(x_i))}{\partial f_{m-1}(x_i)} \\<br/>
+&amp;= -\frac{\partial \log(1+\exp(-yf_{m-1}(x_i)))}{\partial f_{m-1}(x_i)}\\<br/>
+&amp;= \frac{y\exp(-yf_{m-1}(x_i))}{1+\exp(-yf_{m-1}(x_i))} \\<br/>
+&amp;= \frac{y\exp(-yf_{m-1}(x_i)) \exp(yf_m(x_i))}{(1+\exp(-yf_{m-1}(x_i))) \exp(yf_{m-1}(x_i))} \\<br/>
+&amp;= \frac{y}{\exp(yf_{m-1}(x_i))+1} \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>用 \(r_{mi}\) 拟合一个回归树，得到第 \(m\) 棵树的叶节点区域 \(R_{mj}\)，\(j=1,2,...,J\)，各个叶子节点的最佳残差拟合值为：<br/>
+\[<br/>
+\begin{align*}<br/>
+c_{mj} &amp;= arg \min_c \sum_{x_i\in R_{mj}} L(y_i,f_{m-1}(x_i) + c) = arg \min_c \sum_{x_i \in R_{mj}} \log(1+\exp(-y_i(f(x_i) + c)))<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>由于上式比较难优化，我们一般使用近似值代替：<br/>
+\[<br/>
+c_{mj} = \sum_{x_i \in R_{mj}} r_{mi} / \sum_{x_i\in R_{mj}} |r_{mi}|(1−|r_{mi}|)<br/>
+\]</p>
+
+<p>除了负梯度计算和叶子节点的最佳残差拟合的线性搜索，二元GBDT分类和GBDT回归算法过程相同。</p>
+
+<h4 id="toc_9">GBDT 多分类问题</h4>
+
+<p>多分类 GBDT 要比二分类更复杂一下，对应的是多元逻辑回归和二元逻辑回归的复杂度差别。假设类别数为 \(K\)，则此时我们的对数似然损失函数为：<br/>
+\[<br/>
+L(y,f(x)) = -\sum_{k=1}^K y_k \log p_k(x)<br/>
+\]</p>
+
+<p>如果输出样本为 \(k\) ，则 \(y_k=1\) ，第 \(k\) 类的概率 \(p_k(x)\) 的表达式为：<br/>
+\[<br/>
+p_k(x) = \frac{\exp(f_k(x))}{\sum_{l=1}^K \exp(f_l(x))} <br/>
+\]</p>
+
+<p>集合上面两式可以计算第 \(m\) 轮的第 \(i\) 个样本对应类别 \(k\) 的负梯度误差为：<br/>
+\[<br/>
+\begin{align*}<br/>
+r_{mik} &amp;= -\bigg[\frac{\partial L(y_i,f(x_i))}{\partial f_k(x_i)}\bigg]_{f_l(x) = f_{l,m-1}(x)}\\<br/>
+&amp;= -\bigg[\frac{\partial -\sum_{k=1}^K y_{ik} \log \big[{\exp(f_k(x_i))}/{\sum_{l=1}^K \exp(f_l(x_i))}\big]}{\partial f_k(x_i)} \bigg]_{f_l(x) = f_{l,m-1}(x)}\\<br/>
+&amp;= -\bigg[\frac{\partial -\sum_{k=1}^K y_{ik} \log \big[{\exp(f_{k,m-1}(x_i))}/{\sum_{l=1}^K \exp(f_{l,m-1}(x_i))}\big]}{\partial f_{k,m-1}(x_i)} \bigg]\\<br/>
+&amp;= \frac{y_{ik} \frac{\exp(f_{k,m-1}(x_i))}{{\sum_{l=1}^K \exp(f_{l,m-1}(x_i))}}- \frac{\exp(f_{k,m-1}(x_i))\exp(f_{k,m-1}(x_i))}{({\sum_{l=1}^K \exp(f_{l,m-1}(x_i))})^2}}{{\exp(f_{k,m-1}(x_i))}/{\sum_{l=1}^K \exp(f_{l,m-1}(x_i))}}\\<br/>
+&amp;= \frac{y_{ik} p_{k,m-1}(x_i)- (p_{k,m-1})^2}{p_{k,m-1}(x_i)}\\<br/>
+&amp;= y_{ik} - p_{k,m-1}(x_i)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>观察上式可以看出，其实这里的误差就是样本 \(i\) 对应类别 \(k\) 的真实概率和 \(m−1\) 轮预测概率的差值。用 \(r_{mi}\) 拟合一个回归树，得到第 \(m\) 棵树的叶节点区域 \(R_{mj}\)，\(j=1,2,...,J\)，各个叶子节点的最佳残差拟合值为：<br/>
+\[<br/>
+\begin{align*}<br/>
+c_{mjk} = arg \min_{c_{jk}} \sum_{x_i\in R_{mj}} \sum_{k=1}^K L(y_k,f_{m-1,k}(x_i)+\sum_{j=1}^J c_{jk}) \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>由于上式比较难优化，我们一般使用近似值代替：<br/>
+\[<br/>
+c_{mjk} = \frac{K-1}{K} \frac{\sum_{x_i \in R_{mj}} r_{mil}}{\sum_{x_i\in R_{mj}} |r_{mik}|(1-|r_{mik}|)}<br/>
+\]</p>
+
+<p>除了负梯度计算和叶子节点的最佳残差拟合的线性搜索，多元GBDT分类和二元GBDT分类以及GBDT回归算法过程相同。</p>
+
+<h3 id="toc_10">GBDT常见损失函数</h3>
+
+<p>对于分类算法，其损失函数一般有对数损失函数和指数损失函数两种:</p>
+
+<ol>
+<li><p>如果是指数损失函数，则损失函数表达式为<br/>
+\[<br/>
+L(y,f(x))=\exp(−yf(x))<br/>
+\]</p>
+
+<p>其负梯度计算和叶子节点的最佳残差拟合可以参考Adaboost自适应提升方法。</p></li>
+<li><p>如果是对数损失函数，分为二元分类和多元分类两种，参加上面的讲解。</p></li>
+</ol>
+
+<p>对于回归算法，常用损失函数有如下4种:</p>
+
+<ol>
+<li><p>均方差，这个是最常见的回归损失函数了<br/>
+\[<br/>
+L(y,f(x))=\frac 1 2 (y−f(x))^2<br/>
+\]</p></li>
+<li><p>绝对损失，这个损失函数也很常见：</p>
+
+<p>\[<br/>
+L(y,f(x) = |y-f(x)|<br/>
+\]</p>
+
+<p>对于负梯度误差为：<br/>
+\[<br/>
+\mathrm {sign}(y_i-f(x_i))<br/>
+\]</p></li>
+<li><p>Huber损失，它是均方差和绝对损失的折衷产物，对于远离中心的异常点，采用绝对损失，而中心附近的点采用均方差。这个界限一般用分位数点度量。损失函数如下：<br/>
+\[<br/>
+L(y,f(x))=\left \{\begin{array}\\<br/>
+\frac 1 2 (y−f(x))^2\quad &amp;|y−f(x)|\le \delta\\<br/>
+\delta (|y−f(x)|− \frac \delta 2)\quad &amp;|y−f(x)|&gt;\delta\\<br/>
+\end{array} \right .<br/>
+\]</p>
+
+<p>对应的负梯度为：<br/>
+\[<br/>
+r(y_i,f(x_i))=\left \{\begin{array}\\<br/>
+y_i−f(x_i)\quad &amp; |y_i−f(x_i)|\le\delta\\<br/>
+\delta\text{ sign}(y_i−f(x_i))\quad &amp; |yi−f(xi)|&gt;\delta\\<br/>
+\end{array} \right .<br/>
+\]</p></li>
+<li><p>分位数损失。它对应的是分位数回归的损失函数，表达式为<br/>
+\[<br/>
+L(y,f(x))= \sum_{y\ge f(x)}\theta|y−f(x)|+\sum_{y&lt;f(x)}(1−\theta)|y−f(x)|<br/>
+\]</p>
+
+<p>其中 \(\theta\) 为分位数，需要我们在回归前指定。对应的负梯度误差为：<br/>
+\[<br/>
+r(y_i,f(x_i))=\left \{\begin{array}\\<br/>
+\theta\quad&amp; y_i\ge f(x_i)\\<br/>
+\theta-1\quad &amp;y_i&lt;f(x_i)\\<br/>
+\end{array}\right .<br/>
+\]</p></li>
+</ol>
+
+<p>对于Huber损失和分位数损失，主要用于健壮回归，也就是减少异常点对损失函数的影响。</p>
+
+<h3 id="toc_11">GBDT 的正则化</h3>
+
+<p>和 Adaboost 一样，我们也需要对 GBDT 进行正则化，防止过拟合。GBDT的正则化主要有三种方式。</p>
+
+<ol>
+<li><p>和Adaboost类似的正则化项，即步长(learning rate)。定义为 \(v\)，对于前面的弱学习器的迭代<br/>
+\[<br/>
+f_m(x) = f_{m-1}(x) + G_m(x)<br/>
+\]</p>
+
+<p>如果我们加上了正则化项，则有：<br/>
+\[<br/>
+f_m(x) = f_{m-1}(x) + v\text{ }G_m(x)<br/>
+\]</p>
+
+<p>\(v\) 的取值范围为 \(0&lt;v\le 1\)。对于同样的训练集学习效果，较小的 \(v\) 意味着我们需要更多的弱学习器的迭代次数。通常我们用步长和迭代最大次数一起来决定算法的拟合效果。</p></li>
+<li><p>通过子采样比例（subsample）。取值为 \((0,1]\) 。注意这里的子采样和随机森林不一样，随机森林使用的是放回抽样，而这里是不放回抽样。如果取值为1，则全部样本都使用，等于没有使用子采样。如果取值小于 1 ，则只有一部分样本会去做GBDT的决策树拟合。选择小于 1 的比例可以减少方差，即防止过拟合，但是会增加样本拟合的偏差，因此取值不能太低。推荐在 \([0.5, 0.8]\) 之间。</p>
+
+<p>使用了子采样的GBDT有时也称作随机梯度提升树(Stochastic Gradient Boosting Tree, SGBT)。由于使用了子采样，程序可以通过采样分发到不同的任务去做boosting的迭代过程，最后形成新树，从而减少弱学习器难以并行学习的弱点。</p></li>
+<li><p>对于弱学习器即CART回归树进行正则化剪枝。</p></li>
+</ol>
+
+<h3 id="toc_12">GBDT 优缺点</h3>
+
+<p>GBDT主要的优点有：</p>
+
+<ol>
+<li>可以灵活处理各种类型的数据，包括连续值和离散值。</li>
+<li>在相对少的调参时间情况下，预测的准备率也可以比较高。这个是相对SVM来说的。</li>
+<li>使用一些健壮的损失函数，对异常值的鲁棒性非常强。比如 Huber损失函数和Quantile损失函数。</li>
+</ol>
+
+<p>GBDT的主要缺点有：</p>
+
+<ol>
+<li>由于弱学习器之间存在依赖关系，难以并行训练数据。不过可以通过自采样的SGBT来达到部分并行。</li>
+</ol>
+
+<hr/>
+
+<p>李航【统计学习方法】<br/>
+<a href="https://blog.csdn.net/lanchunhui/article/details/50980635">决策树桩</a><br/>
+<a href="https://www.cnblogs.com/pinard/p/6140514.html">梯度提升树 GBDT</a><br/>
+<a href="https://statweb.stanford.edu/%7Ejhf/ftp/trebst.pdf">Greedy Function Approximation:A Gradient Booting Machine</a></p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html'>集成学习</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15170125982743.html" 
+	        title="Previous Post: XgBoost 算法">&laquo; XgBoost 算法</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15158019416874.html" 
+	        title="Next Post: 自适应提升方法 Adaboost">自适应提升方法 Adaboost &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

@@ -1,0 +1,458 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  人工神经网络-SOM自组织系统 - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">人工神经网络-SOM自组织系统</h1>
+				<p class="meta"><time datetime="2018-11-10T22:44:13+08:00" pubdate data-updated="true">2018/11/10</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>自组织映射是一个很有趣的竞争性学习系统，其中输出神经元之间竞争激活，结果是在任意时间只有一个神经元被激活。这个激活的神经元被称为胜者神经元（winner-takes-all neuron）。这种竞争可以通过在神经元之间具有横向抑制连接（负反馈路径）来实现。其结果是神经元被迫对自身进行重新组合，这样的网络我们称之为自组织映射（Self Organizing Map，SOM）。</p>
+
+<p>生物学研究表明，在人脑的感觉通道上，神经元的组织原理是有序排列的。当外界的特定信息输入时，大脑皮层的特定区域兴奋，而且类似的外界信息在对应区域是连续映像的。生物视网膜中有许多特定细胞对特定的图形比较敏感，当视网膜中有若干个接受单元同时受特定模式刺激时，就使大脑皮层中的特定神经元开始兴奋，输入模式越近，与之对应的兴奋神经元也接近；在听觉通道上，神经元在结构排列上与频率的关系十分密切，对于某个频率，特定的神经元具有最大的响应，位置相邻的神经元具有相近的频率特征，而远离的神经元具有的频率特征差别也较大。大脑皮层中神经元的这种响应特点不是先天安排好的，而是后天的学习自组织形成的。</p>
+
+<h3 id="toc_0">自组织神经网络</h3>
+
+<p>自组织神经网络是无导师学习网络。它通过自动寻找样本的内在规律和本质属性，自组织、自适应地改变网络参数与结构。层次性结构，具有竞争层。如下图所示：</p>
+
+<div align="center">
+    <img src="media/15418610530072/15458312665496.jpg" width="400" />
+</div>
+
+<p>a. 输入层：接受外界信息，将输入模式向竞争层传递，起“观察”作用。 <br/>
+b. 竞争层：负责对输入模式进行“分析比较”，寻找规律，并归类。</p>
+
+<p>在SOM中，一层是输入层，一层是竞争层，又称为输出层和核心层。在一次输入中，权值是随机给定的，在捐赠层，每一个神经元获胜的概率是相同的，但是最后会有一个兴奋最强的神经元。兴奋最强的神经元战胜了其他神经元，在权值调整过程中，兴奋得到进一步加强，而其他神经元保持不变，竞争神经网络通过这种方式获取训练样本的分布信息，每一个训练样本对应一个兴奋的竞争层神经元，也就是对应一个类别。当有新样本输入时，就可以根据兴奋的神经元进行模式分类。</p>
+
+<p>当有一个新样本输入时，要进行相似性测量，神经网络的输入模式向量的相似性测量可用向量之间的距离来衡量。常用的方法有欧氏距离法和余弦法两种。</p>
+
+<h4 id="toc_1">欧式距离法</h4>
+
+<p>设 \(X\)、\(X_1\) 为两行向量，其间的欧式距离：<br/>
+\[<br/>
+d = || X - X_i || = \sqrt{(X-X_i)(X-X_i)^T}<br/>
+\]</p>
+
+<p>\(d\) 越小，\(X\) 与 \(X_i\) 越接近，两者越相似，当 \(d=0\) 时，\(X=X_i\)  以 \(d=T\)（常数）为判据，可对输入向量模式进行聚类分析：由于 \(d_{12}\)、\(d_{23}\)、\(d_{31}\) 均小于 \(T\)，\(d_{45}\)、\(d_{56}\)、\(d_{46}\) 均小于 \(T\) ,而 \(d_{1i} \gt T(i=4,5,6)\)；\(d_{2i}\gt T(i=4,5,6)\) ,\(d_{3i}\gt T(i=4,5,6)\),故将输入模式 \(X_i\) 按如下分类：</p>
+
+<div align="center">
+    <img width="360" src="media/15418610530072/15458363067627.jpg" />
+</div>
+
+<h4 id="toc_2">余弦法</h4>
+
+<p>计算两个向量夹角的余弦：<br/>
+\[<br/>
+\cos \psi = \frac{X^T X_i}{||X||\text{ }||X_i||}<br/>
+\]</p>
+
+<p>两个模式向量越接近，其夹角越小，余弦越大。如果对同一类内各个模式向量间的夹角做出规定，不允许超过某一最大角，最这个最大夹角就成为一种聚类判据。同模式向量的夹角小于此最大角，不同模式类的夹角大于此最大角。余弦法适合模式向量长度相同或者模式特征只与向量相关的相似性测量。</p>
+
+<div align="center">
+    <img width="360" src="media/15418610530072/15458372832995.jpg" />
+</div>
+
+<p>很容易证明，当图中 \(\mathbf X\) 与 \(\mathbf X_i\) 的模为1的单位向量时（其实不一定要1,，只要是常数就行），余弦相似度也就退化成了内积计算：<br/>
+\[<br/>
+\cos \psi(\mathbf X,\mathbf X_i) = \frac{\mathbf X^T \mathbf X_i}{||\mathbf X||\text{ }||\mathbf X_i||} = \mathbf X^T \mathbf X_i<br/>
+\]</p>
+
+<p>此时欧式距离等价于余弦相似度<br/>
+\[<br/>
+\begin{align*}<br/>
+(\mathbf X - \mathbf X_i)^T(\mathbf X - \mathbf X_i) &amp;= \mathbf X^T\mathbf X - 2\mathbf X^T \mathbf X)i + \mathbf X_i^T \mathbf X_i\\<br/>
+&amp;= 2 - 2\mathbf X^T \mathbf X_i \\<br/>
+&amp;= 2 - 2\cos \psi(\mathbf X,\mathbf X_i)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>从式子中可以看出，夹角越大，欧式距离的平方就越小。</p>
+
+<h3 id="toc_3">竞争学习规则</h3>
+
+<p>自组织映射中首先对网络权值进行初始化，选择较小的初始值，对向量进行归一化，然后经过三个过程：竞争过程、合作过程和权值调节。<br/>
+<strong>竞争过程</strong>：对每个输入信号，网络中的神经元计算他们各自的判别函数的值，判别值最大的特定神经元成为本次的获胜神经元。<br/>
+<strong>合作过程</strong>：获胜的神经元决定兴奋神经元的拓扑领域，即获胜神经元周围空间位置内的神经元，提供相邻神经元的合作基础。<br/>
+<strong>权值调节</strong>：通过对获胜神经元及其周围的兴奋神经元的权值进行调节，以增加它们对输入信号判别函数值，随着权值的不断调整，获胜神经元对相似的输入信号会有更强的响应，即判别函数的值越大。</p>
+
+<h4 id="toc_4">竞争过程</h4>
+
+<p>假设网络中输入信号（数据）空间的维度为 \(m\)，从中随机选择一个输入信号（向量）记为 \(\mathbf x\)，<br/>
+\[<br/>
+\mathbf x = \left [ \begin{array}\\ x_1 &amp; x_2 &amp; x_3 &amp; \cdots x_m \\\end{array}\right ]^T<br/>
+\]</p>
+
+<p>输出层的每一个神经元与输入层是全连接的结构，所以每个神经元的权值向量和输入空间的维度相同，神经元 \(j\) 的权值向量记为：\(w_j\)，<br/>
+\[<br/>
+w_j = \left [ \begin{array}\\ w_{j1} &amp; w_{j2} &amp; w_{j3} &amp; \cdots &amp; w_{jm} \\\end{array} \right ]\qquad j = 1,2,3\dots l<br/>
+\]</p>
+
+<p>其中 \(l\) 是输出层网络中神经元的总数，竞争过程就是找到与向量 \(\mathbf x\) 最佳匹配的权值向量 \(w_j\)。最佳匹配的意思是：对于 \(j=1,2,3,\dots\)，比较每一个神经元对应的权值与输入向量 \(\mathbf x\) 的内积 \(w_j^T \mathbf x\)，选择最大值，对应的神经元作为获胜神经元。前面已经说过<strong>内积 \(w_j^T\mathbf x\) 最大化，这可以等价于向量 \(\mathbf x\) 与 \(w_j\) 的欧几里得距离最小。</strong></p>
+
+<p>我们定义 \(i(x)\) 标识与向量 \(\mathbf x\) 最佳匹配的神经元，\(i(x)\) 定义为：<br/>
+\[<br/>
+i(x) = \arg\min || \mathbf x - w_j|| \qquad j = 1,2,3\dots l<br/>
+\]</p>
+
+<h4 id="toc_5">合作过程</h4>
+
+<p>在竞争过程中产生的获胜神经元处于兴奋拓扑领域的中心位置。在神经生物学中有证据显示，一个获胜神经元倾向于激活它紧接着的领域内神经元，而不是隔得很远的神经元。所以对于获胜神经元的拓扑领域按照侧向距离光滑地缩减。具体的，用 \(h_{j,i}\) 表示以获胜神经元为中心的拓扑领域且包含这一组兴奋（合作）神经元，\(j\) 表示一个输出神经元，设 \(d(i,j)\) 表示获胜神经元 \(i\) 与兴奋神经元 \(j\) 之间的距离。假设拓扑领域 \(h_{j,i}\) 是一个单峰函数，与 \(d_{i,j}\) 大小有关，获胜神经元与兴奋神经元之间的距离越小，兴奋神经元收到的刺激越大。拓扑领域 \(h_{j,i}\) 也可以表示兴奋神经元受到影响的程度。</p>
+
+<p><strong>单峰函数 \(h_{j,i}\) 满足两个要求</strong>：</p>
+
+<ol>
+<li>对于单峰函数 \(h_{j,i}\)，在 \(d_{i,j} = 0\) 处，获胜神经元 \(i\) 达到最大值。</li>
+<li>\(h_{j,i}\) 的幅值随距离 \(d_{i,j}\) 的增加而减小，距离趋于无穷大时幅值趋向于0；</li>
+</ol>
+
+<p>高斯函数满足这些要求：<br/>
+\[<br/>
+h_{j,i(x)} = \exp\Big( -\frac{d_{j,i}^2}{2\sigma^2} \Big)<br/>
+\]</p>
+
+<p>\(i(x)\) 为获胜神经元的位置（在输出神经元网络中的坐标），\(j\) 是神经元在网络中的位置，\(d_{j,i}^2\) 是其他神经元距离获胜神经元的距离，\(\sigma\) 是拓扑领域的有效宽度，它度量了靠近获胜神经元的兴奋神经元在学习过程中的参与程度，由此可见领域函数依赖于获胜神经元和兴奋神经元在输出空间的位置距离，不依赖于原始输入空间的度量。</p>
+
+<p>在二维网格的情况下<br/>
+\[<br/>
+d_{i,j}^2 = || r_j - r_i ||<br/>
+\]</p>
+
+<p>\(r_j\) 是兴奋神经元在输出网格中的位置向量，\(r_i\) 是获胜神经元在输出网格中的位置向量。</p>
+
+<p>在 SOM网络中海油一个特征就是拓扑领域的大小随着时间收缩，总要求拓扑领域函数 \(h_{i,j}\) 的有效宽度 \(\sigma\) 随时间减小来实现，对于 \(\sigma\) 依赖于时间 \(n\) 流行的选择是：<br/>
+\[<br/>
+\sigma(n) = \sigma_0 \exp(-\frac{n}{\tau_1}) \qquad n = 1,2,3\dots<br/>
+\]</p>
+
+<p>\(\sigma_0\) 是 \(\sigma\) 的初始值，\(\tau_1\) 是一个时间常数；</p>
+
+<p><strong>加入时间依赖的拓扑领域定义为：</strong><br/>
+\[<br/>
+h_{j,i}(n) = \exp\Big(-\frac{2d_{j,i}^2}{2\sigma(n)^2}\Big) \qquad n = 1,2,3\dots<br/>
+\]</p>
+
+<p>在网络进行学习的初始阶段，拓扑领域 \(h_{i,j}\) 应该包含以获胜神经元为中心的所有神经元，然后随着时间 \(n\)（即：迭代次数增加）慢慢收缩，宽度 \(\sigma(n)\) 以指数下滑，拓扑领域也一相应的方式收缩。\(h_{j,i}\) 会减少到仅有围绕获胜神经元的少量邻居神经元或者减少到只剩下获胜神经元。</p>
+
+<p>在网络初始阶段 \(\sigma_0\) 的初始值为输出网格的半径，时间常数为：\(\tau_1 = \frac{1000}{\log(\sigma_0)}\)（1000不是固定的，也可以更大）</p>
+
+<h4 id="toc_6">自适应过程</h4>
+
+<p>自组织网络的神经元的权值 \(w_j\) 随着输入向量 \(\mathbf x\) 的变化而改变。\(n\) 轮的迭代：</p>
+
+<ol>
+<li>从训练数据中：随机选择一个向量作为输入向量 \(\mathbf x\)；</li>
+<li>竞争过程：确定一个获胜神经元以及神经元在输出网格中的位置向量（拓扑领域的中心位置）；</li>
+<li>合作过程：在 \(n\) 时刻确定拓扑领域的有效半径内所有的兴奋神经元，每一轮训练中，拓扑领域 \(h_{j,i}(n)\) 和有效半径（随时间 \(n\) 衰减）。</li>
+<li>权值更新：
+\[
+w_j(n+1) = w_j(n) + \eta(n)(x(n) - w_j(n))\qquad j\in \mathcal A[h_{ji}(n)]
+\]</li>
+</ol>
+
+<p>其中 \(j\in\mathcal A[h_{ji}(n)]\) 代表在 \(n\) 时刻拓扑领域的有效半径内所有的兴奋神经元（含获胜神经元）\(\eta\)表示学校效率参数，学习效率也是随时间逐渐衰减的：<br/>
+\[<br/>
+\eta(n) = \eta(0)\exp(-\frac{n}{\tau_2})\qquad n = 1,2,3\dots<br/>
+\]</p>
+
+<p>\(\tau_2\) 是另一个时间常数，\(\eta_0\) 是学习效率的初始值，一般设为0.1然后随着时间 \(n\) 递减，但是永远不等于零。</p>
+
+<p>权值更新的公式，实际上是在将获胜神经元和拓扑邻域内的兴奋神经元的权值向量，向输入向量 \(\mathbf x\) 移动，随着训练数据的重复出现，拓扑邻域内的网络权值向量的分布会趋于服从输入向量 \(\mathbf x\) 的分布。网络中的相邻神经元的权值向量会很相似。</p>
+
+<h3 id="toc_7">SOM算法小结</h3>
+
+<p>1．初始化，对初始权值向量 \(w_j\) 选择随机的值初始化，选择较小的权值; <br/>
+2．取样，随机从输入空间选取样本 \(\mathbf x\) ; <br/>
+3．相似性匹配，在时间 \(n\) 时刻根据最小距离准则找到最佳匹配(获胜神经元) \(i(x)\);<br/>
+\[<br/>
+i(x)=\arg\min||\mathbf x−w_j||\qquad j\in[1,2,3,\dots,l]<br/>
+\]　</p>
+
+<p>4．更新权值，通过更新公式调整所有神经元的权值; <br/>
+\[<br/>
+w_j(n+1)=w_j(n)+\eta(n)(x(n)−w_j(n))<br/>
+\]</p>
+
+<p>5．重复2，3，4步骤，知道特征映射不再发生明显变化为止;</p>
+
+<hr/>
+
+<p><a href="https://blog.csdn.net/u014281392/article/details/76461270">自组织映射网 SOMnet</a></p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html'>神经网络</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15424711438602.html" 
+	        title="Previous Post: 人工神经网络-GAN">&laquo; 人工神经网络-GAN</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15406533448507.html" 
+	        title="Next Post: 人工神经网络-长短时记忆网络 GRU">人工神经网络-长短时记忆网络 GRU &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

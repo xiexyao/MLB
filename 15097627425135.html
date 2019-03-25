@@ -1,0 +1,573 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  KNN 算法 与 KD树 - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">KNN 算法 与 KD树</h1>
+				<p class="meta"><time datetime="2017-11-04T10:32:22+08:00" pubdate data-updated="true">2017/11/4</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<h3 id="toc_0">KNN 算法</h3>
+
+<p>KNN 算法全称是 K-Nearest Neighbors，中文名称 K 近邻算法，作为一种基本的分类算法。KNN采用一种投票表决的方式，首先在样本空间里选出目标对象最相似的 K 个近邻，用这 K 个近邻大多数归属的类别作为目标对象的类别，其中 K 通常是不大于20的整数。KNN算法中，所选择的近邻都是已经正确分类的对象。该方法在定类决策上只依据最邻近的一个或者几个样本的类别来决定待分样本所属的类别。</p>
+
+<p>如下图是两个部落居民居住分布图：</p>
+
+<div align=center>
+    <img width="300" src="media/15097627425135/15316253197416.jpg" />
+</div>
+
+<p>如果要用 KNN 方法裁决金矿所有权，采用 \(K=1\) 时，会认为金矿属于B部落，因为离金矿最近的居民（对象）属于B部落（类别），所以金矿（目标对象）属于B部落：</p>
+
+<div align=center>
+    <img width="300" src="media/15097627425135/15316252573368.jpg" />
+</div>
+
+<p>如果采用 \(K=3\) 时，情况就会不同，认为金矿属于A部落，离金矿最近的3个居民（对象）中，有2个（大多数）属于A部落，所以金矿（目标对象）属于A部落：</p>
+
+<div align="center">
+    <img width="300" src="media/15097627425135/15316253946661.jpg" />
+</div>
+
+<p>在这个例子中，<strong>最相近</strong>用的是欧几里得距离：</p>
+
+<p>\(D = \sqrt{{(x_{1}-x_{2})^{2}+(y_{1}-y_{2})^{2}}}\)</p>
+
+<p>在实际项目中，可能还会采用其他距离，如曼哈顿距离：<br/>
+\(D = \|x_{1}-x_{2}\|+\|y_{1}-y_{2}\|\)</p>
+
+<p>在KNN算法中，由于k选择的不同，得到的分类也可能是不同的，如当 \(K=1\) 时，金矿属于B部落，而当 \(K=3\) 时，金矿属于A部落。</p>
+
+<h5 id="toc_1">算法步骤：</h5>
+
+<ol>
+<li>计算目标对象与各训练数据之间的距离；</li>
+<li>按照距离的递增关系进行排序；</li>
+<li>选取与目标对象距离最小的K个点；</li>
+<li>确定目标对象最近的 K 个点所在类别的出现频率；</li>
+<li>返回前K个点中出现频率最高的类别作为目标对象的预测分类。</li>
+</ol>
+
+<h5 id="toc_2">算法缺点</h5>
+
+<p>从算法上来看，KNN 算法有一些缺点：<br/>
+1）只计算了最近 K 个邻居的类别，而未考虑 K 个邻居远近程度，也就是距离近的邻居和距离远的邻居具有相同的投票权。因此，我们可以采用权值的方法来改进，和该样本距离小的邻居权值大，和该样本距离大的邻居权值则相对较小，由此，将距离远近的因素也考虑在内，避免因一个样本过大导致误判的情况；</p>
+
+<p>2）在计算时，需要计算所有待分类对象与所有训练对象的距离，再进行排序选择出最近的 K 个邻居。因此我们需要一种快速搜索近邻的算法，一种比较常见的算法就是KD树。</p>
+
+<h3 id="toc_3">BST树</h3>
+
+<p>在介绍KD树之前，先介绍一种一维形式二叉查找树 BST（Binary Search Tree），可以快速定位一维数据，如下图：</p>
+
+<div align="center">
+    <img width="250px" src="media/15097627425135/15316274460262.jpg" />
+</div>
+
+<p>BST 具有以下性质：</p>
+
+<ol>
+<li>若它的左子树不为空，则它的左子树节点上的值皆小于它的根节点。</li>
+<li>若它的右子树不为空，则它的右子树节点上的值皆大于它的根节点。</li>
+<li>它的左右子树也分别是二叉查找树。</li>
+</ol>
+
+<p>当上图中，要搜索结点64便很简单，将64与根结点56比较，64比56大，在它的的右子树上；将64与子结点78比较，64比78小，在结点78的左子树上；如此递归下去，很容易搜索到结果。</p>
+
+<p>构造BST树也非常简单，在集合中选择一个点作为根结点（尽可能选择一个使左右子树深度差不多的点，如中位点），然后按照上面方法找到一个叶结点作为父结点，按照左小右大开辟新结点。假设上例中，我们需要插入一个72的结点，比较根结点56与72，56小于72，在根结点56的右子树上；发现结点78，比较72与78，72小于78，在结点78的左子树上；发现结点64，因为64是叶结点，需要开辟新结点，72比64大，所以将结点72作为64的右结点：</p>
+
+<div align="center">
+    <img width="250" src="media/15097627425135/15316291384018.jpg" />
+</div>
+
+<p>如果再插入点60，发现结点64后，60比64小，且64不含左子树，开辟新结点60作为64的左子结点，如下：</p>
+
+<div align="center">
+    <img width="250" src="media/15097627425135/15316290927517.jpg" />
+</div>
+
+<p>下面叙述在BST上搜索最近邻的方法：</p>
+
+<ol>
+<li>在BST树上找到包含目标点 x 的叶结点：从根结点出发，递归向下访问BST树，如目标结点小于切分点的值，则移动到左子结点，否则移动到右子结点，直到子结点为叶结点为止，记录当前搜索路径 search_path。</li>
+<li>从 search_path 中取出最后一个点作为”当前最近点“，计算距离=该叶结点与目标结点距离，并设为“当前最近距离”。</li>
+<li>回溯搜索路径 search_path，对每个结点计算该结点和目标结点的距离，如果该距离小于当前最小距离，则更新该结点为“当前最近点”，并更新“当前最近距离”为该距离。</li>
+</ol>
+
+<p>在一维数据上，可以通过BST树来实现。拓展到k维数据上，便可以通过构建KD树来迅速搜索最近邻。</p>
+
+<h3 id="toc_4">KD树</h3>
+
+<p>假设输入为k维空间的数据集 \(D=(x_1,x_2,...,x_N)\)，其中 \(x_i = (x_i^{(1)},x_i^{(2)},...,x_i^{(k)})\)，输出为KD树。</p>
+
+<ol>
+<li>开始：构造根结点，根结点对于包含 \(D\) 的k维空间的超矩形区域。</li>
+<li>选择 \(x^{(1)}\) 为坐标轴，以 \(D\) 中所有实例的 \(x^{(i)}\) 坐标的中位数（偶数个数，其中任何一个都可以）为切分点，将根结点分为两个区域，切分由通过切分点并与坐标轴垂直的超平面实现。由根结点生成深度为1的左、右子结点；左子结点对应坐标 \(x^{(i)}\) 小于切分点的子区域，右子结点对应坐标 \(x^{(i)}\) 大于切分点的子区域。落在超平面的实例点保存在根结点。</li>
+<li>重复：对深度为 j 的结点，选择 \(x^{(l)}\) 为切分的坐标轴，其中 \(l=j\%k+1\) ，以该结点的区域中所有实例的 \(x^{(l)}\) 坐标的中位数为切分点，将该结点对应的区域分成两个子区域，切分由通过切分点并与坐标轴 \(x^{(l)}\) 垂直的超平面实现。由该结点生成深度 j+1 的左右子结点。左子结点对应坐标 \(x^{(l)}\) 小于切分点的子区域，右子结点对应坐标 \(x^{(l)}\) 大于切分点的子区域。</li>
+<li>直到两个子区域没有实例存在时则结束，此时形成了KD树的特征空间划分。</li>
+</ol>
+
+<p>举个2维空间的例子，数据集 \(D=((2,3)^T,(5,4)^T,(9,6)^T,(4,7)^T,(8,1)^T,(7,2)^T)\)构造平衡KD树。</p>
+
+<p>1）构造根结点为包含 \(D\) 的k维空间的超矩形区域。</p>
+
+<div align="center">
+    <img width="300" src="media/15097627425135/15316691655134.jpg" />
+</div>
+
+<p>2）选择 \(x^{(1)}\) 轴，所有实例的 \(x^{(1)}\) 轴值为（2，5，9，4，8，7），中位数为7，切分为过7且与 \(x^{(i)}\) 轴垂直的超平面：</p>
+
+<div align="center">
+    <img width="300" src="media/15097627425135/15316729790397.jpg" />
+</div>
+
+<p>3）分割超平面将根结点分成两部分，其中 \(x^{(1)} \lt 7\) 的分为左子结点，分别为 \(((2,3)^T,(4,7)^T,(5,4)^T)\)，\(x^{(1)} \gt 7\) 的分为右子结点，分别为 \(((8,1)^T,(9,6)^T)\)。左子结点 \(x^{(2)}\) 轴的中位数为4，右子结点 \(x^{(2)}\) 轴的中位数为6，分别过中位数且垂直 \(x^{(2)}\) 轴作分割超平面：</p>
+
+<div align="center">
+    <img width="300" src="media/15097627425135/15316732569554.jpg" />
+</div>
+
+<p>4）对上面过程形成的左右结点，深度为2，选择 \(x^{(1)}\) 轴进行分割：</p>
+
+<div align="center">
+    <img width="300" src="media/15097627425135/15316735112236.jpg" />
+</div>
+
+<p>特征空间划分完成，对分割线上的结点，可以建立KD树：</p>
+
+<div align="center">
+    <img width="300" src="media/15097627425135/15316743917066.jpg" />
+</div>
+
+<h3 id="toc_5">KD树最近邻搜索</h3>
+
+<p>KD树的最近邻搜索同BST大同小异：</p>
+
+<ol>
+<li>在KD树上找到包含目标点 x 的叶结点：从根结点出发，递归向下访问KD树，如目标结点小于切分点的值，则移动到左子结点，否则移动到右子结点，直到子结点为叶结点为止，记录沿途经过点为search_path。</li>
+<li>从 search_path 中取出最后一个点为”当前最近点“，计算距离=该结点与目标结点距离，并设为“当前最近距离”。</li>
+<li><p>回溯搜索路径 search_path，对每个结点执行以下操作：</p>
+
+<p>（a）如果该结点保存的实例点比当前最近点距目标点更近，则以该实例点为“当前最近点”；<br/>
+（b）当前节点为根节点，结束。否则检查该子结点的父结点的另一个子结点对应的区域是否有更近的点。具体的，检查另一个子结点对应的区域是否与以目标点为球心、以目标点与“当前最近点”间的距离为半径的超球体相交。如果相交，可能在另一个子结点对应的区域内存在距离目标更近的点，移动到另一个子结点，<font color=red>将其当做根节点，重复步骤1，2，3进行目标节点最近邻搜索</font>。如果不相交，向上回退。</p></li>
+</ol>
+
+<p>举个一个例子来阐述这个算法：假设数据集 \(D = ((4,1)^T,(3,4)^T,(5,4)^T,(2,3)^T,(3,5)^T,(5,3)^T,(4.1,9)^T)\)，需要搜索最近邻的对象为 \((4.1,5)\) ，这里生成KD树的步骤直接省略，生成的KD树如下：</p>
+
+<div align="center">
+    <img width="320" src="media/15097627425135/15319189036938.jpg" />
+</div>
+
+<p>生成的特征空间如下：</p>
+
+<div align="center">
+    <img width="250" src="media/15097627425135/15319274240539.jpg" />
+</div>
+
+<p>从根节点 \((4,1)\) 开始，递归向下搜索KD树，第一个切分点值为 \(4\) ，小于目标节点对应值 \(4.1\)，移动到右子节点 \((5,4)\) ；第二个切分点值为 \(4\) ，小于目标节点对应值 \(9\) ，移动到右子节点 \((4.1,9)\) ，该节点为叶节点，记录沿途经过点为 search_path 为 \(((4,1)^T,(5,4)^T，(4.1,9)^T)\) 。</p>
+
+<p>从 search_path 中取出最后一个点 \((4.1,9)^T\) ，步骤（a）：计算该节点与目标节点 \((4.1,5)^T\) 的距离为4，设该节点为“当前最近点”，当前距离为“当前最近距离”；步骤（b）：以 \((4.1,5)^T\) 为圆心，4为半径作圆，与超平面 \(y=4\) 相交，最近点可能在父节点的另一个节点 \((5,3)^T\) 上，将 \((5,3)^T\) 当做根节点，进行最近邻搜索。</p>
+
+<ul>
+<li>因为 \((5,3)^T\) 是叶节点，直接计算它与目标节点的距离为2.19，小于“当前最近距离”，更新“当前最近点”为 \((5,3)^T\) 和更新“当前最近距离”为2.19。</li>
+</ul>
+
+<div align="center">
+    <img width="270" src="media/15097627425135/15366780863386.jpg" />
+</div>
+
+<p>从 search_path 中取出最后一个点 \((5,4)^T\) ，步骤（a）：计算该节点与目标节点 \((4.1,5)^T\) 的距离为1.35，小于“当前最近距离”，更新&quot;当前最近点&quot;为 \((5,4)^T\) 和更新”当前最近距离“为1.35；步骤（b）：以 \((4.1,5)^T\) 为圆心，1.35为半径作圆，与超平面 \(x=4\) 相交，最近点可能在父节点的另外一个节点 \((3,4)^T\) 上，将 \((3,4)^T\) 当做根节点，搜索最近邻。</p>
+
+<div align="center">
+    <img width="270" src="media/15097627425135/15366782535217.jpg" />
+</div>
+
+<ul>
+<li>从根节点 \((3,4)^T\) 开始搜索目标节点 \((4.1,5)^T\) 的最近邻，\((3,4)^T\) 切分点的值是4，目标节点 \((4.1,5)^T\) 对应位置值 5 大于切分点，在 \((3,4)^T\) 的右子节点 \((3,5)^T\) 上，因为\((3,5)^T\)是叶节点搜索结束，此时 \(\text{search_path}^{*}\) 为 \(((3,4)^T,(3,5)^T)\) 。</li>
+<li>从 \(\text{search_path}^{*}\) 中取出最后一个点 \((3,5)^T\)，步骤（a）：计算该节点与目标节点的距离为1.10，小于“当前最近距离”，更新“当前最近点“为 \((3,5)^T\) 和”更新当前最近距离“为1.10；步骤（b）：以 \((4.1,5)^T\) 为圆心，1.10为半径作圆，与超平面 \(y=4\) 相交，最近点可能在父节点的另外一个节点 \((2,3)^T\) 上，将 \((2,3)^T\) 当做根节点，搜索最近邻，由于\((2,3)^T\) 是叶节点，直接计算与目标节点的距离为2.9，大于“当前最近距离”，不更新。</li>
+<li>从 \(\text{search_path}^{*}\) 中取出最后一个点 \((3,4)^T\)，步骤（a）：计算该节点与目标节点的距离为1.49，大于“当前最近距离”，不更新。步骤（b）：当前节点为根节点，结束。</li>
+</ul>
+
+<p>从 search_path 中取出最后一个点 \((4,1)^T\) ，步骤（a）：计算该节点与目标节点的距离为4.001，大于“当前最近距离”，不更新；步骤（b）：当前节点为根节点，结束。</p>
+
+<p>所以“最近点”为 \((3,5)^T\) ，当前最近距离为1.10。</p>
+
+<h3 id="toc_6">KD树相关代码</h3>
+
+<p>节点定义</p>
+
+<pre><code class="language-python">class KD_node:
+    def __init__(self, point=None, split=None, LL = None, RR = None, parent = None):
+        &quot;&quot;&quot; 
+        point:数据点 
+        split:划分域 
+        LL, RR:节点的左子节点跟右子节点
+        parent:父节点
+        &quot;&quot;&quot;
+        self.point = point
+        self.split = split
+        self.left = LL
+        self.right = RR
+        self.parent = parent
+</code></pre>
+
+<p>创建KD树：</p>
+
+<pre><code class="language-python">def createKDTree(root,data_list,split=0,parent=None):
+    &quot;&quot;&quot; 
+    root:当前树的根节点 
+    data_list:数据点的集合(无序) 
+    return:构造的KDTree的树根 
+    &quot;&quot;&quot;
+    LEN = len(data_list)
+    if LEN == 0:
+        return
+    # 数据点的维度
+    dimension = len(data_list[0])
+    # 根据划分域的数据对数据点进行排序
+    data_list.sort(key=lambda x: x[split])
+    # 选择下标为len / 2的点作为分割点
+    point = data_list[LEN // 2]
+    root = KD_node(point, split, parent=parent)
+    root.left = createKDTree(root.left, data_list[0:(LEN // 2)],(split+1)%dimension,root)
+    root.right = createKDTree(root.right, data_list[(LEN // 2 + 1):LEN],(split+1)%dimension,root)
+</code></pre>
+
+<p>搜索最近邻步骤1：搜索KD树代码</p>
+
+<pre><code class="language-python">def findKD(root, query):
+    &quot;&quot;&quot;
+    root: KDTree的树根
+    query: 查询点
+    return: 返回KD树查找到的叶节点
+    &quot;&quot;&quot;
+    temp_root = root
+    next = None
+    ##二分查找建立路径
+    while temp_root.left and temp_root.right:
+        # 当前节点的划分域
+        ss = temp_root.split
+        if query[ss] &lt;= temp_root.point[ss]:
+            next = temp_root.left
+        else:
+            next = temp_root.right
+        if next is None:
+            break
+        else:
+            temp_root = next
+    return temp_root
+</code></pre>
+
+<p>步骤2：搜索最近邻代码</p>
+
+<pre><code class="language-python">    def findNN(root, query, NN = None, min_dist = None):
+    &quot;&quot;&quot; 
+    root:KDTree的树根 
+    query:查询点 
+    return:返回距离data最近的点NN，同时返回最短距离min_dist 
+    &quot;&quot;&quot;
+    # 初始化为root的节点
+    temp_root = findKD(root,query)
+    dist = computeDist(query, temp_root.point)
+    if min_dist is None or dist &lt; min_dist:
+        min_dist = dist
+        NN = temp_root.point
+    while root != temp_root:
+        if temp_root.parent:
+            ss = temp_root.parent.split
+            if abs(query[ss] - temp_root.parent.point[ss]) &lt; min_dist:
+                if query[ss] &lt;= temp_root.parent.point[ss]:
+                    brother = temp_root.parent.right
+                else:
+                    brother = temp_root.parent.left
+                NN,min_dist = findNN(brother, query, NN, min_dist)
+        temp_root = temp_root.parent
+        dist = computeDist(query,temp_root.point)
+        if dist &lt; min_dist:
+            min_dist = dist
+            NN = temp_root.point
+
+    return NN, min_dist
+</code></pre>
+
+<h3 id="toc_7">KD树搜索K邻域</h3>
+
+<p>搜索最近邻了解后，搜索K邻域便很简单，维护一个存放节点和对应距离的堆，将搜索最近邻过程中计算的节点和相应的距离加入其中，如果堆的大小小于K，直接加入；如果堆的大小等于K，则替换最大距离的节点。搜索结束后，输出K邻域即可。</p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html'>聚类问题</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15103338404339.html" 
+	        title="Previous Post: 基于划分的聚类算法-KMean算法与KMean++及优化">&laquo; 基于划分的聚类算法-KMean算法与KMean++及优化</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15092133657181.html" 
+	        title="Next Post: 决策树 Decision Tree">决策树 Decision Tree &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

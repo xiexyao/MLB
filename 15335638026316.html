@@ -1,0 +1,365 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  多元函数极值与Hessian矩阵的关系 - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">多元函数极值与Hessian矩阵的关系</h1>
+				<p class="meta"><time datetime="2018-08-06T21:56:42+08:00" pubdate data-updated="true">2018/8/6</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>海塞矩阵（Hessian Matrix），又译作海森矩阵，是一个多元函数的二阶偏导数构成的方阵。在机器学习和图像处理（例如SIFT和SURF特征检测）中，经常可以遇到它。</p>
+
+<h3 id="toc_0">一元函数极值问题</h3>
+
+<p>如果我们需要求一个一元函数的极值，比如 \(f(x) = x^2\)，我们必然想到要求函数的一阶导数，并令结果等于0：<br/>
+\[<br/>
+f&#39;(x) = 2x<br/>
+\]</p>
+
+<p>当时一阶导数为0，不总是能求出极值。我们知道在 \(x_0\) 点的一阶导数值在几何意义上表示函数在 \(x_0\) 点的切线。下图中，可以清晰说明导数为0，不一定就是极限值。</p>
+
+<div align="center">
+    <img width="350" src="media/15335638026316/15335656524655.jpg" />
+</div>
+
+<p>在B点导数为0，该点却不是极值点，而是驻点。</p>
+
+<p>将一元函数 \(f(x)\) 在 \(x_0\) 处用二阶近似得<br/>
+\[<br/>
+f(x) = f(x_0) + f&#39;(x_0)(x-x_0) + \frac 1 2 f&#39;&#39;(x_0)(x-x_0)^2<br/>
+\]</p>
+
+<p>当 \(f&#39;(x_0)=0\) 时，如果二阶导数 \(f&#39;&#39;(x_0) \gt 0\)，可得在 \(x_0\) 旁边任意点有 \(f(x) \gt f(x_0)\)，那么 \(x_0\) 就是该局部极小值。如果二阶导数 \(f&#39;&#39;(x_0) \lt 0\)，可得在 \(x_0\) 旁边任意点有 \(f(x) \lt f(x_0)\)，\(x_0\) 是该局部极大值。如果 \(f&#39;&#39;(x_0)=0\)，则结果仍然是不确定的，我们就不得不再通过其他方式来确定函数的极值性。</p>
+
+<h3 id="toc_1">多元函数极值问题</h3>
+
+<p>类似的，如果在多元函数中求极值点，可以通过一阶导数等于0 和二阶导数来判断。假设 \(f\) 是一个二元函数<br/>
+\[<br/>
+f=(x,y)<br/>
+\]</p>
+
+<p>\(f\) 的一阶导数<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial f}{\partial x} &amp;= 0\\<br/>
+\frac{\partial f}{\partial y} &amp;= 0\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>\(f\) 的二阶导数有9个，如果用矩阵形式表示就是<br/>
+\[<br/>
+H = \left [\begin{array}\\<br/>
+\frac{\partial f}{\partial x\partial x}&amp;\frac{\partial f}{\partial x\partial y}\\<br/>
+\frac{\partial f}{\partial y\partial x}&amp;\frac{\partial f}{\partial y\partial y}\\<br/>
+\end{array} \right ]<br/>
+\]</p>
+
+<p>如果将多元函数在 \((x_0,y_0)\) 处二阶近似得<br/>
+\[<br/>
+f(x,y) = f(x_0,y_0) + [x-x_0,y-y_0]\left [\begin{array}\\\frac{\partial f}{\partial x}\\\frac{\partial}{\partial y}\\\end{array}\right ] + \frac 1 2 [x-x_0,y-y_0] \left [\begin{array}\\<br/>
+\frac{\partial f}{\partial x\partial x}&amp;\frac{\partial f}{\partial x\partial y}\\<br/>
+\frac{\partial f}{\partial y\partial x}&amp;\frac{\partial f}{\partial y\partial y}\\<br/>
+\end{array} \right ] \left[ \begin{array}\\x-x_0\\y-y_0\\\end{array}\right ]<br/>
+\]</p>
+
+<p>令 \(\triangle x = [x-x_0,y-y_0]\)，上式简化表示即<br/>
+\[<br/>
+f(x,y) = f(x_0,y_0) + \triangle x \nabla f + \triangle x H \triangle x^T<br/>
+\]</p>
+
+<p>二元函数 \(f(x,y)\) 一阶导数为0，即 \(\triangle x \nabla f = 0\)，所以<br/>
+\[<br/>
+f(x,y) = f(x_0,y_0) + \triangle x H \triangle x^T<br/>
+\]</p>
+
+<p>如果 \(\triangle x H \triangle x^T \gt 0\)，则 \(f(x,y) \gt f(x_0,y_0)\) 即 \((x_0,y_0)\) 是函数局部极小值。因为 \(H\) 是实对称矩阵，当 \(\triangle x H \triangle x^T \gt 0\) 时，可以说 \(H\) 是正定矩阵。所以我们可以得出结论</p>
+
+<ul>
+<li>当 \(H\) 是正定矩阵时，\((x_0,y_0)\) 是函数局部极小值；</li>
+<li>当 \(H\) 是负定矩阵时，\((x_0,y_0)\) 是函数局部极大值；</li>
+<li>当 \(H\) 是不定矩阵时，\((x_0,y_0)\) 不是函数极值点；</li>
+</ul>
+
+<hr/>
+
+<p><a href="https://blog.csdn.net/baimafujinji/article/details/51167852">Hessian矩阵与多元函数极值</a><br/>
+<a href="https://blog.csdn.net/chduan_10/article/details/78075112">怎么理解二阶偏导与凸函数的Hessian矩阵是半正定的</a></p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html'>数学基础</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15342500383830.html" 
+	        title="Previous Post: 矩阵条件数与病态矩阵">&laquo; 矩阵条件数与病态矩阵</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15327348574245.html" 
+	        title="Next Post: 人工神经网络-卷积神经网络">人工神经网络-卷积神经网络 &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

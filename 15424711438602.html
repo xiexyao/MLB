@@ -1,0 +1,350 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  人工神经网络-GAN - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">人工神经网络-GAN</h1>
+				<p class="meta"><time datetime="2018-11-18T00:12:23+08:00" pubdate data-updated="true">2018/11/18</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>生成式对抗网络 GAN（Generative adversarial networks）是 Goodfellow 等在2014年提出的一种生成式模型。GAN 在结构上受博弈论中的二人零和博弈（即二人的利益之和为零，一方的所得正是另一方的所失）的启发，系统由一个生成器 \(G\) 和一个判别器 \(D\) 构成。</p>
+
+<p>GAN 的核心思想来源于博弈论的纳什均衡。它设定参与游戏双方分别为一个生成器（Generator）和一个判别器（Discriminator），生成器的目的是尽量去学习真实的数据分布，而判别器的目的是尽量正确输入数据是来自真实数据还是来自生成器；为了取得游戏胜利，这两个游戏参与者需要不断优化，各自提高自己的生成能力和判别能力，这个学习优化过程就是寻找二者之间的一个纳什均衡。</p>
+
+<p>这里以生成图片为例进行说明，假设我们有两个网络，\(G\)和\(D\)。正如它们的名字所暗示的那样，它们的功能分别是：</p>
+
+<ol>
+<li>\(G\) 是一个生成图片的网络，它接受一个随机的噪声 \(z\)，通过这个噪声生成图片，记做 \(G(z)\)。</li>
+<li>\(D\) 是一个判别图片的网络，判别一张图片是不是“真实的”。它的输入参数是 \(x\),\(x\) 代表一张图片，输出为 \(D(x)\) 代表 \(x\) 为真实图片的概率，如果为1，就代表 100%是真实的图片，而输出为0，就代表不可能是真实的图片。</li>
+</ol>
+
+<p>在训练过程中，生成网络 \(G\) 的目标就是尽量生成真实的图片去欺骗判别网络 \(D\)。而 \(D\) 的目标就是尽量把 \(G\) 生成的图片和真实的图片分别开来。这样，\(G\) 和 \(D\) 构成了一个动态的“博弈过程”。</p>
+
+<p>最后博弈的结果是在最理想的状态下，\(G\)可以生成足以“以假乱真”的图片 \(G(z)\)。对于 \(D\) 来说，它难以判定 \(G\) 生成的图片究竟是不是真实的，因此 \(D(G(z)) = 0.5\)。</p>
+
+<p>这样，我们的目的就达到了，我们得到了衣蛾生成式的模型 \(G\)，可以用来生成图片。</p>
+
+<div align="center">
+    <img src="media/15424711438602/15457475619356.jpg" width="680" />
+</div>
+
+<p>训练两个模型的方法：<strong>单独交替迭代训练</strong></p>
+
+<p><strong>判别模型</strong>：希望真样本集尽可能输出1，假样本集输出。因此对于判别网络，问题可以转换为一个<strong>有监督的二分类问题</strong>，直接送到神经网络模型中训练就好。</p>
+
+<p><strong>生成网络</strong>：我们的目的是生成尽可能逼真的样本。那么需要将原始的生成网络生成的样本送到判别网络中，所以在训练生成网络的时候，我们需要联合判别网络一起才能达到训练的目的。我们可以将判别网络串接在生成网络的后面，这样便可以知道生成网络生成的样本的误差，有了误差我们便可以对判别-生成网络进行训练。</p>
+
+<p>现在我们再来看一下训练方式，首先我们有原始的噪音数组 \(Z\)，也就是我们生成了假样本，现在很关键的一点，我们要把这些假样本的标签都设置为1，也就是认为这些假样本在生成网络训练的时候是真样本。这样能起到迷惑判别器的目的，也才能使得生成的假样本逐渐逼近正样本。现在对于生成网络的训练，我们有了样本集（只有假样本集，没有真样本集），有了对应的label（全为1），在训练过程中，<strong>判别网络的网络参数不发生变化</strong>，只需要将误差一直传到生成网络那一块更新生成网络的参数。这样就完成了生成网络的训练。</p>
+
+<p>在完成生成网络的训练后，我们可以根据目前新的生成网络再对先前的噪声 \(z\) 生成新的假样本，这时候生成的假样本应该更真了。有了新的真假样本的集，就又可以重复上述过程，我们把这个过程称为单独交替训练。我们可以定义一个迭代次数，交替迭代到一定次数后即可停止。这时候，噪声 \(z\) 生成的假样本已经很真了。</p>
+
+<h3 id="toc_0">GAN 的学习方法</h3>
+
+<p>首先我们直接给出原始论文中的目标公式：<br/>
+\[<br/>
+\min_G \max_D V(D,G) = E_{x \sim \text{data}(x)} [ \log(D(x)) ] + E_{z\sim p_z(z)}[\log(1 - D(G(z))) ]<br/>
+\]</p>
+
+<p>这是一个极大极小优化问题，其实对应的就是上述的两个优化过程，对比我们的分析流程，先优化 \(D\)，再优化 \(G\)，本质上是两个优化问题，上式可以拆解为下面两个公式：</p>
+
+<p>优化 D ：<br/>
+\[<br/>
+\max_D V(D,G) = E_{x\sim p_{data}(x)}[\log(D(x))] + E_{z\sim p_z(z)}[\log( 1 - D(G(z))]<br/>
+\]</p>
+
+<p>优化 G ：<br/>
+\[<br/>
+\min_G V(D,G) = E_{z\sim p_z(z)} [\log(1 - D(G(z))]<br/>
+\]</p>
+
+<p>可以看到，优化 \(D\) 的时候，也就是判别网络，其实没有生成网络什么事，后面的 \(G(z)\) 这里就是相当于已经得到的假样本。优化 \(D\) 的公式的第一项，使得真样本 \(x\) 输入的时候得到的结果越大越好，可以理解，因为需要真样本的预测结果越接近于1判别效果越好。对于假样本，需要优化的结果是 \(D(G(z))\) 越小越好，因为假样本的标签理论是应该是0。所以优化 \(D\) 的第二项，\(1 - D(G(z))\) 也就是越大越好，所以优化 \(D\) 取得是式子的极大值。</p>
+
+<p>同理在优化 \(G\) 的时候，这个时候不需要真样本的参与，这个时候把第一项直接去掉，只流向假样本项，因为我们希望能迷惑判别器 \(D\)，也就是希望假样本的标签为1，所以是 \(D(G(z))\) 越大越好，为了统一也就是希望 \(1- D(G(z))\) 越小越好。</p>
+
+<p>这样便得到了之前的极小极大问题，里面包含了生成模型以假乱真的优化和判别模型的优化，完美阐释了这样一个优美的理论。</p>
+
+<p>GAN可以和CNN、RNN结合在一起。任何一个可微分的函数，都可以用来参数化GAN的生成模型和判别模型。那么，在实际中，我们就可以使用深度卷积网络，来参数化生成模型。另外，GAN和RNN结合在一起，用来处理和描述一些连续的序列数据，可以学习到序列数据的分布，同时也可以产生序列数据应用，包括对音乐数据或者是一些自然语言数据的建模和生成。</p>
+
+<hr/>
+
+<p><a href="https://blog.csdn.net/on2way/article/details/72773771">简单理解与实验生成对抗网络GAN</a><br/>
+<a href="https://blog.csdn.net/u010834458/article/details/71286376">GAN生成式对抗网络总结</a></p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html'>神经网络</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15436296136092.html" 
+	        title="Previous Post: 蒙特卡罗树搜搜 MCTS">&laquo; 蒙特卡罗树搜搜 MCTS</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15418610530072.html" 
+	        title="Next Post: 人工神经网络-SOM自组织系统">人工神经网络-SOM自组织系统 &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

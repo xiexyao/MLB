@@ -1,0 +1,3791 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  神经网络 - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div class="blog-index">
+
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15454660806753.html">深度学习中的正则化-Dropout方法</a></h1>
+			<p class="meta"><time datetime="2018-12-22T16:08:00+08:00" 
+			pubdate data-updated="true">2018/12/22</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p><strong>Dropout</strong>提供了正则化一大类模型的方法，计算方便但功能强大。但训练一个深层神经网络时，我们可以随机丢弃一部分神经元（同时丢弃其对应的连接边）来避免过拟合，这种方法称为<strong>丢弃法（Dropout Method）</strong>。每次选择丢弃的神经元是随机的。最简单的方法是设置一个固定的概率 \(p\)。对每一个神经元都一个概率 \(p\) 来判定要不要保留。对于一个神经层 \(\mathbf f = f(W\mathbf x + b)\)，我们可以引入一个丢弃函数 \(d(\cdot)\) 使得 \(\mathbf y = f(Wd(\mathbf x) + b)\)。丢弃函数 \(d(\cdot)\) 的定义为<br/>
+\[<br/>
+\begin{align*}<br/>
+d(\mathbf x) = \left \{ \begin{array} \\ \mathbf m \odot \mathbf x &amp;\qquad \text{当训练阶段时}\\ p\mathbf x &amp;\qquad \text{当测试阶段时} \\ \end{array} \right .<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(\mathbf m\in \{0,1\}^d\) 是丢弃掩码，通过以概率为 \(p\) 的贝努力分布随机生成。\(p\) 可以通过验证集来选取一个最优的值。或者 \(p\) 也可以设为 0.5，这对大部分的网络和任务比较有效。在训练时，这会造成训练和测试时的网络输出不一致。为了缓解这个问题，在测试时需要将每一个神经元的输出乘以 \(p\)，也相当于把不同的神经网络做了平均。</p>
+
+<p>下图给出了一个网络应用 dropout 方法后的示例。</p>
+
+<div align="center">
+    <img width="460" src="media/15454660806753/15472819545032.jpg" />
+</div>
+
+<p>一般来讲，对于隐藏层的神经元，其丢弃率 \(p=0.5\) 时效果最好。当 \(p=0.5\) 时，在训练时有一半的神经元被丢弃，只剩余一半的神经元是可以激活的，随机生成的网络结果最具多样性。对于输入层的神经元，其丢弃率通常设为更接近1的数，使得输入变化不会变化太大。对输入层神经元进行丢弃时，相当于给数据增加噪声，以此来提高网络的鲁棒性。</p>
+
+<p>丢弃法一般是针对神经元进行随机丢弃，但是也可以扩展到对神经元之间的连接进行随机丢弃，或每一层进行随机丢弃。</p>
+
+<p><strong>集成学习的解释</strong>：每做一次丢弃，相当于从原始的网络采样得到一个子网络。如果一个神经网络有 \(n\) 个神经元，那么总共可以采样出 \(2^n\) 个子网络。每次迭代都相当于训练一个不同的子网络，这些子网络都可以共享原始网络的参数。那么最终的网络可以近似看作为集成了指数级个不同网络的组合模型。</p>
+
+<p><strong>贝叶斯学习的解释</strong>：丢弃法也可以解释为一种贝叶斯学习的近似。用 \(y=f(\mathbf x,\theta)\) 来表示要学习的神经网络，贝叶斯学习是假设参数 \(\theta\) 为随机向量，并且先验分布为 \(q(\theta)\)，贝叶斯方法的预测为<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbb E_{q(\theta)}[y] &amp;= \int_q f(\mathbf x,\theta) q(\theta) d\theta \\<br/>
+&amp;\approx \frac 1 M \sum_{m=1}^M f(\mathbf x,\theta_m)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(f(\mathbf x,\theta_m)\) 为第 \(m\) 次应用丢弃方法后的网络，其参数 \(\theta_m\) 为对全部参数 \(\theta\) 的一次采样。</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15424711438602.html">人工神经网络-GAN</a></h1>
+			<p class="meta"><time datetime="2018-11-18T00:12:23+08:00" 
+			pubdate data-updated="true">2018/11/18</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>生成式对抗网络 GAN（Generative adversarial networks）是 Goodfellow 等在2014年提出的一种生成式模型。GAN 在结构上受博弈论中的二人零和博弈（即二人的利益之和为零，一方的所得正是另一方的所失）的启发，系统由一个生成器 \(G\) 和一个判别器 \(D\) 构成。</p>
+
+<p>GAN 的核心思想来源于博弈论的纳什均衡。它设定参与游戏双方分别为一个生成器（Generator）和一个判别器（Discriminator），生成器的目的是尽量去学习真实的数据分布，而判别器的目的是尽量正确输入数据是来自真实数据还是来自生成器；为了取得游戏胜利，这两个游戏参与者需要不断优化，各自提高自己的生成能力和判别能力，这个学习优化过程就是寻找二者之间的一个纳什均衡。</p>
+
+<p>这里以生成图片为例进行说明，假设我们有两个网络，\(G\)和\(D\)。正如它们的名字所暗示的那样，它们的功能分别是：</p>
+
+<ol>
+<li>\(G\) 是一个生成图片的网络，它接受一个随机的噪声 \(z\)，通过这个噪声生成图片，记做 \(G(z)\)。</li>
+<li>\(D\) 是一个判别图片的网络，判别一张图片是不是“真实的”。它的输入参数是 \(x\),\(x\) 代表一张图片，输出为 \(D(x)\) 代表 \(x\) 为真实图片的概率，如果为1，就代表 100%是真实的图片，而输出为0，就代表不可能是真实的图片。</li>
+</ol>
+
+<p>在训练过程中，生成网络 \(G\) 的目标就是尽量生成真实的图片去欺骗判别网络 \(D\)。而 \(D\) 的目标就是尽量把 \(G\) 生成的图片和真实的图片分别开来。这样，\(G\) 和 \(D\) 构成了一个动态的“博弈过程”。</p>
+
+<p>最后博弈的结果是在最理想的状态下，\(G\)可以生成足以“以假乱真”的图片 \(G(z)\)。对于 \(D\) 来说，它难以判定 \(G\) 生成的图片究竟是不是真实的，因此 \(D(G(z)) = 0.5\)。</p>
+
+<p>这样，我们的目的就达到了，我们得到了衣蛾生成式的模型 \(G\)，可以用来生成图片。</p>
+
+<div align="center">
+    <img src="media/15424711438602/15457475619356.jpg" width="680" />
+</div>
+
+<p>训练两个模型的方法：<strong>单独交替迭代训练</strong></p>
+
+<p><strong>判别模型</strong>：希望真样本集尽可能输出1，假样本集输出。因此对于判别网络，问题可以转换为一个<strong>有监督的二分类问题</strong>，直接送到神经网络模型中训练就好。</p>
+
+<p><strong>生成网络</strong>：我们的目的是生成尽可能逼真的样本。那么需要将原始的生成网络生成的样本送到判别网络中，所以在训练生成网络的时候，我们需要联合判别网络一起才能达到训练的目的。我们可以将判别网络串接在生成网络的后面，这样便可以知道生成网络生成的样本的误差，有了误差我们便可以对判别-生成网络进行训练。</p>
+
+<p>现在我们再来看一下训练方式，首先我们有原始的噪音数组 \(Z\)，也就是我们生成了假样本，现在很关键的一点，我们要把这些假样本的标签都设置为1，也就是认为这些假样本在生成网络训练的时候是真样本。这样能起到迷惑判别器的目的，也才能使得生成的假样本逐渐逼近正样本。现在对于生成网络的训练，我们有了样本集（只有假样本集，没有真样本集），有了对应的label（全为1），在训练过程中，<strong>判别网络的网络参数不发生变化</strong>，只需要将误差一直传到生成网络那一块更新生成网络的参数。这样就完成了生成网络的训练。</p>
+
+<p>在完成生成网络的训练后，我们可以根据目前新的生成网络再对先前的噪声 \(z\) 生成新的假样本，这时候生成的假样本应该更真了。有了新的真假样本的集，就又可以重复上述过程，我们把这个过程称为单独交替训练。我们可以定义一个迭代次数，交替迭代到一定次数后即可停止。这时候，噪声 \(z\) 生成的假样本已经很真了。</p>
+
+<h3 id="toc_0">GAN 的学习方法</h3>
+
+<p>首先我们直接给出原始论文中的目标公式：<br/>
+\[<br/>
+\min_G \max_D V(D,G) = E_{x \sim \text{data}(x)} [ \log(D(x)) ] + E_{z\sim p_z(z)}[\log(1 - D(G(z))) ]<br/>
+\]</p>
+
+<p>这是一个极大极小优化问题，其实对应的就是上述的两个优化过程，对比我们的分析流程，先优化 \(D\)，再优化 \(G\)，本质上是两个优化问题，上式可以拆解为下面两个公式：</p>
+
+<p>优化 D ：<br/>
+\[<br/>
+\max_D V(D,G) = E_{x\sim p_{data}(x)}[\log(D(x))] + E_{z\sim p_z(z)}[\log( 1 - D(G(z))]<br/>
+\]</p>
+
+<p>优化 G ：<br/>
+\[<br/>
+\min_G V(D,G) = E_{z\sim p_z(z)} [\log(1 - D(G(z))]<br/>
+\]</p>
+
+<p>可以看到，优化 \(D\) 的时候，也就是判别网络，其实没有生成网络什么事，后面的 \(G(z)\) 这里就是相当于已经得到的假样本。优化 \(D\) 的公式的第一项，使得真样本 \(x\) 输入的时候得到的结果越大越好，可以理解，因为需要真样本的预测结果越接近于1判别效果越好。对于假样本，需要优化的结果是 \(D(G(z))\) 越小越好，因为假样本的标签理论是应该是0。所以优化 \(D\) 的第二项，\(1 - D(G(z))\) 也就是越大越好，所以优化 \(D\) 取得是式子的极大值。</p>
+
+<p>同理在优化 \(G\) 的时候，这个时候不需要真样本的参与，这个时候把第一项直接去掉，只流向假样本项，因为我们希望能迷惑判别器 \(D\)，也就是希望假样本的标签为1，所以是 \(D(G(z))\) 越大越好，为了统一也就是希望 \(1- D(G(z))\) 越小越好。</p>
+
+<p>这样便得到了之前的极小极大问题，里面包含了生成模型以假乱真的优化和判别模型的优化，完美阐释了这样一个优美的理论。</p>
+
+<p>GAN可以和CNN、RNN结合在一起。任何一个可微分的函数，都可以用来参数化GAN的生成模型和判别模型。那么，在实际中，我们就可以使用深度卷积网络，来参数化生成模型。另外，GAN和RNN结合在一起，用来处理和描述一些连续的序列数据，可以学习到序列数据的分布，同时也可以产生序列数据应用，包括对音乐数据或者是一些自然语言数据的建模和生成。</p>
+
+<hr/>
+
+<p><a href="https://blog.csdn.net/on2way/article/details/72773771">简单理解与实验生成对抗网络GAN</a><br/>
+<a href="https://blog.csdn.net/u010834458/article/details/71286376">GAN生成式对抗网络总结</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15418610530072.html">人工神经网络-SOM自组织系统</a></h1>
+			<p class="meta"><time datetime="2018-11-10T22:44:13+08:00" 
+			pubdate data-updated="true">2018/11/10</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>自组织映射是一个很有趣的竞争性学习系统，其中输出神经元之间竞争激活，结果是在任意时间只有一个神经元被激活。这个激活的神经元被称为胜者神经元（winner-takes-all neuron）。这种竞争可以通过在神经元之间具有横向抑制连接（负反馈路径）来实现。其结果是神经元被迫对自身进行重新组合，这样的网络我们称之为自组织映射（Self Organizing Map，SOM）。</p>
+
+<p>生物学研究表明，在人脑的感觉通道上，神经元的组织原理是有序排列的。当外界的特定信息输入时，大脑皮层的特定区域兴奋，而且类似的外界信息在对应区域是连续映像的。生物视网膜中有许多特定细胞对特定的图形比较敏感，当视网膜中有若干个接受单元同时受特定模式刺激时，就使大脑皮层中的特定神经元开始兴奋，输入模式越近，与之对应的兴奋神经元也接近；在听觉通道上，神经元在结构排列上与频率的关系十分密切，对于某个频率，特定的神经元具有最大的响应，位置相邻的神经元具有相近的频率特征，而远离的神经元具有的频率特征差别也较大。大脑皮层中神经元的这种响应特点不是先天安排好的，而是后天的学习自组织形成的。</p>
+
+<h3 id="toc_0">自组织神经网络</h3>
+
+<p>自组织神经网络是无导师学习网络。它通过自动寻找样本的内在规律和本质属性，自组织、自适应地改变网络参数与结构。层次性结构，具有竞争层。如下图所示：</p>
+
+<div align="center">
+    <img src="media/15418610530072/15458312665496.jpg" width="400" />
+</div>
+
+<p>a. 输入层：接受外界信息，将输入模式向竞争层传递，起“观察”作用。 <br/>
+b. 竞争层：负责对输入模式进行“分析比较”，寻找规律，并归类。</p>
+
+<p>在SOM中，一层是输入层，一层是竞争层，又称为输出层和核心层。在一次输入中，权值是随机给定的，在捐赠层，每一个神经元获胜的概率是相同的，但是最后会有一个兴奋最强的神经元。兴奋最强的神经元战胜了其他神经元，在权值调整过程中，兴奋得到进一步加强，而其他神经元保持不变，竞争神经网络通过这种方式获取训练样本的分布信息，每一个训练样本对应一个兴奋的竞争层神经元，也就是对应一个类别。当有新样本输入时，就可以根据兴奋的神经元进行模式分类。</p>
+
+<p>当有一个新样本输入时，要进行相似性测量，神经网络的输入模式向量的相似性测量可用向量之间的距离来衡量。常用的方法有欧氏距离法和余弦法两种。</p>
+
+<h4 id="toc_1">欧式距离法</h4>
+
+<p>设 \(X\)、\(X_1\) 为两行向量，其间的欧式距离：<br/>
+\[<br/>
+d = || X - X_i || = \sqrt{(X-X_i)(X-X_i)^T}<br/>
+\]</p>
+
+<p>\(d\) 越小，\(X\) 与 \(X_i\) 越接近，两者越相似，当 \(d=0\) 时，\(X=X_i\)  以 \(d=T\)（常数）为判据，可对输入向量模式进行聚类分析：由于 \(d_{12}\)、\(d_{23}\)、\(d_{31}\) 均小于 \(T\)，\(d_{45}\)、\(d_{56}\)、\(d_{46}\) 均小于 \(T\) ,而 \(d_{1i} \gt T(i=4,5,6)\)；\(d_{2i}\gt T(i=4,5,6)\) ,\(d_{3i}\gt T(i=4,5,6)\),故将输入模式 \(X_i\) 按如下分类：</p>
+
+<div align="center">
+    <img width="360" src="media/15418610530072/15458363067627.jpg" />
+</div>
+
+<h4 id="toc_2">余弦法</h4>
+
+<p>计算两个向量夹角的余弦：<br/>
+\[<br/>
+\cos \psi = \frac{X^T X_i}{||X||\text{ }||X_i||}<br/>
+\]</p>
+
+<p>两个模式向量越接近，其夹角越小，余弦越大。如果对同一类内各个模式向量间的夹角做出规定，不允许超过某一最大角，最这个最大夹角就成为一种聚类判据。同模式向量的夹角小于此最大角，不同模式类的夹角大于此最大角。余弦法适合模式向量长度相同或者模式特征只与向量相关的相似性测量。</p>
+
+<div align="center">
+    <img width="360" src="media/15418610530072/15458372832995.jpg" />
+</div>
+
+<p>很容易证明，当图中 \(\mathbf X\) 与 \(\mathbf X_i\) 的模为1的单位向量时（其实不一定要1,，只要是常数就行），余弦相似度也就退化成了内积计算：<br/>
+\[<br/>
+\cos \psi(\mathbf X,\mathbf X_i) = \frac{\mathbf X^T \mathbf X_i}{||\mathbf X||\text{ }||\mathbf X_i||} = \mathbf X^T \mathbf X_i<br/>
+\]</p>
+
+<p>此时欧式距离等价于余弦相似度<br/>
+\[<br/>
+\begin{align*}<br/>
+(\mathbf X - \mathbf X_i)^T(\mathbf X - \mathbf X_i) &amp;= \mathbf X^T\mathbf X - 2\mathbf X^T \mathbf X)i + \mathbf X_i^T \mathbf X_i\\<br/>
+&amp;= 2 - 2\mathbf X^T \mathbf X_i \\<br/>
+&amp;= 2 - 2\cos \psi(\mathbf X,\mathbf X_i)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>从式子中可以看出，夹角越大，欧式距离的平方就越小。</p>
+
+<h3 id="toc_3">竞争学习规则</h3>
+
+<p>自组织映射中首先对网络权值进行初始化，选择较小的初始值，对向量进行归一化，然后经过三个过程：竞争过程、合作过程和权值调节。<br/>
+<strong>竞争过程</strong>：对每个输入信号，网络中的神经元计算他们各自的判别函数的值，判别值最大的特定神经元成为本次的获胜神经元。<br/>
+<strong>合作过程</strong>：获胜的神经元决定兴奋神经元的拓扑领域，即获胜神经元周围空间位置内的神经元，提供相邻神经元的合作基础。<br/>
+<strong>权值调节</strong>：通过对获胜神经元及其周围的兴奋神经元的权值进行调节，以增加它们对输入信号判别函数值，随着权值的不断调整，获胜神经元对相似的输入信号会有更强的响应，即判别函数的值越大。</p>
+
+<h4 id="toc_4">竞争过程</h4>
+
+<p>假设网络中输入信号（数据）空间的维度为 \(m\)，从中随机选择一个输入信号（向量）记为 \(\mathbf x\)，<br/>
+\[<br/>
+\mathbf x = \left [ \begin{array}\\ x_1 &amp; x_2 &amp; x_3 &amp; \cdots x_m \\\end{array}\right ]^T<br/>
+\]</p>
+
+<p>输出层的每一个神经元与输入层是全连接的结构，所以每个神经元的权值向量和输入空间的维度相同，神经元 \(j\) 的权值向量记为：\(w_j\)，<br/>
+\[<br/>
+w_j = \left [ \begin{array}\\ w_{j1} &amp; w_{j2} &amp; w_{j3} &amp; \cdots &amp; w_{jm} \\\end{array} \right ]\qquad j = 1,2,3\dots l<br/>
+\]</p>
+
+<p>其中 \(l\) 是输出层网络中神经元的总数，竞争过程就是找到与向量 \(\mathbf x\) 最佳匹配的权值向量 \(w_j\)。最佳匹配的意思是：对于 \(j=1,2,3,\dots\)，比较每一个神经元对应的权值与输入向量 \(\mathbf x\) 的内积 \(w_j^T \mathbf x\)，选择最大值，对应的神经元作为获胜神经元。前面已经说过<strong>内积 \(w_j^T\mathbf x\) 最大化，这可以等价于向量 \(\mathbf x\) 与 \(w_j\) 的欧几里得距离最小。</strong></p>
+
+<p>我们定义 \(i(x)\) 标识与向量 \(\mathbf x\) 最佳匹配的神经元，\(i(x)\) 定义为：<br/>
+\[<br/>
+i(x) = \arg\min || \mathbf x - w_j|| \qquad j = 1,2,3\dots l<br/>
+\]</p>
+
+<h4 id="toc_5">合作过程</h4>
+
+<p>在竞争过程中产生的获胜神经元处于兴奋拓扑领域的中心位置。在神经生物学中有证据显示，一个获胜神经元倾向于激活它紧接着的领域内神经元，而不是隔得很远的神经元。所以对于获胜神经元的拓扑领域按照侧向距离光滑地缩减。具体的，用 \(h_{j,i}\) 表示以获胜神经元为中心的拓扑领域且包含这一组兴奋（合作）神经元，\(j\) 表示一个输出神经元，设 \(d(i,j)\) 表示获胜神经元 \(i\) 与兴奋神经元 \(j\) 之间的距离。假设拓扑领域 \(h_{j,i}\) 是一个单峰函数，与 \(d_{i,j}\) 大小有关，获胜神经元与兴奋神经元之间的距离越小，兴奋神经元收到的刺激越大。拓扑领域 \(h_{j,i}\) 也可以表示兴奋神经元受到影响的程度。</p>
+
+<p><strong>单峰函数 \(h_{j,i}\) 满足两个要求</strong>：</p>
+
+<ol>
+<li>对于单峰函数 \(h_{j,i}\)，在 \(d_{i,j} = 0\) 处，获胜神经元 \(i\) 达到最大值。</li>
+<li>\(h_{j,i}\) 的幅值随距离 \(d_{i,j}\) 的增加而减小，距离趋于无穷大时幅值趋向于0；</li>
+</ol>
+
+<p>高斯函数满足这些要求：<br/>
+\[<br/>
+h_{j,i(x)} = \exp\Big( -\frac{d_{j,i}^2}{2\sigma^2} \Big)<br/>
+\]</p>
+
+<p>\(i(x)\) 为获胜神经元的位置（在输出神经元网络中的坐标），\(j\) 是神经元在网络中的位置，\(d_{j,i}^2\) 是其他神经元距离获胜神经元的距离，\(\sigma\) 是拓扑领域的有效宽度，它度量了靠近获胜神经元的兴奋神经元在学习过程中的参与程度，由此可见领域函数依赖于获胜神经元和兴奋神经元在输出空间的位置距离，不依赖于原始输入空间的度量。</p>
+
+<p>在二维网格的情况下<br/>
+\[<br/>
+d_{i,j}^2 = || r_j - r_i ||<br/>
+\]</p>
+
+<p>\(r_j\) 是兴奋神经元在输出网格中的位置向量，\(r_i\) 是获胜神经元在输出网格中的位置向量。</p>
+
+<p>在 SOM网络中海油一个特征就是拓扑领域的大小随着时间收缩，总要求拓扑领域函数 \(h_{i,j}\) 的有效宽度 \(\sigma\) 随时间减小来实现，对于 \(\sigma\) 依赖于时间 \(n\) 流行的选择是：<br/>
+\[<br/>
+\sigma(n) = \sigma_0 \exp(-\frac{n}{\tau_1}) \qquad n = 1,2,3\dots<br/>
+\]</p>
+
+<p>\(\sigma_0\) 是 \(\sigma\) 的初始值，\(\tau_1\) 是一个时间常数；</p>
+
+<p><strong>加入时间依赖的拓扑领域定义为：</strong><br/>
+\[<br/>
+h_{j,i}(n) = \exp\Big(-\frac{2d_{j,i}^2}{2\sigma(n)^2}\Big) \qquad n = 1,2,3\dots<br/>
+\]</p>
+
+<p>在网络进行学习的初始阶段，拓扑领域 \(h_{i,j}\) 应该包含以获胜神经元为中心的所有神经元，然后随着时间 \(n\)（即：迭代次数增加）慢慢收缩，宽度 \(\sigma(n)\) 以指数下滑，拓扑领域也一相应的方式收缩。\(h_{j,i}\) 会减少到仅有围绕获胜神经元的少量邻居神经元或者减少到只剩下获胜神经元。</p>
+
+<p>在网络初始阶段 \(\sigma_0\) 的初始值为输出网格的半径，时间常数为：\(\tau_1 = \frac{1000}{\log(\sigma_0)}\)（1000不是固定的，也可以更大）</p>
+
+<h4 id="toc_6">自适应过程</h4>
+
+<p>自组织网络的神经元的权值 \(w_j\) 随着输入向量 \(\mathbf x\) 的变化而改变。\(n\) 轮的迭代：</p>
+
+<ol>
+<li>从训练数据中：随机选择一个向量作为输入向量 \(\mathbf x\)；</li>
+<li>竞争过程：确定一个获胜神经元以及神经元在输出网格中的位置向量（拓扑领域的中心位置）；</li>
+<li>合作过程：在 \(n\) 时刻确定拓扑领域的有效半径内所有的兴奋神经元，每一轮训练中，拓扑领域 \(h_{j,i}(n)\) 和有效半径（随时间 \(n\) 衰减）。</li>
+<li>权值更新：
+\[
+w_j(n+1) = w_j(n) + \eta(n)(x(n) - w_j(n))\qquad j\in \mathcal A[h_{ji}(n)]
+\]</li>
+</ol>
+
+<p>其中 \(j\in\mathcal A[h_{ji}(n)]\) 代表在 \(n\) 时刻拓扑领域的有效半径内所有的兴奋神经元（含获胜神经元）\(\eta\)表示学校效率参数，学习效率也是随时间逐渐衰减的：<br/>
+\[<br/>
+\eta(n) = \eta(0)\exp(-\frac{n}{\tau_2})\qquad n = 1,2,3\dots<br/>
+\]</p>
+
+<p>\(\tau_2\) 是另一个时间常数，\(\eta_0\) 是学习效率的初始值，一般设为0.1然后随着时间 \(n\) 递减，但是永远不等于零。</p>
+
+<p>权值更新的公式，实际上是在将获胜神经元和拓扑邻域内的兴奋神经元的权值向量，向输入向量 \(\mathbf x\) 移动，随着训练数据的重复出现，拓扑邻域内的网络权值向量的分布会趋于服从输入向量 \(\mathbf x\) 的分布。网络中的相邻神经元的权值向量会很相似。</p>
+
+<h3 id="toc_7">SOM算法小结</h3>
+
+<p>1．初始化，对初始权值向量 \(w_j\) 选择随机的值初始化，选择较小的权值; <br/>
+2．取样，随机从输入空间选取样本 \(\mathbf x\) ; <br/>
+3．相似性匹配，在时间 \(n\) 时刻根据最小距离准则找到最佳匹配(获胜神经元) \(i(x)\);<br/>
+\[<br/>
+i(x)=\arg\min||\mathbf x−w_j||\qquad j\in[1,2,3,\dots,l]<br/>
+\]　</p>
+
+<p>4．更新权值，通过更新公式调整所有神经元的权值; <br/>
+\[<br/>
+w_j(n+1)=w_j(n)+\eta(n)(x(n)−w_j(n))<br/>
+\]</p>
+
+<p>5．重复2，3，4步骤，知道特征映射不再发生明显变化为止;</p>
+
+<hr/>
+
+<p><a href="https://blog.csdn.net/u014281392/article/details/76461270">自组织映射网 SOMnet</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15406533448507.html">人工神经网络-长短时记忆网络 GRU</a></h1>
+			<p class="meta"><time datetime="2018-10-27T23:15:44+08:00" 
+			pubdate data-updated="true">2018/10/27</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15370227198772.html">人工神经网络-长短时记忆网络 LSTM</a></h1>
+			<p class="meta"><time datetime="2018-09-15T22:45:19+08:00" 
+			pubdate data-updated="true">2018/9/15</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>长短期记忆（ long short-term memory， LSTM）网络是循环神经网络的一个变体，可以有效地解决简单循环神经网络的梯度爆炸或消失问题。</p>
+
+<p><strong>新的内部状态</strong>：LSTM网络引入一个新的内部状态（internal state）\(\mathbf c_t\) 专门进行线性的循环信息传递，同时（非线性）输出信息给隐藏层的外部状态 \(\mathbf h_t\)。<br/>
+\[<br/>
+\begin{align}<br/>
+\mathbf c_t &amp;= \mathbf f_t \odot \mathbf c_{t-1} + \mathbf i_t \odot \widetilde{\mathbf c}_t\label{mctm1}\\<br/>
+\mathbf h_t &amp;= \mathbf o_t \odot \tanh(\mathbf c_t)\label{mctm2}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>其中 \(\mathbf f_t\)，\(\mathbf i_t\) 和 \(\mathbf o_t\) 为三个门（gate）来控制信息传递的路径；\(\odot\) 为向量元素乘积；\(\mathbf c_{t−1}\) 为上一时刻的记忆单元；\(\widetilde{\mathbf c}_t\) 是通过非线性函数得到候选状态，<br/>
+\[<br/>
+\widetilde{\mathbf c}_t = \tanh(W_c \mathbf x_t + U_c \mathbf h_{t−1} + \mathbf b_c)<br/>
+\]</p>
+
+<p>在每个时刻 \(t\)， LSTM网络的内部状态 \(\mathbf c_t\) 记录了到当前时刻为止的历史信息。</p>
+
+<div align="center">
+    <img src="media/15370227198772/15428977728733.jpg" width="260" />
+</div>
+
+<p><strong>门机制</strong>：LSTM 网络引入门机制（gating mechanism）来控制信息传递的路径。公式 ( \ref{mctm1} )和 ( \ref{mctm2} ) 中三个“门”分别为输入门 \(\mathbf i_t\), 遗忘门 \(\mathbf f_t\) 和输出门 \(\mathbf o_t\)，在数字电路中，门（gate）为一个二值变量 \(\{0,1\}\)， 0代表关闭状态，不许任何信息通过； 1代表开放状态，允许所有信息通过。 LSTM网络中的“门”是一种“软”门，取值在 \((0,1)\)之间，表示以一定的比例运行信息通过。 LSTM网络中三个门的作用为</p>
+
+<ul>
+<li>遗忘门 \(\mathbf f_t\) 控制上一个时刻的内部状态 \(\mathbf c_{t−1}\) 需要遗忘多少信息。</li>
+<li>输入门 \(\mathbf i_t\) 控制当前时刻的候选状态 \(\widetilde{\mathbf c}_t\) 有多少信息需要保存。</li>
+<li>输出门 \(\mathbf o_t\) 控制当前时刻的内部状态 \(\mathbf c_t\) 有多少信息需要输出给外部状态 \(\mathbf h_t\)。</li>
+</ul>
+
+<p>当 \(\mathbf f_t = 0\), \(\mathbf i_t = 1\)时，记忆单元将历史信息清空，并将候选状态向量 \(\widetilde c_t\) 写入。但此时记忆单元 \(\mathbf c_t\) 依然和上一时刻的历史信息相关。当 \(\mathbf f_t = 1\),\(\mathbf i_t = 0\) 时，记忆单元将复制上一时刻的内容，不写入新的信息。</p>
+
+<p>第一个开关，负责控制继续保存长期状态 \(c\)；第二个开关，负责控制把即时状态输入到长期状态 \(c\) ；第三个开关，负责控制是否把长期状态 \(c\) 作为当前的LSTM的输出。三个开关的作用如下图所示：</p>
+
+<div align=center>
+    <img width="340" src="media/15370227198772/15428989376472.jpg" />
+</div>
+
+<p>三个门的计算范式为:<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbf i_t &amp;= \sigma(W_i \mathbf x_t + U_i \mathbf h_{t−1} + \mathbf b_i),\\<br/>
+\mathbf f_t &amp;= \sigma(W_f \mathbf x_t + U_f \mathbf h_{t-1} + \mathbf b_f),\\<br/>
+\mathbf o_t &amp;= \sigma(W_o \mathbf x_t + U_o \mathbf h_{t−1} + \mathbf b_o),\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(\sigma(\cdot)\) 为 logistic 函数，其输出区间为 (0, 1)， \(\mathbf x_t\) 为当前时刻的输入， \(\mathbf h_{t−1}\) 为上一时刻的外部状态。</p>
+
+<p>下图给出了 LSTM 网络的循环单元结构，其计算过程为：（1）首先利用上一时刻的外部状态 \(\mathbf h_{t−1}\) 和当前时刻的输入 \(\mathbf x_t\)，计算出三个门，以及候选状态 \(\widetilde{\mathbf c}_t\);（2）结合遗忘门 \(\mathbf f_t\) 和输入门 \(\mathbf i_t\) 来更新记忆单元 \(\mathbf c_t\);（3）结合输出门 \(\mathbf o_t\)，将内部状态的信息传递给外部状态 \(\mathbf h_t\)。</p>
+
+<p><font size=33 color=red>图</font></p>
+
+<p>下面来分开介绍LSTM的各个步骤：下图展示了遗忘门的计算</p>
+
+<div align="center">
+    <img src="media/15370227198772/15429034872510.jpg" width="520" />
+</div>
+
+<p>\(W_f\) 和 \(U_f\) 分别是遗忘门当前输入 \(\mathbf x_i\) 和上一时刻外部状态 \(\mathbf h_i\) 的权重，\(\mathbf b_f\) 是遗忘门的偏置项，\(\sigma\) 是sigmoid函数。<br/>
+\[<br/>
+\mathbf f_t = \sigma(\left [ \begin{array}{cc} W_f &amp; U_f\\ \end{array}\right ] \cdot \left [\begin{array}{c} \mathbf x_t\\\mathbf h_{t-1}\\\end{array}\right ] + \mathbf b_f)<br/>
+\]</p>
+
+<p>接下来看看输入门：</p>
+
+<div align="center">
+    <img src="media/15370227198772/15429037793431.jpg" width="520" />
+</div>
+
+<p>\(W_i\) 和 \(U_i\) 分别是输入门当前输入 \(\mathbf x_i\) 和 上一时刻外部状态 \(\mathbf h_i\) 的权重，\(\mathbf b_i\) 是输入门的偏置项<br/>
+\[<br/>
+\mathbf i_t = \sigma(\left [ \begin{array}{cc} W_i &amp; U_i\\ \end{array}\right ] \cdot \left [\begin{array}{c} \mathbf x_t\\\mathbf h_{t-1}\\\end{array}\right ] + \mathbf b_i)<br/>
+\]</p>
+
+<p>接下来，我们计算用于描述当前输入的单元状态（候选状态）\(\widetilde{\mathbf c}_t\)，它是根据上一次的输出和本次输入来计算的，其中 \(W_c\) 和 \(U_c\) 表示候选状态的权重，\(\mathbf b_c\) 表示偏置项：<br/>
+\[<br/>
+\mathbf i_t = \tanh(\left [ \begin{array}{cc} W_c &amp; U_c\\ \end{array}\right ] \cdot \left [\begin{array}{c} \mathbf x_t\\\mathbf h_{t-1}\\\end{array}\right ] + \mathbf b_c)<br/>
+\]</p>
+
+<p>下图表示 \(\widetilde c_t\) 的计算</p>
+
+<div align="center">
+    <img src="media/15370227198772/15429038909847.jpg" width="520" />
+</div>
+
+<p>现在，我们计算当前时刻的单元状态 \(\mathbf c_t\) 。它是由上一次的单元状态 \(\mathbf c_{t-1}\) 按元素乘以遗忘门 \(\mathbf f_t\)，再用当前输入的候选状态 \(\widetilde{\mathbf c}_t\) 按元素乘以输入门 \(\mathbf i_t\)，再将两个积加和产生的：<br/>
+\[<br/>
+\mathbf c_t = \mathbf c_{t-1} \odot \mathbf f_t + \widetilde{\mathbf c}_t \odot \mathbf i_t<br/>
+\]</p>
+
+<p>下图是 \(\mathbf c_t\) 的计算</p>
+
+<div align="center">
+    <img src="media/15370227198772/15429042137568.jpg" width="520" />
+</div>
+
+<p>这样，我们就把LSTM关于当前的记忆 \(\widetilde{\mathbf c}_t\) 和长期的记忆 \(\mathbf c_{t-1}\) 组合在一起，形成了新的单元状态 \(\mathbf c_t\)。由于遗忘门的控制，它可以保存很久很久之前的信息，由于输入门的控制，它又可以避免当前无关紧要的内容进入记忆。</p>
+
+<p>下面，我们要看看输出门，它控制了长期记忆对当前输出的影响，其中 \(W_o\) 和 \(U_o\) 表示输出门对当前输入 \(\mathbf x_t\) 和上一时刻外部状态 \(\mathbf h_{t-1}\) 的权重，\(\mathbf h_{t-1}\) 是偏置项：<br/>
+\[<br/>
+\mathbf o_t = \sigma(\left [ \begin{array}{cc} W_o &amp; U_o\\ \end{array}\right ] \cdot \left [\begin{array}{c} \mathbf x_t\\\mathbf h_{t-1}\\\end{array}\right ] + \mathbf b_o)<br/>
+\]</p>
+
+<p>下图表示输出门的计算</p>
+
+<div align="center">
+    <img src="media/15370227198772/15429043281567.jpg" width="520" />
+</div>
+
+<p>LSTM最终的输出，是由输出门和单元状态共同确定的：<br/>
+\[<br/>
+h_t = \mathbf o_t \odot \tanh(\mathbf c_t)<br/>
+\]</p>
+
+<p>如下图：</p>
+
+<div align="center">
+    <img src="media/15370227198772/15429043987838.jpg" width="520" />
+</div>
+
+<p>通过 LSTM循环单元，整个网络可以建立较长距离的时序依赖关系。上面公式可以简洁地描述为<br/>
+\[<br/>
+\begin{align*}<br/>
+\left [ \begin{array}{c} \widetilde{\mathbf c}_t \\ \mathbf o_t \\ \mathbf i_t \\ \mathbf f_t \\\end{array} \right ] &amp;= \left [ \begin{array}{c} \tanh \\ \sigma \\ \sigma \\ \sigma \\\end{array}\right ] \Big( \left [ \begin{array}{cc} W &amp; U \\\end{array} \right ] \left [ \begin{array}{c} \mathbf x_t\\\mathbf h_{t-1}\\\end{array} \right ] + b\Big)\\<br/>
+\mathbf c_t &amp;= \mathbf f_t \odot \mathbf c_{t-1} + \mathbf i_t \odot \widetilde{\mathbf c}_t\\<br/>
+\mathbf h_t &amp;= \mathbf o_t \odot \tanh(\mathbf c_t)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p><strong>记忆</strong>：循环神经网络中的隐状态 \(\mathbf h\) 存储了历史信息，可以看作是一种记忆（memory）。在简单循环网络中，隐状态每个时刻都会被重写，因此可以看作是一种短期记忆（short-term memory）。在神经网络中， 长期记忆（long-term memory）可以看作是网络参数，隐含了从训练数据中学到的经验，并更新周期要远远慢于短期记忆。而在 LSTM网络中，记忆单元 \(\mathbf c\) 可以在某个时刻捕捉到某个关键信息，并有能力将此关键信息保存一定的时间间隔。记忆单元 \(\mathbf c\) 中保存信息的生命周期要长于短期记忆 \(\mathbf h\)，但又远远短于长期记忆，因此称为长的短期记忆（long short-term memory）。</p>
+
+<h3 id="toc_0">参数学习</h3>
+
+<p>LSTM的训练算法仍然是反向传播算法，首先我们来看一下前向计算中出现的激活函数，激活函数有两个，分别是sigmoid函数函数和tanh函数<br/>
+\[<br/>
+\begin{align*}<br/>
+\sigma(z) &amp;= y = \frac{1}{1 + e^{-z}} \\<br/>
+\sigma&#39;(z) &amp;= y(1-y) \\<br/>
+\tanh(z) &amp;= y = \frac{e^z - e^{-z}}{e^z + e^{-z}}\\<br/>
+\tanh&#39;(z) &amp;= 1 - y^2\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>从上面可以看出，sigmoid和tanh函数的导数都是原函数的函数。这样，我们一旦计算原函数的值，就可以用它来计算出导数的值。</p>
+
+<p>LSTM需要学习的参数共有8组，分别是：遗忘门的权重矩阵 \(W_f\)、\(U_f\) 和偏置项 \(b_f\) 、输入门的权重矩阵 \(W_i\)、\(U_i\) 和偏置项 \(b_i\)、输出门的权重矩阵 \(W_o\)、\(U_o\) 和偏置项 \(b_o\)，以及计算候选状态的权重矩阵 \(W_c\)、\(U_c\) 和偏置项 \(b_c\)。</p>
+
+<p>我们解释一下按元素乘 \(\odot\) 符号。当 \(\odot\) 作用于两个向量时，运算如下：<br/>
+\[<br/>
+\mathbf a \odot \mathbf b = \left [ \begin{array}{c} a_1 \\ a_2 \\ a_3 \\ \dots \\ a_n \\ \end{array} \right ] \odot \left [ \begin{array}{c} b_1 \\ b_2 \\ b_3 \\ \dots \\ b_n \\ \end{array} \right ] = \left [ \begin{array}{c} a_1 b_1 \\ a_2 b_2 \\ a_3 b_3 \\ \dots \\ a_n b_n \\ \end{array} \right ]<br/>
+\]</p>
+
+<p>当 \(\odot\) 作用于一个<strong>向量</strong>和一个<strong>矩阵</strong>时，运算如下：<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbf a \odot X &amp;= \left [ \begin{array}{c} a_1 \\ a_2 \\ a_3 \\ \dots \\ a_n \\ \end{array} \right ] \odot \left [ \begin{array}{ccccc} x_{11} &amp; x_{12} &amp; x_{13} &amp; \dots &amp; x_{1n} \\ x_{21} &amp; x_{22} &amp; x_{23} &amp; \dots &amp; x_{2n} \\ x_{31} &amp; x_{32} &amp; x_{33} &amp;\dots &amp;x_{3n} \\ \vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\ x_{n1} &amp; x_{n2} &amp; x_{n3} &amp; \dots &amp; x_{nn}\\\end{array} \right ]\\<br/>
+&amp;= \left [ \begin{array}{ccccc} a_1 x_{11} &amp; a_1 x_{12} &amp; a_1 x_{13} &amp; \dots &amp; a_1 x_{1n} \\ a_2 x_{21} &amp; a_2 x_{22} &amp; a_2 x_{23} &amp; \dots &amp; a_2 x_{2n} \\ a_3 x_{31} &amp; a_3 x_{32} &amp; a_3 x_{33} &amp; \dots &amp; a_3 x_{3n} \\ \vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\ a_n x_{n1} &amp; a_n x_{n2} &amp; a_n x_{n3} &amp; \dots &amp; a_n x_{nn} \\\end{array} \right ]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>当 \(\odot\) 作用于两个矩阵时，两个矩阵对应位置的元素相乘。按元素乘可以在某些情况下简化矩阵和向量运算。例如，当一个对角矩阵右乘一个矩阵时，相当于用对角矩阵的对角线组成的向量安元素乘那个矩阵：<br/>
+\[<br/>
+\text{diag}[a] X = a\odot X<br/>
+\]</p>
+
+<p>当一个行向量右乘一个对角矩阵时，相当于这个行向量按元素乘那个矩阵对角线组成的向量：<br/>
+\[<br/>
+a^T \text{diag}[b] = a^T \odot b<br/>
+\]</p>
+
+<p>上面这两点，在我们后续推导中会多次用到。</p>
+
+<p>在t时刻，LSTM的输出值为 \(\mathbf h_t\)。我们定义t时刻的误差项 \(\delta_t\) 为：<br/>
+\[<br/>
+\delta_t = \frac{\partial E}{\partial \mathbf h_t}<br/>
+\]</p>
+
+<p>我们假设误差项是损失函数对输出值的导数，而不是对加权输入 \(\mathbf{net}_t^l\) 的导数。因为LSTM有四个加权输入，分别对于 \(\mathbf f_t\)、\(\mathbf i_t\)、\(\mathbf c_t\) 和 \(\mathbf o_t\)，我们希望往上一层传递一个误差项而不是四个。但我们仍然需要定义出这个四个加权输入，以及对应的误差项。<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbf{net}_{f,t} &amp;= W_f \mathbf h_{t-1} + U_f \mathbf x_t + \mathbf b_f\\<br/>
+\mathbf{net}_{i,t} &amp;= W_i \mathbf h_{t-1} + U_i \mathbf x_t + \mathbf b_i\\<br/>
+\mathbf{net}_{\widetilde c,t} &amp;= W_c \mathbf h_{t-1} + U_c \mathbf x_t + \mathbf b_c\\<br/>
+\mathbf{net}_{o,t} &amp;= W_o \mathbf h_{t-1} + U_o \mathbf x_o + \mathbf b_o\\<br/>
+\delta_{f,t} &amp;= \frac{\partial E}{\partial \mathbf{net}_{f,t}}\\<br/>
+\delta_{i,t} &amp;= \frac{\partial E}{\partial \mathbf{net}_{i,t}}\\<br/>
+\delta_{\widetilde c,t} &amp;= \frac{\partial E}{\partial \text{net}_{\widetilde c,t}}\\<br/>
+\delta_{o,t} &amp;= \frac{\partial E}{\partial \mathbf{net}_{o,t}}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<h3 id="toc_1">误差沿时间反向传递</h3>
+
+<p>沿时间反向传递误差项，就是要计算出 \(t-1\) 时刻的误差项 \(\delta_{t-1}\)。<br/>
+\[<br/>
+\begin{align*}<br/>
+\delta_{t-1}^T &amp;= \frac{\partial E}{\partial \mathbf h_{t-1}}\\<br/>
+&amp;= \frac{\partial E}{\partial \mathbf h_t} \frac{\partial \mathbf h_t}{\partial \mathbf h_{t-1}}\\<br/>
+&amp;= \delta_t^T \frac{\partial \mathbf h_t}{\partial \mathbf h_{t-1}}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>我们知道，\(\frac{\partial \mathbf h_t}{\partial \mathbf h_{t-1}}\) 是一个 Jacbian矩阵。如果隐藏 \(h\) 的维度是 \(N\) 的话，那么它就是一个 \(N\times N\) 矩阵。为了求出它，我们列出 \(\mathbf h_t\) 的计算公式<br/>
+\[<br/>
+\begin{align}<br/>
+\mathbf h_t &amp;= \mathbf o_t \odot \tanh(\mathbf c_t)\label{mhmoo}\\<br/>
+\mathbf c_t &amp;= \mathbf f_t \odot \mathbf c_{t-1} + \mathbf i_t \odot \widetilde{\mathbf c}_t\label{mhmoo2}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>显然，\(\mathbf o_t\)、\(\mathbf f_t\)、\(\mathbf i_t\)、\(\widetilde{\mathbf c}_t\) 都是 \(\mathbf h_{t-1}\) 的函数，那么利用全导数公式可得：<br/>
+\[<br/>
+\begin{align}<br/>
+\delta_t^T \frac{\partial \mathbf h_t}{\partial \mathbf h_{t-1}} &amp;= \delta_t^T \frac{\partial \mathbf h_t}{\partial \mathbf o_t} \frac{\partial \mathbf o_t}{\partial \mathbf{net}_{o,t}} \frac{\partial \mathbf{net}_{o,t}}{\partial \mathbf h_{t-1}} + \delta_t^T \frac{\partial \mathbf h_t}{\partial \mathbf c_t} \frac{\partial \mathbf c_t}{\partial \mathbf f_t} \frac{\partial \mathbf f_t}{\partial \mathbf{net}_{f,t}} \frac{\partial \mathbf{net}_{f,t}}{\partial \mathbf h_{t-1}} + \delta_t^T \frac{\partial \mathbf h_t}{\partial \mathbf c_t} \frac{\partial \mathbf c_t}{\partial \mathbf i_t} \frac{\partial \mathbf i_t}{\partial \mathbf{net}_{i,t}} \frac{\partial \mathbf{net}_{i,t}}{\partial \mathbf h_{t-1}} + \delta_t^T \frac{\partial{\mathbf{h_t}}}{\partial{\mathbf{c}_t}}\frac{\partial{\mathbf{c}_t}}{\partial{\mathbf{\tilde{c}}_{t}}}\frac{\partial{\mathbf{\tilde{c}}_t}}{\partial{\mathbf{net}_{\tilde{c},t}}}\frac{\partial{\mathbf{net}_{\tilde{c},t}}}{\partial{\mathbf{h_{t-1}}}}\nonumber\\<br/>
+&amp;= \delta_{o,t}^T \frac{\partial \mathbf{net}_{o,t}}{\partial \mathbf h_{t-1}} + \delta_{f,t}^T \frac{\partial \mathbf{net}_{f,t}}{\partial \mathbf h_{t-1}}  + \delta_{i,t}^T \frac{\partial \mathbf{net}_{i,t}}{\partial \mathbf h_{t-1}} + \delta_{\widetilde c,t}^T \frac{\partial \mathbf{net}_{\widetilde c,t}}{\partial h_{t-1}}\label{dftpm}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>下面我们求出上式中的每一个偏导数，根据 ( \ref{mhmoo} ) ，我们可以求出：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial \mathbf h_t}{\partial \mathbf o_t} &amp;= \text{diag}[\tanh(\mathbf c_t)]\\<br/>
+\frac{\partial \mathbf h_t}{\partial \mathbf c_t} &amp;= \text{diag}[\mathbf o_t \odot (1 - \tanh(\mathbf c_t)^2 )]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>根据 ( \ref{mhmoo2} )，我们可以求出：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial \mathbf c_t}{\partial \mathbf f_t} &amp;= diag[\mathbf c_{t-1}]\\<br/>
+\frac{\partial \mathbf c_t}{\partial \mathbf i_t} &amp;= diag[\widetilde{\mathbf c}_t] \\<br/>
+\frac{\partial \mathbf c_t}{\partial \widetilde{\mathbf c}_t} &amp;= diag[\mathbf i_t]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>因为：<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbf o_t &amp;= \sigma(\mathbf{net}_{o,t}) \\<br/>
+\mathbf{net}_{o,t} &amp;= W_{oh} \mathbf h_{t-1} + W_{ox} \mathbf x_t + \mathbf b_o\\<br/>
+\\<br/>
+\mathbf f_t &amp;= \sigma(\mathbf{net}_{f,t}) \\<br/>
+\mathbf{net}_{f,t} &amp;= W_{fh} \mathbf h_{t-1} + W_{fx} \mathbf x_t + \mathbf b_f\\<br/>
+\\<br/>
+\mathbf i_t &amp;= \sigma(\mathbf{net}_{i,t}) \\<br/>
+\mathbf{net}_{i,t} &amp;= W_{ih} \mathbf h_{t-1} + W_{ix} \mathbf x_t + \mathbf b_i\\<br/>
+\\<br/>
+\widetilde{\mathbf c}_t &amp;= \tanh(\mathbf{net}_{\widetilde c,t})\\<br/>
+\mathbf{net}_{\widetilde c,t} &amp;= W_{ch} \mathbf h_{t-1} + W_{cx} \mathbf x_t + \mathbf b_c\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>我们容易得出<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial \mathbf o_t}{\partial \mathbf{net}_{o,t}} &amp;= diag[\mathbf o_t \odot (1- \mathbf o_t)]\\<br/>
+\frac{\partial \mathbf{net}_{o,t}}{\partial \mathbf h_{t-1}} &amp;= W_{oh}\\<br/>
+\frac{\partial \mathbf f_t}{\partial \mathbf{net}_{f,t}} &amp;= diag[\mathbf f_t \odot (1 - \mathbf f_t)]\\<br/>
+\frac{\partial \mathbf{net}_{f,t}}{\partial \mathbf h_{t-1}} &amp;= W_{fh}\\<br/>
+\frac{\partial \mathbf i_t}{\partial \mathbf{net}_{i,t}} &amp;= diag[\mathbf i_t \odot (1 - \mathbf i_t)]\\<br/>
+\frac{\partial \mathbf{net}_{i,t}}{\partial \mathbf h_{t-1}} &amp;= W_{ih}\\<br/>
+\frac{\partial \widetilde{\mathbf c}_t}{\partial \mathbf{net}_{\widetilde c,t}} &amp;= diag[1 - \widetilde{\mathbf c}_t^2]\\<br/>
+\frac{\partial \mathbf{net}_{\widetilde c,t}}{\partial \mathbf h_{t-1}} &amp;= W_{ch}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>将上述偏导数代入 ( \ref{dftpm} ) 中，可以得到：<br/>
+\[<br/>
+\begin{align}<br/>
+\delta_{t-1}^T &amp;= \delta_{o,t}^T \frac{\partial \mathbf{net}_{o,t}}{\partial \mathbf h_{t-1}} + \delta_{f,t}^T \frac{\partial \mathbf{net}_{f,t}}{\partial \mathbf h_{t-1}} + \delta_{i,t}^T \frac{\partial \mathbf{net}_{i,t}}{\partial \mathbf h_{t-1}} + \delta_{\widetilde c,t}^T \frac{\partial \mathbf{net}_{\widetilde c,t}}{\partial \mathbf h_{t-1}}\nonumber\\<br/>
+&amp;= \delta_{o,t}^T W_{oh} + \delta_{f,t}^T W_{fh} + \delta_{i,t}^T W_{ih} + \delta_{\widetilde c,t}^T W_{ch}\label{dotwd}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>根据 \(\delta_{o,t}\)、\(\delta_{f,t}\)、\(\delta_{i,t}\) 和 \(\delta_{\widetilde c,t}\) 的定义，可知：<br/>
+\[<br/>
+\begin{align}<br/>
+\delta_{o,t}^T &amp;= \frac{\partial E}{\partial \mathbf{net}_{o,t}} \\<br/>
+&amp;= \frac{\partial E}{\partial \mathbf h_t} \frac{\partial \mathbf h_t}{\partial \mathbf{net}_{o,t}}\nonumber\\<br/>
+&amp;= \delta_t^T \frac{\partial \mathbf h_t}{\partial \mathbf{net}_{o,t}}\nonumber\\<br/>
+&amp;= \delta_t^T \frac{\partial \mathbf h_t}{\partial \mathbf o_t} \frac{\partial \mathbf o_t}{\partial \mathbf{net}_{o,t}}\nonumber\\<br/>
+&amp;= \delta_t^T diag[\tanh(\mathbf c_t)] diag[\mathbf o_t \odot (1- \mathbf o_t)]\nonumber\\<br/>
+&amp;= \delta_t^T diag[\tanh(\mathbf c_t) \odot \mathbf o_t \odot (1 - \mathbf o_t)]\nonumber\\<br/>
+&amp;= \delta_t^T \odot \mathbf \tanh(\mathbf c_t) \odot \mathbf o_t \odot (1 - \mathbf o_t)\label{dotwd1}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>同理<br/>
+\[<br/>
+\begin{align}<br/>
+\delta_{f,t}^T &amp;= \delta_t^T \odot \mathbf o_t \odot (1 - \tanh(\mathbf c_t)^2) \odot \mathbf c_{t-1} \odot \mathbf f_t \odot (1 - \mathbf f_t) \label{dotwd2}\\<br/>
+\delta_{i,t}^T &amp;= \delta_t^T \odot \mathbf o_t \odot (1 - \tanh(\mathbf c_t)^2) \odot \widetilde{\mathbf c}_t \odot \mathbf i_t ( 1- \mathbf i_t)\label{dotwd3}\\<br/>
+\delta_{\widetilde c,t}^T &amp;= \delta_t^T \odot \mathbf o_t \odot ( 1 - \tanh(\mathbf c_t)^2) \odot \mathbf i_t \odot (1 - \widetilde{\mathbf c}^2 ) \label{dotwd4}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>式 ( \ref{dotwd} ) 到式 ( \ref{dotwd4} ) 就是将误差沿时间反向传播一个时刻的公式。有了它，我们可以写出将误差项向前传递到任意时刻 \(k\) 的公式。</p>
+
+<h3 id="toc_2">将误差项传递到上一层</h3>
+
+<p>我们假设当前层为第 \(l\) 层，定义 \(l-1\) 层的误差项是误差函数对 \(l-1\) 层的加权输入的导数，即：<br/>
+\[<br/>
+\delta_t^{l-1} = \frac{E}{\partial \mathbf{net}_t^{l-1}}<br/>
+\]</p>
+
+<p>本次LSTM的输入 \(x_t\) 由下面的公式计算：<br/>
+\[<br/>
+\mathbf x_t^l = f^{l-1}(\mathbf{net}_t^{l-1})<br/>
+\]</p>
+
+<p>上式中，\(f^{l-1}\) 表示第 \(l-1\) 层的激活函数。</p>
+
+<p>因为 \(\mathbf{net}_{f,t}^l\)、\(\mathbf{net}_{i,t}^l\)、\(\mathbf{net}_{\widetilde{c},t}^l\)、\(\mathbf{net}_{o,t}^l\) 都是 \(\mathbf x_t\) 的函数，\(\mathbf{x}_t \) 又是 \(\mathbf{net}_t^{l-1}\) 的函数，因此，要求 \(E\) 对  \(\mathbf{net}_t^{l-1}\) 的导数，就需要用全导数公式：<br/>
+\[<br/>
+\begin{align}<br/>
+\frac{\partial E}{\partial \mathbf{net}_t^{l-1}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{f,t}^l} \frac{\partial \mathbf{net}_{f,t}^l}{\partial \mathbf x_t^l} \frac{\partial \mathbf x_t^l}{\partial \mathbf{net}_t^{l-1}} + \frac{\partial E}{\partial \mathbf{net}_{i,t}^l}\frac{\partial \mathbf{net}_{i,t}^l}{\partial \mathbf x_t^l}\frac{\partial \mathbf x_t^l}{\partial \mathbf{net}_t^{l-1}} + \frac{\partial E}{\partial \mathbf{net}_{\widetilde c,t}^l}\frac{\partial \mathbf{net}_{\widetilde c,t}^l}{\partial \mathbf{net}_{\widetilde c,t}^t}{\partial \mathbf x_t^l} \frac{\partial \mathbf x_t^l}{\partial \mathbf{net}_t^{l-1}} + \frac{\partial E}{\partial \mathbf{net}_{o,t}^l} \frac{\partial \mathbf{net}_{o,t}^l}{\partial \mathbf x_t^l}\frac{\partial \mathbf x_t^l}{\partial \mathbf{net}_t^{l-1}}\nonumber\\<br/>
+&amp;= \delta^T_{f,t} W_{fx} \odot f&#39;(\mathbf{net}_t^{l-1}) + \delta^T_{i,t} W_{ix} \odot f&#39;(\mathbf{net}_t^{l-1}) + \delta^T_{\widetilde c,t} W_{cx}\odot f&#39;(\mathbf{net}_t^{l-1}) + \delta^T_{o,t} W_{ox} \odot f&#39;(\mathbf{net}_t^{l-1})\nonumber\\<br/>
+&amp;= (\delta^T_{f,t} W_{fx} + \delta^T_{i,t} W_{ix} + \delta_{\widetilde{c},t}^T W_{cx} + \delta_{o,t}^T W_{ox}) \odot f&#39;(\mathbf{net}_t^{l-1})\label{dtftw}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>式 ( \ref{dtftw} ) 就是将误差传递到上一层的公式。</p>
+
+<h3 id="toc_3">权重梯度的计算</h3>
+
+<p>对于 \(W_{fh}\)、\(W_{ih}\)、\(W_{ch}\)、\(W_{oh}\) 的权重梯度，我们知道它的梯度式各个时刻的梯度之和，我们首先求出它们在 \(t\) 时刻的梯度，然后再求出他们最终的梯度。</p>
+
+<p>我们已经求得了误差项 \(\delta_{o,t}\)、\(\delta_{f,t}\)、\(\delta_{i,t}\)、\(\delta_{\widetilde{c},t}\)，很容易求出 \(t\) 时刻的 \(W_{fh}\)、\(W_{ih}\)、\(W_{ch}\)、\(W_{oh}\)：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial E}{\partial W_{oh,t}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{o,t}} \frac{\partial \mathbf{net}_{o,t}}{\partial W_{oh,t}}\\<br/>
+&amp;= \delta_{o,t} \mathbf h_{t-1}^T\\<br/>
+\frac{\partial E}{\partial W_{fh,t}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{f,t}} \frac{\partial \mathbf{net}_{f,t}}{\partial W_{fh,t}}\\<br/>
+&amp;= \delta_{f,t} \mathbf h_{t-1}^T\\<br/>
+\frac{\partial E}{\partial W_{ih,t}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{i,t}} \frac{\partial \mathbf{net}_{i,t}}{\partial W_{ih,t}} \\<br/>
+&amp;= \delta_{i,t} \mathbf h_{t-1}^T\\<br/>
+\frac{\partial E}{\partial W_{ch,t}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{\widetilde{c},t}} \frac{\partial \mathbf{net}_{\widetilde{c},t}}{\partial W_{ch,t}}\\<br/>
+&amp;= \delta_{\widetilde{c},t} \mathbf h_{t-1}^T \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>将各个时刻的梯度加在一起，就能得到最终的梯度：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial E}{\partial W_{oh}} = \sum_{j=1}^t \delta_{o,j} \mathbf h_{j-1}^T\\<br/>
+\frac{\partial E}{\partial W_{fh}} = \sum_{j=1}^t \delta_{f,j} \mathbf h_{j-1}^T\\<br/>
+\frac{\partial E}{\partial W_{ih}} = \sum_{j=1}^t \delta_{i,j} \mathbf h_{j-1}^T\\<br/>
+\frac{\partial E}{\partial W_{ch}} = \sum_{j=1}^t \delta_{\widetilde{c},j} \mathbf h_{j-1}^T \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>对于偏置项 \(\mathbf b_{f}\)、\(\mathbf b_{i}\)、\(\mathbf b_{c}\)、\(\mathbf b_{o}\) 的梯度，也是将各个时刻的梯度加在一起。下面是各个时刻的偏置项梯度：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial E}{\partial \mathbf b_{o,t}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{o,t}} \frac{\partial \mathbf{net}_{o,t}}{\partial \mathbf b_{o,t}}\\<br/>
+&amp;= \delta_{o,t}\\<br/>
+\frac{\partial E}{\partial \mathbf b_{f,t}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{f,t}} \frac{\partial \mathbf{net}_{f,t}}{\partial \mathbf b_{f,t}}\\<br/>
+&amp;= \delta_{f,t}\\<br/>
+\frac{\partial E}{\partial \mathbf b_{i,t}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{i,t}} \frac{\partial \mathbf{net}_{i,t}}{\partial \mathbf b_{i,t}}\\<br/>
+&amp;= \delta_{i,t}\\<br/>
+\frac{\partial E}{\partial \mathbf b_{c,t}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{\widetilde{c},t}} \frac{\partial \mathbf{net}_{\widetilde{c},t}}{\partial \mathbf b_{c,t}}\\<br/>
+&amp;= \delta_{\widetilde{c},t}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>下面是最终的偏置项梯度，即将各个时刻的偏置项梯度加在一起：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial E}{\partial \mathbf{b}_o} = \sum_{j=1}^t \delta_{o,j}\\<br/>
+\frac{\partial E}{\partial \mathbf{b}_i} = \sum_{j=1}^t \delta_{i,j}\\<br/>
+\frac{\partial E}{\partial \mathbf{b}_f} = \sum_{j=1}^t \delta_{f,j}\\<br/>
+\frac{\partial E}{\partial \mathbf{b}_c} = \sum_{j=1}^t \delta_{\widetilde{c},j}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>对于 \(W_{fx}\)、\(W_{ix}\)、\(W_{cx}\)、\(W_{ox}\) 的权重梯度，只需要根据相应的误差项直接计算即可：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial E}{\partial W_{ox}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{o,t}}\frac{\partial \mathbf{net}_{o,t}}{\partial W_{ox}}\\<br/>
+&amp;= \delta_{o,t} \mathbf x_t^T \\<br/>
+\frac{\partial E}{\partial W_{fx}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{f,t}} \frac{\partial \mathbf{net}_{f,t}}{\partial W_{fx}} \\<br/>
+&amp;= \delta_{f,t} \mathbf x_t^T \\<br/>
+\frac{\partial E}{\partial W_{ix}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{i,t}} \frac{\partial \mathbf{net}_{i,t}}{\partial W_{ix}} \\<br/>
+&amp;= \delta_{i,t} \mathbf x_t^T \\<br/>
+\frac{\partial E}{\partial W_{cx}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{\widetilde{c},t}} \frac{\partial \mathbf{net}_{\widetilde{c},t}}{\partial W_{cx}} \\<br/>
+&amp;= \delta_{\widetilde{c},t} \mathbf x_t^T\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>以上就是LSTM的训练算法的全部公式。</p>
+
+<hr/>
+
+<p><a href="https://zybuluo.com/hanbingtao/note/581764">零基础入门深度学习(6) - 长短时记忆网络(LSTM)</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15357311876395.html">人工神经网络-递归神经网络</a></h1>
+			<p class="meta"><time datetime="2018-08-31T23:59:47+08:00" 
+			pubdate data-updated="true">2018/8/31</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>对于常见的树结构、图结构等更复杂的结构，循环神经网络往往力不从心。我们需要一种更为强大、复杂的神经网络：递归神经网络，以及它的训练算法 BPTS（Back Propagation Through Structure）。顾名思义，递归神经网络可以处理诸如树、图这样的递归结构。</p>
+
+<h3 id="toc_0">递归神经网络介绍</h3>
+
+<p>因为神经网络的输入层单元个数是固定的，因此使用必须使用循环或递归的方式来处理长度可变的输入。循环神经网络实现了前者，通过将长度不定的输入分割成等长度的小块，然后再依次的输入到网络中，从而实现了神经网络对变长输入的处理。一个典型的例子是，当我们处理一句话的时候，我们可以把一句话看做词组成的序列，然后，每次向循环神经网络输入一个词，如此循环直到整句话输入完毕，循环神经网络将产生对应的输出。如此循环直到整句话输入完毕，循环神经网络将产生对应的输出。这样，我们便可以处理任意长度的句子了。如下图所以：</p>
+
+<div align="center">
+    <img width="450" src="media/15357311876395/15447178201186.jpg" />
+</div>
+
+<p>递归神经网络是循环神经网络在有向无环图上的扩展，一般为树状的层次结构，如下图所示：</p>
+
+<div align="center">
+    <img width="400" src="media/15357311876395/15447182614717.jpg" />
+</div>
+
+<p>除上述的一般结构外，递归神经网络还有一种退化结构，如下图所示：</p>
+
+<div align="center">
+    <img width="280" src="media/15357311876395/15452285668908.jpg" />
+</div>
+
+<h3 id="toc_1">递归神经网络的前向计算</h3>
+
+<p>递归神经网络的输入是两个子节点（也可以是多个），输出就是将这两个子节点编码后产生的父节点，父节点的维度和每个子节点是相同的。如下图所示：</p>
+
+<div align="center">
+    <img width="260" src="media/15357311876395/15452309662076.jpg" />
+</div>
+
+<p>\(\mathbf c_1\) 和 \(\mathbf c_2\) 分别是表示两个子节点的向量，\(\mathbf p\) 是表示父节点的向量。子节点和父节点组成一个全连接神经网络，也就是子节点的每个神经元都和父节点的每个神经元两两相连。我们用矩阵 \(W\) 表示这些连接上的权重，它的维度将是 \(d\times 2d\) ，其中，\(d\) 表示每个节点的维度。父节点的计算公式可以写成：<br/>
+\[<br/>
+\begin{equation}<br/>
+\mathbf p = \tanh(W\left [ \begin{array}\\\mathbf c_1\\\mathbf c_2\\\end{array} \right ] + \mathbf b) \label{mptw}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>在上式中，\(\tanh\) 是激活函数（当然也可以用其他的激活函数），\(\mathbf b\) 是偏置项，它也是一个维度为 \(d\) 的向量。</p>
+
+<p>然后，我们把产生的父节点的向量和其他子节点的向量再次作为网络的输入，再次产生它们的父节点。如此递归下去，直至整棵树处理完毕。最终，我们将得到根节点的向量，我们可以认为它是对整棵树的表示，这样我们就实现了把树映射为一个向量。在下图中，我们使用递归神经网络处理一棵树，最终得到的向量 \(\mathbf p_3\)，就是对整棵树的表示：</p>
+
+<div align="center">
+    <img width="320" src="media/15357311876395/15452311936823.jpg" />
+</div>
+
+<p>举个例子，我们使用递归神将网络将『两个外语学校的学生』映射为一个向量，如下图所示：</p>
+
+<div align="center">
+    <img width="640" src="media/15357311876395/15452314581059.jpg" />
+</div>
+
+<p>最后得到的向量 \(\mathbf p_3\) 就是对整个句子『两个外语学校的学生』的表示。由于整个结构是递归的，不仅仅是根节点，事实上每个节点都是以其为根的子树的表示。比如，在左边的这棵树中，向量 \(\mathbf p_2\) 是短语『外语学院的学生』的表示，而向量 \(\mathbf p_1\) 是短语『外语学院的』的表示。</p>
+
+<p>式 \ref{mptw} 就是<strong>递归神经网络</strong>的前向计算算法。它和全连接神经网络的计算没有什么区别，只是在输入的过程中需要根据输入的树结构依次输入每个子节点。</p>
+
+<p>需要特别注意的是，<strong>递归神经网络</strong>的权重 \(\mathbf W\) 和偏置项 \(\mathbf b\) 在所有的节点都是共享的。</p>
+
+<h3 id="toc_2">递归神经网络的训练</h3>
+
+<p><strong>递归神经网络</strong> 的训练算法和 <strong>循环神经网络</strong> 类似，两者不同之处在于，前者需要将残差 \(\delta\) 从根节点反向传播到各个子节点，而后者是将残差 \(\delta\) 从当前时刻 \(t_k\) 反向传播到初始时刻 \(t_1\)。</p>
+
+<p>下面，我们介绍适用于递归神经网络的训练算法，也就是<strong>BPTS</strong>算法。</p>
+
+<h4 id="toc_3">误差项的传递</h4>
+
+<p>首先，我们先推导将误差从父节点传递到子节点的公式，如下图：</p>
+
+<div align="center">
+    <img width="260" src="media/15357311876395/15452319372169.jpg" />
+</div>
+
+<p>定义 \(\delta_p\) 为误差函数 \(E\) 相对于父节点 \(p\) 的加权输入 \(\mathbf{net}_p\) 的导数，即<br/>
+\[<br/>
+\delta_p = \frac{\partial E}{\partial \mathbf{net}_p}<br/>
+\]</p>
+
+<p>设 \(\mathbf{net}_p\) 是父节点的<strong>加权输入</strong>，则<br/>
+\[<br/>
+\mathbf{net}_p = W\left[\begin{array}\\\mathbf c_1\\\mathbf c_2\\\end{array}\right ] + \mathbf b<br/>
+\]</p>
+
+<p>在上述式子里，\(\mathbf{net}_p\)、\(\mathbf c_1\)、\(\mathbf c_2\) 都是向量，而\(W\) 是矩阵。为了看清楚它们的关系，我们将其展开</p>
+
+<p>\[<br/>
+\left[\begin{array}\\\mathbf{net}_{p_1}\\ \mathbf{net}_{p_2}\\\cdots\\\mathbf{net}_{p_n}\\\end{array}\right ] = \left [ \begin{array}\\ w_{p_1 c_{11}} &amp; w_{p_1 c_{12}} &amp; \cdots &amp; w_{p_1 c_{1n}}&amp; w_{p_1 c_{21}} &amp; w_{p_1 c_{22}} &amp; \cdots &amp; w_{p_1 c_{2n}} \\ w_{p_1 c_{11}} &amp; w_{p_1 c_{12}} &amp; \cdots &amp; w_{p_1 c_{1n}}&amp; w_{p_1 c_{21}} &amp; w_{p_1 c_{22}} &amp; \cdots &amp; w_{p_1 c_{2n}} \\ \cdots \\ w_{p_1 c_{11}} &amp; w_{p_1 c_{12}} &amp; \cdots &amp; w_{p_1 c_{1n}}&amp; w_{p_1 c_{21}} &amp; w_{p_1 c_{22}} &amp; \cdots &amp; w_{p_1 c_{2n}} \\ \end{array} \right ] \left [ \begin{array}\\ c_{11} \\ c_{12} \\ \vdots \\ c_{1n} \\ c_{21} \\ c_{22} \\ \cdots \\ c_{2n} \\ \end{array} \right ] + \left [ \begin{array}\\ b_1 \\ b_2 \\ \cdots \\ b_n \\ \end{array} \right ]<br/>
+\]</p>
+
+<p>在上面的公式中，\(p_i\) 表示父节点 \(p\) 的第 \(i\) 个分量；\(c_{1i}\) 表示 \(\mathbf c_1\) 子节点的第 \(i\) 个分量；\(c_{2i}\) 表示 \(\mathbf c_2\) 子节点的第 \(i\) 个分量；\(w_{p_1 c_{jk}}\) 表示子节点 \(\mathbf c_j\) 的第 \(k\) 个分量到父节点 \(p\) 的第 \(i\) 个分量的权重。根据上面展开后矩阵乘法，我们不难看出，对于子节点 \(c_{jk}\) 来说，它会影响父节点所有的分量。因此，我们求误差函数 \(E\) 对 \(c_{jk}\) 的导数时，必须使用全导数公式，也就是：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial E}{\partial c_{jk}} &amp;= \sum_{i} \frac{\partial E}{\partial \text{net}_{p_1}} \frac{\partial \text{net}_{p_1}}{\partial c_{jk}} \\<br/>
+&amp;= \sum_i \delta_{p_1} w_{p_i c_{jk}}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>有了上式，我们就可以把它表示为矩阵形式，从而得到一个向量化表达：<br/>
+\[<br/>
+\frac{\partial E}{\partial \mathbf c_j} = U_j \delta_p <br/>
+\]</p>
+
+<p>其中，矩阵 \(U_j\) 是从矩阵 \(W\) 中提取部分元素组成的矩阵。其单元为：<br/>
+\[<br/>
+U_{j_{ik}} = w_{p_k c_{ji}}<br/>
+\]</p>
+
+<p>上式看上去可能会让人晕，从下图，我们可以直观看到 \(U_j\) 到底是什么。首先我们把 \(W\) 拆分成两个矩阵 \(W_1\) 和 \(W_2\)，如下图所示：<br/>
+\[<br/>
+W =\begin{matrix} W_1\\  \left [\overbrace{\begin{array}\\<br/>
+w_{p_1 c_{11}} &amp; w_{p_1 c_{12}} &amp; \cdots &amp; w_{p_1 c_{1n}}\\ <br/>
+w_{p_1 c_{11}} &amp; w_{p_1 c_{12}} &amp; \cdots &amp; w_{p_1 c_{1n}}\\ <br/>
+\cdots \\ <br/>
+w_{p_1 c_{11}} &amp; w_{p_1 c_{12}} &amp; \cdots &amp; w_{p_1 c_{1n}}\\<br/>
+\end{array}} \right .\end{matrix} \quad \Bigg | \quad<br/>
+\begin{matrix} W_2\\  \left . \overbrace {\begin{array}\\<br/>
+w_{p_1 c_{21}} &amp; w_{p_1 c_{22}} &amp; \cdots &amp; w_{p_1 c_{2n}} \\ <br/>
+w_{p_1 c_{21}} &amp; w_{p_1 c_{22}} &amp; \cdots &amp; w_{p_1 c_{2n}} \\ <br/>
+\cdots \\ <br/>
+w_{p_1 c_{21}} &amp; w_{p_1 c_{22}} &amp; \cdots &amp; w_{p_1 c_{2n}} \\<br/>
+\end{array}} \right ]\end{matrix}<br/>
+\]</p>
+
+<p>显然，子矩阵 \(W_1\) 和 \(W_2\) 分别对应子节点 \(\mathbf c_1\) 和 \(\mathbf c_2\) 到父节点 \(\mathbf p\) 的权重。则矩阵 \(U_j\) 为：<br/>
+\[<br/>
+U_j = W_j^T<br/>
+\]</p>
+
+<p>也就是说，将误差项反向传递到相应子节点 \(\mathbf c_j\) 的矩阵 \(U_j\) 就是其对应权重矩阵 \(W_j\) 的转置。</p>
+
+<p>现在，我们设 \(\mathbf{net}_{c_j}\) 是子节点 \(\mathbf c_j\) 的加权输入，\(f\) 是子节点  \(c\) 的激活函数，则：<br/>
+\[<br/>
+\mathbf c_j = f(\mathbf{net}_{c_j})<br/>
+\]</p>
+
+<p>这样，我们得到<br/>
+\[<br/>
+\begin{align*}<br/>
+\delta_{c_j} &amp;= \frac{\partial E}{\partial \mathbf{net}_{c_j}} \\<br/>
+&amp;= \frac{\partial E}{\partial \mathbf c_j} \frac{\partial \mathbf c_j}{\partial \mathbf{net}_{c_j}}\\<br/>
+&amp;= W_j^T \delta_p \odot f&#39;(\mathbf{net}_{c_j})<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>如果我们将不同子节点 \(\mathbf c_j\) 对应的误差项 \(\delta_{c_j}\) 连接成一个向量 \(\delta_c= \left [ \begin{array}\\\delta_{c_1} \\ \delta_{c_2} \\ \end{array} \right ]\)。那么，上式可以写成<br/>
+\[<br/>
+\begin{equation}<br/>
+\delta_c = W^T \delta_p \odot f&#39;(\mathbf{net}_c)\label{dcwtp}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>上式就是将误差项从父节点传递到子节点的公式。注意，上式中的 \(\mathbf{net}_c\) 也是将两个子节点的加权输入 \(\mathbf{net}_{c_1}\) 和 \(\mathbf{net}_{c_2}\) 连接到一起的向量。</p>
+
+<p>有了传递一层的公式，我们就可以得到逐层传递的公式。</p>
+
+<div align="center">
+    <img width="340" src="media/15357311876395/15456640827877.jpg" />
+</div>
+
+<p>上图是树型结构中反向传递误差项的全景图，反复应用式 \ref{dcwtp}，在已知 \(\delta_p^{(3)}\) 的情况下，我们不难算出 \(\delta_p^{(1)}\) 为：<br/>
+\[<br/>
+\begin{align*}<br/>
+\delta^{(2)} &amp;= W^T \delta_p^{(3)} \odot f&#39;(\mathbf{net}^{(2)}) \\<br/>
+\delta_p^{(2)} &amp;= [\delta^{(2)}]_p \\<br/>
+\delta^{(1)} &amp;= W^T \delta_p^{(2)} \odot f&#39;(\mathbf{net})\\<br/>
+\delta_p^{(1)} &amp;= [\delta^{(1)}]_p \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>在上面的公式中，\(\delta^{(2)} = \left [ \begin{array}\\ \delta_c^{(2)}\\ \delta_p^{(2)} \\ \end{array} \right ]\)，\([\delta^{(2)}]_p\) 表示取向量 \(\delta^{(2)}\) 属于节点 \(p\) 的部分。</p>
+
+<h3 id="toc_4">权重梯度的计算</h3>
+
+<p>根据加权输入的计算公式：<br/>
+\[<br/>
+\mathbf{net}_p^{(l)} = W \mathbf{c}^{(l)} + \mathbf b<br/>
+\]</p>
+
+<p>其中，\(\mathbf{net}_p^{(l)}\) 表示第 \(l\) 层的父节点的加权输入，\(\mathbf c^{(l)}\) 表示第 \(l\) 层的子节点。\(W\) 表示权重矩阵，\(\mathbf b\) 是偏置项。将其展开可得：<br/>
+\[<br/>
+\mathbf{net}_{p_j}^{l} = \sum_i w_{ji} c_i^{l} + b_j<br/>
+\]</p>
+
+<p>那么，我们可以求得误差函数在第 \(l\) 层对权重的梯度为：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial E}{\partial w_{ji}^{(l)}} &amp;= \frac{\partial E}{\partial \mathbf{net}_{p_j}^{(l)}} \frac{\partial \mathbf{net}_{p_j}}{\partial w_{ji}^{(l)}}\\<br/>
+&amp;= \delta_{p_j}^{(l)} c_i^{(l)}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>上式是针对一个权重 \(w_{ji}\) 的公式，现在需要把它扩展对所有的权重项的公式。我们可以吧上式写成矩阵的形式（在下面公式中，\(m=2n\)）：<br/>
+\[<br/>
+\begin{align}<br/>
+\frac{\partial E}{\partial W^{(l)}} &amp;= \left [ \begin{array}\\ <br/>
+\frac{\partial E}{\partial w^{(l)}_{11}} &amp; \frac{\partial E}{\partial w^{(l)}_{12}} &amp; \cdots &amp; \frac{\partial E}{\partial w^{(l)}_{1m}} \\<br/>
+\frac{\partial E}{\partial w^{(l)}_{21}} &amp; \frac{\partial E}{\partial w^{(l)}_{22}} &amp; \cdots &amp; \frac{\partial E}{\partial w^{(l)}_{2m}} \\<br/>
+\vdots&amp;\vdots&amp;\ddots\vdots\\<br/>
+\frac{\partial E}{\partial w^{(l)}_{n1}} &amp; \frac{\partial E}{\partial w^{(l)}_{n2}} &amp; \cdots &amp; \frac{\partial E}{\partial w^{(l)}_{nm}} \\<br/>
+\end{array} \right ] \nonumber\\<br/>
+&amp;= \left [\begin{array}\\<br/>
+\delta_{p_1}^{(l)} c_1^l &amp; \delta_{p_1}^{(l)} c_2^l &amp; \cdots &amp; \delta_{p_1}^{(l)} c_m^l\\<br/>
+\delta_{p_2}^{(l)} c_1^l &amp; \delta_{p_2}^{(l)} c_2^l &amp; \cdots &amp; \delta_{p_2}^{(l)} c_m^l\\<br/>
+\vdots&amp;\vdots&amp;\ddots&amp;\vdots\\<br/>
+\delta_{p_n}^{(l)} c_1^l &amp; \delta_{p_n}^{(l)} c_2^l &amp; \cdots &amp; \delta_{p_n}^{(l)} c_m^l\\<br/>
+\end{array} \right] \nonumber\\<br/>
+&amp;= \delta^{(l)} (c^{(l)})^T \label{dlct}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>式 \ref{dlct} 就是第 \(l\) 层权重项的梯度计算公式。我们知道，由于权重 \(W\) 是在所有层共享的，最终权重梯度是各个层权重梯度之和，即：<br/>
+\[<br/>
+\begin{equation}<br/>
+\frac{\partial E}{\partial W} = \sum_{l} \frac{\partial E}{\partial W^{(l)}} \label{fptep}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>接下来，我们求偏置项 \(\mathbf b\) 的梯度计算公式。先计算误差函数对第 \(l\) 层偏置项  \(\mathbf b^{(l)}\) 的梯度：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial E}{\partial b^{(l)}_j} &amp;= \frac{\partial E}{\partial \mathbf{net}_{p_j}^{(l)}} \frac{\partial \mathbf{net}_{p_j}^{(l)}}{\partial b_j^{(l)}} \\<br/>
+&amp;= \delta_{p_j}^{(l)}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>把上式扩展为矩阵的形式：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial E}{\partial \mathbf b^{(l)}} &amp;= \left [ \begin{array}\\ \frac{\partial E}{\partial b_1^{(l)}} \\ \frac{\partial E}{\partial b_2^{(l)}} \\ \vdots \\ \frac{\partial E}{\partial b_n^{(l)}} \\ \end{array} \right ] \\<br/>
+&amp;= \left [ \begin{array}\\ \delta_{p_1}^{(l)} \\ \delta_{p_2}^{(l)} \\ \vdots \\ \delta_{p_n}^{(l)} \\ <br/>
+\end{array} \right ] \\<br/>
+&amp;= \delta_p^{(l)}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>上式是第 \(l\) 层偏置项的梯度，那么最终的偏置项梯度是各个层偏置项梯度之和，即：<br/>
+\[<br/>
+\begin{equation}<br/>
+\frac{\partial E}{\partial \mathbf b} = \sum_l \frac{\partial E}{\partial \mathbf b^{(l)}} \label{fptepb}<br/>
+\end{equation}<br/>
+\]</p>
+
+<h3 id="toc_5">权重更新</h3>
+
+<p>如果使用梯度下降优化算法，那么权重更新公式为：<br/>
+\[<br/>
+W \leftarrow W + \eta \frac{\partial E}{\partial W}<br/>
+\]</p>
+
+<p>其中，\(\eta\) 是学习速率常数。把式 \ref{fptep} 代入上式，即可完成权重的更新。同理，偏置项的更新公式为：<br/>
+\[<br/>
+\mathbf b \leftarrow \mathbf b + \eta \frac{\partial E}{\partial \mathbf b}<br/>
+\]</p>
+
+<p>把式 \ref{fptepb} 代入上式，即可完成偏置项的更新。</p>
+
+<p>这就是递归神经网络的训练算法BPTS。</p>
+
+<hr/>
+
+<p><a href="https://zybuluo.com/hanbingtao/note/626300">零基础入门深度学习(7) - 递归神经网络</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15348711256289.html">人工神经网络-循环神经网络</a></h1>
+			<p class="meta"><time datetime="2018-08-22T01:05:25+08:00" 
+			pubdate data-updated="true">2018/8/22</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>循环神经网络（Recurrent Neural Network， RNN）是一类具有短期记忆能力的神经网络。在循环神经网络中，神经元不但可以接受其它神经元的信息，也可以接受自身的信息，形成具有环路的网络结构。和前馈神经网络相比，循环神经网络更加符合生物神经网络的结构。循环神经网络已经被广泛应用在语音识别、语言模型以及自然语言生成等任务上。循环神经网络的参数学习可以通过随时间反向传播算法 [Werbos, 1990] 来学习。随时间反向传播算法即按照时间的逆序将错误信息一步步地往前传递。当输入序列比较长时，会存在梯度爆炸和消失问题[Bengio et al., 1994, Hochreiter and Schmidhuber, 1997, Hochreiteret al., 2001]，也称为长期依赖问题。为了解决这个问题，人们对循环神经网络进行了很多的改进，其中最有效的改进方式引入门控机制。</p>
+
+<p>此外，循环神经网络可以很容易地扩展到两种更广义的记忆网络模型： 递归神经网络和图网络。</p>
+
+<h3 id="toc_0">给网络增加记忆功能</h3>
+
+<p>为了处理这些时序数据并利用其历史信息，我们需要让网络具有短期记忆能力。而前馈网络是一个静态网络，不具备这种记忆能力。</p>
+
+<p>一般来讲，我们可以通过以下三种方法来给网络增加短期记忆能力。</p>
+
+<h4 id="toc_1">延时神经网络</h4>
+
+<p>一种简单的利用历史信息的方法是建立一个额外的延时单元，用来存储网络的历史信息（可以包括输入、输出、隐状态等）。比较有代表性的模型是延时神经网络（Time Delay Neural Network， TDNN）。</p>
+
+<p>延时神经网络是在前馈网络中的非输出层都添加一个延时器，记录最近几次神经元的输出。在第 \(t\) 个时刻，第 \(l + 1\) 层神经元和第 \(l\) 层神经元的最近 \(p\) 次输出相关，即<br/>
+\[<br/>
+h^{(l+1)}_t = f(h_t^{(l)}, h_{t-1}^{(l)},...,h_{t-p+1}^{(l)}. (6.1)<br/>
+\]</p>
+
+<p>通过延时器，前馈网络就具有了短期记忆的能力。</p>
+
+<h4 id="toc_2">有外部输入的非线性自回归模型</h4>
+
+<p>自回归模型（Autoregressive Model，AR）是统计学上常用的一类时间序列模型，用一个变量 \(y_t\) 的历史信息来预测自己。<br/>
+\[<br/>
+y_t = w_0 + \sum^p_{i=1} w_py_{t−p} + \epsilon_t<br/>
+\]</p>
+
+<p>其中 \(p\) 为超参数， \(w_p\) 为参数， \(\epsilon_t \sim N(0, \sigma^2)\) 为第 \(t\) 个时刻的噪声，方差 \(\sigma^2\) 和时间无关。</p>
+
+<p>有外部输入的非线性自回归模型（Nonlinear Autoregressive with Exogenous Inputs Model， NARX） [Leontaritis and Billings, 1985] 是自回归模型的扩展，在每个时刻 t都有一个外部输入\(x_t\)，产生一个输出 \(y_t\)。 NARX通过一个延时器记录最近几次的外部输入和输出，第 \(t\) 个时刻的输出 \(y_t\) 为<br/>
+\[<br/>
+y_t = f(x_t, x_{t−1},..., x_{t−p}, y_{t−1}, y_{t−2},..., y_{t−q})<br/>
+\]</p>
+
+<p>其中 \(f(\cdot)\) 表示非线性函数，可以是一个前馈网络， \(p\) 和 \(q\) 为超参数。</p>
+
+<h4 id="toc_3">循环神经网络</h4>
+
+<p>循环神经网络（RNN）通过使用带自反馈的神经元，能够处理任意长度的时序数据。RNN 也经常被翻译为递归神经网络。这里我们使用 RNN 指代循环神经网络。</p>
+
+<p>给定一个输入序列 \(x_{1:T} = (x_1, x_2,..., x_t,..., x_T )\)，循环神经网络通过下面公式更新带反馈边的隐藏层的活性值 h_t<br/>
+\[<br/>
+h_t = f(h_{t−1}, x_t)<br/>
+\]</p>
+
+<p>其中\(h_0 = 0\)， \(f(\cdot)\) 为一个非线性函数，也可以是一个前馈网络。</p>
+
+<div align=center>
+    <img src="media/15348711256289/15422003427571.jpg" width="520" />
+</div>
+
+<h3 id="toc_4">简单的循环神经网络</h3>
+
+<p>简单循环网络（Simple Recurrent Network，SRN）是一个非常简单的循环神经网络，只有一个隐藏层的神经网络。在一个两层的前馈神经网络中，连接存在相邻的层与层之间，隐藏层的节点之间是无连接的。而简单循环网络增加了从隐藏层到隐藏层的反馈连接。</p>
+
+<p>假设在时刻 \(t\) 时，网络的输入为 \(x_t\)，隐层状态（即隐层神经元活性值）为 \(h_t\) 不仅和当前时刻的输入\(x_t\) 相关，也和上一个时刻的隐层状态 \(h_{t−1}\) 相关。<br/>
+\[<br/>
+\begin{align}<br/>
+z_t &amp;= Uh_{t−1} + Wx_t + b\label{zuhw}\\<br/>
+h_t &amp;= f(z_t)\label{zuhw2}\\<br/>
+\end{align}<br/>
+\] </p>
+
+<p>其中 \(z_t\) 为隐藏层的净输入， \(f(\cdot)\) 是非线性激活函数，通常为 logistic 函数或 tanh 函数， \(U\) 为状态-状态权重矩阵， \(W\) 为状态-输入权重矩阵, \(b\) 为偏置。公式 ( \ref{zuhw} ) 和 ( \ref{zuhw2} ) 也经常直接写为<br/>
+\[<br/>
+h_t = f(Uh_{t−1} + W x_t + b)<br/>
+\]</p>
+
+<p>如果我们把每个时刻的状态都看作是前馈神经网络的一层的话，循环神经网络可以看作是在时间维度上权值共享的神经网络。</p>
+
+<h3 id="toc_5">循环神经网络的计算能力</h3>
+
+<p>由于循环神经网络具有短期记忆能力，相当于存储装置，因此其计算能力十分强大。前馈神经网络可以模拟任何连续函数，而循环神经网络可以模拟任何程序。</p>
+
+<p>我们先定义一个完全连接的循环神经网络，其输入为 \(x_t\)，输出为 \(y_t\)，<br/>
+\[<br/>
+\begin{align*}<br/>
+h_t &amp;= f(U h_{t−1} + W x_t + b)\\<br/>
+y_t &amp;= V h_t\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(h\) 为隐藏状态，\(f(\cdot)\) 为非线性激活函数，\(U\)、\(W\)、\(b\) 和\(V\) 为网络参数。</p>
+
+<h3 id="toc_6">应用到机器学习</h3>
+
+<p>循环神经网络可以应用到很多不同类型的机器学习任务。根据这些任务的特点可以分为以下几种模式:<strong>序列到类别模式</strong>、<strong>同步序列到序列模式</strong>、<strong>异步的序列到序列模式</strong>。</p>
+
+<p>下面我们分别来看下这几种应用模式。</p>
+
+<h4 id="toc_7">序列到类别模式</h4>
+
+<p>序列到类别模式主要用于序列数据的分类问题：输入为序列，输出为类别。比如在文本分类中，输入数据为单词的序列，输出为该文本的类别。假设一个样本 \(\mathbf x_{1:T} = (\mathbf x_1,...,\mathbf x_T)\) 为一个长度为 \(T\) 的序列，输出为一个类别 \(y \in {1,...,C}\)。我们可以将样本 \(\mathbf x\) 按不同时刻输入到循环神经网络中，并得到不同时刻的隐藏状态 \(\mathbf h_1,...,\mathbf h_T\)。我们可以将 \(\mathbf h_T\) 看作整个序列的最终表示（或特征），并输入给分类器 \(g(\cdot)\) 进行分类<br/>
+\[<br/>
+\hat y = g(\mathbf h_T)<br/>
+\]</p>
+
+<p>其中 \(g(\cdot)\) 可以是简单的线性分类器（比如 Logistic 回归）或复杂的分类器（比如多层前馈神经网络）。</p>
+
+<div align="center">
+    <img src="media/15348711256289/15422029676355.jpg" width="350" />
+</div>
+
+<p>除了将最后时刻的状态作为序列表示之外，我们还可以对整个序列的所有状态进行平均，并用这个平均状态来作为整个序列的表示：<br/>
+\[<br/>
+\hat y  = g(\frac 1 T \sum_{t=1}^T \mathbf h_t)<br/>
+\]</p>
+
+<div align="center">
+    <img src="media/15348711256289/15422032233597.jpg" width="350" />
+</div>
+
+<h4 id="toc_8">同步的序列到序列模式</h4>
+
+<p>同步的序列到序列模式主要用于序列标注（Sequence Labeling）任务，即每一时刻都有输入和输出，输入序列和输出序列的长度相同。比如词性标注（Partof-Speech Tagging）中，每一个单词都需要标注其对应的词性标签。</p>
+
+<p>在同步的序列到序列模式中，输入为一个长度为 \(T\) 的序列 \(\mathbf x_{1:T} = (\mathbf x_1,..., \mathbf x_T)\)，输出为序列 \(y_{1:T} = (y_1,..., y_T)\)。样本 \(\mathbf x\) 按不同时刻输入到循环神经网络中，并得到不同时刻的隐状态 \(\mathbf h_1,...,\mathbf h_T\)。每个时刻的隐状态 \(\mathbf h_t\) 代表了当前时刻和历史的信息，并输入给分类器 \(g(\cdot)\) 得到当前时刻的标签 \(\hat y_t\)。<br/>
+\[<br/>
+\hat y_t = g(\mathbf h_t), \qquad\qquad \forall  t \in [1,T]<br/>
+\]</p>
+
+<div align="center">
+    <img src="media/15348711256289/15422043099881.jpg" width="350" />
+</div>
+
+<h4 id="toc_9">异步的序列到序列模式</h4>
+
+<p>异步的序列到序列模式也称为编码器-解码器（Encoder-Decoder）模型，即输入序列和输出序列不需要有严格的对应关系，也不需要保持相同的长度。比如在机器翻译中，输入为源语言的单词序列，输出为目标语言的单词序列。</p>
+
+<p>在异步的序列到序列模式中，输入为一个长度为 \(T\) 的序列 \(\mathbf x_{1:T} = (\mathbf x_1,..., \mathbf x_T)\)，输出为长度为 \(M\) 的序列 \(y_{1:M} = (y_1,...,y_M)\)。经常通过先编码后解码的方式来实现。先将样本 \(\mathbf x\) 按不同时刻输入到一个循环神经网络（编码器）中，并得到其编码 \(\mathbf h_T\)。然后在使用另一个循环神经网络（解码器）中，得到输出序列 \(\hat y_{1:M}\)。为了建立输出序列之间的依赖关系，在解码器中通常使用非线性的自回归模型。<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbf h_t &amp;= f_1( \mathbf h_{t−1}, \mathbf x_t), &amp;\forall t \in [1,T]\\<br/>
+\mathbf h_{T+t} &amp;= f_2(\mathbf h_{T+t−1}, \mathbf {\hat y}_{t−1}), &amp;\forall t \in [1, M]\\<br/>
+\hat y_t &amp;= g(\mathbf h_{T+t}), &amp;\forall t \in [1, M]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(f_1(\cdot)\), \(f_2(\cdot)\) 分别为用作编码器和解码器的循环神经网络，\(g(\cdot)\) 为分类器， \(\mathbf {\hat y}_t\) 为预测输出 \(\hat y_t\) 的向量表示。</p>
+
+<div align="center">
+    <img src="media/15348711256289/15422062138337.jpg" width="500" />
+</div>
+
+<h3 id="toc_10">参数学习</h3>
+
+<p>循环神经网络的参数可以通过梯度下降方法来进行学习。这里我们以同步的序列到序列模式为例来介绍循环神经网络的参数学习。以随机梯度下降为例，给定一个训练样本 \((\mathbf x,\mathbf y)\)，其中 \(\mathbf x_{1:T} = (\mathbf x_1,..., \mathbf x_T)\) 为长度是 \(T\) 的输入序列， \(y_{1:T} = (y_1,..., y_T)\) 是长度为 \(T\) 的标签序列。即在每个时刻 \(t\)，都有一个监督信息 \(y_t\)，我们定义时刻 \(t\) 的损失函数为<br/>
+\[<br/>
+\mathcal L_t = \mathcal L(y_t, g(\mathbf h_t))<br/>
+\]</p>
+
+<p>其中 \(g(\mathbf h_t)\) 为第 \(t\) 时刻的输出，\(\mathcal L\)为可微分的损失函数，比如交叉熵。那么整个序列上损失函数为<br/>
+\[<br/>
+\mathcal L = \sum_{t=1}^T \mathcal L_t<br/>
+\]</p>
+
+<p>整个序列的损失函数 \(\mathcal L\) 关于参数 \(U\) 的梯度为<br/>
+\[<br/>
+\begin{align}<br/>
+\frac{\partial \mathcal L}{\partial U} &amp;= \sum_{t=0}^T \frac{\partial \mathcal L}{\partial \mathcal L_t} \frac{\partial \mathcal L_t}{\partial U}\nonumber\\<br/>
+&amp;= \sum_{t=0}^T \frac{\partial \mathcal L_t}{\partial U}\label{stfpm}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>即每个时刻损失 \(\mathcal L_t\) 对参数 \(U\) 的偏导数之和。</p>
+
+<p>循环神经网络中存在一个递归调用的函数 \(f(\cdot)\)，因此其计算参数梯度的方式和前馈神经网络不太相同。在循环神经网络中主要有两种计算梯度的方式：随时间反向传播（BPTT）和实时循环学习（RTRL）算法。</p>
+
+<h4 id="toc_11">随时间反向传播算法</h4>
+
+<p>随时间反向传播（Backpropagation Through Time， BPTT）算法的主要思想是通过类似前馈神经网络的错误反向传播算法 [Werbos, 1990] 来进行计算梯度。</p>
+
+<p>BPTT算法将循环神经网络看作是一个展开的多层前馈网络，其中“每一层”对应循环网络中的“每个时刻”。这样，循环神经网络就可以按照前馈网络中的反向传播算法进行计算参数梯度。在“展开”的前馈网络中，所有层的参数是共享的，因此参数的真实梯度是将所有“展开层”的参数梯度之和。</p>
+
+<p>计算偏导数 \(\frac{\partial \mathcal L}{\partial U}\) ，先来计算公式 ( \ref{stfpm} ) 中第 \(t\) 时刻损失对参数 \(U\) 的偏导数 \(\frac{\partial \mathcal L_t}{\partial U}\) 。</p>
+
+<p>因为参数 \(U\) 和隐藏层在每个时刻 \(k(1 \le k \le t)\) 的净输入 \(\mathbf z_k = U\mathbf h_{k−1} + W \mathbf x_k + \mathbf b\) 有关，因此第 \(t\) 时刻损失的损失函数 \(\mathcal L_t\) 关于参数 \(U_{ij}\) 的梯度为：<br/>
+\[<br/>
+\begin{align}<br/>
+\frac{\partial \mathcal L_t}{\partial U_{ij}} &amp;= \sum^t_{k=1} tr\Big((\frac{\partial \mathcal L_t}{\partial \mathbf z_k})^T \frac{\partial^+ \mathbf z_k}{\partial U_{ij}} \Big)\nonumber\\<br/>
+&amp;= \sum_{k=1}^t \Big(\frac{\partial^+ \mathbf z_k}{\partial U_{ij}} \Big)^T \frac{\partial \mathcal L_t}{\partial \mathbf z_k}\label{sktb}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>其中 \(\frac{\partial^+ \mathbf z_k}{\partial U_{ij}}\)  表示“直接”偏导数，即公式 \(\mathbf z_k = U\mathbf h_{k−1} +W \mathbf x_k + \mathbf b\) 中保持 \(\mathbf h_{k−1}\) 不变，对 \(U_{ij}\) 进行求偏导数，得到<br/>
+\[<br/>
+\begin{equation}<br/>
+\frac{\partial^+ \mathbf z_k}{\partial U_{ij}} = \left [ \begin{array}{c} 0\\ \vdots\\ [\mathbf h_{k-1}]_j\\\vdots\\0\\ \end{array} \right ] \buildrel \Delta \over= \mathbb I_i([\mathbf h_{k-1}]_j)\label{fpmzp}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>其中 \([\mathbf h_{k-1}]_j\) 为第 \(k - 1\) 时刻隐状态的第 \(j\) 维； \(\mathbb I_i(x)\) 除了第 \(i\) 行值为 \(x\) 外，其余都为0的向量。</p>
+
+<p>定义 \(\delta_{t,k} = \frac{\partial \mathcal L_t}{\partial \mathbf z_k}\) 为第 \(t\) 时刻的损失对第 \(k\) 时刻隐藏神经层的净输入 \(\mathbf z_k\) 的导数，则<br/>
+\[<br/>
+\begin{align}<br/>
+\delta_{t,k} &amp;= \frac{\partial \mathcal L_t}{\partial \mathbf z_k}\nonumber\\<br/>
+&amp;= \frac{\partial \mathbf h_k }{\partial \mathbf z_k} \cdot \frac{\partial \mathbf z_{k+1}}{\partial \mathbf h_k} \cdot \frac{\partial \mathcal L_t}{\partial \mathbf z_{k+1}}\nonumber\\<br/>
+&amp;= diag(f&#39;(\mathbf z_k)) U^T\delta_{t,k+1}\label{dmzu}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>将公式 ( \ref{fpmzp} )和 ( \ref{dmzu} )代入公式 ( \ref{sktb} )得到<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial \mathcal L_t}{\partial U_{ij}} &amp;= \sum_{k=1}^t [\delta_{t,k}]_i [\mathbf h_{k-1}]_j<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>将上式写成矩阵形式为<br/>
+\[<br/>
+\begin{equation}<br/>
+\frac{\partial \mathcal L_t}{\partial U} = \sum_{k=1}^t \delta_{t,k} \mathbf h_{k-1}^{T}\label{fpmlp}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>下图给出了误差项随时间进行反向传播算法的示例。</p>
+
+<div align="center">
+    <img src="media/15348711256289/15406548476276.jpg" width="600" />
+</div>
+
+<p><strong>参数梯度</strong>：将公式 ( \ref{fpmlp} )代入到将公式 ( \ref{stfpm} )得到整个序列的损失函数 \(\mathcal L\) 关于参数 \(U\) 的梯度<br/>
+\[<br/>
+\frac{\mathcal L}{\partial U} = \sum_{t=1}^T \sum_{k=1}^t \delta_{t,k} h_k^{T-1}<br/>
+\]</p>
+
+<p>同理可得， \(\mathcal L\) 关于权重 \(W\) 和偏置 \(\mathbf b\) 的梯度为<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial \mathcal L}{\partial W} &amp;= \sum_{t=1}^T \sum_{k=1}^t \delta_{t,k} \mathbf x_k^T\\<br/>
+\frac{\partial \mathcal L}{\partial \mathbf b} &amp;= \sum_{t=1}^T \sum_{k=1}^t \delta_{t,k}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p><strong>计算复杂度</strong>：在 BPTT 算法中，参数的梯度需要在一个完整的“前向”计算和“反向”计算后才能得到并进行参数更新。</p>
+
+<h4 id="toc_12">实时循环学习算法</h4>
+
+<p>与反向传播的 BPTT 算法不同的是，实时循环学习（Real-Time Recurrent Learning， RTRL）是通过前向传播的方式来计算梯度。</p>
+
+<p>假设循环网络网络中第 \(t + 1\) 时刻的状态 \(\mathbf h_{t+1}\) 为<br/>
+\[<br/>
+\mathbf h_{t+1} = f(\mathbf z_{t+1}) = f(U\mathbf h_t + W\mathbf x_{t+1} + \mathbf b)<br/>
+\]</p>
+
+<p>其关于参数 \(U_{ij}\) 的偏导数为<br/>
+\[<br/>
+\begin{align}<br/>
+\frac{\partial \mathbf h_{t+1}}{\partial U_{ij}} &amp;= \frac{\partial \mathbf h_{t+1}}{\partial \mathbf z_{t+1}} \frac{\partial z_{t+1}}{\partial U_{ij}}\nonumber\\<br/>
+&amp;= \frac{\partial \mathbf h_{t+1}}{\partial \mathbf z_{t+1}}\Big(\frac{\partial \mathbf z_{t+1}}{\partial U_{ij}} + \frac{\partial \mathbf z_{t+1}}{\partial \mathbf h_{t}} \frac{\partial \mathbf h_{t}}{\partial U_{ij}} \Big)\nonumber\\<br/>
+&amp;= diag(f&#39;(\mathbf z_{t+1}))\Big(\mathbb I_i([\mathbf h_t]_j) + U \frac{\partial \mathbf h_t}{\partial U_{ij}} \Big)\nonumber\\<br/>
+&amp;= f&#39;(\mathbf z_{t+1}) \odot \Big(\mathbb I_i([\mathbf h_t]_j) + U \frac{\partial \mathbf h_t}{\partial U_{ij}}\label{fmzo}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>其中 \(\mathbb I_i(x)\) 除了第 \(i\) 行值为 \(x\) 外，其余都为0的向量。</p>
+
+<p>RTRL算法从第 1 个时刻开始，除了计算循环神经网络的隐状态之外，还利用公式 ( \ref{fmzo} ) 依次前向计算偏导数 \(\frac{\partial \mathbf h_1}{\partial U_{ij}}\)，\(\frac{\partial \mathbf h_2}{\partial U_{ij}}\)，\(\frac{\partial \mathbf h_3}{\partial U_{ij}}\)，\(\dots\)。</p>
+
+<p>这样，假设第 \(t\) 个时刻存在一个监督信息，其损失函数为 \(\mathcal L_t\)，就可以同时计算损失函数对 \(U_{ij}\) 的偏导数<br/>
+\[<br/>
+\frac{\partial \mathcal L_t}{\partial U_{ij}} = \Big(\frac{\partial \mathbf h_t}{\partial U_{ij}}\Big)^T \frac{\partial \mathcal L_t}{\partial \mathbf h_t}<br/>
+\]</p>
+
+<p>这样在第 \(t\) 时刻，可以实时地计算损失 \(\mathcal L_t\) 关于参数 \(U\) 的梯度，并更新参数。参数 \(W\) 和 \(\mathbf b\) 的梯度也可以同样按上述方法实时计算。</p>
+
+<p><strong>两种算法比较</strong>：BPTT 算法和 RTRL 算法都是基于梯度下降的算法，分别通过前向模式和反向模式应用链式法则来计算梯度。在循环神经网络中，一般网络输出维度远低于输入维度，因此 BPTT算法的计算量会更小，但是 BPTT 算法需要保存所有时刻的中间梯度，空间复杂度较高。 RTRL算法不需要梯度回传，因此非常适合用于需要在线学习或无限序列的任务中。</p>
+
+<h3 id="toc_13">长期依赖问题</h3>
+
+<p>循环神经网络在学习过程中的主要问题是长期依赖问题。在 BPTT 算法中，将公式 ( \ref{dmzu} ) 展开得到<br/>
+\[<br/>
+\delta_{t,k} = \prod_{i=k}^{t-1} \Big(diag(f&#39;(\mathbf z_i)) U^T\Big) \delta_{t,t}<br/>
+\]</p>
+
+<p>如果定义 \(\gamma \cong || diag(f&#39;(\mathbf z_i)) U^T||\) ，则<br/>
+\[<br/>
+\delta_{t,k} = \gamma^{t-k} \delta_{t,t}<br/>
+\]</p>
+
+<p>若 \(\gamma &gt; 1\)，当 \(t-k \rightarrow \infty\) 时， \(\gamma^{t-k} \rightarrow \infty\)，会造成系统不稳定，称为梯度爆炸问题（Gradient Exploding Problem）；相反，若 \(\gamma &lt; 1\)，当 \(t-k \rightarrow \infty\) 时，\(\gamma^{t - k} \rightarrow 0\)，会出现和深度前馈神经网络类似的梯度消失问题（gradient vanishing problem）。</p>
+
+<p>要注意的是，在循环神经网络中的梯度消失不是说 \(\frac{\partial \mathcal L_t}{\partial U}\) 的梯度消失了，而是 \(\frac{\partial \mathcal L_t}{\partial \mathbf h_k}\) 的梯度消失了（当 \(t - k\) 比较大时）。也就是说，参数 \(U\) 的更新主要靠当前时刻 \(k\) 的几个相邻状态 \(\mathbf h_k\) 来更新，长距离的状态对 \(U\) 没有影响。</p>
+
+<p>由于循环神经网络经常使用非线性激活函数为 logistic 函数或 tanh 函数作为非线性激活函数，其导数值都小于 1；并且权重矩阵 \(||U||\) 也不会太大，因此如果时间间隔 \(t - k\) 过大， \(\delta_{t,k}\) 会趋向于 0，因此经常会出现梯度消失问题。</p>
+
+<p>虽然简单循环网络理论上可以建立长时间间隔的状态之间的依赖关系，但是由于梯度爆炸或消失问题，实际上只能学习到短期的依赖关系。这样，如果 \(t\) 时刻的输出 \(y_t\) 依赖于 \(t-k\) 时刻的输入 \(x_{t-k}\)，当间隔 \(k\) 比较大时，简单神经网络很难建模这种长距离的依赖关系，称为长期依赖问题。</p>
+
+<h3 id="toc_14">改进方案</h3>
+
+<p>为了避免梯度爆炸或消失问题，一种最直接的方式就是选取合适的参数，同时使用非饱和的激活函数，尽量使得 \(diag(f′(\mathbf z_i))U^T \approx 1\)，这种方式需要足够的人工调参经验，限制了模型的广泛应用。比较有效的方式通过改进模型或优化方法来缓解循环网络的梯度爆炸和梯度消失问题。</p>
+
+<p><strong>梯度爆炸</strong>：一般而言，循环网络的梯度爆炸问题比较容易解决，一般通过权重衰减或梯度截断来避免。</p>
+
+<p>权重衰减是通过给参数增加 \(\mathcal l_1\) 或 \(\mathcal l_2\) 范数的正则化项来限制参数的取值范围，从而使得 \(\gamma \le 1\)。梯度截断是另一种有效的启发式方法，当梯度的模大于一定阈值时，就将它截断成为一个较小的数。</p>
+
+<p><strong>梯度消失</strong>：梯度消失是循环网络的主要问题。除了使用一些优化技巧外，更有效的方式就是改变模型，比如让 \(U = I\)，同时使用 \(f′(\mathbf z_i) = 1\)，即<br/>
+\[<br/>
+\begin{equation}<br/>
+\mathbf h_t = \mathbf h_{t-1} + g(\mathbf x_t; \theta)\label{mhmh}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>其中 \(g(\cdot)\) 是一个非线性函数， \(\theta\) 为参数。公式 ( \ref{mhmh} )中， \(\mathbf h_t\) 和 \(\mathbf h_{t-1}\) 之间为线性依赖关系，且权重系数为1，这样就不存在梯度爆炸或消失问题。但是，这种改变也丢失了神经元在反馈边上的非线性激活的性质，因此也降低了模型的表示能力。</p>
+
+<p>为了避免这个缺点，我们可以采用一个更加有效的改进策略：<br/>
+\[<br/>
+\begin{equation}<br/>
+\mathbf h_t = \mathbf h_{t-1} + g(\mathbf x_t, \mathbf h_{t-1}; \theta)\label{hhgh}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>这样 \(\mathbf h_t\) 和 \(\mathbf h_{t-1}\) 之间为既有线性关系，也有非线性关系，在一定程度上可以缓解梯度消失问题。但这种改进依然有一个问题就是记忆容量（memory capacity）。随着 \(\mathbf h_t\) 不断累积存储新的输入信息，会发生饱和现象。假设 \(g(\cdot)\) 为 logistic函数，则随着时间 \(t\) 的增长， \(\mathbf h_t\) 会变得越来越大，从而导致 \(\mathbf h\) 变得饱和。也就是说，隐藏状态 \(\mathbf h_t\) 可以存储的信息是有限的，随着记忆单元存储的内容越来越多，其丢失的信息也越来越多。</p>
+
+<p>为了解决容量问题，可以有两种方法。一种是增加一些额外的存储单元：外部记忆；另一种是进行选择性的遗忘，同时也进行有选择的更新。</p>
+
+<hr/>
+
+<p><a href="https://zybuluo.com/hanbingtao/note/541458">零基础入门深度学习(5) - 循环神经网络</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15327348574245.html">人工神经网络-卷积神经网络</a></h1>
+			<p class="meta"><time datetime="2018-07-28T07:40:57+08:00" 
+			pubdate data-updated="true">2018/7/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>卷积神经网络是一种<strong>局部连接</strong>、<strong>权重共享</strong>等特性的深层前馈神经网络。卷积神经网络最早是主要用来处理图像信息。如果用全连接来处理图像信息时，会出现几个问题<br/>
+1）参数太多。假设一个100 * 100 * 3的图像（高100，宽100,RGB）。在全连接前馈网络中，隐藏层的每一个神经元到输入层的连接有 100 * 100 * 3 = 30000个连接，每个连接对应一个权重参数。随着隐藏层神经元的增多，参数规模会急剧增加。参数过多，也会很容易产生过拟合。<br/>
+2）局部不变性：自然图像中的物体具有局部不变特性，比如在尺度缩放、平移、旋转等操作不影响其语义信息。而全连接前馈网络很难提取这些局部不变特征，一般需要进行数据增强来提高性能。</p>
+
+<p>那么，卷积神经网络又是怎样解决这个问题的呢？主要有三个思路：<br/>
+1）局部连接：这个是最容易想到的，每个神经元不再和上一层的所有神经元相连，而只和一小部分神经元相连。这样就减少了很多参数。<br/>
+2）权值共享：一组连接可以共享同一个权重，而不是每个连接有一个不同的权重，这样又减少了很多参数。<br/>
+3）下采样：可以使用Pooling来减少每层的样本数，进一步减少参数数量，同时还可以提升模型的鲁棒性。</p>
+
+<p>卷积神经网络主要使用在图像和视频分析的各种任务上，比如图像分类、人脸识别、物体识别、图像分割等，其准确率一般也远远超出了其它的神经网络模型。近年来卷积神经网络也广泛地应用到自然语言处理、推荐系统等领域。</p>
+
+<h3 id="toc_0">卷积</h3>
+
+<p>卷积是一种重要的运算。在信号处理或图像处理中，经常使用一维或二维卷积。</p>
+
+<h4 id="toc_1">一维卷积</h4>
+
+<p>一维卷积常用于序列模型，自然语言处理领域。一维卷积指的是卷积核是1维的，而不是卷积的输入是1维的。假设一个信号发生器每个时刻 \(t\) 产生一个信号 \(x_t\)，其信息的衰减率为 \(w_k\)，即在 \(k−1\) 个时间步长后，信息为原来的 \(w_k\) 倍。假设 \(w_1=1\),\(w_2 =1/2\),\(w_3 =1/4\)，那么在时刻 \(t\) 收到的信号 \(y_t\) 为当前时刻产生的信息和以前时刻延迟信息的叠加，<br/>
+\[<br/>
+\begin{align*}<br/>
+y_t &amp;= 1\times x_t +1/2\times x_{t−1} + 1/4\times x_{t−2}\\<br/>
+&amp;= w_1 \times x_t +w_2 \times x_{t−1} + w_3 \times x_{t−2}\\<br/>
+&amp;= \sum^3_{k=1} w_k \cdot x_{t−k+1}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>我们假设卷积核（滤波器）为 \(\mathbf w = (w_1,...,w_{m})\)，长度为 \(m\) ，它和一个信号序列 \(x_1,...\) 的卷积为<br/>
+\[<br/>
+y_t = \sum_{k=1}^{m} w_k x_{t-k+1}<br/>
+\]</p>
+
+<p>信号序列 \(\mathbf x\) 与滤波器 \(\mathbf w\) 的卷积定义为<br/>
+\[<br/>
+y = \mathbf w \otimes \mathbf x<br/>
+\]</p>
+
+<p>其中 \(\otimes\) 表示卷积操作。</p>
+
+<p>假设如下图，图中的输入的数据维度为8，卷积核的维度为5，卷积步数为1时，卷积后输出的数据维度为8−5+1=4。卷积核为 \((0,1,1,2,-1)\)，输入信号为 \((1,1,2,-1,1,-1,2,1)\)，卷积为<br/>
+\[<br/>
+\begin{align*}<br/>
+y_0 &amp;= \sum_{k=1}^5 w_k x_{1-k} = w_1 x_1 + w_2 x_0 + w_3 x_{-1} + w_4 x_{-2} + w_5 x_{-3} \\<br/>
+&amp;= 0 \times  1 + 1 \times (-1) + 1 \times 2 + 2 \times 1 + (-1) \times 1 \\<br/>
+&amp;= 0 - 1 + 2 + 2 - 1 \\<br/>
+&amp;= 2\\<br/>
+y_1 &amp;= \sum_{k=0}^4 w_k x_{5-k} = w_0 x_5 + w_1 x_4 + w_2 x_3 + w_3 x_2 + w_4 x_1 \\<br/>
+&amp;= 0 \times  (-1) + 1 \times 1 + 1 \times (-1) + 2 \times 2 + (-1) \times 1 \\<br/>
+&amp;= 0 + 1 -1 + 4 - 1\\<br/>
+&amp;= 3\\<br/>
+y_2 &amp;= \sum_{k=0}^4 w_k x_{6-k} = w_0 x_6 + w_1 x_5 + w_2 x_4 + w_3 x_3 + w_4 x_2 \\<br/>
+&amp;= 0 \times  2 + 1 \times (-1) + 1 \times 1 + 2 \times (-1) + (-1) \times 2\\<br/>
+&amp;= 0 - 1 + 1 - 2 - 2\\<br/>
+&amp;= -4\\<br/>
+y_3 &amp;= \sum_{k=0}^4 w_k x_{7-k} = w_0 x_7 + w_1 x_6 + w_2 x_5 + w_3 x_4 + w_4 x_3 \\<br/>
+&amp;= 0 \times  1 + 1 \times 2 + 1 \times (-1) + 2 \times 1 + (-1) \times (-1)\\<br/>
+&amp;= 0 + 2 - 1 + 2 + 1\\<br/>
+&amp;= 4\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>我们可以简单的进行用图表示，先将卷积核反转，然后挨个与信号相乘，结果求和即可，如下：</p>
+
+<div align="center">
+    <img width="480" src="media/15327348574245/15395252379933.jpg" />
+</div>
+
+<h4 id="toc_2">二维卷积</h4>
+
+<p>二维卷积常用语图像识别等领域。因为图像为一个两维结构，所以需要将一维卷积进行扩展。给定一个图像 \(X \in \mathbb R^{M\times N}\)，和滤波器 \(W \in \mathbb R^{m\times n}\)，一般 \(m \le M,n\le N\)，其卷积为<br/>
+\[<br/>
+y_{ij} = \sum_{u=1}^{m} \sum_{v=1}^{n} w_{uv}\cdot x_{i-u+1,j-v+1}<br/>
+\]</p>
+
+<p>下图给出了二维卷积示例。</p>
+
+<div align="center">
+    <img width="480" src="media/15327348574245/15395277611156.jpg" />
+</div>
+
+<p>\[<br/>
+\begin{align*}<br/>
+y_{13} &amp;= \sum_{u=1}^3 \sum_{v=1}^3 w_{uv} \cdot x_{1-u+1,3-v+1} = \sum_{u=1}^3\sum_{v=1}^3 w_{uv} x_{2-u,4-v}\\<br/>
+&amp;= w_{11} x_{13} + w_{12} x_{12} + w_{13} x_{11} \\<br/>
+&amp;+ w_{10} x_{14} + w_{11} x_{13} + w_{12} x_{12} \\<br/>
+&amp;+ w_{20} x_{04} + w_{21} x_{03} + w_{22} x_{02} \\ <br/>
+&amp;= 1 \times 0 + 0 \times (-1) + 0 \times 1 \\<br/>
+&amp;+ 0 \times 1 + 0 \times 0 + 0 \times (-3) \\<br/>
+&amp;+ 0 \times 1 + 0 \times 1 + (-1) \times 1 \\ <br/>
+&amp;= -1\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>在图像处理中，卷积经常作为特征提取的有效方法。一幅图像在经过卷积操作后得到结果称为特征映射(feature map)。图给出在图像处理中几种常用的滤波器，以及其对应的特征映射。图中最上面的滤波器是常用的高斯滤波器，可以用来对图像进行平滑去噪;中间和最下面的过滤器可以用来提取边缘特征。</p>
+
+<div align="center">
+    <img width=500 src="media/15327348574245/15395313721468.jpg" />
+</div>
+
+<h4 id="toc_3">互相关</h4>
+
+<p>在机器学习和图像处理领域，卷积的主要功能是在一个图像（或某种特征）上滑动一个卷积核（即滤波器），通过卷积操作得到一组新的特征。在计算卷积的过程中，需要对卷积核翻转。在具体实现上，一般会以互相关操作来代替卷积，从而减少一些不必要的操作和开销。互相关是衡量两个序列相关性的函数，通常是滑动卷口的点击运算来实现的。给定一个图像 \(X\in \mathbb R^{M\times N}\) 和卷积核 \(W\in\mathbb R^{m\times n}\)，它们的互相关为<br/>
+\[<br/>
+\begin{align}<br/>
+y_{ij} = \sum_{u=1}^m \sum_{v=1}^n w_{uv} x_{i+u-1,j+v-1}\label{yijs}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>和卷积相比，互相关的区别在于卷积核是否进行了翻转，也可以理解为图像是否进行翻转。因此互相关也可以被称为<strong>不翻转卷积</strong>。</p>
+
+<p>在神经网络中使用卷积是为了进行特征抽取，卷积核是否进行了翻转和其特征抽取无关。特别是当卷积核是可学习的参数时，卷积核互相关是等价的。一次，为了实现上的方便起见，我们用互相关来代替卷积。事实上，很多深度学习工具中卷积操作都是互相关操作。</p>
+
+<p>公式 ( \ref{yijs} )可以表述为<br/>
+\[<br/>
+Y = W \otimes X<br/>
+\]</p>
+
+<p>其中 \(Y\in \mathbb R^{M-m+1,N-n+1}\) 为输出矩阵。</p>
+
+<h4 id="toc_4">卷积的变种</h4>
+
+<p>在卷积的标准定义基础上，还可以引入滤波器的滑动步长和零填充来增加卷积的多样性，可以更灵活地进行特征抽取。</p>
+
+<h5 id="toc_5"><strong>滑动步长（stride）</strong>：卷积核在滑动时的间隔。下图给出了步长为2的二维卷积示例。</h5>
+
+<div align=center>
+    <img width="500" src="media/15327348574245/15402216516097.jpg" />
+</div>
+
+<p><strong>零填充（zero padding）</strong>：输入两端进行补零。因为步长的设置问题，可能导致剩下未扫描的空间不足以提供给卷积核，比如有图大小为5 * 5,卷积核为2 * 2,步长为2,卷积核扫描了两次后，剩下一个元素，不够卷积核扫描了，这个时候就需要补零。更一般地，假设卷积层的输入神经元个数为 \(n\)，卷积大小为 \(m\)，步长（stride）为 \(s\)，输入神经元两端各填补 \(p\) 个零（zero padding），那么该卷积层的神经元数量为 \((n − m + 2p)/s + 1\)。</p>
+
+<div align="center">
+    <img width="280" src="media/15327348574245/15402225775512.jpg" />
+</div>
+
+<p>一般常用的卷积有以下三类：</p>
+
+<ol>
+<li><strong>窄卷积（narrow convolution）</strong>：步长 \(s=1\)，两端不补零 \(p=0\)，卷积后输出长度为 \(n-m+1\)。</li>
+<li><strong>宽卷积（wide convolution）</strong>：步长 \(s=1\)，两端补零 \(p=m-1\)，卷积后的长度为 \(n+m-1\)。</li>
+<li><strong>等长卷积（equal-width convolution）</strong>：步长 \(s=1\)，两端补零 \(p=(m-1)/2\)，卷积后输出长度为 \(n\)。</li>
+</ol>
+
+<p>这里的窄、宽、等长指的都是卷积后与卷积前的大小比较。</p>
+
+<h3 id="toc_6">卷积的数学性质</h3>
+
+<p>卷积有很多很好的数学性质，这些性质不止是二维卷积，也可以适用到一维卷积的情况。</p>
+
+<h4 id="toc_7">交换性</h4>
+
+<p>如果不限制两个卷积信号的长度，卷积是具有交换性的，即 \(x\otimes y = y \otimes x\)。当输入信息和卷积核有固定长度时，它们的宽卷积依然具有交换性。对于两维图像 \(X \in \mathbb R^{M×N}\) 和卷积核 \(W \in \mathbb R^{m×n}\)，对图像 \(X\) 的两个维度进行零填充，两端各补 \(m-1\) 和 \(n-1\) 个零，得到全填充（full padding）的图像 \(\widetilde X\in\mathbb R^{(M+2m−2)\times(N+2n−2)}\)。图像 \(X\) 和卷积核 \(W\) 的宽卷积（wide convolution）定义为<br/>
+\[<br/>
+W \widetilde \otimes X \buildrel \Delta \over = W \otimes \widetilde X<br/>
+\]</p>
+
+<p>其中 \(\widetilde \otimes\) 为宽卷积操作。</p>
+
+<p>宽卷积具有交换性，即<br/>
+\[<br/>
+W \widetilde \otimes X = X \widetilde \otimes W<br/>
+\]</p>
+
+<p>可以用一个简单的例子来看看这个交换操作。</p>
+
+<h4 id="toc_8">导数</h4>
+
+<p>假设 \(Y=W\otimes X\)，其中 \(X \in \mathbb R^{M\times N}\)，\(W\in \mathbb R^{m\times n}\)，\(Y \in \mathbb R^{(M-m+1)\times (N-n+1)}\)，函数 \(f(Y) \in \mathbb R\) 为一个标量函数，则<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial f(Y)}{\partial w_{uv}} &amp;= \sum_{i=1}^{M-m+1} \sum_{j=1}^{M-m+1} \frac{\partial f(Y)}{\partial y_{ij}}\frac{\partial y_{ij}}{\partial w_{uv}}\\<br/>
+&amp;= \sum_{i=1}^{M-m+1} \sum_{j=1}^{M-m+1} \frac{\partial f(Y)}{\partial y_{ij}}\frac{\partial}{\partial w_{uv}} \Big(\sum_{u=1}^m \sum_{v=1}^n w_{uv} x_{i+u-1,j+v-1}\Big)\\<br/>
+&amp;= \sum_{i=1}^{M-m+1} \sum_{j=1}^{M-m+1} \Big(\frac{\partial f(Y)}{\partial y_{ij}}\Big) x_{i+u-1,j+v-1}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>上式可以看出， \(f(Y)\) 关于 \(W\) 的偏导数为 \(X\) 和 \(\frac{\partial f(Y)}{\partial Y}\) 的卷积<br/>
+\[<br/>
+\begin{equation}<br/>
+\frac{\partial f(Y)}{\partial W} = \frac{\partial f(Y)}{\partial Y} \otimes X\\\label{fpfyp}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>同理可得<br/>
+\[<br/>
+\begin{align}<br/>
+\frac{\partial f(Y)}{\partial x_{st}} &amp;= \sum_{i=1}^{M-m+1} \sum_{j=1}^{N-n+1} \frac{\partial y_{ij}}{\partial x_{st}}\frac{\partial f(Y)}{\partial y_{ij}}\nonumber\\<br/>
+&amp;= \sum_{i=1}^{M-m+1} \sum_{j=1}^{N-n+1} w_{s-i+1,t-j+1} \frac{\partial f(Y)}{\partial y_{ij}}\label{fpsmi}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>其中当 \((s-i+1) \lt 1\)，或 \((s-i+1) \gt m\)，或 \((t-j+1) \lt 1\)，或 \((t - j + 1) \gt n\) 时， \(w_{s-i+1,t-j+1} = 0\)。即相当于对 \(W\) 进行了 \(p = (M - m, N - n)\) 的零填充。</p>
+
+<p>从公式 \(( \ref{fpsmi} )\) 可以看出， \(f(Y)\) 关于 \(X\) 的偏导数为 \(W\) 和 \(\frac{\partial f(Y)}{\partial Y}\) 的宽卷积。公式 ( \ref{fpsmi} ) 中的卷积是真正的卷积而不是互相关，为了一致性，我们用互相关的“卷积”，即<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial f(Y)}{\partial X} &amp;= \mathbf{rot180}(\frac{f(Y)}{\partial Y})\widetilde \otimes W\\<br/>
+&amp;=\mathbf{rot180}(W)\widetilde \otimes \frac{\partial f(Y )}{\partial Y}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(\mathbf{rot180}(\cdot)\) 表示旋转 180度。</p>
+
+<h3 id="toc_9">卷积神经网络</h3>
+
+<p>卷积神经网络一般由卷积层、池化层和全连接层构成。</p>
+
+<h4 id="toc_10">用卷积来代替全连接</h4>
+
+<p>在全连接前馈神经网络中，如果第 \(l\) 层有 \(n^{(l)}\) 个神经元，第 \(l-1\) 层有 \(n^{(l−1)}\) 个神经元，连接边有 \(n^{(l)} \times n^{(l−1)}\) 个，也就是权重矩阵有 \(n^{(l)} \times n^{(l−1)}\) 个参数。此时权重矩阵的参数非常多，训练的效率会非常低。</p>
+
+<p>如果采用卷积来代替全连接，第 \(l\) 层的净输入 \(\mathbf z(l)\) 为第 \(l-1\) 层活性值 \(\mathbf a(l−1)\) 和滤波器 \(\mathbf w^{(l)} \in \mathbb R^m\) 的卷积，即<br/>
+\[<br/>
+\begin{equation}<br/>
+\mathbf z^{(l)} = \mathbf w^{(l)} \otimes \mathbf a^{(l−1)} + b^{(l)}\label{mzlm}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>其中滤波器 \(\mathbf w^{(l)}\) 为权重向量， \(b^{(l)} \in \mathbb R^{n^{l−1}}\) 为偏置。</p>
+
+<p>根据卷积的定义，卷积层有两个很重要的性质：</p>
+
+<ol>
+<li><strong>局部连接</strong>：在卷积层（假设是第 \(l\) 层）中的每一个神经元都只和下一层（第 \(l-1\) 层）中某个局部窗口内的神经元相连，构成一个局部连接网络。如下右图所示，卷积层和下一层之间的连接数大大减少，有原来的 \(n^{(l)} \times n^{(l−1)}\) 个连接变为 \(n^{(l)} \times m\) 个连接，\(m\) 为滤波器大小。</li>
+<li><strong>权重共享</strong>：从公式 ( \ref{mzlm} )可以看出，作为参数的滤波器 \(w^{(l)}\) 对于第 \(l\) 层的所有的神经元都是相同的。如下右图中，所有的同颜色连接上的权重是相同的。</li>
+</ol>
+
+<p>由于局部连接和权重共享，卷积层的参数只有一个 \(m\) 维的权重 \(w^{(l)}\) 和 1 维的偏置 \(b^{(l)}\)，共 \(m+1\) 个参数。参数个数和神经元的数量无关。此外，第 \(l\) 层的神经元个数不是任意选择的，而是满足 <br/>
+\[<br/>
+n^{(l)} = n^{(l−1)} − m + 1。<br/>
+\]</p>
+
+<h4 id="toc_11">卷积层</h4>
+
+<p>卷积层的作用是提取一个局部区域的特征，不同的卷积核相当于不同的特征提取器。上面描述的卷积层的神经元和全连接网络一样都是一维结构。既然卷积网络主要应用在图像处理上，而图像为两维结构，因此为了更充分地利用图像的局部信息，通常将神经元组织为三维结构的神经层，其大小为高度 \(M\) \(\times\) 宽度 \(N\) \(\times\) 深度 \(D\)，有 \(D\) 个 \(M \times N\) 大小的特征映射构成。</p>
+
+<p><strong>特征映射（feature map）</strong>为一幅图像（或其它特征映射）在经过卷积提取到的特征，每个特征映射可以作为一类抽取的图像特征。为了卷积网络的表示能力，可以在每一层使用多个不同的特征映射，以更好地表示图像的特征。</p>
+
+<p>在输入层，特征映射就是图像本身。如果是灰度图像，就是有一个特征映射，深度 \(D = 1\)；如果是彩色图像，分别有 RGB 三个颜色通道的特征映射，输入层深度 \(D = 3\)。</p>
+
+<p>不失一般性，假设一个卷积层的结构如下：</p>
+
+<ul>
+<li>输入特征映射组： \(\mathbf X \in \mathbb R^{M\times N\times D}\) 为三维张量（tensor），其中每个切片(slice )矩阵 \(X^d \in \mathbb R^{M\times N}\) 为一个输入特征映射， \(1 \le d \le D\)；</li>
+<li>输出特征映射组： \(\mathbf Y \in \mathbb R^{M&#39; \times N&#39; \times P}\) 为三维张量，其中每个切片矩阵 \(Y^p \in \mathbb R^{M&#39; \times N&#39;}\) 为一个输出特征映射， \(1 \le p \le P\)；</li>
+<li>卷积核： \(\mathbf W \in \mathbb R^{m\times n\times D\times P}\) 为四维张量，其中每个切片矩阵 \(W^{p,d} \in \mathbb R^{m×n}\) 为一个两维卷积核， \(1 \le d \le D\), \(1 \le p \le P\)。</li>
+</ul>
+
+<p>为了计算输出特征映射 \(Y^p\)，用卷积核 \(W^{p,1}\), \(W^{p,2}\),\(...\), \(W^{p,D}\) 分别对输入特征映射 \(X^1, X^2,..., X^D\) 进行卷积，然后将卷积结果相加，并加上一个标量偏置 \(b\) 得到卷积层的净输入 \(Z^p\)，再经过非线性激活函数后得到输出特征映射 \(Y^p\)。<br/>
+\[<br/>
+Z^p = \mathbf W^p \otimes \mathbf X + b^p = \sum^D_{d=1} W^{p,d} \otimes X^d + b^p\\<br/>
+Y^p = f(Z^p)<br/>
+\]</p>
+
+<p>其中 \(\mathbf W^p \in \mathbf R^{m\times n\times D}\) 为三维卷积核， \(f(\cdot)\) 为非线性激活函数，一般用 ReLU 函数。整个计算过程如下图所示。如果希望卷积层输出 \(P\) 个特征映射，可以将上述计算机过程重复 \(P\) 次，得到 \(P\) 个输出特征映射 \(Y^1, Y^2,..., Y^P\)。</p>
+
+<p>在输入为 \(\mathbf X \in \mathbb R^{M\times N\times D}\)，输出为 \(\mathbf Y \in \mathbb R^{M&#39; \times N&#39; \times P}\) 的卷积层中，每一个输入特征映射都需要 \(D\) 个滤波器以及一个偏置。假设每个滤波器的大小为 \(m \times n\)，那么共需要 \(P \times D \times (m\times n) + P\) 个参数。</p>
+
+<h4 id="toc_12">池化层</h4>
+
+<p>池化层（pooling layer）也叫子采样层（subsampling layer），其作用是进行特征选择，降低特征数量，并从而减少参数数量。卷积层虽然可以显著减少网络中连接的数量，但特征映射组中的神经元个数并没有显著减少。如果后面接一个分类器，分类器的输入维数依然很高，很容易出现过拟合。为了解决这个问题，可以在卷积层之后加上一个池化层，从而降低特征维数，避免过拟合。减少特征维数也可以通过增加卷积步长来实现。</p>
+
+<p>假设池化层的输入特征映射组为 \(\mathbf X \in \mathbb R^{M\times N\times D}\)，对于其中每一个特征映射 \(X^d\)，将其划分为很多区域 \(R^d_{m,n}\), \(1 \le m \le M&#39;\), \(1 \le n \le N&#39;\)，这些区域可以重叠，也可以不重叠。池化 (pooling)是指对每个区域进行下采样（down sampling）得到一个值，作为这个区域的概括。</p>
+
+<p>常用的池化函数有两种：</p>
+
+<ol>
+<li><p>最大池化（maximum pooling）：一般是取一个区域内所有神经元的最大值。<br/>
+\[<br/>
+Y^d_{m,n} = \max_{i \in R^d_{m,n}} x_i<br/>
+\]</p>
+
+<p>其中 \(x_i\) 为区域 \(R_k^d\) 内每个神经元的激活值。</p></li>
+<li><p>平均池化（mean pooling）：一般是取区域内所有神经元的平均值。<br/>
+\[<br/>
+Y^d_{m,n} = \frac{1}{|R^d_{m,n}|} \sum_{i\in R^d_{m,n}} x_i<br/>
+\]</p></li>
+</ol>
+
+<p>对每一个输入特征映射 \(X^d\) 的 \(M&#39; \times N&#39;\) 个区域进行子采样，得到汇聚层的输出特征映射 \(Y^d = \{Y_{m,n}^d \}\), \(1 \le m \le M&#39;\) , \(1 \le n \le N&#39;\)。</p>
+
+<p>池化层不但可以有效地减少神经元的数量，还可以使得网络对一些小的局部形态改变保持不变性，并拥有更大的感受野。</p>
+
+<p>目前主流的卷积网络中，池化层仅包含下采样操作。但在早期的一些卷积网络（比如 LeNet-5）中，有时也会在池化层使用非线性激活函数，比如<br/>
+\[<br/>
+Y&#39;^d = f(w^d \cdot Y^d + b^d)<br/>
+\]</p>
+
+<p>其中 \(Y&#39;^d\) 为池化层的输出， \(f(\cdot)\) 为非线性激活函数， \(w^d\) 和 \(b^d\) 为可学习的标量权重和偏置。</p>
+
+<p>典型的池化层是将每个特征映射划分为2 ×2大小的不重叠区域，然后使用最大池化的方式进行下采样。池化层也可以看做是一个特殊的卷积层，卷积核大小为 \(m \times m\)，步长为 \(s \times s\)，卷积核为 max 函数或 mean 函数。过大的采样区域会急剧减少神经元的数量，会造成过多的信息损失。</p>
+
+<h3 id="toc_13">参数学习</h3>
+
+<p>在卷积网络中，参数为卷积核中权重以及偏置。和全连接前馈网络类似，卷积网络也可以通过误差反向传播算法来进行参数学习。</p>
+
+<p>在全连接前馈神经网络中，梯度主要通过每一层的误差项 \(\delta\) 进行反向传播，并进一步计算每层参数的梯度。</p>
+
+<p>在卷积神经网络中，主要有两种不同功能的神经层：卷积层和池化层。而参数为卷积核以及偏置，因此只需要计算卷积层中参数的梯度。</p>
+
+<p>不失一般性，对第 \(l\) 层为卷积层，第 \(l-1\) 层的输入特征映射为 \(\mathbf X^{(l−1)} \in<br/>
+\mathbb R^{M\times N\times D}\)，通过卷积计算得到第 \(l\) 层的特征映射净输入 \(\mathbf Z^{(l)}\in \mathbb R^{M&#39;\times N&#39; \times P}\)。第 \(l\) 层的第 \(p(1 \le p \le P)\)个特征映射净输入<br/>
+\[<br/>
+\begin{equation}<br/>
+Z^{(l,p)} = \sum_{d=1}^D W^{(l,p,d)} \otimes X^{(l−1,d)} + b^{(l,p)}\label{zlpsu}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>其中 \(W^{(l,p,d)}\) 和 \(b^{(l,p)}\) 为卷积核以及偏置。第 \(l\) 层中共有 \(P \times D\) 个卷积核和 \(P\) 个偏置，可以分别使用链式法则来计算其梯度。<br/>
+。<br/>
+根据公式 ( \ref{fpfyp} )和( \ref{zlpsu} )，损失函数关于第 \(l\) 层的卷积核 \(W^{(l,p,d)}\) 的偏导数为<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial \mathcal L(Y, \hat Y)}{\partial W^{(l,p,d)}} &amp;= \frac{\partial \mathcal L(Y,\hat Y)}{Z^{(l,p)}} \otimes X^{(l−1,d)}\\<br/>
+&amp;= \delta^{(l,p)} \otimes X^{(l−1,d)}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(\delta^{(l,p)} = \frac{\partial \mathcal L(Y,\hat Y)}{\partial Z^{(l,p)}}\) 为损失函数关于第 \(l\) 层的第 \(p\) 个特征映射净输入 \(Z^{(l,p)}\) 的偏导数。</p>
+
+<p>同理可得，损失函数关于第 \(l\) 层的第 \(p\) 个偏置 \(b^{(l,p)}\) 的偏导数为<br/>
+\[<br/>
+\frac{\partial \mathcal L(Y,\hat Y)}{\partial b(l,p)} = \sum_{i,j} [\delta^{(l,p)}]_{i,j}<br/>
+\]</p>
+
+<p>卷积网络中，每层参数的梯度依赖其所在层的误差项 \(\delta^{(l,p)}\)。</p>
+
+<h4 id="toc_14">误差项的计算</h4>
+
+<p>卷积层和池化层中，误差项的计算有所不同，因此我们分别计算其误差项。</p>
+
+<p><strong>池化层</strong>：当第 \(l + 1\) 层为池化层时，因为池化层是下采样操作， \(l + 1\) 层的每个神经元的误差项 \(\delta\) 对应于第 \(l\) 层的相应特征映射的一个区域。 \(l\) 层的第 \(p\) 个特征映射中的每个神经元都有一条边和 \(l + 1\) 层的第 \(p\) 个特征映射中的一个神经元相连。<br/>
+根据链式法则，第 \(l\) 层的一个特征映射的误差项 \(\delta(l,p)\)，只需要将 \(l + 1\) 层对应特征映射的误差项 \(\delta^{(l+1,p)}\) 进行上采样操作（和第 \(l\) 层的大小一样），再和 \(l\) 层特征映射的激活值偏导数逐元素相乘，就得到了 \(\delta^{(l,p)}\)。</p>
+
+<p>第 \(l\) 层的第 \(p\) 个特征映射的误差项 \(\delta^{(l,p)}\) 的具体推导过程如下：<br/>
+\[<br/>
+\begin{align*}<br/>
+\delta^{(l,p)} &amp;\buildrel \Delta \over = \frac{\partial \mathcal L(Y,\hat Y)}{\partial Z^{l,p}}\\<br/>
+&amp;= \frac{X^{(l,p)}}{Z^{(l,p)}}\cdot \frac{\partial Z^{(l+1,p)}}{\partial X^{(l,p)}}\cdot \frac{\partial \mathcal L(Y,\hat Y)}{\partial Z^{(l+1,p)}} \\<br/>
+&amp;= f&#39;_l(Z^{(l,p)}) \odot \mathbf {up}(\delta^{(l+1,p)})\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(f&#39;_l(\cdot)\) 为第 \(l\) 层使用的激活函数导数， \(\mathbf {up}\) 为上采样函数（upsampling），与池化层中使用的下采样操作刚好相反。如果下采样是最大池化（max pooling），误差项 \(\delta^{(l+1,p)}\) 中每个值会直接传递到上一层对应区域中的最大值所对应的神经元，该区域中其它神经元的误差项的都设为 0。如果下采样是平均汇聚（mean pooling），误差项 \(\delta^{(l+1,p)}\) 中每个值会被平均分配到上一层对应区域中的所有神经元上。</p>
+
+<p><strong>卷积层</strong>：当 \(l + 1\) 层为卷积层时，假设特征映射净输入 \(\mathbf Z^{(l+1)}\in \mathbb R^{M&#39;\times N&#39; \times P}\)，其中第 \(p(1 \le p \le P)\) 个特征映射净输入<br/>
+\[<br/>
+Z^{(l+1,p)} = \sum^D_{d=1} W^{(l+1,p,d)} \otimes X^{(l,d)} + b^{(l+1,p)}<br/>
+\]</p>
+
+<p>其中 \(W^{(l+1,p,d)}\) 和 \(b^{(l+1,p)}\) 为第 \(l+1\) 层的卷积核以及偏置。第 \(l+1\) 层中共有 \(P \times D\) 个卷积核和 \(P\) 个偏置。</p>
+
+<p>第 \(l\) 层的第 \(d\) 个特征映射的误差项 \(\delta^{(l,d)}\) 的具体推导过程如下：<br/>
+\[<br/>
+\begin{align*}<br/>
+\delta^{(l,d)} &amp;\buildrel \Delta \over = \frac{\partial \mathcal L(Y,\hat Y)}{\partial Z^{(l,d)}} \\<br/>
+&amp;= \frac{\partial X^{(l,d)}}{\partial Z^{(l,d)}}\cdot \frac{\partial \mathcal L(Y,\hat)}{\partial X^{(l,d)}}\\<br/>
+&amp;= f&#39;_l(Z^{(l)}) \odot \sum_{p=1}^P \bigg (\mathbf{rot180}(W^{(l+1,p,d)})\bigg) \widetilde \otimes \frac{\partial \mathcal L(Y,\hat Y)}{\partial Z^{(l+1,p)}}\\<br/>
+&amp;= f&#39;_l(Z^{(l)}) \odot \sum_{p=1}^P \bigg (\mathbf{rot180}(W^{(l+1,p,d)})\bigg) \widetilde \otimes \delta^{(l+1,p)}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(\widetilde \otimes\) 为宽卷积。</p>
+
+<h3 id="toc_15">其它卷积方式</h3>
+
+<h4 id="toc_16">转置卷积</h4>
+
+<p>我们一般可以通过卷积操作来实现高维特征到低维特征的转换。比如在一维卷积中，一个 5 维的输入特征，经过一个大小为 3的卷积核，其输出为 3 维特征。如果设置步长大于 1，可以进一步降低输出特征的维数。但在一些任务中，我们需要将低维特征映射到高维特征，并且依然希望通过卷积操作来实现。</p>
+
+<p>假设有一个高维向量为 \(\mathbf x \in \mathbb R^d\) 和一个低维向量为 \(\mathbf z \in \mathbb R^p\)，\(p \lt d\)。如果用仿射变换来实现高维到低维的映射，不失一般性，这里忽略了平移项。<br/>
+\[<br/>
+\begin{equation}<br/>
+\mathbf z = W\mathbf x \label{zwx}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>其中 \(W \in \mathbb R^{p\times d}\) 为转换矩阵。我们可以很容易地通过转置 \(W\) 来实现低维到高维的反向映射，即<br/>
+\[<br/>
+\begin{equation}<br/>
+\mathbf x = W^T\mathbf z \label{xwtz}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>需要说明的是，公式 ( \ref{zwx} ) 和 ( \ref{xwtz} ) 并不是逆运算，两个映射只是形式上的转置关系。</p>
+
+<p>在全连接网络中，忽略激活函数，前向计算和反向传播就是一种转置关系。比如前向计算时，第 \(l+1\) 层的净输入为 \(\mathbf z^{(l+1)} = W^{(l+1)} \mathbf z^{(l)}\)，反向传播时，第 \(l\) 层的误差项为 \(\delta^{(l)} = (W^{(l+1)})^T \delta^{(l+1)}\)。</p>
+
+<p>卷积操作也可以写为仿射变换的形式。假设一个 5维向量 \(\mathbf x\)，经过大小为 3 的卷积核 \(\mathbf w = [w_1, w_2, w_3]^T\) 进行卷积，得到 3 维向量 \(\mathbf z\)。卷积操作可以写为<br/>
+\[<br/>
+\begin{align}<br/>
+\mathbf z &amp;= \mathbf w \otimes \mathbf x\nonumber\\<br/>
+&amp;= \left [ \begin{array}{ccccc} w_1 &amp; w_2 &amp; w_3 &amp; 0 &amp; 0\\ 0 &amp; w_1 &amp; w_2 &amp; w_3 &amp; 0 \\ 0 &amp; 0 &amp; w_1 &amp; w_2 &amp; w_3 \end{array} \right ]\cdot \mathbf x\label{lbacw}\\<br/>
+&amp;= C\mathbf x \nonumber\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>其中 \(C\) 是一个稀疏矩阵，其非零元素来自于卷积核 \(\mathbf w\) 中的元素。</p>
+
+<p>如果要实现 3 维向量 \(z\) 到 5 维向量 \(x\) 的映射，可以通过仿射矩阵的转置来实现。<br/>
+\[<br/>
+\begin{align}<br/>
+\mathbf x &amp;= C^T\mathbf z\nonumber\\<br/>
+&amp;= \left [ \begin{array} w_1 &amp; 0 &amp; 0\\w_2 &amp; w_1 &amp; 0 \\ w_3 &amp; w_2 &amp; w_1 \\ 0 &amp; w_3 &amp; w_2 \\ 0 &amp; 0 &amp; w_3\\ \end{array} \right ] \cdot \mathbf z\label{lbw00}\\<br/>
+&amp;= \mathbf{rot180(w)} \widetilde \oplus \mathbf z\nonumber\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>其中 \(\mathbf{rot180}(\cdot)\) 表示旋转180度。</p>
+
+<p>从公式 ( \ref{lbacw} ) 和 ( \ref{lbw00} ) 可以看出，从仿射变换的角度来看两个卷积操作 \(\mathbf z = \mathbf w \otimes \mathbf x\) 和 \(\mathbf x = \mathbf{rot180}(\mathbf w)\widetilde \oplus \mathbf z\) 也是形式上的转置关系。因此，我们将低维特征映射到高维特征的卷积操作称为转置卷积（transposed convolution），也称为反卷积（deconvolution）。</p>
+
+<p>和卷积网络中，卷积层的前向计算和反向传播也是一种转置关系。</p>
+
+<p>对一个 \(p\) 维的向量 \(\mathbf z\)，和大小为 \(m\) 的卷积核，如果希望通过卷积操作来映射到高维向量，只需要对向量 \(\mathbf z\) 进行两端补零 \(p = m − 1\)，然后进行卷积，可以得到 \(p + m − 1\) 维的向量。</p>
+
+<p>转置卷积同样适用于二维卷积。</p>
+
+<div align="center">
+    <img width="460" src="media/15327348574245/15427228522286.jpg" />
+</div>
+
+<p><strong>微步卷积</strong>：我们可以通过增加卷积操作的步长 \(s &gt; 1\) 来实现对输入特征的降采样操作，大幅降低特征维数。同样，我们也可以通过减少转置卷积的步长 \(s &lt; 1\) 来实现上采样操作，大幅提高特征维数。</p>
+
+<p>步长 \(s &lt; 1\) 的转置卷积也称为微步卷积（fractionally-strided convolution）。为了实现微步卷积，我们可以在输入特征之间插入 0 来间接地使得步长变小。</p>
+
+<p>如果卷积操作的步长为 \(s &gt; 1\)，希望其对应的转置卷积的步长为 \(\frac 1 s\)，需要在输入特征之间插入 \(s − 1\) 个 0 来使得其移动的速度变慢。</p>
+
+<p>以一维转置卷积为例，对一个 \(p\) 维的向量 \(z\)，和大小为 \(m\) 的卷积核，通过对向量 \(z\) 进行两端补零 \(p = m − 1\)，并且在每两个向量元素之间插入 \(s − 1\) 个 0，然后进行步长为 1的卷积，可以得到 \(s \times (p − 1) + m\) 维的向量。</p>
+
+<p>图5.16给出了一个步长 s = 2，无零填充 p = 0的两维卷积和其对应的转置卷积。</p>
+
+<div align="center">
+    <img width="500" src="media/15327348574245/15427227998993.jpg" />
+</div>
+
+<h3 id="toc_17">空洞卷积</h3>
+
+<p>对于一个卷积层，如果希望增加输出单元的感受野，一般可以通过三种方式实现：（1）增加卷积核的大小;（2）增加层数；（3）在卷积之前进行汇聚操作。前两种操作会增加参数数量，而第三种会丢失一些信息。</p>
+
+<p>空洞卷积（atrous convolutions），也称为膨胀卷积（dilated convolution），是一种不增加参数数量，同时增加输出单元感受野的一种方法。空洞卷积通过给卷积核插入“空洞”来变相地增加其大小。如果在卷积核的每两个元素之间插入 \(d − 1\) 个空洞，卷积核的有效大小为<br/>
+\[<br/>
+\begin{align*}<br/>
+m&#39; = m + (m − 1) \times (d − 1)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(d\) 称为膨胀率（dilation rate）。当 \(d = 1\) 时卷积核为普通的卷积核。</p>
+
+<div align="center">
+    <img width="440" src="media/15327348574245/15427229263490.jpg" />
+</div>
+
+<hr/>
+
+<p><a href="https://blog.csdn.net/pudongdong/article/details/60782985">多维卷积与一维卷积的统一性（运算篇）</a><br/>
+<a href="http://www.datakit.cn/blog/2016/03/23/bp_cnn.html">CNN基本公式</a><br/>
+<a href="https://www.zybuluo.com/hanbingtao/note/485480">零基础入门深度学习(4)-卷积神经网络</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15317530788642.html">人工神经网络-RBF径向基网络</a></h1>
+			<p class="meta"><time datetime="2018-07-16T22:57:58+08:00" 
+			pubdate data-updated="true">2018/7/16</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>RBF径向基网络全称是 Radical basis function network；RBF network，是一种常见的人工神经网络；在径向基网络先介绍径向基函数（RBF）。</p>
+
+<h3 id="toc_0">径向基函数RBF</h3>
+
+<p>径向基函数是某种沿径向对称的标量函数。通常定义为空间中任一点 \(x\) 到某一中心 \(x_c\) 之间欧氏距离的单调函数，可记作 \(\phi(||x-x_c||)\)，其作用往往是局部的 , 即当 \(x\) 远离 \(x_c\) 时函数取值很小。径向基函数的一般形式为<br/>
+\[<br/>
+\phi = \exp\big(-(x-x_c)^2\big)<br/>
+\]</p>
+
+<p>其中 \(x_c\) 为核函数中心，最常用的径向基函数是高斯核函数，形式为 <br/>
+\[<br/>
+\phi(||x-x_c||)=\exp\bigg(-\frac{||x-x_c||^2}{2\sigma^2}\bigg) = RBF(x,x_c)<br/>
+\] </p>
+
+<p>其中 \(\sigma\) 为函数的宽度参数，控制了函数的径向作用范围。如果 \(x\) 和 \(x_c\) 很相近那么核函数值为1，如果 \(x\) 和 \(x_c\) 相差很大那么核函数值约等于0。由于这个函数类似于高斯分布，因此也称为高斯核函数。它能够把原始特征映射到无穷维。</p>
+
+<div align="center">
+    <img width="320" src="media/15317530788642/15382614421727.jpg" />
+</div>
+
+<p>上图形象说明离中心点越远，函数值越小；距离值超过一定值后，函数值几乎为0。</p>
+
+<p>简单说明一下为什么采样RBF函数的神经网络学习收敛得比较快。当网络的一个或多个可调参数（权值或阈值）对任何一个输出都有影响时，这样的网络称为全局逼近网络。由于对于每次输入，网络上的每一个权值都要调整，从而导致全局逼近网络的学习速度很慢。BP网络就是一个典型的例子。</p>
+
+<p>如果对于输入空间的某个局部区域只有少数几个连接权值影响输出，大多数连接权重由于和中心点距离远，影响几乎为0，则该网络称为局部逼近网络。常见的局部逼近网络有RBF网络、小脑模型（CMAC）网络、B样条网络等。</p>
+
+<h3 id="toc_1">径向基神经网络</h3>
+
+<p>RBF神经网络，属于前向神经网络类型，它能够以任意精度逼近任意连续函数，特别适合于解决分类问题。</p>
+
+<p>RBF网络的结构与多层前向网络类似，它是一种三层前向网络。第一层为输入层，由信号源结点组成；第二层为隐含层，隐单元数视所描述问题的需要而定，隐单元的变换函数是RBF径向基函数，它是对中心点径向对称且衰减的非负非线性函数；第三层为输出层，它对输入模式的作用作出响应。从输人空间到隐含层空间的变换是非线性的，而从隐含层空间到输出层空间变换是线性的。</p>
+
+<div align="center">
+    <img width="400" src="media/15317530788642/15382636777583.jpg" />
+</div>
+
+<p>RBF网络的基本思想是：用RBF作为隐单元的“基”构成隐含层空间，这样就可将输入矢量直接（即不需要通过权连接）映射到隐空间。根据Cover定理，低维空间不可分的数据到了高维空间会更有可能变得可分。换句话来说，<strong>RBF网络的隐层的功能就是将低维空间的输入通过非线性函数映射到一个高维空间。然后再在这个高维空间进行曲线的拟合</strong>。它等价于在一个隐含的高维空间寻找一个能最佳拟合训练数据的表面。这点与普通的多层感知机MLP是不同的。</p>
+
+<p>当RBF的中心点确定以后，这种映射关系也就确定了。而隐含层空间到输出空间的映射是线性的，即网络的输出是隐单元输出的线性加权和，此处的权即为网络可调参数。由此可见，从总体上看，网络由输入到输出的映射是非线性的，而网络输出对可调参数而言却又是线性的。这样网络的权就可由线性方程组直接解出，从而大大加快学习速度并具有全局逼近能力，从根本上解决了BP网络的局部最优问题。</p>
+
+<blockquote>
+<p>在理论上，RBF网络和BP网络一样能以任意精度逼近任何非线性函数。但由于它们使用的激励函数不同，其逼近性能也不相同。Poggio和Girosi已经证明，RBF网络是连续函数的最佳逼近，而BP网络不是。BP网络使用的Sigmoid函数具有全局特性，它在输入值的很大范围内每个节点都对输出值产生影响，并且激励函数在输入值的很大范围内相互重叠，因而相互影响，因此BP网络训练过程很长。此外，由于BP算法采用梯度下降法，训练时间常，容易陷入局部极小的问题不可能从根本上避免，并且BP网络隐层节点数目的确定依赖于经验和试凑，很难得到最优网络。采用局部激励函数的RBF网络在很大程度上克服了上述缺点，RBF不仅有良好的泛化能力，而且对于每个输入值，只有很少几个节点具有非零激励值，因此只需很少部分节点及权值改变。学习速度可以比通常的BP算法提高上千倍,容易适应新数据，其隐层节点的数目也在训练过程中确定，并且其收敛性也较BP网络易于保证，因此可以得到最优解。</p>
+</blockquote>
+
+<p>从另一个方面也可以这样理解，多层感知器（包括BP神经网络）的隐节点基函数采用线性函数，激活函数则采用Sigmoid函数或硬极限函数。而<strong>RBF网络的隐节点的基函数采用距离函数（如欧氏距离），并使用径向基函数（如Gaussian函数）作为激活函数</strong>。径向基函数关于n维空间的一个中心点具有径向对称性，而且神经元的输入离该中心点越远，神经元的激活程度就越低。隐节点的这一特性常被称为“局部特性”。</p>
+
+<p>\[<br/>
+g_{RBF}(x_j) = \text{Output}\bigg(\sum_{i=1}^{|h|} w_{ij} \exp\Big(-\frac{||x_i - x_{c_i}||} {2\sigma^2}\Big) + b_{i}\bigg),j=1,2,...,M<br/>
+\]</p>
+
+<p>其中 \(|h|\) 表示隐藏层个数，也代表选取中心点的个数，\(M\) 表示输出层个数，\(\sigma\) 表示方差，\(w\) 则是对应的权重。最外层的 \(\text{Output}\) 函数则是根据目的选择不同的函数，如果想做分类的话就可以使用 softmax 或sign等函数，如果打算做回归或函数逼近就不用 \(\text{Output}\) 函数了，RBF Network 可以逼近任意连续的函数。</p>
+
+<p>RBF的设计主要包括两个方面，一个是结构设计，也就是说隐藏层含有几个节点合适。另一个就是参数设计，也就是对网络各参数进行求解。由上面的输入到输出的网络映射函数公式可以看到，网络的参数主要包括三种：径向基函数的中心、方差和隐含层到输出层的权值。到目前为止，出现了很多求解这三种参数的方法，主要可以分为以下两大类：</p>
+
+<h3 id="toc_2">RBF神经网络中心选取方法</h3>
+
+<p>对于RBF神经网络的学习算法，关键问题是隐藏层神经元中心参数的合理确定。常用的方法是从中心参数(或者其初始值)是从给定的训练样本集里按照某种方法直接选取，或者是采用聚类的方法确定。</p>
+
+<h4 id="toc_3">Full RBF network</h4>
+
+<p>Full RBF 网络是指所有的数据节点都作为中心。</p>
+
+<p>\[<br/>
+g_{RBF}(x) = \text{Ouput}\bigg(\sum_{m=1}^M \beta_m RBF(x,c_m)\bigg)<br/>
+\]</p>
+
+<p>即 \(M=N\)，\(c_m = x_m\)，也就是中心点的个数（隐藏单元的个数）等于输入数据的个数。这样的话，预测新的数据点，就需要计算该点和所有训练数据点的距离，也就是相似度，然后结合权重 \(\beta\) 进行线性组合，此过程就是将所有的训练数据点对预测点的影响聚集到一起，距离越近，影响越大，这样得到最终的结果。</p>
+
+<p>假设有四个元素 \(x_1,x_2,x_3,x_4\) 使用RBF神经网络，这样隐藏点的个数也是4，中心点分别是 \(c_1 = x_1\)，\(c_2 = x_2\)，\(c_3=x_3\) 和 \(c_4 = x_4\)，网络图如下<br/>
+<div align=center><br/>
+    <img width=360 src="media/15317530788642/15383902217169.jpg" /><br/>
+</div></p>
+
+<p>比如用均匀影响做二分类的话，即 \(\beta_m=1\cdot y_m\)，即:<br/>
+\[<br/>
+g_{RBF}(x) = \text{sign}\bigg(\sum_{m=1}^N y_m \exp(-\gamma ||x-x_m||^2)\bigg )<br/>
+\]</p>
+
+<p>就相当于每个训练数据给新数据投票，通过RBF，可以使得距离远的票数大，近的票数小，同时 \(y_m\) 可以控制投票的类别，这样通过统计所有点的观点，就可以得到新数据的类别了。</p>
+
+<p>但是很显然， 这种Full RBF Network是一种偷懒的方式，因为直接将所有的点作为了center，因此如果样本量很大的话，那么计算量就太大了，在实际中，很少使用。</p>
+
+<p>如果我们通过回归的方法学习参数 \(\beta_m\)，full RBF 是如下的形式<br/>
+\[<br/>
+\begin{align}<br/>
+g_{RBF}(x) = \sum_{m=1}^N \beta_m RBF(x,x_m)\label{grsn}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>假设考虑 \(\mathbf x_i\) 在 RBF 转换后采用线性回归<br/>
+\[<br/>
+z_i = [RBF(\mathbf x_i,x_1),RBF(\mathbf x_i,x_2),...,RBF(\mathbf x_i,x_N)]<br/>
+\]</p>
+
+<p>令 \(\mathbf Z = [z_1,z_2,...,z_n]^T\)，\(\beta = [\beta_1,\beta_2,...,\beta_n]^T\)，用向量化表示式 ( \ref{grsn} )，现在我们要最小化这个函数<br/>
+\[<br/>
+L = \frac 1 2 \Big(\beta^T \mathbf Z - y\Big)^T(\beta^T \mathbf Z - y)<br/>
+\]</p>
+
+<p>用 \(L\) 对 \(\beta\) 求得，令结果为0，解得<br/>
+\[<br/>
+\begin{align*}<br/>
+\beta = (\mathbf Z^T\mathbf Z)^{-1}\mathbf Z^Ty<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>矩阵 \(\mathbf Z\) 的大小是 \(N\times N\)，是一个方阵。而且，由于 \(\mathbf Z\) 中每个向量 \(z_i\) 表示该点与其它所有点的RBF 距离，所以从形式上来说，\(\mathbf Z\) 也是对称矩阵。如果所有的样本点 \(x_i\) 都不一样，则 \(\mathbf Z\)一定是可逆的。</p>
+
+<p>如果 \(\mathbf Z\) 是对称矩阵<br/>
+\[<br/>
+\beta = (\mathbf Z^T\mathbf Z)^{-1}\mathbf Z^Ty = (\mathbf Z^T\mathbf Z)^{-1}\mathbf Z^T\mathbf Z^{-1}y = \mathbf Z^{-1}y<br/>
+\]</p>
+
+<p>因为 \(\mathbf Z\) 是对称矩阵，所以 \(\mathbf Z^{-1}\) 也是对称矩阵，所以<br/>
+\[<br/>
+g_{RBF}(x) = \beta^T \mathbf Z = (\mathbf Z^{-1}y)^T \mathbf Z = \mathbf Z^{-1} \mathbf Z y = y<br/>
+\]</p>
+
+<p>这里模型的输出与原样本的标签一模一样，所以模型的误差为0，这很有可能会增加模型的复杂度和过拟合。为了解决过拟合，这里可以参考岭回归，使用 \(L^2\) 正则化<br/>
+\[<br/>
+\beta = (\mathbf Z^T\mathbf Z + \lambda I)\mathbf Z^T y<br/>
+\]</p>
+
+<h4 id="toc_4">K-Means 方法</h4>
+
+<p>将上面的方法改变一下，现在我们从训练样本集中随机选择 \(M\)（\(M\lt N\)）个样本作为 \(M\)个径向基函数的中心。更好的办法是这 \(m\) 个样本使用KNN的方式来选取，在Full RBF中，我们计算所有的训练数据与新数据的距离，距离最小的与新数据的相似度最高，而且高斯函数衰减很快，距离新数据远的点对它的影响很小，因此我们可以忽略那些距离较远的点，只需要找到几个最靠近新数据的点，然后只计算它们的贡献即可，假设我们找最近的K个点的话，那就是K近邻算法。这种类型的算法在训练的时候，不用花力气，但是再做测试或者预测的时候，需要对比全部的数据，然后找到几个最近的，计算这几个的贡献得到最后结果，这个过程跟上面的Full RBF 一样，计算量很大。因此这种方式经常在样本数据较少的时候使用。</p>
+
+<p>下面重新给出使用K-Means的RBF Net用来做预测回归的流程:</p>
+
+<ol>
+<li>运行 K-Means 获得 \(k=M\) 个中心点 \(c_m\)</li>
+<li>使用 RBF 在 \(c_m\) 构造转换 \(\phi(x)\)
+\[
+\phi(x) = [RBF(x,c_1),RBF(x,c_2),...,RBF(x,c_m)]
+\]</li>
+<li>在 \(\{\phi(x_i),y_i\}\) 上建立线性模型，获取 \(\beta\)。</li>
+<li>返回\[
+g_{RBF}(x) = \text{LinearHypothesis}(\beta,\phi(x))
+\]</li>
+</ol>
+
+<p>这个过程与上面唯一不同的地方就是，开始先使用K-Means得到了中心，然后再计算特征转换的 \(Z\) 矩阵，其余步骤完全相同。</p>
+
+<h3 id="toc_5">RBF神经网络的方差的选择</h3>
+
+<p>RBF神经网络的基函数为高斯函数，方差 \(\sigma_i\) 可由下式求解得出：<br/>
+\[<br/>
+\sigma_i=\frac{c_{max}}{2M},i=1,2,⋯,M<br/>
+\]</p>
+
+<p>其中 \(c_{max}\) 是所选取中心之间的最大距离。</p>
+
+<hr/>
+
+<p><a href="http://www.cnblogs.com/zhangchaoyang/articles/2591663.html">径向基（RBF）神经网络</a><br/>
+<a href="https://blog.csdn.net/zouxy09/article/details/13297881">径向基网络（RBF network）之BP监督训练</a><br/>
+<a href="https://blog.csdn.net/sunxinyu/article/details/76598446">RBF神经网络与BP神经网络优缺点比较</a><br/>
+<a href="https://shomy.top/2017/02/26/rbf-network/">机器学习技法笔记(6)-RBF Network(径向基函数网络)</a><br/>
+<a href="https://github.com/ShomyLiu/stat-learn/tree/master/RBFNet">Numpy版KMeans+RBFNet 与 TensorFlow版KMeans+RBFNet的完整代码</a><br/>
+<a href="http://read.pudn.com/downloads110/sourcecode/others/454289/Paper/pdf/y9935500004.pdf">第3章 RBF神经网络的基本原理</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15279303888267.html">随机梯度下降法的变化形式</a></h1>
+			<p class="meta"><time datetime="2018-06-02T17:06:28+08:00" 
+			pubdate data-updated="true">2018/6/2</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>通过反向传播进行的随机梯度下降已经有很好的效果。然而，还有很多其他的观点来优化代价函数，有时候，这些方法能够带来比在小批量的随机梯度下降更好的效果。在这之前，我们先看一下梯度下降法（GD）、批量梯度下降法（BGD）和随机梯度下降法（SGD）。</p>
+
+<h3 id="toc_0">梯度下降法（GD）</h3>
+
+<p>梯度下降算法（Gradient Descent Optimization）是神经网络模型训练最常用的优化算法。目标函数 \(J(w)\) 是关于 \(w\) 的函数，梯度将是目标函数上升最快的方向。对于最小化优化问题，只需要将参数沿着梯度相反的方向前进一个步长，就可以实现目标函数的下降。这个步长又称为学习速率 \(\eta\)。公式如下<br/>
+\[<br/>
+w \leftarrow w - \eta \frac{\partial J}{\partial w} <br/>
+\]</p>
+
+<p>几何意义如下图所示：</p>
+
+<div align="center">
+    <img width="300" src="media/15279303888267/15370651197093.jpg" />
+</div>
+
+<p>在 H 点的导数小于0，梯度向下，H 点将增大靠近最低点，在 F 点的导数大于0，梯度向上，F 点需要减小靠近最低。点。</p>
+
+<p>关于梯度下降法，我们需要知道：<br/>
+1）梯度下降不一定可以收敛到最小值。</p>
+
+<div align="center">
+    <img width="400" src="media/15279303888267/15370667266792.jpg" />
+</div>
+
+<p>2）学习率的大小要适中。</p>
+
+<div align="center">
+    <img width="200" src="media/15279303888267/15370672033462.jpg" />
+</div>
+
+<h3 id="toc_1">批量梯度下降法（BGD）</h3>
+
+<p>在神经网络训练中，往往代价函数是多个参数的函数，训练样本也是数以万计的，批量梯度下降法的具体作法是在更新参数时使用所有的样本来进行更新。设 \(h(x)\) 是要拟合的函数，\(m\) 是训练样本的数量，代价函数假设为二次代价函数：<br/>
+\[<br/>
+\begin{align}<br/>
+J(w) = \frac 1 m \sum_{i=1}^m \Big(\frac 1 2  [h(x^i) - y^i]^2\Big)\label{j1m}\\<br/>
+w_j \leftarrow w_j - \eta \frac{\partial J(w)}{\partial w_j}\label{wlw}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>其中 \(x^i\) 是第 \(i\) 个训练样本。</p>
+
+<p>以二次代价函数为例，求<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial J(w)}{\partial w_j} &amp;= \frac{\partial}{\partial w_j} \frac{1}{2m} \sum_{i=1}^m [h(x^i) - y^i]^2\\<br/>
+&amp;= \frac{1}{m} \sum_{i=1}^m [h(x^i) - y^i]\frac{\partial h(x^i)}{\partial w_j} \\<br/>
+&amp;= \frac{1}{m} \sum_{i=1}^m [h(x^i) - y^i]x^i_j \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>上式代入式(\ref{wlw}) 得<br/>
+\[<br/>
+w_j \leftarrow w_j - \eta \frac{1}{m} \sum_{i=1}^m [h(x^i) - y^i]x^i_j<br/>
+\]</p>
+
+<p>由上式知批量梯度下降是对所有样本进行计算，复杂度高，因此引入了另外一种算法。</p>
+
+<h3 id="toc_2">随机梯度下降法（SGD）</h3>
+
+<p>由于批量梯度下降每跟新一个参数的时候，要用到所有的样本数，所以训练速度会随着样本数量的增加而变得非常缓慢。随机梯度下降正是为了解决这个办法而提出的。它是利用每个样本的损失函数对 \(w_j\) 求偏导得到对应的梯度，来更新 \(w_j\) ，还是以二次代价函数为例：</p>
+
+<p>\[<br/>
+J(w) = \frac 1 2 [h(x^i) - y^i]^2\\<br/>
+\frac{\partial J(w)}{\partial w_j} = [h(x^i) - y^i] x^i_j<br/>
+\]</p>
+
+<p>对于训练速度来说，随机梯度下降法由于每次仅仅采用一个样本来迭代，训练速度很快，而批量梯度下降法在样本量很大的时候，训练速度不能让人满意。对于准确度来说，随机梯度下降法用于仅仅用一个样本决定梯度方向，导致解很有可能不是最优（噪音数据处理不好）。对于收敛速度来说，由于随机梯度下降法一次迭代一个样本，导致迭代方向变化很大，不能很快的收敛到局部最优解。</p>
+
+<h3 id="toc_3">小批量梯度下降法（Mini-BGD）</h3>
+
+<p>小批量梯度下降法是批量梯度下降法和随机梯度下降法的折衷，也就是对于 \(m\) 个样本，我们采用 \(n\) 个样子来迭代，\(1&lt;n&lt;m\)。一般可以取 \(n=10\) ，当然根据样本的数据，可以调整这个 \(n\) 的值。以二次代价函数为例，对应的更新公式是：<br/>
+\[<br/>
+J(w) = \frac 1 n \sum_{i=t}^{t+n-1} [\frac 1 2 h(x^i) - y^i]^2\\<br/>
+\frac{\partial J(w)}{\partial w_j} = \frac{1}{n} \sum_{i=t}^{t+n-1} [h(x^i) - y^i]x^i_j<br/>
+\]</p>
+
+<p>其中 \(t\) 表示第 \(t\) 次迭代。</p>
+
+<p>现在开始讲解随机梯度下降的变化形式。</p>
+
+<h3 id="toc_4">牛顿法（Hessian 技术）</h3>
+
+<p>代价函数 \(C\) 是多个参数的函数，\(w = (w_1, w_2,...,w_n)^T\)，所以 \(C = C(w)\)。 借助于泰勒展开式，代价函数可以在点 \(w^0=(w^0_1,w^0_2,...,w^0_n)^T\) 处被近似为:</p>
+
+<p>\[<br/>
+C(w) = C(w_0) + \sum_j \frac{\partial C}{\partial w_j} (w^j - w_0^j) + \frac{1}{2!} \sum_{j,k} \triangle (w^j - w_0^j)(w^k - w_0^k )\frac{\partial^2 C}{\partial w_j \partial w_k}  + o^n<br/>
+\]</p>
+
+<p>令 \(\triangle w = w-w^0\)，我们可以将其压缩为:<br/>
+\[<br/>
+C(w^0 + \triangle w) = C(w^0) + \nabla C \triangle w + \frac 1 2 \triangle {w}^T H \triangle w + o^n<br/>
+\]</p>
+
+<p>其中 \(\nabla C\) 是通常的梯度向量，\(H\) 就是矩阵形式的 <strong>Hessian 矩阵</strong>，其中 jk-th 项就是 \(\frac{\partial^2 C}{\partial w_j \partial w_k}\)<br/>
+\[<br/>
+H = \left [\begin{array}{cccccc}<br/>
+\frac{\partial^2 C}{\partial w_1\partial w_1}&amp;\frac{\partial^2 C}{\partial w_1\partial w_2}&amp;\cdots&amp;\frac{\partial^2 C}{\partial w_1\partial w_k}&amp;\cdots&amp;\frac{\partial^2 C}{\partial w_1 \partial w_n}\\<br/>
+\frac{\partial^2 C}{\partial w_2\partial w_1}&amp;\frac{\partial^2 C}{\partial w_2\partial w_2}&amp;\cdots&amp;\frac{\partial^2 C}{\partial w_2\partial w_k}&amp;\cdots&amp;\frac{\partial^2 C}{\partial w_2 \partial w_n}\\<br/>
+\vdots&amp;\vdots&amp;\ddots&amp;\vdots&amp;\ddots&amp;\vdots\\<br/>
+\frac{\partial^2 C}{\partial w_j\partial w_1}&amp;\frac{\partial^2 C}{\partial w_j\partial w_2}&amp;\cdots&amp;\frac{\partial^2 C}{\partial w_j\partial w_k}&amp;\cdots&amp;\frac{\partial^2 C}{\partial w_j \partial w_n}\\<br/>
+\vdots&amp;\vdots&amp;\ddots&amp;\vdots&amp;\ddots&amp;\vdots\\<br/>
+\frac{\partial^2 C}{\partial w_n\partial w_1}&amp;\frac{\partial^2 C}{\partial w_n\partial w_2}&amp;\cdots&amp;\frac{\partial^2 C}{\partial w_n\partial w_k}&amp;\cdots&amp;\frac{\partial^2 C}{\partial w_n \partial w_n}\\<br/>
+\end{array} \right ]<br/>
+\]</p>
+
+<p>假设我们通过丢弃更高阶的项来近似 \(C\)：<br/>
+\[<br/>
+\begin{equation}<br/>
+C(w^0 + \triangle w) \approx C(w^0) + \nabla C \triangle w + \frac 1 2 \triangle {w}^T H \triangle w \label{cwap}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>由极值条件必要条件可知，\(C(w^0+\triangle w)\) 求得最优解时，\(C′(w^0 + \triangle w)\) 应满足 <br/>
+\[<br/>
+C′(w^0+\triangle w)=0<br/>
+\]</p>
+
+<p>对式(\ref{cwap})两边求导，可以求得 \(\nabla C\)<br/>
+\[<br/>
+C′(w^0+\triangle w) = \nabla C + H \triangle w = 0<br/>
+\]</p>
+
+<blockquote>
+<p>对 \(w\) 两边求导<br/>
+\[<br/>
+\frac{\partial C}{\partial w} = \frac{\partial C}{\partial \triangle w} \frac{\partial \triangle w}{\partial w}  = \frac{\partial C}{\partial \triangle w} \frac{\partial}{\partial w}(w-w^0)  = \frac{\partial C}{\triangle w}<br/>
+\]</p>
+</blockquote>
+
+<p>如果海森矩阵是正定的<br/>
+\[<br/>
+\triangle w = -H^{-1}\nabla C<br/>
+\]</p>
+
+<p>因此利用牛顿法进行迭代的过程就是</p>
+
+<ol>
+<li>选择开始点 \(w^0\)；</li>
+<li>更新 \(w^0\) 到新点 \(w^1=w^0−H^{−1}\nabla C\)，其中的 \(H\) 和 \(\nabla C\) 是在 \(w^0\) 处计算出来的；</li>
+<li>更新 \(w^1\) 到新点 \(w^2=w^1−H^{−1}\nabla C\)，其中的 \(H\) 和 \(\nabla C\) 是在 \(w^1\) 处计算出来的。</li>
+<li>...</li>
+</ol>
+
+<p>实际应用中，(\ref{cwap}) 是唯一的近似，并且选择更小的步⻓会更好。我们通过重复地使用改变 量 \(\triangle w = −\eta H^{−1}\nabla C\) 来改变 \(w\)，其中 \(\eta\) 是学习速率。</p>
+
+<p>这个最小化代价函数的方法常常被称为 Hessian 技术或者 Hessian 优化。在理论上和实践中的结果都表明 Hessian 方法比标准的梯度下降方法收敛速度更快。特别地，通过引入代价函数的二阶变化信息，可以让 Hessian 方法避免在梯度下降中常碰到的多路径(pathologies)问题。 而且，反向传播算法的有些版本也可以用于计算 Hessian。</p>
+
+<p>如果 Hessian 优化这么厉害，为何我们这里不使用它呢?不幸的是，尽管 Hessian 优化有很多可取的特性，它其实还有一个不好的地方:在实践中很难应用。这个问题的部分原因在于 Hessian 矩阵的太大了。假设你有一个 \(10^7\) 个权重和偏置的网络。那么对应的 Hessian 矩阵会有 \(10^7 \times 10^7 = 10^{14}\) 个元素。这真的是太大了!所以在实践中，计算 \(H^{−1}\nabla C\) 就极其困难。不过， 这并不表示学习理解它没有用了。实际上，有很多受到 Hessian 优化启发的梯度下降的变种，能避免产生太大矩阵的问题。让我们看看其中一个称为基于 momentum 梯度下降的方法。</p>
+
+<h3 id="toc_5">基于 momentum 的梯度下降</h3>
+
+<p>直觉上看，Hessian 优化的优点是它不仅仅考虑了梯度，而且还包含梯度如何变化的信息。基于 momentum 的梯度下降就基于这个直觉，但是避免了二阶导数的矩阵的出现。为了理解 momentum 技术，想想我们关于梯度下降的原始图片，其中我们研究了一个球滚向山谷的场景。那时候，我们发现梯度下降，除了这个名字外，就类似于球滚向山谷的底部。momentum 技术修改了梯度下降的两处使之类似于这个物理场景。首先，为我们想要优化的参数引入了一个称为速度(velocity)的概念。梯度的作用就是改变速度，而不是直接的改变位置，就如同物理学中的力改变速度，只会间接地影响位置。第二，momentum 方法引入了一种摩擦力的项，用来逐步地减少速度。</p>
+
+<p>让我们给出更加准确的数学描述。我们引入对每个权重 \(w_j\) 设置相应的速度变量 \(v = v_1, v_2,...\)。 注意，这里的权重也可以笼统地包含偏置。然后我们将梯度下降更新规则 \(w \leftarrow w − \eta \nabla C\)，改成<br/>
+\[<br/>
+\begin{align*}<br/>
+v &amp;\leftarrow \mu v - \eta\nabla C\\<br/>
+w &amp;\leftarrow w + v<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>在这些方程中，\(\mu\) 是用来控制阻碍或者摩擦力的量的超参数。为了理解这个公式，可以考虑一下当 \(\mu = 1\) 的时候，对应于没有任何摩擦力。所以，此时你可以看到力 \(\nabla C\) 改变了速度 \(v\)，速度随后再控制 \(w\) 变化率。直觉上看，我们通过重复地增加梯度项来构造速度。这表示，如果梯度在某些学习的过程中几乎在同样的方向，我们可以得到在那个方向上比较大的移动量。</p>
+
+<div align="center">
+    <img width="300" src="media/15279303888267/15370754583882.jpg" />
+</div>
+
+<p>相比普通梯度向下，在K点可以凭借之前的速度，令其在这部分参数更新的速度得以增加；同样在I点能凭借之前的速度跨过鞍点；最后在局部最小值J点中，也可能凭借之前的速度跨过。所以基于Momentum的梯度下降虽然不能保证得到一个全局最小值，但是至少给了我们可能性。</p>
+
+<p>前面提到，\(\mu\) 可以控制系统中的摩擦力大小;更加准确地说，你应该将 \(1 − \mu\) 看成是摩擦力的量。当 \(\mu = 1\) 时，没有摩擦，速度完全由梯度 \(\nabla C\) 决定。相反，若是 \(\mu = 0\)，就存在很大的摩擦，速度无法叠加，变成普通的梯度下降。使用 0 和 1 之间的 \(\mu\) 值可以给我们避免过量而又能够叠加速度的好处。我们可以使用 hold out 验证数据集来选择合适的 \(\mu\) 值。</p>
+
+<p>关于 momentum 技术的一个很好的特点是它基本上不需要改变太多梯度下降的代码就可以 实现。我们可以继续使用反向传播来计算梯度，就和前面那样，使用随机选择的 minibatch 的方法。</p>
+
+<p>同样这种方法也有着自身的两个缺点：首先容易跨过全局最小点，其次可能因为惯性过大造成在应该改变梯度（主要指的是下降方向）时无法及时改变。</p>
+
+<h5 id="toc_6">Momentum算法步骤</h5>
+
+<p><strong>输入</strong>：学习率 \(\eta\)，动量参数 \(\mu\)，初始参数 \(w\)，初始速度 \(v\)<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li>while 没有达到停止准则 do
+
+<ul>
+<li>从训练集中采包含 \(m\) 个样本 \(\{x^{(i)},...,x^{(m)}\}\) 的小批量，对应目标为 \(y^{(i)}\)</li>
+<li>计算梯度（在临时点）：\(g\leftarrow \frac 1 m \nabla_{w}\sum_i C(f(x^{(i)};w),y^{(i)})\)</li>
+<li>计算速度更新：\(v \leftarrow \mu v - \eta g\)</li>
+<li>应用更新：\(w \leftarrow w + v\)</li>
+</ul></li>
+<li>end while</li>
+</ul>
+
+<h3 id="toc_7">NAG（Nesterov&#39;s accelerated gradient 涅斯捷罗夫加速梯度下降）</h3>
+
+<p>从山顶往下滚的球会盲目地选择斜坡。更好的方式应该是在遇到倾斜向上之前应该减慢速度。NAG 不仅增加了动量项，并且在计算参数的梯度时，在损失函数中减去了动量项，即计算<br/>
+\[<br/>
+\begin{align*}<br/>
+g^{(t)} &amp;= \nabla C(w^{(t-1)} + \mu v^{(t-1)})\\<br/>
+v^{(t)} &amp;\leftarrow \mu v^{(t-1)} - \eta g^{(t)}\\<br/>
+w^{(t)} &amp;\leftarrow w^{(t-1)} + v_t \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>这种方式首先预估了下一次参数所在的位置，再加上动量项，这样可以阻止过快更新来提高响应性。NAG可以看作是Momentum的改进版，对于这个改动，很多文章给出的解释是，能够让算法提前看到前方的地形梯度，如果前面的梯度比当前位置的梯度大，那我就可以把步子迈得比原来大一些，如果前面的梯度比现在的梯度小，那我就可以把步子迈得小一些。这个大一些、小一些，都是相对于原来不看前方梯度、只看当前位置梯度的情况来说的。</p>
+
+<div align="center">
+    <img width="270" src="media/15279303888267/15370787141104.jpg" />
+</div>
+
+<p>在点H的梯度更新不仅看到当前的梯度和加速度，还能考虑到下一步的梯度，提前做出改变。</p>
+
+<h5 id="toc_8">NAG算法步骤</h5>
+
+<p><strong>输入</strong>：学习率 \(\eta\)，动量参数 \(\mu\)，初始参数 \(w\)，初始速度 \(v\)<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li>while 没有达到停止准则 do
+
+<ul>
+<li>从训练集中采包含 \(m\) 个样本 \(\{x^{(i)},...,x^{(m)}\}\) 的小批量，对应目标为 \(y^{(i)}\)</li>
+<li>应用临时更新：\(\widetilde w \leftarrow w + \mu v\)</li>
+<li>计算梯度（在临时点）：\(g\leftarrow \frac 1 m \nabla_{\widetilde w}\sum_i C(f(x^{(i)};\widetilde w),y^{(i)})\)</li>
+<li>计算速度更新：\(v \leftarrow \mu v - \eta g\)</li>
+<li>应用更新：\(w \leftarrow w + v\)</li>
+</ul></li>
+<li>end while</li>
+</ul>
+
+<h3 id="toc_9">AdaGrad算法</h3>
+
+<p>在上面的参数更新中，都是固定了学习率 \(\eta\)，而Adagrad方法是通过参数来调整合适的学习率 \(\eta\)，对稀疏参数进行大幅更新和对频繁参数进行小幅更新。因此，Adagrad方法非常适合处理稀疏数据。</p>
+
+<p>对于 AdaGrad 算法而言在 t 时刻对每一个参数 \(w_i\) 都使用了不同的学习率，我们首先介绍 AdaGrad 对每一个参数的更新，然后我们对其向量化。为了简洁，令 \(g_{t,i}\) 表示 t 时刻目标函数关于参数 \(w_i\) 的梯度<br/>
+\[<br/>
+g_{t,i} = \nabla_w C(w_i)<br/>
+\]</p>
+
+<p>在 t 时刻，对每一个参数 \(w_i\) 的更新过程变为：<br/>
+\[<br/>
+w_{t+1,i} = w_{t,i} - \eta\cdot g_{t,i}<br/>
+\]</p>
+
+<p>基于上述对 \(w_i\) 计算过的历史梯度，AdaGrad 修正了对每一个参数 \(w_i\) 的学习率：<br/>
+\[<br/>
+w_{t+1,i} \leftarrow w_{t,i} - \frac{\eta}{\sqrt{G_{t,ii} + \epsilon}}\cdot g_{t,i}<br/>
+\]</p>
+
+<p>\(G_t \in \mathbb R^{d\times d}\) 为一个对角矩阵，<strong>对角线上第 \(i,i\) 个元素为 \(w_i\) 的梯度由开始到当前时刻的平方和</strong>。\(\epsilon\) 通常为 \(10^{-7}\)，这是为了保证分母非0。如果不使用开方的话，该算法性能会差很多。</p>
+
+<p>因为 \(G_t\) 在其对角线上所有参数 \(w\) 的历史梯度的平方和，我们可以通过 \(G_t\) 和 \(g_t\) 向量乘法 \(\odot\)，将我们的表达式向量化：<br/>
+\[<br/>
+w_{t+1} \leftarrow w_{t} - \frac{\eta}{\sqrt{G_{t} + \epsilon}}\odot g_{t}<br/>
+\]</p>
+
+<p>该算法优点是自适应的调整学习率。一般初始学习率设置为0.01。</p>
+
+<p>该算法的缺点是，分母中需要计算每个参数梯度的累计平方和，由于每次均累加一个正数，训练阶段累积和会持续增加，导致训练后期的学习率非常小，以至更新时不能从当前的梯度获取任何有用信息（另外，更新参数时，左右两边的单位不统一）。下面的算法 Adadelta 等可以解决这个问题。</p>
+
+<h5 id="toc_10">AdaGrad算法步骤</h5>
+
+<p><strong>输入</strong>：全局学习率 \(\eta\)，初始参数 \(w\)，小参数  \(\epsilon\)，一般设置为 \(10^{-7}\)<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li>初始化梯度数据 \(r=0\)</li>
+<li>while 没有达到体质准则 do
+
+<ul>
+<li>从训练集中采样 \(m\) 个样本 \(\{x^{(1)},...,x^{(m)}\}\) 的小批量，对应目标为 \(y^{(i)}\)</li>
+<li>计算梯度：\(g\leftarrow \frac 1 m \nabla_{w}\sum_{i} C(f(x^{(i)};w),y^{(i)})\)</li>
+<li>累积平方梯度：\(r\leftarrow r+g\odot g\)</li>
+<li>计算参数更新：\(\triangle w \leftarrow -\frac{\eta}{\sqrt{r+ \epsilon}}\odot g\)</li>
+<li>应用更新：\(w \leftarrow w + \triangle w\)</li>
+</ul></li>
+<li>end while</li>
+</ul>
+
+<h3 id="toc_11">RMSprop算法</h3>
+
+<p>鉴于神经网络都是非凸条件下的，RMSProp在非凸条件下结果更好，改变梯度累积为指数衰减的移动平均以丢弃遥远的过去历史。经验上，RMSProp被证明有效且实用的深度学习网络优化算法。目前 它是深度学习从业者经常采用的优化方法之一。</p>
+
+<p>相比于AdaGrad算法的历史梯度：<br/>
+\[<br/>
+r \leftarrow r + g\odot g<br/>
+\]</p>
+
+<p>RMSProp增加了一个衰减系数来控制历史信息的获取多少： <br/>
+\[<br/>
+r \leftarrow \rho r + (1-\rho) g\odot g<br/>
+\]</p>
+
+<h5 id="toc_12">原生的RMSprop算法</h5>
+
+<p><strong>输入</strong>：全局学习率 \(\eta\)，衰减系数 \(\rho\)（建议设置为0.9），初始参数 \(w\)，小参数  \(\epsilon\)，一般设置为 \(10^{-6}\)（用于被小数除时的数值稳定）<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li>初始化累积梯度数据 \(r=0\)</li>
+<li>while 没有达到体质准则 do
+
+<ul>
+<li>从训练集中采样 \(m\) 个样本 \(\{x^{(1)},...,x^{(m)}\}\) 的小批量，对应目标为 \(y^{(i)}\)</li>
+<li>计算梯度：\(g\leftarrow \frac 1 m \nabla_{w}\sum_{i} C(f(x^{(i)};w),y^{(i)})\)</li>
+<li>累积平方梯度：\(r \leftarrow \rho r + (1-\rho) g\odot g\)</li>
+<li>计算参数更新：\(\triangle w \leftarrow -\frac{\eta}{\sqrt{r + \epsilon}}\odot g\)</li>
+<li>应用更新：\(w \leftarrow w + \triangle w\)</li>
+</ul></li>
+<li>end while</li>
+</ul>
+
+<p>再看看结合Nesterov动量的RMSProp，直观上理解就是： <br/>
+RMSProp改变了学习率，Nesterov引入动量改变了梯度，从两方面改进更新方式。 </p>
+
+<h5 id="toc_13">加入Nesterov动量的RMSprop算法</h5>
+
+<p><strong>输入</strong>：全局学习率 \(\eta\)，衰减系数 \(\rho\)（建议设置为0.9），动量系数 \(\mu\)，初始参数 \(w\)<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li>初始化累积梯度数据 \(r=0\)</li>
+<li>while 没有达到体质准则 do
+
+<ul>
+<li>从训练集中采样 \(m\) 个样本 \(\{x^{(1)},...,x^{(m)}\}\) 的小批量，对应目标为 \(y^{(i)}\)</li>
+<li>计算临时更新： \(\widetilde w \leftarrow w + \mu v\)</li>
+<li>计算梯度（在临时点）：\(g\leftarrow \frac 1 m \nabla_{\widetilde w}\sum_{i} C(f(x^{(i)};\widetilde w),y^{(i)})\)</li>
+<li>累积平方梯度：\(r \leftarrow \rho r + (1-\rho) g\odot g\)</li>
+<li>计算速度更新：\(v\leftarrow \mu v - \frac{\epsilon}{\sqrt{r}}\odot g\)</li>
+<li>应用更新：\(w \leftarrow w + v\)</li>
+</ul></li>
+<li>end while</li>
+</ul>
+
+<h3 id="toc_14">Adadelta算法</h3>
+
+<p>Adadelta 类似于RMSprop也使用小批量随机梯度按元素平方的指数加权移动平均变量 \(r\)，设在时刻 \(t\) (前面的 \(r\) 这里用 \(\mathbb E[g^2]_t\) 表示)：<br/>
+\[<br/>
+\mathbb E[g^2]_t \leftarrow \rho \mathbb E[g^2]_{t-1} + (1-\rho) g_t\odot g_t<br/>
+\]</p>
+
+<p>再求它的平方根，下面记为 \(RMS[g]_t\)<br/>
+\[<br/>
+RMS[g]_t = \sqrt{\mathbb E[g^2]_t + \epsilon}<br/>
+\]</p>
+
+<p>AdaDelta算法的作者注意到SGD、Momentum、AdaGrad和RMSProp等算法在参数更新时，单位并不匹配，他认为更新应该和参数应有相同的假想单位，为了实现这一想法，AdaDelta在RMSProp的基础上，还考虑了参数更新的指数衰减累积平方和<br/>
+\[<br/>
+\mathbb E[\triangle w^2]_t \leftarrow \rho \mathbb E[\triangle w^2]_{t-1} + (1-\rho) \triangle w_t^2<br/>
+\]</p>
+
+<p>同理，记<br/>
+\[<br/>
+RMS[\triangle w]_t = \sqrt{\mathbb E[\triangle w^2]_t + \epsilon}<br/>
+\]</p>
+
+<p>Adadelta 算法使用 \(RMS[\triangle w]_t\) 来代替学习率 \(\eta\)，直接采用<br/>
+\[<br/>
+\begin{align*}<br/>
+\triangle w_t &amp;\leftarrow -\frac{\sqrt{\mathbb E[\triangle w^2]_{t-1} + \epsilon}}{\sqrt{\mathbb E[g^2]_t + \epsilon}}\odot g_t\\<br/>
+&amp;= -\frac{RMS[\triangle w]_{t-1}}{RMS[g]_t }\odot g_t\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>最后更新<br/>
+\[<br/>
+w_{t+1} \leftarrow w_{t} + \triangle w_t<br/>
+\]</p>
+
+<h5 id="toc_15">Adadelta算法步骤</h5>
+
+<p><strong>输入</strong>：衰减系数 \(\rho\)（建议设置为0.9），初始参数 \(w\)，小参数  \(\epsilon\)，一般设置为 \(10^{-6}\)（用于被小数除时的数值稳定）<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li>初始化累积梯度数据 \(r=0\)</li>
+<li>初始化累积参数更新数据 \(s=0\)</li>
+<li>while 没有达到体质准则 do
+
+<ul>
+<li>从训练集中采样 \(m\) 个样本 \(\{x^{(1)},...,x^{(m)}\}\) 的小批量，对应目标为 \(y^{(i)}\)</li>
+<li>计算梯度：\(g\leftarrow \frac 1 m \nabla_{w}\sum_{i} C(f(x^{(i)};w),y^{(i)})\)</li>
+<li>累积平方梯度：\(r \leftarrow \rho r + (1-\rho) g\odot g\)</li>
+<li>计算参数更新：\(\triangle w \leftarrow -\frac{\sqrt{s+\epsilon}}{\sqrt{r + \epsilon}}\odot g\)</li>
+<li>累加平方参数更新：\(s \leftarrow \rho s + (1-\rho) \triangle w^2\)</li>
+<li>应用更新：\(w \leftarrow w + \triangle w\)</li>
+</ul></li>
+<li>end while</li>
+</ul>
+
+<h3 id="toc_16">Adam（Adaptive Moment Estimation）</h3>
+
+<p>Adam算法即自适应时刻估计方法（Adaptive Moment Estimation），能计算每个参数的自适应学习率。<strong><font color=red>Adam算法可以看做是修正后的Momentum+RMSProp算法</font></strong>。在实际应用中，Adam方法效果良好。与其他自适应学习率算法相比，其收敛速度更快，学习效果更为有效，而且可以纠正其他优化技术中存在的问题，如学习率消失、收敛过慢或是高方差的参数更新导致损失函数波动较大等问题。学习率建议为0.001。</p>
+
+<h5 id="toc_17">Adam算法步骤</h5>
+
+<p><strong>输入</strong>：步长 \(\eta\)（建议设为0.001），矩估计的指数衰减速率，\(\rho_1\) 和 \(\rho_2\) 在区间 [0,1)内。（建议默认为0.9和0.999），用于数值稳定的小常数 \(\epsilon\)（建议默认为 \(10^-8\)），初始参数 \(w\)<br/>
+<strong>算法过程</strong></p>
+
+<ul>
+<li>初始化一阶和二阶矩变量 \(s=0,r=0\)</li>
+<li>初始化时间 \(t=0\)</li>
+<li>while 没有达到停止准则 do
+
+<ul>
+<li>从训练集中采样 \(m\) 个样本 \(\{x^{(1)},...,x^{(m)}\}\) 的小批量，对应目标为 \(y^{(i)}\)</li>
+<li>计算梯度：\(g\leftarrow \frac 1 m \nabla_{w}\sum_{i} C(f(x^{(i)};w),y^{(i)})\)</li>
+<li>\(t \leftarrow t + 1\)</li>
+<li>更新有偏一阶矩估计：\(s\leftarrow \rho_1 s + (1-\rho_1)g\)<strong><font color=red>　　　　　Momentum项</font></strong></li>
+<li>更新有偏二阶矩估计：\(r\leftarrow \rho_2 r + (1-\rho_2)g\odot g\)<strong><font color=red>　　　RMSProp项</font></strong></li>
+<li>修正一阶矩的偏差：\(\hat s\leftarrow \frac{s}{1-\rho_1^2}\)</li>
+<li>修正二阶矩的偏差：\(\hat r\leftarrow \frac{s}{1-\rho_2^2}\)</li>
+<li>计算参数更新：\(\triangle w = -\frac{\eta}{\sqrt{\hat r}+\epsilon}\hat s\)</li>
+<li>应用更新：\(w\leftarrow w + \triangle w\)</li>
+</ul></li>
+<li>end while</li>
+</ul>
+
+<hr/>
+
+<p>神经网络与深度学习<br/>
+<a href="https://blog.csdn.net/dugudaibo/article/details/77413071">改变神经网络的学习方法（5）：随机梯度下降的变化形式(Adagrad、RMSProp、Adadelta、Momentum、NAG)</a><br/>
+<a href="https://zh.gluon.ai/chapter_optimization/adagrad.html">Adagrad 例子</a><br/>
+<a href="http://zh.gluon.ai/chapter_optimization/adadelta.html">Adadelta</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15272663505619.html">深度学习中正则化</a></h1>
+			<p class="meta"><time datetime="2018-05-26T00:39:10+08:00" 
+			pubdate data-updated="true">2018/5/26</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>在神经网络的训练过程中很容易发生过拟合现象，最好的降低过度拟合的方式之一就是增加训练样本的量。有了足够的训练数据，就算是一个规模非常大的网络也不容易过度拟合。不幸的是，训练数据其实是很难或者很昂贵的资源，所以这不是一种太切实际的选择。</p>
+
+<p>还有一种可行的方式就是降低网络的规模。然而，大的网络拥有一种小的网络更强的潜力，所以这里存在一种应用冗余性的选项。幸运的是，还有其他的技术能够缓解过度拟合，即使我们只有一个固定的网络和固定的训练集合。这种技术就是正则化。</p>
+
+<h3 id="toc_0">正则化方法</h3>
+
+<p>正则化技术不仅可以应用在神经网络中，线性模型，如线性回归和逻辑回归都可以使用简单、直接、有效的正则化策略。在SVM中和决策树上就有这方面的应用。</p>
+
+<p>许多正则化方法通过对目标函数 \(J\) 假设一个参数范数惩罚 \(\Omega(\theta)\) 限制模型的学习能力。我们将正则化后的目标函数记为 \(\widetilde J\)：<br/>
+\[<br/>
+\widetilde J = J + \alpha\Omega(\theta)<br/>
+\]</p>
+
+<p>其中 \(\alpha\in [0,\infty)\) 是权衡范数惩罚项 \(\Omega\) 和标准目标函数 \(J\) 相对贡献的超参数。将 \(\alpha\) 设为0表示没有正则化。 \(\alpha\) 越大，对应正则化惩罚越大。</p>
+
+<p>当我们的训练算法最小化正则化后的目标函数 \(\widetilde J\) 时，它会降低原始目标 \(J\) 关于训练数据的误差并同时减小在某些衡量标准下参数 \(\theta\)（或参数子集）的规模。选择不同的参数范数 \(\Omega\) 会偏好不同的解。</p>
+
+<p>在神经网络中，参数包括每一层仿射变换的权重和偏置，我们通常只对权重做惩罚而不对偏置做正则惩罚。精确拟合偏置所需的数据通常比拟合权重少得多。每个权重会指定两个变量如何相互作用。我们需要在各种条件下观察这两个变量才能良好地拟合权重。而每个偏置仅控制一个单变量。这意味着，我们不对其进行正则化也不会导致太大的方差。另外，正则化偏置参数可能会导致明显的欠拟合。因此，我们使用向量 \(w\) 表示所有应受范数惩罚影响的权重，而向量 \(\theta\) 表示所有参数 (包括 \(w\) 和无需正则化的参数)。</p>
+
+<p>在神经网络的情况下，有时希望对网络的每一层使用单独的惩罚，并分配不同的 \(\alpha\) 系数。寻找合适的多个超参数的代价很大，因此为了减少搜索空间，我们会在所有层使用相同的权重衰减。</p>
+
+<h4 id="toc_1">\(L^2\) 正则化（权重衰减）</h4>
+
+<p>\(L^2\)正则化就是在代价函数 \(J\) 后面再加上一个正则化项 \(\Omega(\theta) = \frac{1}{2}||w||_2^2\) ：</p>
+
+<p>\[<br/>
+\widetilde J = J + \frac{\alpha}{2}w^T w <br/>
+\]</p>
+
+<p>与之对应梯度为：<br/>
+\[<br/>
+\nabla_w \widetilde J = \nabla_w J + \alpha w<br/>
+\]</p>
+
+<p>使用单步梯度下降更新权重，即执行以下更新:<br/>
+\[<br/>
+w \leftarrow w − \eta(\alpha w + \nabla_w J)<br/>
+\]</p>
+
+<p>换种写法就是:<br/>
+\[<br/>
+w \leftarrow (1 − \eta \alpha)w − \eta \nabla_w J<br/>
+\]</p>
+
+<p>我们可以看到，加入权重衰减后会引起学习规则的修改，即在每步执行通常的梯度更新之前先收缩权重向量（将权重向量乘以一个常数因子）。</p>
+
+<p>我们进一步简化分析，令 \(w^∗\) 为未正则化的目标函数取得最小训练误差时的权重向量，即 \(w^∗ = \arg\min_w J (w)\)，并在 \(w^∗\) 的邻域对目标函数做二次近似。如果目标函数确实是二次的（如以均方误差拟合线性回归模型的情况），则该近似是完美的。 近似的 \(\hat J(θ)\) 如下<br/>
+\[<br/>
+\hat J(θ) = J(w^∗) + \frac 1 2 (w − w^∗)^T H(w − w^∗),<br/>
+\]</p>
+
+<p>其中 \(H\) 是 \(J\) 在 \(w^*\) 处计算的 Hessian 矩阵（关于 \(w\)）。因为 \(w^*\) 被定义为最优，即梯度消失为 0，所以该二次近似中没有一阶项。同样地，因为 \(w^*\) 是 \(J\) 中的一个最优点，我们可以得出 \(H\) 是半正定的结论。</p>
+
+<p>当 \(\hat J\) 取得最小时，其梯度<br/>
+\[<br/>
+\nabla_w \hat J(w) = H(w-w^*) <br/>
+\]</p>
+
+<p>为0。</p>
+
+<p>如果我们加上权重衰减梯度之后再来看最小化正则化后的 \(\hat J\)，我们使用 \(\widetilde w\) 表示此时的最优点：<br/>
+\[<br/>
+\begin{align}<br/>
+H(\widetilde w - w^*) + \alpha \widetilde w = 0\nonumber\\<br/>
+(H + \alpha I)\widetilde w = Hw^*\nonumber\\<br/>
+\widetilde w = (H+\alpha I)^{-1}Hw^*\label{wwha}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>当 \(\alpha\) 趋向于 0 时，正则化的解 \(\widetilde w\) 会趋向于 \(w^*\)。因为 \(H\) 是实对称矩阵，我们可以将其分解为一个对角矩阵 \(\Lambda\) 和一组特征向量的标准正交基 \(Q\)，并且有 \(H=Q\Lambda Q^T\)。应用于式 ( \ref{wwha} ) 得<br/>
+\[<br/>
+\begin{align}<br/>
+\widetilde w &amp;= (Q\Lambda Q^T + \alpha I)^{-1} Q\Lambda Q^T w^*\label{wwqq}\\<br/>
+&amp;= [Q(\Lambda + \alpha I)Q^T]^{-1} Q\Lambda Q^Tw^*\label{wwqq2}\\<br/>
+&amp;= Q(\Lambda + \alpha I)^{-1} \Lambda Q^T w^*\label{wwqq3}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>从 ( \ref{wwqq} ) 式到 ( \ref{wwqq2} ) 式是因为</p>
+
+<blockquote>
+<p>正交矩阵和它的转置的乘积是单位矩阵，即 \(Q\) 是正交矩阵，有 \(QQ^T = I\)</p>
+</blockquote>
+
+<p>从 ( \ref{wwqq2} ) 式到 ( \ref{wwqq3} ) 式是因为</p>
+
+<blockquote>
+<p>正交矩阵的转置矩阵等于逆矩阵，即 \(Q\) 是正交矩阵，有 \(Q^T = Q^{-1}\)</p>
+</blockquote>
+
+<p>现在将 \((\Lambda + \alpha I)^{-1} \Lambda\) 分解结算<br/>
+\[<br/>
+\begin{align*}<br/>
+(\Lambda + \alpha I)\Lambda &amp;= \Bigg(\left [ \begin{array}\\\lambda_{1}&amp;&amp;&amp;\\&amp;\lambda_{2}&amp;&amp;\\&amp;&amp;\ddots&amp;\\&amp;&amp;&amp;\lambda_{n}\\ \end{array} \right ] + \alpha \cdot\left [ \begin{array}\\1&amp;&amp;&amp;\\&amp;1&amp;&amp;\\&amp;&amp;\ddots&amp;\\&amp;&amp;&amp;1\\\end{array}\right ] \Bigg)^{-1}\cdot \left [ \begin{array}\\\lambda_{1}&amp;&amp;&amp;\\&amp;\lambda_{2}&amp;&amp;\\&amp;&amp;\ddots&amp;\\&amp;&amp;&amp;\lambda_{n}\\ \end{array} \right ]\\<br/>
+&amp;= \left [ \begin{array}\\\lambda_{1}+\alpha&amp;&amp;&amp;\\&amp;\lambda_{2}+\alpha&amp;&amp;\\&amp;&amp;\ddots&amp;\\&amp;&amp;&amp;\lambda_{n}+\alpha\\\end{array}\right ]^{-1}\cdot \left [ \begin{array}\\\lambda_{1}&amp;&amp;&amp;\\&amp;\lambda_{2}&amp;&amp;\\&amp;&amp;\ddots&amp;\\&amp;&amp;&amp;\lambda_{n}\\ \end{array} \right ]\\<br/>
+&amp;= \left [ \begin{array}\\\frac{1}{\lambda_{1}+\alpha}&amp;&amp;&amp;\\&amp;\frac{1}{\lambda_{2}+\alpha}&amp;&amp;\\&amp;&amp;\ddots&amp;\\&amp;&amp;&amp;\frac{1}{\lambda_{n}+\alpha}\\\end{array}\right ]\cdot \left [ \begin{array}\\\lambda_{1}&amp;&amp;&amp;\\&amp;\lambda_{2}&amp;&amp;\\&amp;&amp;\ddots&amp;\\&amp;&amp;&amp;\lambda_{n}\\ \end{array} \right ]\\<br/>
+&amp;= \left [ \begin{array}\\\frac{\lambda_1}{\lambda_{1}+\alpha}&amp;&amp;&amp;\\&amp;\frac{\lambda_2}{\lambda_{2}+\alpha}&amp;&amp;\\&amp;&amp;\ddots&amp;\\&amp;&amp;&amp;\frac{\lambda_n}{\lambda_{n}+\alpha}\\\end{array}\right]<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>我们可以看到权重衰减的效果是沿着由 \(H\) 的特征向量所定义的轴缩放 \(w^*\)。也就是说，我们会根据 \(\frac{\lambda_i}{\lambda_i + \alpha}\) 因子缩放与 \(H\) 的第 \(i\) 个特征向量对齐的 \(w^*\) 的分量。沿着 \(H\) 特征值较大的方向，\(\lambda_i \gg \alpha\) 时，正则化的影响较小。而 \(\lambda_i \ll \alpha\) 时，此时分量将收缩到几乎为零。</p>
+
+<p>我们借助一张图来看看 \(L^2\) 正则化的效果。</p>
+
+<div align="center">
+    <img width="350" src="media/15272663505619/15380583249307.jpg" />
+</div>
+
+<p>坐标轴右上方是原始目标函数 \(J(w)\) 的等高线，中心 \(w^∗\) 是没有正则化的原始最优解。图中虚线的同心圆是L2正则化项的等高线。在 \(\widetilde w\) 点，这两个竞争目标达到平衡。目标函数 J 的 Hessian 的 第一维特征值很小，当 \(w^∗\) 沿水平方向移动时，目标函数值不会增加的太多，因为目标函数对这个方向没 有强烈的偏好，所以正则化项对该轴具有强烈的影响，正则化项将 \(w_1\) 拉向零；当 \(w^∗\) 沿竖直方向移动时，目标函数值变化比较剧烈，对应于特征值大的方向，表示高区率。然后对比图中 \(\widetilde w\) 和 \(w^∗\) 的位置，发现 \(\widetilde w\) 在水平方向上移动距离比较大，竖直方向上比较小，这也印证了之前权重衰减的规律。 </p>
+
+<blockquote>
+<ol>
+<li>Hessian矩阵中，在最大特征值所对应的特征向量的方向上有二阶导数的最大值，事实上，在每一个特征向量方向上，二阶导数都等于相应的特征值。在其他方向上，二阶导数是特征值的加权平均。特征值是相应特征向量方向上的二阶导数。</li>
+<li>等高线的疏密与地势的坡度有关。等高线越密集,代表该地区的坡度越陡；等高线越稀疏,说明地势坡度越小越平坦。</li>
+<li>假设有一大一小两个特征值，较小曲率（二阶导数）落在小特征值对应的特征向量方向上，这里较平坦；较大曲率（二阶导数）落在大特征值对应的特征向量方向上，这里陡峭；所以说，特征向量被称为函数等高线的主轴。</li>
+</ol>
+
+<p>综上：Hessian矩阵的特征值控制了梯度更新步长，对于二维图像的某点的Hessian矩阵，其最大特征值和对应的特征向量对应其邻域二维曲线最大曲率的强度和方向，即山坡陡的那面，最小特征值对应的特征向量对应与其垂直的方向，即平缓的方向。简单来讲，图像某点的 Hessian 矩阵特征值大小和符号决定了该点邻域内的几何结构。三维图像同理。</p>
+</blockquote>
+
+<p>如果我们在线性回归的基础上研究权重衰减对二次代价函数的影响。线性回归的代价函数是平方误差之和<br/>
+\[<br/>
+(Xw - y)^T(Xw - y)<br/>
+\]</p>
+
+<p>我们添加 \(L^2\) 正则化项后，目标函数变为<br/>
+\[<br/>
+(Xw - y)^T(Xw - y) + \frac 1 2 \alpha w^T w<br/>
+\]</p>
+
+<p>这将普通方程的解（求导并令结果等于0）从<br/>
+\[<br/>
+\begin{align}<br/>
+w = (X^TX)^{-1} X^T y\label{wx1}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>变为<br/>
+\[<br/>
+\begin{align}<br/>
+w = (X^TX + \alpha I)^{-1} X^T y\label{wx2}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>式 ( \ref{wx1} ) 中的矩阵 \(X^TX\) 与协方差矩阵 \(\frac 1 m X^TX\) 成正比。\(L^2\) 正则后仅仅是在对角加了 \(\alpha\)。这个矩阵的对角项对应每个输入特征的方差（协方差的定义）。可以看到，\(L^2\) 正则化能让学习算法感知到具有较高方差的输入 \(x\)，因此与输出目标的协方差较小（相对增加方差）的特征的权重将会收缩。</p>
+
+<h4 id="toc_2">\(L^1\)正则化</h4>
+
+<p>\(L^2\)权重衰减是权重衰减最常见的形式，我们还可以使用其他的方法限制模型参数的规模。一个选择是使用\(L^1\)正则化。 形式地，对模型参数 \(w\) 的\(L^1\)正则化被定义为:<br/>
+\[<br/>
+\Omega(\theta) = ||w||_1 = \sum_{i} |w_i|<br/>
+\]</p>
+
+<p>即各个参数的绝对值之和。接着我们将讨论\(L^1\)正则化对简单线性回归模型的影响，与分析\(L^2\)正则化时一样不考虑偏置参数。我们尤其感兴趣的是找出\(L^1\)和\(L^2\)正则化之间的差异。与\(L^2\)权重衰减类似，我们也可以通过缩放惩罚项 \(\Omega\) 的正超参数 \(\alpha\) 来控制\(L^1\)权重衰减的强度。因此，正则化的目标函数 \(\widetilde J\) 如下所示<br/>
+\[<br/>
+\begin{align}<br/>
+\widetilde J = J + \alpha ||w||_1\label{wjj}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>我们常说 \(L^1\) 正则化的优良性质是能产生稀疏性，导致 \(\mathbf w\) 中许多项变成零。这里我们先直观的看一下 \(L^1\) 的图像（下右图）：</p>
+
+<div align="center">
+    <img width="550" src="media/15272663505619/15380584017290.jpg" />
+</div>
+
+<p>可以看到，\(L^1\) 与 \(L^2\) 的不同就在于他在和每个坐标轴相交的地方都有“角”出现，而目标函数的测地线除非位置摆得非常好，大部分时候都会在角的地方相交。注意到在角的位置为产生稀疏性，例如图中的相交点就有 \(w_1 = 0\)，而更高维的时候除了角点以外，还有很多边的轮廓也是既有很大的概率成为第一次相交的地方，又会产生稀疏性。</p>
+
+<p>相比之下，\(L^2\) 就没有这样的性质，因为没有角，所以第一次相交的地方出现在具有稀疏性的位置的概率就变得非常小了。这就从直观上来解释了为什么  \(L^1\) 正则化能产生稀疏性，而  \(L^2\) 正则化不行的原因了。</p>
+
+<p>正则化后的目标函数 ( \ref{wjj} )对应的梯度 (实际上是次梯度):<br/>
+\[<br/>
+\nabla_w \hat J = \nabla_w J + \alpha \text{ sign}(w)<br/>
+\]</p>
+
+<p>其中 \(\text{sign}(w)\) 只是简单地取 \(w\) 各个元素的正负号。</p>
+
+<p>由于 \(L^1\) 惩罚项在完全一般化的 Hessian 的情况下，无法得到直接清晰的代数表达式，因此我们将进一步简化假设 Hessian 是对角的，即 \(H = diag([H_{1,1},..., H_{n,n}])\)， 其中每个 \(H_{i,i} &gt; 0\)。如果线性回归问题中的数据已被预处理(如可以使用 PCA)，去 除了输入特征之间的相关性，那么这一假设成立。</p>
+
+<p>我们可以将 \(L^1\) 正则化目标函数的二次近似分解成关于参数的求和（一阶导数为0）:<br/>
+\[<br/>
+\begin{align}<br/>
+J(w) &amp;= J(w^*) + \frac 1 2 (w-w^*)^T H(w-w^*) + \alpha ||w||\nonumber\\<br/>
+&amp;= J(w^*) + \frac 1 2 [w_1-w^*_1,w_2 - w^*_2 ,...,w_n-w^*_n]H\left[\begin{array}{c}w_1-w^*_1\\w_2 - w^*_2 \\\vdots\\w_n-w^*_n\\\end{array}\right ]+ \alpha ||w||\nonumber\\<br/>
+&amp;= J(w^*) + \frac 1 2 \left [ \begin{array}{cccc}(w_1-w^*_1)H_{1,1}&amp;&amp;&amp;\\&amp;(w_2-w^*_2)H_{2,2}&amp;&amp;\\&amp;&amp;\ddots&amp;\\&amp;&amp;&amp;(w_n-w^*_n)H_{n,n}\end{array}\right ]\left[\begin{array}\\w_1-w^*_1\\w_2 - w^*_2 \\\vdots\\w_n-w^*_n\\\end{array}\right ]+ \alpha ||w||\nonumber\\<br/>
+&amp;= J(w^*) + \frac 1 2 \Big(\sum_{i=1}^n H_{i,i}(w_i - w^*_i)^2\Big)+ \alpha ||w||\nonumber\\<br/>
+&amp;= J(w^*) + \frac 1 2 \sum_{i=1}^n \Big(H_{i,i}(w_i - w^*_i)^2+ \alpha |w_i|\Big)\label{jfs}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>对二次近似的 ( \ref{jfs} ) 式求导，并结果为 0 来求解 \(w_i\)<br/>
+\[<br/>
+\begin{align}<br/>
+&amp;\frac{\partial}{\partial w_i} J(w^*) + \frac 1 2 \sum_{i=1}^n \Big(H_{i,i}(w_i - w^*_i)^2+ \alpha |w_i|\Big) = H_{i,i}(w_i - w^*_i) + \text{sign}(w_i) \alpha\label{fpp}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<ol>
+<li><p>当 \(w_i \gt 0\) 时<br/>
+\[<br/>
+H_{i,i}(w_i - w^*_i) + \alpha = 0\quad \Rightarrow w_i - w^*_i =- \frac{\alpha}{H_{i,i}} <br/>
+\]</p>
+
+<p>因为 \(\alpha \gt 0\) 和 \(H_{i,i} \gt 0\) 所以 \(w_i - w^*_i =- \frac{\alpha}{H_{i,i}} \lt 0\)，得出 \(w^*_i \gt w_i \gt 0\)</p>
+
+<p>结合 \(w_i = w^* - \frac{\alpha}{H_{i,i}} \) 和 \(w_i \gt 0\) 可得 \(w_i = \max\big(w^*_i - \frac{\alpha}{H_{i,i}},0\big)\)</p></li>
+<li><p>当 \(w_i \lt 0\) 时<br/>
+\[<br/>
+\begin{equation}<br/>
+H_{i,i}(w_i - w^*_i) - \alpha = 0 \quad \Rightarrow w_i - w^*_i = \frac{\alpha}{H_{i,i}}\label{hiww}<br/>
+\end{equation} <br/>
+\]</p>
+
+<p>因为 \(\alpha \gt 0\) 和 \(H_{i,i} \gt 0\) 所以 \(w_i - w^*_i =\frac{\alpha}{H_{i,i}} \gt 0\)，得出 \(w^*_i \lt w_i \lt 0\)</p>
+
+<p>等式 ( \ref{hiww} ) 可以写成<br/>
+\[<br/>
+-w_i = -w^*_i - \frac{\alpha}{H_{i,i}}<br/>
+\]</p>
+
+<p>因为 \(-w_i \gt 0\)，所以 \(-w_i = \max\big(-w^*_i - \frac{\alpha}{H_{i,i}},0\big)\)，也就是 \(w_i = -\max\big(-w^*_i - \frac{\alpha}{H_{i,i}},0\big) \)</p></li>
+</ol>
+
+<p>结合上面两项<br/>
+\[<br/>
+w_i = \left \{ \begin{array} -\max\big(-w^*_i - \frac{\alpha}{H_{i,i}},0\big)&amp;\quad w^*_i \gt w_i \gt 0\\ -\max\big(-w^*_i - \frac{\alpha}{H_{i,i}},0\big)&amp;\quad w^*_i \lt w_i \lt 0\\\end{array}\right .<br/>
+\]</p>
+
+<p>可以写成一个式子<br/>
+\[<br/>
+w_i = \text{sign}(w^*_i)\max\big(||w^*_i|| - \frac{\alpha}{H_{i,i}},0\big)<br/>
+\]</p>
+
+<p>对每个 \(i\) , 考虑 \(w^∗_i &gt; 0\) 的情形，会有两种可能结果：</p>
+
+<ol>
+<li>\(w^*_i \le \frac{\alpha}{H_{i,i}}\) 的情况。正则化后目标中的 \(w_i\) 最优值是 \(w_i = 0\)。这是因为在方向 \(i\) 上的 \(J(w)\) 对 \(\hat J(w)\) 的贡献被抵消，\(L^1\) 正则化项将 \(w_i\) 推至 0。</li>
+<li>\(w^∗_i \gt \frac{\alpha}{H_{i,i}}\) 的情况。在这种情况下，正则化不会将 \(w_i\) 的最优值推至 0，而仅仅在那个方向上移动 \(\frac{\alpha}{H_{i,i}}\) 的距离。</li>
+</ol>
+
+<p>\(w^*_i \lt 0\) 的情况与之类似，但是 \(L^1\) 正则化项使 \(w_i\) 更接近 0（或增加 \(\frac{\alpha}{H_{i,i}}\)）或等于0。</p>
+
+<p>可以用下图形象表示出来</p>
+
+<div align="center">
+    <img width="300" src="media/15272663505619/15380681849481.jpg" />
+</div>
+
+<h4 id="toc_3">\(L^1\) 与 \(L^2\) 优点</h4>
+
+<p>相比 \(L^2\) 正则化，\(L^1\) 正则化会产生更稀疏(sparse)的解。此处稀疏性指的是最优值中的一些参数为 0。和 \(L^2\)正则化相比，\(L^1\)正则化的稀疏性具有本质的不同，在 \(L^2\) 中 是对参数做了缩小 \(\widetilde w_i = \frac{H_{i,i}}{H_{i,i}+\alpha} w^*_i\) ，如果 \(w^*_i\) 不是 0，那么 \(\widetilde w_i\) 也会保持非 0，只是更接近0。</p>
+
+<p>由 \(L^1\) 正则化导出的稀疏性质已经被广泛地用于特征选择(feature selection)机制。特征选择从可用的特征子集选择出有意义的特征，化简机器学习问题。著名的 LASSO (Tibshirani, 1995)(Least Absolute Shrinkage and Selection Operator)模型将 \(L^1\) 惩罚和线性模型结合，并使用最小二乘代价函数。\(L^1\) 惩罚使部分子集的权重为零，表明相应的特征可以被安全地忽略。</p>
+
+<p>再来看看 \(L^2\) 正则化，首先 \(L^2\) 正则化可以解决过拟合问题，这是因为 \(L^2\) 正则化趋向于选择更小的参数，而越小的参数说明模型越简单，越简单的模型则越不容易产生过拟合现象。越复杂的模型，越是会尝试对所有的样本进行拟合，甚至包括一些异常样本点，这就容易造成在较小的区间里预测值产生较大的波动，这种较大的波动也反映了在这个区间里的导数很大，而只有较大的参数值才能产生较大的导数。因此复杂的模型，其参数值会比较大。</p>
+
+<p>另外，\(L^2\) 正则化之前，我们知道可以通过下式求出权重<br/>
+\[<br/>
+W = (X^TX)^{-1}X^Ty<br/>
+\]</p>
+
+<p>然而，如果当我们的样本 \(X\) 的数目比每个样本的维度还要小的时候，矩阵 \(X^TX\) 将会不是满秩的，也就是 \(X^TX\) 会变得不可逆，所以 \(W\) 就没办法直接计算出来了，或者更确切地说，将会有无穷多个解（因为我们方程组的个数小于未知数的个数），也就是说，我们的数据不足以确定一个解。</p>
+
+<p>但如果加上L2规则项，就变成了下面这种情况，就可以直接求逆了：<br/>
+\[<br/>
+W = (X^TX + \alpha I)^{-1}X^Ty<br/>
+\]</p>
+
+<p>这里面，要得到这个解，我们通常并不直接求矩阵的逆，而是通过解线性方程组的方式（例如高斯消元法）来计算。考虑没有规则项的时候，也就是 \(\lambda=0\) 的情况，如果矩阵 \(X^TX\) 的 condition number 很大的话，解线性方程组就会在数值上相当不稳定，而这个规则项的引入则可以改善 condition number。</p>
+
+<p>另外，如果使用迭代优化的算法，condition number 太大仍然会导致问题：它会拖慢迭代的收敛速度，而规则项从优化的角度来看，实际上是将目标函数变成 \(\lambda\)-strongly convex（\(\lambda\)强凸）的了。</p>
+
+<div align="center">
+    <img width="450" src="media/15272663505619/15380731126993.jpg" />
+</div>
+
+<p>如图说一个函数是凸函数，指函数曲线位于改点处的切线之上，而强凸则进一步要求位于该处的一个二次函数之上，也就是说要求函数不要太“平坦”而是可以保证有一定的 “向上弯曲” 的趋势。如果我们有“强凸”的话，我们就可以得到一个更好的近似解。效果的好坏取决于 strongly convex性质中的常数 \(\lambda\) 的大小。</p>
+
+<p>所以，如果我们想要获得 \(\lambda\)强凸的话，就是往目标函数里面加上 \(\frac{\alpha}{2}||w||^2\)。</p>
+
+<p>如果我们的函数 \(f(w)\) 如右图红色那个函数，我们取我们的最优解 \(w^*\) 的地方都会位于蓝色虚线的那根二次函数之上，这样就算 \(w_t\) 和 \(w^*\) 离的比较近的时候，\(f(w_t)\) 和 \(f(w^*)\) 的值差别还是挺大的，也就是会保证在我们的最优解 \(w^*\) 附近的时候，还存在较大的梯度值，这样我们才可以在比较少的迭代次数内达到 \(w^*\) 。但对于左图，红色的函数 \(f(w)\) 只约束在一个线性的蓝色虚线之上，假设是如左图的很不幸的情况（非常平坦），那在 \(w_t\) 还离我们的最优点 \(w^*\) 很远的时候，我们的近似梯度 \((f(wt)-f(w*))/(wt-w*)\) 就已经非常小了，在 \(w_t\) 处的近似梯度\(\frac{\partial f}{\partial w}\) 就更小了，这样通过梯度下降得到的结果就是 \(w\) 的变化非常缓慢，非常缓慢的向我们的最优点 \(w^*\) 爬动，那在有限的迭代时间内，它离我们的最优点还是很远。我们有可能会找到一个很远的点。但如果我们有“强凸”的话，就能对情况做一些控制，我们就可以得到一个更好的近似解。</p>
+
+<h3 id="toc_4">数据增强</h3>
+
+<p>理论上来说，数据越多，模型训练得越充分，模型泛化能力越强。但是现实情况是，数据量总是有限的，解决此问题的一个方法是生成一部分的模拟数据。对于一些机器学习任务，创建新的假数据相当简单。</p>
+
+<p>对分类来说这种方法是最简单的。分类器需要一个复杂的高维输入 x，并用单 个类别标识 y 概括 x。这意味着分类面临的一个主要任务是要对各种各样的变换保 持不变。我们可以轻易通过转换训练集中的 x 来生成新的 (x, y) 对。经典的方法有SMOTE方法。</p>
+
+<p>这种方法对于其他许多任务来说并不那么容易。例如，除非我们已经解决了密 度估计问题，否则在密度估计任务中生成新的假数据是很困难的。</p>
+
+<p><strong>图像识别</strong>：图像是高维的并包括各种巨大的变化因素，其中有许多可以轻易地模拟。即使模型已使用卷积和池化技术对部分平移保持不变，沿训练图像每个方向<strong>平移</strong>几个像素的操作通常可以大大改善泛化。许多其他操作如<strong>旋转图像</strong>或<strong>缩放图像</strong>也已被证明非常有效。数据增强用于特定领域分类问题，如图像识别很有效。但是切记，转换数据的时候不要改变图像的正确分类。比如不要将手写字识别图像中的6垂直转换成了9，b 水平翻转成了d。所以对这些任务来说，水平翻转和旋转 180 度并不是合适的数据集增强方式。</p>
+
+<p><strong>语音识别</strong>：语音识别问题中，网络输入数据中也会注入一些随机噪音干扰，这也是一种数据增强（现实生活中语音环境有噪音）。</p>
+
+<p>在神经网络的输入层注入噪声 (Sietsma and Dow, 1991) 也可以被看作是数据增强的一种方式。对于许多分类甚至一些回归任务而言，即使小的随机噪声被加到输入，任务仍应该是能够被解决的。然而，神经网络被证明对噪声不是非常健壮 (Tang and Eliasmith, 2010)。改善神经网络健壮性的方法之一是简单地将随机噪声添加到输入再进行训练。输入噪声注入是一些无监督学习算法的一部分，如去噪自编码器(Vincent et al., 2008a)。向隐藏单元施加噪声也是可行的，这可以被看作在多个抽象层上进行的数据集增强。Poole et al. (2014) 最近表明，噪声的幅度被细心调整后，该方法是非常高效的。正则化策略 Dropout 可以被看作是通过与噪声相乘构建新输入的过程。</p>
+
+<p>在比较机器学习基准测试的结果时，考虑其采取的数据集增强是很重要的。通常情况下，人工设计的数据集增强方案可以大大减少机器学习技术的泛化误差。将一个机器学习算法的性能与另一个进行对比时，对照实验是必要的。在比较机器学习算法 A 和机器学习算法 B 时，应该确保这两个算法使用同一人工设计的数据集增强方案。假设算法 A 在没有数据集增强时表现不佳，而 B 结合大量人工转换的数据后表现良好。在这样的情况下，很可能是合成转化引起了性能改进，而不是机器学习算法 B 比算法 A 更好。有时候，确定实验是否已经适当控制需要主观判断。例如，向输入注入噪声的机器学习算法是执行数据集增强的一种形式。通常，普适操作(例如，向输入添加高斯噪声)被认为是机器学习算法的一部分，而特定于一个应用领域(如随机地裁剪图像)的操作被认为是独立的<strong>预处理</strong>步骤。</p>
+
+<h3 id="toc_5">噪声鲁棒性</h3>
+
+<p>上面我们说过想神经网络的输入层注入噪声可以作为数据增强，对于某些模型而言，想输入添加方差极小的噪声等价于对权重事假范数惩罚。在一般情况下，注入噪声远比简单地收缩参数强大，特别是噪声被添加到隐藏单元时会更加强大。向隐藏单元添加噪声是值得讨论的话题，后面所述 Dropout 算法是这种做法的主要发展方向。</p>
+
+<p>另一种正则化模型的噪声使用方式是将其加到权重。这项技术主要用于循环神经网络（Jim et al., 1996; Graves, 2011）。在某些假设下，施加于权重的噪音可以被解释为与更传统的正则化形式等同，鼓励要学习的函数保持稳定。在回归的情形下，训练将一组特征 \(\mathbf x\) 映射成一个标量的函数 \(\hat y(x)\)，并使用最小二乘代价函数衡量模型预测值 \(\hat y(x)\) 与真实值 \(y\) 的误差<br/>
+\[<br/>
+J = \mathbb E_{p(x,y)}[\hat y(\mathbb x) - y)^2]<br/>
+\]</p>
+
+<p>训练集包含 \(m\) 对标注样例 \(\{(\mathbf x^{(1)},y^{(1)}),...,(\mathbf x^{(m)},y^{(m)})\}\)。</p>
+
+<p>现在我们假设对每个输入表示，网络权重添加随机扰动 \(\epsilon_w\sim \mathcal N(\epsilon;9,\eta I)\)。想象一下我们有个一个标准的 \(l\) 层 MLP。我们将扰动模型记为 \(\hat y_{\epsilon w}(x)\)。尽管有噪声注入，我们仍然希望减少网络输出误差的平方。因此目标函数变为：<br/>
+\[<br/>
+\begin{align*}<br/>
+\widetilde J_{\mathbf w} &amp;= \mathbb E_{p(x,y,\epsilon \mathbf w)}[(\hat y_{\epsilon \mathbf w}(x) - y)^2]\\<br/>
+&amp;= \mathbb E_{p(x,y,\epsilon \mathbf w)}[\hat y^2_{\epsilon \mathbf w}(x) - 2y\hat y_{\epsilon \mathbf w}(x) + y^2]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>对于小的 \(\eta\)，最小化带权重噪声（方差为 \(\eta I\)）的 \(J\) 等同于最小化附加正则化项: \(\eta \mathbb E_{p(x,y)}[||\nabla_{\mathbf W} \hat y(x)||^2]\) 的 \(J\)。这种形式的正则化鼓励参数进入权重小扰动对输出相对影响较小的参数空间区域。换句话说，它推动模型进入对权重小的变化相对不敏感的区域，找到的点不只是极小点，还是由平坦区域所包围的极小点 (Hochreiter and Schmidhuber, 1995)。在简化的线性回归中（例如，\(\hat y(x) = w^T x + b）\)，正则项退化为 \(\eta \mathbb E_{p(x)}[||x||^2]\)，这与函数的参数无关，因此不会对 \(\widetilde J_w\) 关于模型参数的梯度有影响。 </p>
+
+<h4 id="toc_6">向输出目标注入噪声</h4>
+
+<p>大多数数据集的 \(y\) 标签都有一定错误。错误的 \(y\) 不利于最大化 \(\log p(y | \mathbf x)\)。避免这种情况的一种方法是显式地对标签上的噪声进行建模。例如，我们可以假设，对于一些小常数 \(\epsilon\)，训练集标记 \(y\) 是正确的概率是 \(1 − \epsilon\)，(以 \(\epsilon\) 的概率)任何其他可能的标签也可能是正确的。这个假设很容易就能解析地与代价函数结合，而不用显式地抽取噪声样本。例如，<strong>标签平滑</strong>(label smoothing)通过把确切分类目标从 0 和 1 替换成 \(\epsilon\) 和 \(1 − \epsilon\)，正则化具有 \(k\) 个输出的 softmax 函数 的模型。标准交叉熵 \(k−1\) 损失可以用在这些非确切目标的输出上。使用 softmax 函数和明确目标的最大似然学习可能永远不会收敛——softmax 函数永远无法真正预测 0 概率或 1 概率，因此它会继续学习越来越大的权重，使预测更极端。使用如权重衰减等其他正则化策略能够防止这种情况。标签平滑的优势是能够防止模型追求确切概率而不影响模型学习正确分类。这种策略自 20 世纪 80 年代就已经被使用，并在现代神经网络继续保持显著特色 (Szegedy et al., 2015)。</p>
+
+<h3 id="toc_7">提前终止</h3>
+
+<p>当训练有足够的表示能力甚至会过拟合的大模型时，我们经常观察到，训练误差会随着时间的推移逐渐降低但验证集的误差会再次上升。</p>
+
+<p>这意味着我们只要返回使验证集误差最低的参数设置，就可以获得验证集误差更低的模型(并且因此有希望获得更好的测试误差)。在每次验证集误差有所改善后，我们存储模型参数的副本。当训练算法终止时，我们返回这些参数而不是最新的参数。当验证集上的误差在事先指定的循环次数内没有进一步改善时，算法就会终止。</p>
+
+<p>这种策略被称为<strong>提前终止（early stopping）</strong>。这可能是深度学习中最常用的正则化形式。它的流行主要是因为有效性和简单性。</p>
+
+<div align="center">
+    <img width="550" src="media/15272663505619/15472738666106.jpg" />
+</div>
+
+<p>我们可以认为提前终止是非常高效的超参数选择算法。按照这种观点，训练步数仅是另一个超参数。这个超参数在验证集上具有 U 型性能曲线。很多控制模型容量的超参数在验证集都是这样的 U 型性能曲线，在提前终止的情况下，我们通过控制拟合训练集的步数来控制模型的有效容量。大多数超参数的选择必须使用高代价的猜测和检查过程，我们需要再训练开始时超参数的选择必须使用高代价的猜测和检查过程，我们需要再训练开始时猜测一个超参数，然后运行几个步骤检查它的训练效果。“训练时间”是唯一只要跑一次训练就能尝试很多值得超参数。通过提前终止自动选择超参数的唯一显著代价是训练期间要定期评估验证集。在理想情况下，这可以并行在与主训练过程分离的机器上，或独立的CPU，或独立的 GPU 上完成。如果没有这些额外的资源，可以使用比训练集小的验证集或较不频繁地评估验证集来减小评估代价，较粗略地估算取得最佳的训练时间。</p>
+
+<p>另一个提前终止的额外代价是需要保持最佳的参数副本。这种代价一般是可忽略的，因为可以将它储存在较慢较大的存储器上(例如，在 GPU 内存中训练，但将最佳参数存储在主存储器或磁盘驱动器上)。由于最佳参数的写入很少发生而且从不在训练过程中读取，这些偶发的慢写入对总训练时间的影响不大。</p>
+
+<p>提前终止是一个非常不显眼的正则化形式，它几乎不需要改变基本训练过程、目标函数或一组允许的参数值。这意味着，无需破坏学习动态就能很容易地使用提前终止。相对于权重衰减，必须小心不能使用太多的权重衰减，以防网络陷入不良局部极小点（对应于病态的小权重）。</p>
+
+<p>提前终止可单独使用或与其他正则化策略结合使用。即使为鼓励更好泛化，使用正则化策略改进目标函数，在训练目标的局部极小点达到最好泛化也是罕见的。</p>
+
+<p>提前终止需要验证集，这意味着某些训练数据不能被馈送到模型。为了更好地利用这一额外的数据，我们可以在完成提前终止的首次训练之后，进行额外的训练。在第二轮，即额外的训练步骤中，所有的训练数据都被包括在内。有两个基本的策略都可以用于第二轮训练过程。</p>
+
+<p>一个策略是再次初始化模型，然后使用所有数据再次训练。在这个第二轮训练过程中，我们使用第一轮提前终止训练确定的最佳步数。此过程有一些细微之处。例如，我们没有办法知道重新训练时，对参数进行相同次数的更新和对数据集进行相同次数的遍历哪一个更好。由于训练集变大了，在第二轮训练时，每一次遍历数据集将会更多次地更新参数。</p>
+
+<div align="center">
+    <img width="550" src="media/15272663505619/15472789633704.jpg" />
+</div>
+
+<p>另一个策略是保持从第一轮训练获得的参数，然后使用全部的数据继续训练。在这个阶段，已经没有验证集指导我们需要在训练多少步后终止。取而代之，我们 可以监控验证集的平均损失函数，并继续训练，直到它低于提前终止过程终止时的目标值。此策略避免了重新训练模型的高成本，但表现并没有那么好。例如，验证集的目标不一定能达到之前的目标值，所以这种策略甚至不能保证终止。</p>
+
+<div align="center">
+    <img width="550" src="media/15272663505619/15472790713118.jpg" />
+</div>
+
+<hr/>
+
+<p><a href="">deep learn</a><br/>
+<a href="https://www.jianshu.com/p/36312582478f">神经网络性能曲面与最优点</a><br/>
+<a href="https://blog.csdn.net/zouxy09/article/details/24971995">机器学习中的范数规则化之（一）L0、L1与L2范数</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15264839728559.html">神经网络的代价函数</a></h1>
+			<p class="meta"><time datetime="2018-05-16T23:19:32+08:00" 
+			pubdate data-updated="true">2018/5/16</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>代价函数是衡量模型预测输出值与目标真实值之间差距的一类函数，在一些场景中也称为目标函数。我们常用的代价函数是二次代价函数、交叉熵代价函数和对数似然函数。</p>
+
+<h4 id="toc_0">二次代价函数</h4>
+
+<p>考虑 \(n\) 个样本的输入 \(x_1,x_2,...,x_n\)，对应的真实值为 \(y_1,y_2,...,y_n\)，对应的输出为 \(o(x_i)\)，则二次代价函数可定义为： <br/>
+\[<br/>
+C = \frac{1}{2n} \sum_{i=1}^n ||y_i−o(x_i)||^2<br/>
+\]</p>
+
+<p>其中，\(C\) 表示代价函数，\(n\) 表示样本总数。</p>
+
+<ul>
+<li>以一个样本为例</li>
+</ul>
+
+<p>假设在神经网络中，上一层每个神经元的输出为 \(a_j\)，权值为 \(w_j\)，偏置值为 \(b\) 。当前输出神经元的激活函数为 \(\sigma(\cdot)\)。则该神经元的输出值为：<br/>
+\[<br/>
+\text{net} = \sum_j w_j a_j + b\\<br/>
+o = \sigma(\text{net})\\<br/>
+\]</p>
+
+<p>此时二次代价函数为： <br/>
+\[<br/>
+C = \frac{1}{2} (y−o)^2<br/>
+\]</p>
+
+<p>其中，\(y\) 为真实值。</p>
+
+<ul>
+<li>考虑权值和偏置值更新</li>
+</ul>
+
+<p>假如使用梯度下降法(Gradient descent)来调整权值和偏置值大小，则对 \(w\) 和 \(b\) 求偏导得： <br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial C}{\partial w_j} &amp;= \frac{\partial C}{\partial o}\frac{\partial o}{\partial \text{net}}\frac{\partial \text{net}}{\partial w_j}\\<br/>
+&amp;= (o-y)\cdot a_j \cdot \frac{\partial o}{\partial \text{net}}\\<br/>
+&amp;= a_j(\sigma(\text{net}) - y) \sigma&#39;(\text{net})\\<br/>
+\frac{\partial C}{\partial b} &amp;= (\sigma(\text{net}) - y) \sigma&#39;(\text{net})\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>该偏导数乘以学习率 \(\eta\) 就变成了每次调整权值和偏置值得步长。当 \(\eta\) 一定时，可以看出 \(w\) 和 \(b\) 的梯度跟激活函数的梯度成正比，激活函数的梯度（导数）越大，则 \(w\) 和 \(b\) 调整得就越快，训练收敛得就越快。</p>
+
+<ul>
+<li>结合激活函数</li>
+</ul>
+
+<p>假设神经网络使用的是sigmoid激活函数<br/>
+\[<br/>
+\sigma(x) = \frac{1}{1+e^{-x}}<br/>
+\]</p>
+
+<p>图像如下</p>
+
+<div align="center">
+    <img width=400 src="media/15264839728559/15369428123803.jpg" />
+</div>
+
+<p>考虑A点和B点，权值调整大小与sigmoid函数的梯度（导数）有关。<br/>
+1）当真实值 \(y=1\) 时，则输出值目标是收敛至1。A离目标比较远，权值调整大；B离目标比较近，权值调整小。调整方案合理。<br/>
+2）当真实值 \(y=0\) 时，则输出值目标是收敛至0。A离目标比较近，权值调整大；B离目标比较远，权值调整小。调整方案不合理。换句话说，很难调整到目标值0。</p>
+
+<p>从图可以观察的出，学习在神经元犯了明显的错误的时候却比学习快接近真实值的时候缓慢。这是因为在\(\sigma(\cdot)\) 的值等于1或0的时候 \(\sigma&#39;(\cdot)\) 的值会很小很小。从而也就导致了\(\frac{\partial C}{\partial w}\) 和 \(\frac{\partial C}{\partial b}\) 会非常小。这也就是学习缓慢的原因所在。</p>
+
+<h4 id="toc_1">交叉熵代价函数</h4>
+
+<p>考虑 \(n\) 个样本的输入 \(x_1,x_2,...,x_n\)，对应的真实值为 \(y_1,y_2,...,y_n\)，对应的输出为 \(o_i\)，则交叉熵代价函数可定义为： <br/>
+\[<br/>
+C = -\frac 1 n \sum_{i=1}^n [y_i \ln o_i + (1 -y_i)\ln(1-o_i)]\\<br/>
+\]</p>
+
+<p>其中，\(C\) 表示代价函数，\(n\) 表示样本总数。</p>
+
+<ul>
+<li>以一个样本为例</li>
+</ul>
+
+<p>假设在神经网络中，上一层每个神经元的输出为 \(a_j\)，权值为 \(w_j\)，偏置值为 \(b\) 。当前输出神经元的激活函数为 \(\sigma(\cdot)\)。则该神经元的输出值为：<br/>
+\[<br/>
+\text{net} = \sum_j w_j a_j + b<br/>
+o = \sigma(\text{net})<br/>
+\]</p>
+
+<p>此时考虑 \(n\) 个神经元，交叉熵代价函数为： <br/>
+\[<br/>
+C = -\frac 1 n \sum_{i=1}^n [y_i \ln o_i + (1 -y_i)\ln(1-o_i)]\\<br/>
+\]</p>
+
+<p>其中，\(y_i\) 为真实值。</p>
+
+<ul>
+<li>考虑权值和偏置值更新</li>
+</ul>
+
+<p>假设神经网络使用的是sigmoid激活函数，我们知道 \(\sigma(x)\) 对 \(x\) 求导得<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial \sigma(x)}{\partial x} &amp;= \frac{e^{-x}}{(1 + e^{-x})^2} \\<br/>
+&amp;= \frac{1 + e^{-x} - 1}{(1 + e^{-x})^2} \\<br/>
+&amp;= \frac{1}{1 + e^{-x}} - \frac{1}{(1 + e^{-x})^2}\\<br/>
+&amp;= \sigma(x) - \sigma(x)^2 \\<br/>
+&amp;= \sigma(x)[1 - \sigma(x)]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>假如使用梯度下降法(Gradient descent)来调整权值和偏置值大小，则对 \(w\) 和 \(b\) 求偏导得： <br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial C}{\partial w_j} &amp;= -\frac 1 n \sum_{i=1}^n \frac{\partial C}{\partial o_j}\frac{\partial o_j}{\partial net_j}\frac{\partial net_j}{\partial w_j}\\<br/>
+&amp;= -\frac 1 n \sum_{i=1}^n \Big(\frac{y_j}{o_j} - \frac{1-y_j}{1-o_j} \Big)\cdot \Big( \sigma(\text{net_j})(1 - \sigma(\text{net_j}))  \Big)\cdot a_j\\<br/>
+&amp;= -\frac 1 n \sum_{i=1}^n \frac{y_j(1 - o_j) - o_j(1-y_j)}{o_j(1- o_j)}\cdot \Big( \sigma(\text{net_j})(1 - \sigma(\text{net_j}))  \Big)\cdot a_j\\<br/>
+&amp;= -\frac 1 n \sum_{i=1}^n \frac{y_j- o_j}{o_j(1- o_j)}\cdot \Big( \sigma(\text{net_j})(1 - \sigma(\text{net_j}))  \Big)\cdot a_j\\<br/>
+&amp;= -\frac 1 n \sum_{i=1}^n \frac{y_j- o_j}{\sigma(\text{net_j})(1- \sigma(\text{net_j}))}\cdot \Big( \sigma(\text{net_j})(1 - \sigma(\text{net_j}))  \Big)\cdot a_j\\<br/>
+&amp;= \frac 1 n \sum_{i=1}^n (o_j - y_j) a_j<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>同理，偏置值 \(b\) 的梯度(更新步长)为：<br/>
+\[<br/>
+\frac{\partial C}{\partial b} = \frac 1 n \sum_{i=1}^n (o_j − y_j)<br/>
+\]</p>
+
+<p>可以看出，权值和偏置值的调整与 \(\sigma&#39;(\)\text{net}_j)\( 无关，而与 \)\sigma(\text{net}_j)\( 有关。此外，\)o_j - y_j\( 表示真实值与输出值之间的误差。当误差越大时，梯度就越大，\)w\( 和 \)b$ 的调整就越快，训练速度就越快。</p>
+
+<p>对比二次代价函数可以发现，代价函数的选择与激活函数有关。当输出神经元的激活函数是线性时例如，ReLU函数）二次代价函数是一种合适的选择；当输出神经元的激活函数是S型函数（例如sigmoid、tanh函数）时，选择交叉熵代价函数则比较合理。</p>
+
+<h4 id="toc_2">对数似然代价函数</h4>
+
+<p>考虑 \(n\) 个样本的输入 \(x_1,x_2,...,x_n\)，对应的真实值为 \(y_1,y_2,...,y_n\) 取值为0或1，对应的第i个神经元输出为 \(o_i\)，则对数log似然代价函数可定义为：<br/>
+\[<br/>
+C=-\sum_{i=1}^n y_i \log o_i<br/>
+\]</p>
+
+<p>其中，\(C\) 表示代价函数，\(n\) 表示样本总数。</p>
+
+<ul>
+<li>考虑softmax激活函数</li>
+</ul>
+
+<p>在深度学习中，对数似然函数常用来搭配softmax激活函数使用。</p>
+
+<p>假定神经网络的每个输出层神经元（假设共 \(n\) 个）都使用softmax激活函数：<br/>
+\[<br/>
+o_j=\frac{e^{\text{net}_j}}{\sum_k e^{\text{net}_k}}<br/>
+\]</p>
+
+<p>其中，\(\text{net}_j\) 表示输出层第 \(j\) 个神经元的净激活输入，\(o_j\) 表示第 \(j\) 输出神经元的输出。\(\sum_k e^{\text{net}_k}\) 表示所有输出层神经元的净激活输入之和。</p>
+
+<p><strong>softmax函数的特点</strong></p>
+
+<p>1）它把每个神经元的输入占当前层所有神经元输入之和的比值，当作该神经元的输出。这使得输出更容易被解释：神经元的输出值越大，则该神经元对应的类别是真实类别的可能性更高。<br/>
+2）此外，softmax的输出是一个<strong>归一化</strong>的概率分布，能够衡量输出分布与真实分布之间的差距。</p>
+
+<p><strong>softmax函数求导</strong></p>
+
+<p>1）当 \(j\neq i\) 时<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial o_j}{\partial \text{net}_i} &amp;= \frac{\partial}{\partial \text{net}_j} \Big(\frac{e^{\text{net}_i}}{\sum_k e^{\text{net}_k}}\Big)\\<br/>
+&amp;= -\frac{e^{\text{net}_j} e^{\text{net}_i} }{(\sum_k e^{\text{net}_k})^2}\\<br/>
+&amp;= -o_j o_i<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>2）当 \(j= i\) 时<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial o_j}{\partial \text{net}_i} &amp;= \frac{\partial}{\partial \text{net}_j} \Big(\frac{e^{\text{net}_i}}{\sum_k e^{\text{net}_k}}\Big)\\<br/>
+&amp;= \frac{e^{\text{net}_j} \sum_k e^{\text{net}_k} - e^{\text{net}_j} e^{\text{net}_i}}{(\sum_k e^{\text{net}_k})^2}\\<br/>
+&amp;= \frac{e^{\text{net}_j}}{\sum_k e^{\text{net}_k}} - \frac{e^{\text{net}_j} e^{\text{net}_i}}{(\sum_k e^{\text{net}_k})^2}\\<br/>
+&amp;= o_j - o_j o_i\\<br/>
+&amp;= o_j(1 - o_j)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p><strong>考虑权值和偏置更新</strong></p>
+
+<p>对权值 \(w_{jk}\) （节点 \(k\) 到节点 \(j\) 的权值）求偏导得权值更新步长为：</p>
+
+<p>\[<br/>
+\begin{align*}<br/>
+\frac{\partial C}{\partial w_{jk}} &amp;= \frac{\partial}{\partial w_{jk}}\Big( -\sum_i y_i \log o_i \Big)\\<br/>
+&amp;= -\sum_i \frac{y_i}{o_i} \frac{\partial o_i}{\partial w_{jk}}\\<br/>
+&amp;= -\frac{y_j}{o_j} \frac{\partial o_j}{\partial w_{jk}} - \sum_{i\neq j} \frac{y_i}{o_i} \frac{\partial o_i}{\partial w_{jk}}\\<br/>
+&amp;= -\frac{y_j}{o_j} \frac{\partial o_j}{\partial \text{net}_j} \frac{\partial \text{net}_j}{\partial w_{jk}} - \sum_{i\neq j} \frac{y_i}{o_i} \frac{\partial o_i}{\partial w_{jk}}\\<br/>
+&amp;= -\frac{y_j}{o_j} o_j(1-o_j) x_k - \sum_{i\neq j} \frac{y_i}{o_i} \frac{\partial o_i}{\partial w_{jk}}\\<br/>
+&amp;= -y_j(1-o_j) x_k - \sum_{i\neq j} \frac{y_i}{o_i} \frac{\partial o_i}{\partial \text{net}_j} \frac{\partial \text{net}_j}{\partial w_{jk}}\\<br/>
+&amp;= -y_j(1-o_j) x_k + \sum_{i\neq j} \frac{y_i}{o_i} o_i o_j x_k \\<br/>
+&amp;= -y_j(1-o_j) x_k + o_j x_k\sum_{i\neq j} y_i \\<br/>
+&amp;= o_j x_k \sum_{i} y_i - y_j x_k\\<br/>
+&amp;= o_j x_k - y_j x_k\\<br/>
+&amp;= (o_j - y_j) x_k<br/>
+\end{align*}<br/>
+\] </p>
+
+<p>同理得偏置值更新步长为：<br/>
+\[ <br/>
+\frac{\partial C}{\partial b_j} =o_j−y_j<br/>
+\]</p>
+
+<p>可以看出，权值和偏置得更新与输出值和真实值之间得误差有关，误差越大，权值和偏置更新得速度越快，训练得速度也就越快。</p>
+
+<p>根据上述分析可得，对数似然代价函数配合softmax函数和交叉熵代价函数配合 S 型函数的原理相似，都能有效地解决权值和偏置值更新速度慢导致得训练速度慢的问题。二者联系：对数似然代价函数在二分类时，可以简化为交叉熵代价函数的形式。</p>
+
+<hr/>
+
+<p><a href="https://blog.csdn.net/weixin_40170902/article/details/80032669">机器学习：神经网络代价函数总结</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15254702833482.html">反向传播</a></h1>
+			<p class="meta"><time datetime="2018-05-05T05:44:43+08:00" 
+			pubdate data-updated="true">2018/5/5</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>现在，我们需要知道一个神经网络的每个连接上的权值是如何得到的。我们可以说神经网络是一个模型，那么这些权值就是模型的参数，也就是模型要学习的东西。然而，一个神经网络的连接方式、网络的层数、每层的节点数这些参数，则不是学习出来的，而是人为事先设置的。对于这些人为设置的参数，我们称之为超参数(Hyper-Parameters)。</p>
+
+<p>接下来，我们将要介绍神经网络的训练算法：反向传播算法。</p>
+
+<h3 id="toc_0">反向传播算法(Back Propagation)</h3>
+
+<p>假设有如下的神经网络</p>
+
+<div align="center">
+    <img width=500 src="media/15254702833482/15254707153853.jpg" />
+</div>
+
+<p>每个训练样本为 \((\vec x,\vec t)\)，其中向量\(\vec x\) 是训练样本的特征，而 \(\vec t\) 是样本的目标值。</p>
+
+<p>我们使用下面的方式计算出每个节点的误差项 \(\delta_i\)：</p>
+
+<ul>
+<li>对于输出节点 \(i\)
+\[
+\begin{equation}
+\delta_i = y_i(1-y_i)(t_i - y_i)\label{diy}\\
+\end{equation}
+\]</li>
+</ul>
+
+<p>其中，\(\delta_i\) 是节点的误差项，\(y_i\) 是节点的输出值，\(t_i\) 是样本对应于节点 \(i\) 的目标值。举个例子，根据上图，对于输出层节点8来说，它的输出值是 \(y_1\) ，而样本的目标值是 \(t_1\)，带入上面的公式得到节点8的误差项应该是：<br/>
+\[<br/>
+\delta_8 = y_1(1-y_1)(t_1 - y_1)<br/>
+\]</p>
+
+<ul>
+<li>对于隐藏层节点
+\[
+\begin{equation}
+\delta_i = a_i(1-a_i) \sum_{k\in \text{outputs}} w_{ki} \delta_k\label{dia}
+\end{equation}
+\]</li>
+</ul>
+
+<p>其中，\(a_i\) 是节点的输出值，\(w_{ki}\) 是节点 \(i\) 到它的下一层节点 \(k\) 的连接的权重，\(\delta_k\) 是节点 \(i\) 的下一层节点 \(k\) 的误差项。例如，对于隐藏层节点4来说，计算方法如下：<br/>
+\[<br/>
+\delta_4 = a_4(1-a_4)(w_{84}\delta_8 + w_{94}\delta_9)<br/>
+\]</p>
+
+<p>最后，更新每个连接上的权值：<br/>
+\[<br/>
+\begin{equation}<br/>
+w_{ji} \leftarrow w_{ji} + \eta \delta_j x_{ji}\label{wedx}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>其中，\(w_{ji}\) 是节点 \(i\) 到节点 \(j\) 的权重，\(\eta\) 是一个成为学习速率的常数，\(\delta_j\) 是节点 \(j\) 的误差项，\(x_{ji}\) 是节点 \(i\) 传递给节点 \(j\) 的输入。例如，权重 \(w_{84} 的更新方法如下：<br/>
+\)\(<br/>
+w_{84} \leftarrow w_{84} + \eta \delta_8 a_4<br/>
+\)$</p>
+
+<p>类似的，权重 \(w_{41}\) 的更新方法如下：<br/>
+\[<br/>
+w_{41} \leftarrow w_{41} + \eta \delta_4 x_1<br/>
+\]</p>
+
+<p>偏置项的输入值永远为1。例如，节点4的偏置项 \(w_{40}\) 应该按照下面的方法计算：<br/>
+\[<br/>
+w_{40} \leftarrow w_{40} + \eta \delta_4<br/>
+\]</p>
+
+<p>我们已经介绍了神经网络每个节点误差项的计算和权重更新方法。显然，计算一个节点的误差项，需要先计算每个与其相连的下一层节点的误差项。这就要求误差项的计算顺序必须是从输出层开始，然后反向依次计算每个隐藏层的误差项，直到与输入层相连的那个隐藏层。这就是反向传播算法的名字的含义。</p>
+
+<h3 id="toc_1">反向传播推导</h3>
+
+<p>按照机器学习的通用套路，我们先确定神经网络的目标函数，然后用随机梯度下降优化算法去求目标函数最小值时的参数值。</p>
+
+<p>我们取网络所有输出层节点的误差平方和作为目标函数：<br/>
+\[<br/>
+E_d = \frac 1 2 \sum_{i\in \text{outputs}}(t_i - y_i)^2<br/>
+\]</p>
+
+<p>使用随机梯度下降算法对目标函数进行优化：<br/>
+\[<br/>
+w_{ji} \leftarrow w_{ji} - \eta \frac{\partial E_d}{\partial w_{ji}}<br/>
+\]</p>
+
+<div align="center">
+    <img width=500 src="media/15254702833482/15254707153853.jpg" />
+</div>
+
+<p>观察上图，我们发现权重 \(w_{ji}\) 仅能通过影响节点 \(j\) 的输入值影响网络的其它部分，设 \(net_j\) 是节点 \(j\) 的加权输入，\(x_{ji}\) 是节点 \(i\) 传递给节点 \(j\) 的输入值，也就是节点 \(i\) 的输出值，即<br/>
+\[<br/>
+net_j = \vec w_j \cdot \vec x_j = \sum_{i} w_{ji} x_{ji}<br/>
+\]</p>
+
+<p>\(E_d\) 是 \(net_j\) 的函数，而 \(net_j\) 是 \(w_{ji}\) 的函数。根据链式求导法则，可以得到：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial E_d}{\partial w_{ji}} &amp;= \frac{\partial E_d}{\partial net_j}\frac{\partial net_j}{\partial w_{ji}}\\<br/>
+&amp;= \frac{\partial E_d}{\partial net_j}\frac{\partial \sum_i w_{ji} x_{ji}}{\partial w_{ji}}\\<br/>
+&amp;= \frac{\partial E_d}{\partial net_j} x_{ji} \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>对于 \(\frac{\partial E_d}{\partial net_j}\) 的推导，需要区分输出层和隐藏层两种情况。</p>
+
+<p><strong>输出层权值训练</strong>：</p>
+
+<p>对于输出层来说，\(net_j\) 仅能通过节点 \(j\) 的输出值 \(y_j\) 来影响网络其它部分，也就是说 \(E_d\) 是 \(y_j\) 的函数，而 \(y_j\) 是 \(net_j\) 的函数，其中 \(y_j = \text{sigmoid}(net_j)\) 。所以我们可以再次使用链式求导法则：<br/>
+\[<br/>
+\begin{equation}<br/>
+\frac{\partial E_d}{\partial net_j} = \frac{\partial E_d}{\partial y_j}\frac{\partial y_j}{\partial net_j}\label{fpep}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>考虑上式第一项：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial E_d}{\partial y_j} &amp;= \frac{\partial}{\partial y_j} \frac 1 2 \sum_{i\in \text{outputs}}(t_i - y_i)^2\\<br/>
+&amp;= \frac{\partial}{\partial y_j} \frac 1 2 (t_i - y_i)^2\\<br/>
+&amp;= -(t_j - y_j)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>考虑上式第二项：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial y_j}{\partial net_j} &amp;= \frac{\partial}{\partial net_j} \text{sigmoid}(net_j)\\<br/>
+&amp;= y_j(1-y_j)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>将第一项，第二项代入(\ref{fpep})得<br/>
+\[<br/>
+\frac{\partial E_d}{\partial net_j} = -(t_j - y_j)y_j(1-y_j) <br/>
+\]</p>
+
+<p>如果令 \(\delta_j = - \frac{\partial E_d}{\partial net_j}\)，也就是一个节点的误差项 \(\delta\) 是网络误差对这个节点输入的偏导数的相反数。带入上式，得到：<br/>
+\[<br/>
+\delta_j = y_i(1-y_i)(t_i - y_i)<br/>
+\]</p>
+
+<p>也就是式(\ref{diy})，将上述推导带入随机梯度下降公式，得到</p>
+
+<p>\[<br/>
+\begin{align*}<br/>
+w_{ji} &amp;\leftarrow w_{ji} - \eta \frac{\partial E_d}{\partial w_{ji}}\\<br/>
+&amp;= w_{ji} - \eta \frac{\partial E_d}{\partial net_j}\frac{\partial net_j}{\partial w_{ji}}\\<br/>
+&amp;= w_{ji} + \eta (t_j - y_j)y_j(1-y_j) x_{ji}\\<br/>
+&amp;= w_{ji} + \eta\delta_j x_{ji}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>也就是式(\ref{wedx})</p>
+
+<p><strong>隐藏层权值训练</strong>：</p>
+
+<p>现在开始推导隐藏层的 \(\frac{\partial E_d}{\partial net_j}\)。</p>
+
+<div align="center">
+    <img width="300" src="media/15254702833482/15254723302672.jpg" />
+</div>
+
+<p>首先，我们需要定义节点 \(j\) 的所有直接下游节点的集合 \(\text{Downstream}(j)\) 。例如，对于节点4来说，它的直接下游节点是节点8、节点9。可以看到 \(net_j\) 只能通过影响 \(\text{Downstream}(j)\) 再影响 \(E_d\) 。设 \(net_j\) 是节点 \(j\) 的下游节点的输入，则 \(E_d\) 是 \(net_k\) 的函数，而 \(net_k\) 是 \(net_j\) 的函数。因为 \(net_k\) 有多个，我们应用全导数公式，可以做出如下推导：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial E_d}{\partial net_j} &amp;= \sum_{k\in \text{Downstream}(j)} \frac{\partial E_d}{\partial net_k}\frac{\partial net_k}{\partial net_j}\\<br/>
+&amp;= \sum_{k\in \text{Downstream}(j)} - \delta_k \frac{\partial net_k}{\partial net_j}\\<br/>
+&amp;= \sum_{k\in \text{Downstream}(j)} - \delta_k \frac{\partial net_k}{\partial a_j} \frac{\partial a_j}{\partial net_j}\\<br/>
+&amp;= \sum_{k\in \text{Downstream}(j)} - \delta_k w_{kj} \frac{\partial a_j}{\partial net_j}\\<br/>
+&amp;= \sum_{k\in \text{Downstream}(j)} - \delta_k w_{kj} a_j (1-a_j)\\<br/>
+&amp;= - a_j (1-a_j)\sum_{k\in \text{Downstream}(j)} \delta_k w_{kj} \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>因为 \(\delta_j=-\frac{\partial E_d}{\partial net_j}\)，代入上式得：<br/>
+\[<br/>
+\delta_j = a_j(1-a_j)\sum_{k \in \text{Downstream}(j)} \delta_k w_{kj}<br/>
+\]</p>
+
+<p>上式就是式(\ref{dia})。至此，我们已经推导出了反向传播算法。需要注意的是，我们刚刚推导出的训练规则是根据激活函数是sigmoid函数、平方和误差、全连接网络、随机梯度下降优化算法。如果激活函数不同、误差计算方式不同、网络连接结构不同、优化算法不同，则具体的训练规则也会不一样。但是无论怎样，训练规则的推导方式都是一样的，应用链式求导法则进行推导即可。</p>
+
+<h3 id="toc_2">梯度检查</h3>
+
+<p>总体误差函数为<br/>
+\[<br/>
+f(x) = \frac 1 2 \sum_{i\in \text{outputs}}(t_i - y_i)^2<br/>
+\]</p>
+
+<p>对于梯度下降算法：<br/>
+\[<br/>
+w_{ji} \leftarrow w_{ji} - \eta\frac{\partial E_d}{\partial w_{ji}}<br/>
+\]</p>
+
+<p>来说，这里关键之处在于 \(\frac{\partial E_d}{\partial w_{ji}}\) 的计算一定要正确，而它是 \(E_d\) 对 \(w_{ji}\) 的偏导数。而根据导数的定义：<br/>
+\[<br/>
+f&#39;(\theta) = \lim_{\epsilon\rightarrow 0}\frac{f(\theta + \epsilon) - f(\theta - \epsilon)}{2\epsilon}<br/>
+\]</p>
+
+<p>对于任意 \(\theta\) 的导数值，我们都可以用等式右边来近似计算。我们把 \(E_d\) 看做是 \(w_ji\) 的函数，即 \(E_d(w_{ji})\)，那么根据导数定义，\(\frac{\partial E_d(w_{ji})}{\partial w_{ji}}\) 应该等于：<br/>
+\[<br/>
+\frac{\partial E_d(w_{ji})}{\partial w_{ji}} = \lim_{\epsilon \rightarrow 0}\frac{f(w_{ji} + \epsilon) - f(w_{ji} - \epsilon)}{2\epsilon}<br/>
+\]</p>
+
+<p>如果把 \(\epsilon\) 设置为一个很小的数（比如 \(10^{-4}\)），那么上式可以写成：<br/>
+\[<br/>
+\begin{equation}<br/>
+\frac{\partial E_d(w_{ji})}{\partial w_{ji}} \approx \frac{f(w_{ji} + \epsilon) - f(w_{ji} - \epsilon)}{2\epsilon}\label{fpew}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>我们可以利用该式来计算梯度 \(\frac{\partial E_d(w_{ji})}{\partial w_{ji}}\) 的值，然后同我们神经网络代码中计算出来的梯度值进行比较。如果两者的差别非常的小，那么就说明我们的代码是正确的。</p>
+
+<p>下面是梯度检查的代码。如果我们想检查参数 \(w_{ji}\) 的梯度是否正确，我们需要以下几个步骤：</p>
+
+<ol>
+<li>首先使用一个样本 \(d\) 对神经网络进行训练，这样就能获得每个权重的梯度。</li>
+<li>将 \(w_{ji}\) 加上一个很小的值(\(10^{-4}\))，重新计算神经网络在这个样本下的。</li>
+<li>将 \(w_{ji}\) 减上一个很小的值(\(10^{-4}\))，重新计算神经网络在这个样本下的。</li>
+<li>根据式(\ref{fpew})计算出期望的梯度值，和第一步获得的梯度值进行比较，它们应该几乎想等(至少4位有效数字相同)。</li>
+</ol>
+
+<p>当然，我们可以重复上面的过程，对每个权重 \(w_{ji}\) 都进行检查。也可以使用多个样本重复检查。</p>
+
+<hr/>
+
+<p><a href="https://www.zybuluo.com/hanbingtao/note/476663">零基础入门深度学习(3) - 神经网络和反向传播算法</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15249262782494.html">神经网络</a></h1>
+			<p class="meta"><time datetime="2018-04-28T22:37:58+08:00" 
+			pubdate data-updated="true">2018/4/28</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>在介绍神经网络之前，我们先来介绍一些S型神经元。</p>
+
+<h3 id="toc_0">S型神经元</h3>
+
+<p>我们⽤描绘感知器的相同⽅式来描绘 S 型神经元：</p>
+
+<div align="center">
+    <img width="300" src="media/15249262782494/15368696909674.jpg" />
+</div>
+
+<p>正如一个感知器，S 型神经元有多个输入，\(x_1,x_2,...\)。但是这些输入可以取 0 和 1 中的任意值，不仅仅是 0 或 1。例如，0.638...是一个 S 型神经元的有效输入。同样，S 型神经元对每个输入有权重，\(w1,w2,...\)，和一个总的偏置，\(b\)。S 型神经元采用的激活函数是 S 型函数，定义为<br/>
+\[<br/>
+\sigma(z) = \frac{1}{1 + e^{-z}}<br/>
+\]</p>
+
+<p>把它们放在一起可以更清楚的说明，一个具有输入 \(x_1,x_2,...\)，权重 \(w_1,w_2,...\) 和偏置 \(b\) 的 S 型神经元的输出是<br/>
+\[<br/>
+\frac{1}{1 + \exp(-\sum_{j} w_j x_j - b)}<br/>
+\]</p>
+
+<p>初看上去，S 型神经元和感知器有很大区别，但是主要区别还是在 S 型函数上，我们可以看看 S 型函数的几何意义。假设 \(z=\mathbf w \mathbf x + b\) 是一个很大的正数，S 型神经元的输出近似为1；当 \(z=\mathbf w \mathbf x + b\) 是一个较大的负数，S 型神经元的输出近似为0；\(\sigma\) 的函数形状如下图：</p>
+
+<div align="center">
+    <img width=400 src="media/15249262782494/15368701242065.jpg" />
+</div>
+
+<p>很明显，感知器和 S 型神经元之间的一个很大的不同是 S 型神经元不仅仅输出 0 或 1。它可以是 0 到 1 之间的任何实数，比如 0.1773 等。但是有时候在一些分类问题上，输出为 0 或 1 是最简单的，但是如果输出的是一个浮点数，将没法判断，因此我们需要设定一个约定来解决这个问题，例如，约定任何至少为 0.5 的输出为表示真，小于 0.5 表示假。</p>
+
+<h3 id="toc_1">神经网络</h3>
+
+<p>假设我们有如下的网络结构</p>
+
+<div align="center">
+    <img width=500 src="media/15249262782494/15368703446770.jpg" />
+</div>
+
+<p>前面提过，这个网络中最左边的称为<strong>输入层</strong>，其中的神经元称为输入神经元。最右边的为<strong>输出层</strong>，包含有输出神经元。在本例中，输出层只有一个神经元。中间层，这层中的神经元既不是输入也不是输出，也被称为<strong>隐藏层</strong>。“隐藏”这个术语也许听上去有些神秘，但它实际上仅仅意味着“既非输入也非输出”。上面的网络仅有一个隐藏层，但有些网络有多个隐藏层。</p>
+
+<p>由于历史的原因，尽管神经网络是由 S 型神经元而不是感知器构成，但是多层神经网络有时候会被称为<strong>多层感知器</strong>或者<strong>MLP</strong>。</p>
+
+<p>神经网络的输入输出层通常是比较直接的。例如，假设我们尝试确定一张手写数字的图像上是否写的是“9”。很自然地，我们可以将图片像素的强度进行编码作为神经网络的输入。如果图像是一个 64 \(\times\) 64 的灰度图像，那么我们会需要 64 \(\times\) 64 = 4096 个输入神经元，每一个强度取 0 和 1 之间合适的值。输出层只需要包含一个神经元，当输出值小于 0.5时表示“输入图像不是9”，大于 0.5 时表示“输入图像是9”。</p>
+
+<p>相比神经网络中输入输出层的直观设计，隐藏层的设计尤为重要，隐藏层层数和数量等选择的不同，直接会影响算法的效率。目前为止，我们讨论的神经网络都是以上一层的输出作为下一层的输入。这种网络被称为“<strong>前馈</strong>神经网络**。这意味着网络中是没有回路的，信息总是向前进行反馈。</p>
+
+<p>然而后面我们也会学习一些神经网络，反馈环路是可行的，这被称之为递归神经网络。关于递归神经网络暂且不说。</p>
+
+<h4 id="toc_2">神经网络的输出</h4>
+
+<p>神经网络实际上就是一个输入向量 \(\vec x\) 到输出向量 \(\vec y\) 的函数，即<br/>
+\[<br/>
+\vec y = f_{network}(\vec x)<br/>
+\]</p>
+
+<p>接下来用一个例子来说明这个过程，我们先给神经网络的每个单元写上编号。</p>
+
+<div align="center">
+    <img width="400" src="media/15249262782494/15368749617164.jpg" />
+</div>
+
+<p>如上图，输入层有三个节点，隐藏层有4个节点，输出层有2个节点。因为我们这个神经网络是全连接网络，所以每一层都与上一层的所有节点两两相连。假设隐藏节点4与输入层三个节点1、2、3之间都有连接，其连接上的权重分别为 \(w_{41}\)，\(w_{42}\)，\(w_{43}\)。现在来计算节点4的输出值。节点1、2、3是输入层，他们的输出值就是输入向量 \(\vec x\) 本身。假设节点1、2、3的输出值为 \(x_1,x_2,x_3\)。我们要求<strong>输入向量的维度与输入层神经元个数相同</strong>，而输入向量的某个元素对应到哪个输入节点是可以自由决定的，你偏非要把赋值给节点2也是完全没有问题的，但这样除了把自己弄晕之外，并没有什么价值。</p>
+
+<p>一旦我们有了节点1、2、3的输出值，我们就可以计算节点4的输出值 \(a_4\)：<br/>
+\[<br/>
+\begin{align*}<br/>
+a_4 &amp;= \text{sigmoid}({\vec w}^T \vec x)\\<br/>
+&amp;= \text{sigmoid}(w_{41} x_1 + w_{42} x_2 + w_{43} x_3 + b_4)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>上式中 \(b_4\) 代表节点4的偏置项。同理我们可以计算节点5、6、7的输出值 \(a_5,a_6,a_7\)。这样，隐藏层4个节点的输出值就计算完成了，可以计算输出层的节点8的输出值 \(y_1\)：<br/>
+\[<br/>
+\begin{align*}<br/>
+y_1 &amp;= \text{sigmoid}({\vec w}^T \vec a)\\<br/>
+&amp;= \text{sigmoid}(w_{84} a_4 + w_{85} a_5 + w_{86} a_6 + w_{87} a_7 + b_8)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>同理，还可以计算出 \(y_2\) 的值。这样输出层所有节点的输出值计算完毕，我们就得到了在输入向量 \(\vec x\) 为 \(\left [\begin{array}\\x_1\\x_2\\x_3\\\end{array}\right ]\) 时，神经网络的输出向量 \(\vec y = \left [ \begin{array}\\ y_1 \\y_2 \\\end{array}\right ]\)。显然，输出向量的维度等于输出神经元的个数。</p>
+
+<h4 id="toc_3">神经网络的矩阵表示</h4>
+
+<p>神经网络如果用矩阵表示会很方便，首先我们看隐藏层4个节点的计算（偏置项看成输入为1的权重，\(b_4\) 写成 \(w_{40}\)）：<br/>
+\[<br/>
+\begin{align*}<br/>
+a_4 &amp;= \text{sigmoid}(w_{40}+w_{41} x_1 + w_{42} x_2 + w_{43} x_3 )\\<br/>
+a_5 &amp;= \text{sigmoid}(w_{50}+w_{51} x_1 + w_{52} x_2 + w_{53} x_3 )\\<br/>
+a_6 &amp;= \text{sigmoid}(w_{60}+w_{61} x_1 + w_{62} x_2 + w_{63} x_3 )\\<br/>
+a_7 &amp;= \text{sigmoid}(w_{70}+w_{71} x_1 + w_{72} x_2 + w_{73} x_3 )\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>接着，输入层 \(\vec x\) 和隐藏层每个节点权重向量 \(\vec w_j\)。令<br/>
+\[<br/>
+\begin{align*}<br/>
+\vec x &amp;= \left [ \begin{array}\\ 1\\x_1 \\x_2\\x_3\\\end{array} \right ]\\<br/>
+\vec w_4 &amp;= [w_{40},w_{41},w_{42},w_{43}]\\<br/>
+\vec w_5 &amp;= [w_{50},w_{51},w_{52},w_{53}]\\<br/>
+\vec w_6 &amp;= [w_{60},w_{61},w_{62},w_{63}]\\<br/>
+\vec w_7 &amp;= [w_{70},w_{71},w_{72},w_{73}]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令 \(f\) 表示 S 型 sigmoid 函数，代入前面式子得：<br/>
+\[<br/>
+a_4 = f(\vec w_4\cdot \vec x)\\<br/>
+a_5 = f(\vec w_5\cdot \vec x)\\<br/>
+a_6 = f(\vec w_6\cdot \vec x)\\<br/>
+a_7 = f(\vec w_7\cdot \vec x)\\<br/>
+\]</p>
+
+<p>将 \(a_4,a_5,a_6,a_7\) 表示成矩阵，并将 \(\vec w_4,\vec w_5,\vec w_6,\vec w_7\) 表示成一个矩阵的形式，令<br/>
+\[<br/>
+\vec a = \left [\begin{array}\\a_4\\a_5\\a_6\\a_7\\\end{array}\right ],\quad W = \left [ \begin{array}\\\vec w_4\\\vec w_5\\\vec w_6\\\vec w_7\\\end{array}\right ] = \left [\begin{array}\\w_{40},w_{41},w_{42},w_{43}\\w_{50},w_{51},w_{52},w_{53}\\w_{60},w_{61},w_{62},w_{63}\\w_{70},w_{71},w_{72},w_{73}\\\end{array} \right ],\quad f\left(\begin{array}\\x_1\\x_2\\x_3\\\vdots\end{array}\right) = \left [\begin{array} \\f(x_1)\\f(x_2)\\f(x_3)\\\vdots\end{array} \right ]<br/>
+\]</p>
+
+<p>所以隐藏层计算可以写成<br/>
+\[<br/>
+\vec a = f(W \cdot \vec x)<br/>
+\]</p>
+
+<p>每一层的算法都是一样的。比如，对于包含一个输入层，一个输出层和三个隐藏层的神经网络，我们假设其权重矩阵分别为 \(W_1,W_2,W_3,W_4\)，每个隐藏层的输出分别是 \(\vec a_1,\vec a_2,\vec a_3\)，神经网络的输入为 \(\vec x\)，神经网络的输入为 \(\vec y\)，如下图所示：</p>
+
+<div align="center">
+    <img width="500" src="media/15249262782494/15368748602021.jpg" />
+</div>
+
+<p>则每一层的输出向量的计算可以表示为<br/>
+\[<br/>
+\begin{align*}\\<br/>
+\vec a_1 &amp;= f(W_1\cdot \vec x)\\<br/>
+\vec a_2 &amp;= f(W_2\cdot \vec a_1)\\<br/>
+\vec a_3 &amp;= f(W_3\cdot \vec a_2)\\<br/>
+\vec y &amp;= f(W_4\cdot \vec a_3)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>这就是神经网络输出值的计算方法。</p>
+
+<h3 id="toc_4">神经网络超参数的估计</h3>
+
+<p>以手写数字识别为例，首先需要确定网络的层数和每层的节点数。实际并没有什么理论指导，一般靠经验获取，或者可以多试几个值，训练不同层数的神经网络，看哪个结果最好。我们知道网络层数越多越好，也知道层数越多训练难度越大。对于全连接网络，隐藏层最好<strong>不要超过三层</strong>。</p>
+
+<p>输入层节点数是确定的。因为手写数字数据集每个训练数据是28*28的图片，共784个像素，因此，输入层节点数应该是784，每个像素对应一个输入节点。</p>
+
+<p>输出层节点数也是确定的。因为是10分类，我们可以用10个节点，每个节点对应一个分类。输出层10个节点中，输出最大值的那个节点对应的分类，就是模型的预测结果。</p>
+
+<p>隐藏层节点数量是不好确定的，从1到100万都可以。下面有几个经验公式：<br/>
+\[<br/>
+\begin{align*}<br/>
+m &amp;= \sqrt{n + l} + \alpha\\<br/>
+m &amp;= \log_2 n\\<br/>
+m &amp;= \sqrt{nl}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(m\) 表是隐藏层节点数，\(n\) 表示输入层节点数，\(l\) 表示输出层节点数，\(\alpha\) 表示1到10自己的常数。</p>
+
+<p>因此，我们可以先根据上面的公式设置一个隐藏层节点数。如果有时间，我们可以设置不同的节点数，分别训练，看看哪个效果最好就用哪个。</p>
+
+<p>假设设隐藏节点数为300，则对于3层 \(784\times 300 \times 10\) 的全连接网络，总共有 \(300\times(784+1) + 10 \times (300+1) = 238510 \) 个参数！神经网络之所以强大，是它提供了一种非常简单的方法去实现大量的参数。</p>
+
+<hr/>
+
+<p><a href="https://www.zybuluo.com/hanbingtao/note/476663">零基础入门深度学习(3) - 神经网络和反向传播算法</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15239854483603.html">感知器</a></h1>
+			<p class="meta"><time datetime="2018-04-18T01:17:28+08:00" 
+			pubdate data-updated="true">2018/4/18</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>在学习神经网络之前，先来看看一个基础的结构-感知器，可以理解为一个最基础的人工神经元。感知器在 20 世纪五、六十年代由科学家 Frank Rosenblatt 发明，其受到 Warren McCulloch 和 Walter Pitts 早期的工作的影响。</p>
+
+<p>类似于生物中的神经元，感知器从接受一段信号，经过处理后传入下一个感知器。如下图</p>
+
+<div align="center">
+    <img width="500" src="media/15239854483603/15368141404791.jpg" />
+</div>
+
+<p>上图中每一个圆圈都可以代表一个感知器，上面的感知器被分成了多层，这称为多层感知器(Multi-Layer Perception)。层与层之间的感知器有连接，而层内之间的感知器没有连接。最左边的层叫做<strong>输入层</strong>，这层负责接收输入数据；最右边的层叫<strong>输出层</strong>，我们可以从这层获取多层感知器输出数据。输入层和输出层之间的层叫做<strong>隐藏层</strong>。</p>
+
+<p>我们先了解一下单层感知器。</p>
+
+<p>一个单层感知器会接受几个二进制的输入 \(x_1,x_2,...,x_n\)，并产生一个二进制的输出</p>
+
+<div align="center">
+    <img width="500" src="media/15239854483603/15368151260680.jpg" />
+</div>
+
+<p>对于每一个输入信息都有它的重要程度，于是引入了<strong>权重</strong>的概念，用 \(w_i\) 表示输入 \(x_i\) 的权重。为了对每个感知器的结果进行调节，引入了<strong>偏置</strong>的概念，用 \(b\) 表示（对应图中的 \(w_0\)）<br/>
+\[<br/>
+net = \sum_{i} w_i x_i + b<br/>
+\]</p>
+
+<p>感知器的输出 \(y\) 为 0 或 1，是由输入加权和和偏置相加后的结果 \(net\) 再经过激活函数得到的结果。激活函数有很多种，这里使用最简单的<strong>跃阶函数</strong>，即当 \(f(x) \ge 0\) 时，输出 \(y=1\)，否则 \(y=0\)：<br/>
+\[<br/>
+y = f(net)<br/>
+\]</p>
+
+<h3 id="toc_0">感知器的结构</h3>
+
+<p>一个基本的感知器包含三个基本的部分组成</p>
+
+<p><strong>输入权值</strong>：对于感知器的每一个输入都有一个对应的权重 \(w_i\)，除权重之外还有一个偏置 \(b\)，它可以看成默认输入 \(1\) 的权重，用 \(w_0\) 表示。<br/>
+<strong>激活函数</strong>：激活函数可以将线性模型映射到非线性模型。<br/>
+<strong>输出</strong>：感知器的输出可以由下面的公式得到<br/>
+\[<br/>
+\begin{equation}<br/>
+y = f(\mathbf w \cdot \mathbf x + b)\label{yfm}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<h3 id="toc_1">感知器的训练</h3>
+
+<p>现在，你可能困惑前面的权重项和偏置项的值是如何获得的呢？这就要用到感知器训练算法：将权重项和偏置项初始化为0，然后，利用下面的感知器规则迭代的修改 \(w_i\) 和 \(b\)，直到训练完成。<br/>
+\[<br/>
+\begin{align*}<br/>
+w_i &amp;\leftarrow w_i + \triangle w_i\\<br/>
+b &amp;\leftarrow b + \triangle b\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中: <br/>
+\[<br/>
+\begin{align*}<br/>
+\triangle w_i &amp;= \eta (t-y) x_i\\<br/>
+\triangle b &amp;= \eta(t-y)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>\(w_i\) 是与输入 \(x_i\) 对应的权重项，\(b\) 是偏置项。事实上，可以把 \(b\) 看作是值永远为1的输入 \(x_b\) 所对应的权重。\(t\) 是训练样本的实际值，一般称之为label。而 \(y\) 是感知器的输出值，它是根据公式(\ref{yfm})计算得出。\(eta\) 是一个称为学习速率的常数，其作用是控制每一步调整权的幅度。</p>
+
+<p>每次从训练数据中取出一个样本的输入向量 \(\mathbf x\)，使用感知器计算其输出 \(y\)，再根据上面的规则来调整权重。每处理一个样本就调整一次权重。经过多轮迭代后（即全部的训练数据被反复处理多轮），就可以训练出感知器的权重，使之实现目标函数。</p>
+
+<hr/>
+
+<p><a href="https://www.zybuluo.com/hanbingtao/note/433855">零基础入门深度学习(1) - 感知器</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+  
+	<div class="pagination">
+	
+<a href="archives.html">Blog Archives</a>
+	 
+	    
+	</div>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

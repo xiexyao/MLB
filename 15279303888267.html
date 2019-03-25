@@ -1,0 +1,713 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  随机梯度下降法的变化形式 - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">随机梯度下降法的变化形式</h1>
+				<p class="meta"><time datetime="2018-06-02T17:06:28+08:00" pubdate data-updated="true">2018/6/2</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>通过反向传播进行的随机梯度下降已经有很好的效果。然而，还有很多其他的观点来优化代价函数，有时候，这些方法能够带来比在小批量的随机梯度下降更好的效果。在这之前，我们先看一下梯度下降法（GD）、批量梯度下降法（BGD）和随机梯度下降法（SGD）。</p>
+
+<h3 id="toc_0">梯度下降法（GD）</h3>
+
+<p>梯度下降算法（Gradient Descent Optimization）是神经网络模型训练最常用的优化算法。目标函数 \(J(w)\) 是关于 \(w\) 的函数，梯度将是目标函数上升最快的方向。对于最小化优化问题，只需要将参数沿着梯度相反的方向前进一个步长，就可以实现目标函数的下降。这个步长又称为学习速率 \(\eta\)。公式如下<br/>
+\[<br/>
+w \leftarrow w - \eta \frac{\partial J}{\partial w} <br/>
+\]</p>
+
+<p>几何意义如下图所示：</p>
+
+<div align="center">
+    <img width="300" src="media/15279303888267/15370651197093.jpg" />
+</div>
+
+<p>在 H 点的导数小于0，梯度向下，H 点将增大靠近最低点，在 F 点的导数大于0，梯度向上，F 点需要减小靠近最低。点。</p>
+
+<p>关于梯度下降法，我们需要知道：<br/>
+1）梯度下降不一定可以收敛到最小值。</p>
+
+<div align="center">
+    <img width="400" src="media/15279303888267/15370667266792.jpg" />
+</div>
+
+<p>2）学习率的大小要适中。</p>
+
+<div align="center">
+    <img width="200" src="media/15279303888267/15370672033462.jpg" />
+</div>
+
+<h3 id="toc_1">批量梯度下降法（BGD）</h3>
+
+<p>在神经网络训练中，往往代价函数是多个参数的函数，训练样本也是数以万计的，批量梯度下降法的具体作法是在更新参数时使用所有的样本来进行更新。设 \(h(x)\) 是要拟合的函数，\(m\) 是训练样本的数量，代价函数假设为二次代价函数：<br/>
+\[<br/>
+\begin{align}<br/>
+J(w) = \frac 1 m \sum_{i=1}^m \Big(\frac 1 2  [h(x^i) - y^i]^2\Big)\label{j1m}\\<br/>
+w_j \leftarrow w_j - \eta \frac{\partial J(w)}{\partial w_j}\label{wlw}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>其中 \(x^i\) 是第 \(i\) 个训练样本。</p>
+
+<p>以二次代价函数为例，求<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial J(w)}{\partial w_j} &amp;= \frac{\partial}{\partial w_j} \frac{1}{2m} \sum_{i=1}^m [h(x^i) - y^i]^2\\<br/>
+&amp;= \frac{1}{m} \sum_{i=1}^m [h(x^i) - y^i]\frac{\partial h(x^i)}{\partial w_j} \\<br/>
+&amp;= \frac{1}{m} \sum_{i=1}^m [h(x^i) - y^i]x^i_j \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>上式代入式(\ref{wlw}) 得<br/>
+\[<br/>
+w_j \leftarrow w_j - \eta \frac{1}{m} \sum_{i=1}^m [h(x^i) - y^i]x^i_j<br/>
+\]</p>
+
+<p>由上式知批量梯度下降是对所有样本进行计算，复杂度高，因此引入了另外一种算法。</p>
+
+<h3 id="toc_2">随机梯度下降法（SGD）</h3>
+
+<p>由于批量梯度下降每跟新一个参数的时候，要用到所有的样本数，所以训练速度会随着样本数量的增加而变得非常缓慢。随机梯度下降正是为了解决这个办法而提出的。它是利用每个样本的损失函数对 \(w_j\) 求偏导得到对应的梯度，来更新 \(w_j\) ，还是以二次代价函数为例：</p>
+
+<p>\[<br/>
+J(w) = \frac 1 2 [h(x^i) - y^i]^2\\<br/>
+\frac{\partial J(w)}{\partial w_j} = [h(x^i) - y^i] x^i_j<br/>
+\]</p>
+
+<p>对于训练速度来说，随机梯度下降法由于每次仅仅采用一个样本来迭代，训练速度很快，而批量梯度下降法在样本量很大的时候，训练速度不能让人满意。对于准确度来说，随机梯度下降法用于仅仅用一个样本决定梯度方向，导致解很有可能不是最优（噪音数据处理不好）。对于收敛速度来说，由于随机梯度下降法一次迭代一个样本，导致迭代方向变化很大，不能很快的收敛到局部最优解。</p>
+
+<h3 id="toc_3">小批量梯度下降法（Mini-BGD）</h3>
+
+<p>小批量梯度下降法是批量梯度下降法和随机梯度下降法的折衷，也就是对于 \(m\) 个样本，我们采用 \(n\) 个样子来迭代，\(1&lt;n&lt;m\)。一般可以取 \(n=10\) ，当然根据样本的数据，可以调整这个 \(n\) 的值。以二次代价函数为例，对应的更新公式是：<br/>
+\[<br/>
+J(w) = \frac 1 n \sum_{i=t}^{t+n-1} [\frac 1 2 h(x^i) - y^i]^2\\<br/>
+\frac{\partial J(w)}{\partial w_j} = \frac{1}{n} \sum_{i=t}^{t+n-1} [h(x^i) - y^i]x^i_j<br/>
+\]</p>
+
+<p>其中 \(t\) 表示第 \(t\) 次迭代。</p>
+
+<p>现在开始讲解随机梯度下降的变化形式。</p>
+
+<h3 id="toc_4">牛顿法（Hessian 技术）</h3>
+
+<p>代价函数 \(C\) 是多个参数的函数，\(w = (w_1, w_2,...,w_n)^T\)，所以 \(C = C(w)\)。 借助于泰勒展开式，代价函数可以在点 \(w^0=(w^0_1,w^0_2,...,w^0_n)^T\) 处被近似为:</p>
+
+<p>\[<br/>
+C(w) = C(w_0) + \sum_j \frac{\partial C}{\partial w_j} (w^j - w_0^j) + \frac{1}{2!} \sum_{j,k} \triangle (w^j - w_0^j)(w^k - w_0^k )\frac{\partial^2 C}{\partial w_j \partial w_k}  + o^n<br/>
+\]</p>
+
+<p>令 \(\triangle w = w-w^0\)，我们可以将其压缩为:<br/>
+\[<br/>
+C(w^0 + \triangle w) = C(w^0) + \nabla C \triangle w + \frac 1 2 \triangle {w}^T H \triangle w + o^n<br/>
+\]</p>
+
+<p>其中 \(\nabla C\) 是通常的梯度向量，\(H\) 就是矩阵形式的 <strong>Hessian 矩阵</strong>，其中 jk-th 项就是 \(\frac{\partial^2 C}{\partial w_j \partial w_k}\)<br/>
+\[<br/>
+H = \left [\begin{array}{cccccc}<br/>
+\frac{\partial^2 C}{\partial w_1\partial w_1}&amp;\frac{\partial^2 C}{\partial w_1\partial w_2}&amp;\cdots&amp;\frac{\partial^2 C}{\partial w_1\partial w_k}&amp;\cdots&amp;\frac{\partial^2 C}{\partial w_1 \partial w_n}\\<br/>
+\frac{\partial^2 C}{\partial w_2\partial w_1}&amp;\frac{\partial^2 C}{\partial w_2\partial w_2}&amp;\cdots&amp;\frac{\partial^2 C}{\partial w_2\partial w_k}&amp;\cdots&amp;\frac{\partial^2 C}{\partial w_2 \partial w_n}\\<br/>
+\vdots&amp;\vdots&amp;\ddots&amp;\vdots&amp;\ddots&amp;\vdots\\<br/>
+\frac{\partial^2 C}{\partial w_j\partial w_1}&amp;\frac{\partial^2 C}{\partial w_j\partial w_2}&amp;\cdots&amp;\frac{\partial^2 C}{\partial w_j\partial w_k}&amp;\cdots&amp;\frac{\partial^2 C}{\partial w_j \partial w_n}\\<br/>
+\vdots&amp;\vdots&amp;\ddots&amp;\vdots&amp;\ddots&amp;\vdots\\<br/>
+\frac{\partial^2 C}{\partial w_n\partial w_1}&amp;\frac{\partial^2 C}{\partial w_n\partial w_2}&amp;\cdots&amp;\frac{\partial^2 C}{\partial w_n\partial w_k}&amp;\cdots&amp;\frac{\partial^2 C}{\partial w_n \partial w_n}\\<br/>
+\end{array} \right ]<br/>
+\]</p>
+
+<p>假设我们通过丢弃更高阶的项来近似 \(C\)：<br/>
+\[<br/>
+\begin{equation}<br/>
+C(w^0 + \triangle w) \approx C(w^0) + \nabla C \triangle w + \frac 1 2 \triangle {w}^T H \triangle w \label{cwap}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>由极值条件必要条件可知，\(C(w^0+\triangle w)\) 求得最优解时，\(C′(w^0 + \triangle w)\) 应满足 <br/>
+\[<br/>
+C′(w^0+\triangle w)=0<br/>
+\]</p>
+
+<p>对式(\ref{cwap})两边求导，可以求得 \(\nabla C\)<br/>
+\[<br/>
+C′(w^0+\triangle w) = \nabla C + H \triangle w = 0<br/>
+\]</p>
+
+<blockquote>
+<p>对 \(w\) 两边求导<br/>
+\[<br/>
+\frac{\partial C}{\partial w} = \frac{\partial C}{\partial \triangle w} \frac{\partial \triangle w}{\partial w}  = \frac{\partial C}{\partial \triangle w} \frac{\partial}{\partial w}(w-w^0)  = \frac{\partial C}{\triangle w}<br/>
+\]</p>
+</blockquote>
+
+<p>如果海森矩阵是正定的<br/>
+\[<br/>
+\triangle w = -H^{-1}\nabla C<br/>
+\]</p>
+
+<p>因此利用牛顿法进行迭代的过程就是</p>
+
+<ol>
+<li>选择开始点 \(w^0\)；</li>
+<li>更新 \(w^0\) 到新点 \(w^1=w^0−H^{−1}\nabla C\)，其中的 \(H\) 和 \(\nabla C\) 是在 \(w^0\) 处计算出来的；</li>
+<li>更新 \(w^1\) 到新点 \(w^2=w^1−H^{−1}\nabla C\)，其中的 \(H\) 和 \(\nabla C\) 是在 \(w^1\) 处计算出来的。</li>
+<li>...</li>
+</ol>
+
+<p>实际应用中，(\ref{cwap}) 是唯一的近似，并且选择更小的步⻓会更好。我们通过重复地使用改变 量 \(\triangle w = −\eta H^{−1}\nabla C\) 来改变 \(w\)，其中 \(\eta\) 是学习速率。</p>
+
+<p>这个最小化代价函数的方法常常被称为 Hessian 技术或者 Hessian 优化。在理论上和实践中的结果都表明 Hessian 方法比标准的梯度下降方法收敛速度更快。特别地，通过引入代价函数的二阶变化信息，可以让 Hessian 方法避免在梯度下降中常碰到的多路径(pathologies)问题。 而且，反向传播算法的有些版本也可以用于计算 Hessian。</p>
+
+<p>如果 Hessian 优化这么厉害，为何我们这里不使用它呢?不幸的是，尽管 Hessian 优化有很多可取的特性，它其实还有一个不好的地方:在实践中很难应用。这个问题的部分原因在于 Hessian 矩阵的太大了。假设你有一个 \(10^7\) 个权重和偏置的网络。那么对应的 Hessian 矩阵会有 \(10^7 \times 10^7 = 10^{14}\) 个元素。这真的是太大了!所以在实践中，计算 \(H^{−1}\nabla C\) 就极其困难。不过， 这并不表示学习理解它没有用了。实际上，有很多受到 Hessian 优化启发的梯度下降的变种，能避免产生太大矩阵的问题。让我们看看其中一个称为基于 momentum 梯度下降的方法。</p>
+
+<h3 id="toc_5">基于 momentum 的梯度下降</h3>
+
+<p>直觉上看，Hessian 优化的优点是它不仅仅考虑了梯度，而且还包含梯度如何变化的信息。基于 momentum 的梯度下降就基于这个直觉，但是避免了二阶导数的矩阵的出现。为了理解 momentum 技术，想想我们关于梯度下降的原始图片，其中我们研究了一个球滚向山谷的场景。那时候，我们发现梯度下降，除了这个名字外，就类似于球滚向山谷的底部。momentum 技术修改了梯度下降的两处使之类似于这个物理场景。首先，为我们想要优化的参数引入了一个称为速度(velocity)的概念。梯度的作用就是改变速度，而不是直接的改变位置，就如同物理学中的力改变速度，只会间接地影响位置。第二，momentum 方法引入了一种摩擦力的项，用来逐步地减少速度。</p>
+
+<p>让我们给出更加准确的数学描述。我们引入对每个权重 \(w_j\) 设置相应的速度变量 \(v = v_1, v_2,...\)。 注意，这里的权重也可以笼统地包含偏置。然后我们将梯度下降更新规则 \(w \leftarrow w − \eta \nabla C\)，改成<br/>
+\[<br/>
+\begin{align*}<br/>
+v &amp;\leftarrow \mu v - \eta\nabla C\\<br/>
+w &amp;\leftarrow w + v<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>在这些方程中，\(\mu\) 是用来控制阻碍或者摩擦力的量的超参数。为了理解这个公式，可以考虑一下当 \(\mu = 1\) 的时候，对应于没有任何摩擦力。所以，此时你可以看到力 \(\nabla C\) 改变了速度 \(v\)，速度随后再控制 \(w\) 变化率。直觉上看，我们通过重复地增加梯度项来构造速度。这表示，如果梯度在某些学习的过程中几乎在同样的方向，我们可以得到在那个方向上比较大的移动量。</p>
+
+<div align="center">
+    <img width="300" src="media/15279303888267/15370754583882.jpg" />
+</div>
+
+<p>相比普通梯度向下，在K点可以凭借之前的速度，令其在这部分参数更新的速度得以增加；同样在I点能凭借之前的速度跨过鞍点；最后在局部最小值J点中，也可能凭借之前的速度跨过。所以基于Momentum的梯度下降虽然不能保证得到一个全局最小值，但是至少给了我们可能性。</p>
+
+<p>前面提到，\(\mu\) 可以控制系统中的摩擦力大小;更加准确地说，你应该将 \(1 − \mu\) 看成是摩擦力的量。当 \(\mu = 1\) 时，没有摩擦，速度完全由梯度 \(\nabla C\) 决定。相反，若是 \(\mu = 0\)，就存在很大的摩擦，速度无法叠加，变成普通的梯度下降。使用 0 和 1 之间的 \(\mu\) 值可以给我们避免过量而又能够叠加速度的好处。我们可以使用 hold out 验证数据集来选择合适的 \(\mu\) 值。</p>
+
+<p>关于 momentum 技术的一个很好的特点是它基本上不需要改变太多梯度下降的代码就可以 实现。我们可以继续使用反向传播来计算梯度，就和前面那样，使用随机选择的 minibatch 的方法。</p>
+
+<p>同样这种方法也有着自身的两个缺点：首先容易跨过全局最小点，其次可能因为惯性过大造成在应该改变梯度（主要指的是下降方向）时无法及时改变。</p>
+
+<h5 id="toc_6">Momentum算法步骤</h5>
+
+<p><strong>输入</strong>：学习率 \(\eta\)，动量参数 \(\mu\)，初始参数 \(w\)，初始速度 \(v\)<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li>while 没有达到停止准则 do
+
+<ul>
+<li>从训练集中采包含 \(m\) 个样本 \(\{x^{(i)},...,x^{(m)}\}\) 的小批量，对应目标为 \(y^{(i)}\)</li>
+<li>计算梯度（在临时点）：\(g\leftarrow \frac 1 m \nabla_{w}\sum_i C(f(x^{(i)};w),y^{(i)})\)</li>
+<li>计算速度更新：\(v \leftarrow \mu v - \eta g\)</li>
+<li>应用更新：\(w \leftarrow w + v\)</li>
+</ul></li>
+<li>end while</li>
+</ul>
+
+<h3 id="toc_7">NAG（Nesterov&#39;s accelerated gradient 涅斯捷罗夫加速梯度下降）</h3>
+
+<p>从山顶往下滚的球会盲目地选择斜坡。更好的方式应该是在遇到倾斜向上之前应该减慢速度。NAG 不仅增加了动量项，并且在计算参数的梯度时，在损失函数中减去了动量项，即计算<br/>
+\[<br/>
+\begin{align*}<br/>
+g^{(t)} &amp;= \nabla C(w^{(t-1)} + \mu v^{(t-1)})\\<br/>
+v^{(t)} &amp;\leftarrow \mu v^{(t-1)} - \eta g^{(t)}\\<br/>
+w^{(t)} &amp;\leftarrow w^{(t-1)} + v_t \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>这种方式首先预估了下一次参数所在的位置，再加上动量项，这样可以阻止过快更新来提高响应性。NAG可以看作是Momentum的改进版，对于这个改动，很多文章给出的解释是，能够让算法提前看到前方的地形梯度，如果前面的梯度比当前位置的梯度大，那我就可以把步子迈得比原来大一些，如果前面的梯度比现在的梯度小，那我就可以把步子迈得小一些。这个大一些、小一些，都是相对于原来不看前方梯度、只看当前位置梯度的情况来说的。</p>
+
+<div align="center">
+    <img width="270" src="media/15279303888267/15370787141104.jpg" />
+</div>
+
+<p>在点H的梯度更新不仅看到当前的梯度和加速度，还能考虑到下一步的梯度，提前做出改变。</p>
+
+<h5 id="toc_8">NAG算法步骤</h5>
+
+<p><strong>输入</strong>：学习率 \(\eta\)，动量参数 \(\mu\)，初始参数 \(w\)，初始速度 \(v\)<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li>while 没有达到停止准则 do
+
+<ul>
+<li>从训练集中采包含 \(m\) 个样本 \(\{x^{(i)},...,x^{(m)}\}\) 的小批量，对应目标为 \(y^{(i)}\)</li>
+<li>应用临时更新：\(\widetilde w \leftarrow w + \mu v\)</li>
+<li>计算梯度（在临时点）：\(g\leftarrow \frac 1 m \nabla_{\widetilde w}\sum_i C(f(x^{(i)};\widetilde w),y^{(i)})\)</li>
+<li>计算速度更新：\(v \leftarrow \mu v - \eta g\)</li>
+<li>应用更新：\(w \leftarrow w + v\)</li>
+</ul></li>
+<li>end while</li>
+</ul>
+
+<h3 id="toc_9">AdaGrad算法</h3>
+
+<p>在上面的参数更新中，都是固定了学习率 \(\eta\)，而Adagrad方法是通过参数来调整合适的学习率 \(\eta\)，对稀疏参数进行大幅更新和对频繁参数进行小幅更新。因此，Adagrad方法非常适合处理稀疏数据。</p>
+
+<p>对于 AdaGrad 算法而言在 t 时刻对每一个参数 \(w_i\) 都使用了不同的学习率，我们首先介绍 AdaGrad 对每一个参数的更新，然后我们对其向量化。为了简洁，令 \(g_{t,i}\) 表示 t 时刻目标函数关于参数 \(w_i\) 的梯度<br/>
+\[<br/>
+g_{t,i} = \nabla_w C(w_i)<br/>
+\]</p>
+
+<p>在 t 时刻，对每一个参数 \(w_i\) 的更新过程变为：<br/>
+\[<br/>
+w_{t+1,i} = w_{t,i} - \eta\cdot g_{t,i}<br/>
+\]</p>
+
+<p>基于上述对 \(w_i\) 计算过的历史梯度，AdaGrad 修正了对每一个参数 \(w_i\) 的学习率：<br/>
+\[<br/>
+w_{t+1,i} \leftarrow w_{t,i} - \frac{\eta}{\sqrt{G_{t,ii} + \epsilon}}\cdot g_{t,i}<br/>
+\]</p>
+
+<p>\(G_t \in \mathbb R^{d\times d}\) 为一个对角矩阵，<strong>对角线上第 \(i,i\) 个元素为 \(w_i\) 的梯度由开始到当前时刻的平方和</strong>。\(\epsilon\) 通常为 \(10^{-7}\)，这是为了保证分母非0。如果不使用开方的话，该算法性能会差很多。</p>
+
+<p>因为 \(G_t\) 在其对角线上所有参数 \(w\) 的历史梯度的平方和，我们可以通过 \(G_t\) 和 \(g_t\) 向量乘法 \(\odot\)，将我们的表达式向量化：<br/>
+\[<br/>
+w_{t+1} \leftarrow w_{t} - \frac{\eta}{\sqrt{G_{t} + \epsilon}}\odot g_{t}<br/>
+\]</p>
+
+<p>该算法优点是自适应的调整学习率。一般初始学习率设置为0.01。</p>
+
+<p>该算法的缺点是，分母中需要计算每个参数梯度的累计平方和，由于每次均累加一个正数，训练阶段累积和会持续增加，导致训练后期的学习率非常小，以至更新时不能从当前的梯度获取任何有用信息（另外，更新参数时，左右两边的单位不统一）。下面的算法 Adadelta 等可以解决这个问题。</p>
+
+<h5 id="toc_10">AdaGrad算法步骤</h5>
+
+<p><strong>输入</strong>：全局学习率 \(\eta\)，初始参数 \(w\)，小参数  \(\epsilon\)，一般设置为 \(10^{-7}\)<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li>初始化梯度数据 \(r=0\)</li>
+<li>while 没有达到体质准则 do
+
+<ul>
+<li>从训练集中采样 \(m\) 个样本 \(\{x^{(1)},...,x^{(m)}\}\) 的小批量，对应目标为 \(y^{(i)}\)</li>
+<li>计算梯度：\(g\leftarrow \frac 1 m \nabla_{w}\sum_{i} C(f(x^{(i)};w),y^{(i)})\)</li>
+<li>累积平方梯度：\(r\leftarrow r+g\odot g\)</li>
+<li>计算参数更新：\(\triangle w \leftarrow -\frac{\eta}{\sqrt{r+ \epsilon}}\odot g\)</li>
+<li>应用更新：\(w \leftarrow w + \triangle w\)</li>
+</ul></li>
+<li>end while</li>
+</ul>
+
+<h3 id="toc_11">RMSprop算法</h3>
+
+<p>鉴于神经网络都是非凸条件下的，RMSProp在非凸条件下结果更好，改变梯度累积为指数衰减的移动平均以丢弃遥远的过去历史。经验上，RMSProp被证明有效且实用的深度学习网络优化算法。目前 它是深度学习从业者经常采用的优化方法之一。</p>
+
+<p>相比于AdaGrad算法的历史梯度：<br/>
+\[<br/>
+r \leftarrow r + g\odot g<br/>
+\]</p>
+
+<p>RMSProp增加了一个衰减系数来控制历史信息的获取多少： <br/>
+\[<br/>
+r \leftarrow \rho r + (1-\rho) g\odot g<br/>
+\]</p>
+
+<h5 id="toc_12">原生的RMSprop算法</h5>
+
+<p><strong>输入</strong>：全局学习率 \(\eta\)，衰减系数 \(\rho\)（建议设置为0.9），初始参数 \(w\)，小参数  \(\epsilon\)，一般设置为 \(10^{-6}\)（用于被小数除时的数值稳定）<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li>初始化累积梯度数据 \(r=0\)</li>
+<li>while 没有达到体质准则 do
+
+<ul>
+<li>从训练集中采样 \(m\) 个样本 \(\{x^{(1)},...,x^{(m)}\}\) 的小批量，对应目标为 \(y^{(i)}\)</li>
+<li>计算梯度：\(g\leftarrow \frac 1 m \nabla_{w}\sum_{i} C(f(x^{(i)};w),y^{(i)})\)</li>
+<li>累积平方梯度：\(r \leftarrow \rho r + (1-\rho) g\odot g\)</li>
+<li>计算参数更新：\(\triangle w \leftarrow -\frac{\eta}{\sqrt{r + \epsilon}}\odot g\)</li>
+<li>应用更新：\(w \leftarrow w + \triangle w\)</li>
+</ul></li>
+<li>end while</li>
+</ul>
+
+<p>再看看结合Nesterov动量的RMSProp，直观上理解就是： <br/>
+RMSProp改变了学习率，Nesterov引入动量改变了梯度，从两方面改进更新方式。 </p>
+
+<h5 id="toc_13">加入Nesterov动量的RMSprop算法</h5>
+
+<p><strong>输入</strong>：全局学习率 \(\eta\)，衰减系数 \(\rho\)（建议设置为0.9），动量系数 \(\mu\)，初始参数 \(w\)<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li>初始化累积梯度数据 \(r=0\)</li>
+<li>while 没有达到体质准则 do
+
+<ul>
+<li>从训练集中采样 \(m\) 个样本 \(\{x^{(1)},...,x^{(m)}\}\) 的小批量，对应目标为 \(y^{(i)}\)</li>
+<li>计算临时更新： \(\widetilde w \leftarrow w + \mu v\)</li>
+<li>计算梯度（在临时点）：\(g\leftarrow \frac 1 m \nabla_{\widetilde w}\sum_{i} C(f(x^{(i)};\widetilde w),y^{(i)})\)</li>
+<li>累积平方梯度：\(r \leftarrow \rho r + (1-\rho) g\odot g\)</li>
+<li>计算速度更新：\(v\leftarrow \mu v - \frac{\epsilon}{\sqrt{r}}\odot g\)</li>
+<li>应用更新：\(w \leftarrow w + v\)</li>
+</ul></li>
+<li>end while</li>
+</ul>
+
+<h3 id="toc_14">Adadelta算法</h3>
+
+<p>Adadelta 类似于RMSprop也使用小批量随机梯度按元素平方的指数加权移动平均变量 \(r\)，设在时刻 \(t\) (前面的 \(r\) 这里用 \(\mathbb E[g^2]_t\) 表示)：<br/>
+\[<br/>
+\mathbb E[g^2]_t \leftarrow \rho \mathbb E[g^2]_{t-1} + (1-\rho) g_t\odot g_t<br/>
+\]</p>
+
+<p>再求它的平方根，下面记为 \(RMS[g]_t\)<br/>
+\[<br/>
+RMS[g]_t = \sqrt{\mathbb E[g^2]_t + \epsilon}<br/>
+\]</p>
+
+<p>AdaDelta算法的作者注意到SGD、Momentum、AdaGrad和RMSProp等算法在参数更新时，单位并不匹配，他认为更新应该和参数应有相同的假想单位，为了实现这一想法，AdaDelta在RMSProp的基础上，还考虑了参数更新的指数衰减累积平方和<br/>
+\[<br/>
+\mathbb E[\triangle w^2]_t \leftarrow \rho \mathbb E[\triangle w^2]_{t-1} + (1-\rho) \triangle w_t^2<br/>
+\]</p>
+
+<p>同理，记<br/>
+\[<br/>
+RMS[\triangle w]_t = \sqrt{\mathbb E[\triangle w^2]_t + \epsilon}<br/>
+\]</p>
+
+<p>Adadelta 算法使用 \(RMS[\triangle w]_t\) 来代替学习率 \(\eta\)，直接采用<br/>
+\[<br/>
+\begin{align*}<br/>
+\triangle w_t &amp;\leftarrow -\frac{\sqrt{\mathbb E[\triangle w^2]_{t-1} + \epsilon}}{\sqrt{\mathbb E[g^2]_t + \epsilon}}\odot g_t\\<br/>
+&amp;= -\frac{RMS[\triangle w]_{t-1}}{RMS[g]_t }\odot g_t\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>最后更新<br/>
+\[<br/>
+w_{t+1} \leftarrow w_{t} + \triangle w_t<br/>
+\]</p>
+
+<h5 id="toc_15">Adadelta算法步骤</h5>
+
+<p><strong>输入</strong>：衰减系数 \(\rho\)（建议设置为0.9），初始参数 \(w\)，小参数  \(\epsilon\)，一般设置为 \(10^{-6}\)（用于被小数除时的数值稳定）<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li>初始化累积梯度数据 \(r=0\)</li>
+<li>初始化累积参数更新数据 \(s=0\)</li>
+<li>while 没有达到体质准则 do
+
+<ul>
+<li>从训练集中采样 \(m\) 个样本 \(\{x^{(1)},...,x^{(m)}\}\) 的小批量，对应目标为 \(y^{(i)}\)</li>
+<li>计算梯度：\(g\leftarrow \frac 1 m \nabla_{w}\sum_{i} C(f(x^{(i)};w),y^{(i)})\)</li>
+<li>累积平方梯度：\(r \leftarrow \rho r + (1-\rho) g\odot g\)</li>
+<li>计算参数更新：\(\triangle w \leftarrow -\frac{\sqrt{s+\epsilon}}{\sqrt{r + \epsilon}}\odot g\)</li>
+<li>累加平方参数更新：\(s \leftarrow \rho s + (1-\rho) \triangle w^2\)</li>
+<li>应用更新：\(w \leftarrow w + \triangle w\)</li>
+</ul></li>
+<li>end while</li>
+</ul>
+
+<h3 id="toc_16">Adam（Adaptive Moment Estimation）</h3>
+
+<p>Adam算法即自适应时刻估计方法（Adaptive Moment Estimation），能计算每个参数的自适应学习率。<strong><font color=red>Adam算法可以看做是修正后的Momentum+RMSProp算法</font></strong>。在实际应用中，Adam方法效果良好。与其他自适应学习率算法相比，其收敛速度更快，学习效果更为有效，而且可以纠正其他优化技术中存在的问题，如学习率消失、收敛过慢或是高方差的参数更新导致损失函数波动较大等问题。学习率建议为0.001。</p>
+
+<h5 id="toc_17">Adam算法步骤</h5>
+
+<p><strong>输入</strong>：步长 \(\eta\)（建议设为0.001），矩估计的指数衰减速率，\(\rho_1\) 和 \(\rho_2\) 在区间 [0,1)内。（建议默认为0.9和0.999），用于数值稳定的小常数 \(\epsilon\)（建议默认为 \(10^-8\)），初始参数 \(w\)<br/>
+<strong>算法过程</strong></p>
+
+<ul>
+<li>初始化一阶和二阶矩变量 \(s=0,r=0\)</li>
+<li>初始化时间 \(t=0\)</li>
+<li>while 没有达到停止准则 do
+
+<ul>
+<li>从训练集中采样 \(m\) 个样本 \(\{x^{(1)},...,x^{(m)}\}\) 的小批量，对应目标为 \(y^{(i)}\)</li>
+<li>计算梯度：\(g\leftarrow \frac 1 m \nabla_{w}\sum_{i} C(f(x^{(i)};w),y^{(i)})\)</li>
+<li>\(t \leftarrow t + 1\)</li>
+<li>更新有偏一阶矩估计：\(s\leftarrow \rho_1 s + (1-\rho_1)g\)<strong><font color=red>　　　　　Momentum项</font></strong></li>
+<li>更新有偏二阶矩估计：\(r\leftarrow \rho_2 r + (1-\rho_2)g\odot g\)<strong><font color=red>　　　RMSProp项</font></strong></li>
+<li>修正一阶矩的偏差：\(\hat s\leftarrow \frac{s}{1-\rho_1^2}\)</li>
+<li>修正二阶矩的偏差：\(\hat r\leftarrow \frac{s}{1-\rho_2^2}\)</li>
+<li>计算参数更新：\(\triangle w = -\frac{\eta}{\sqrt{\hat r}+\epsilon}\hat s\)</li>
+<li>应用更新：\(w\leftarrow w + \triangle w\)</li>
+</ul></li>
+<li>end while</li>
+</ul>
+
+<hr/>
+
+<p>神经网络与深度学习<br/>
+<a href="https://blog.csdn.net/dugudaibo/article/details/77413071">改变神经网络的学习方法（5）：随机梯度下降的变化形式(Adagrad、RMSProp、Adadelta、Momentum、NAG)</a><br/>
+<a href="https://zh.gluon.ai/chapter_optimization/adagrad.html">Adagrad 例子</a><br/>
+<a href="http://zh.gluon.ai/chapter_optimization/adadelta.html">Adadelta</a></p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html'>神经网络</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15284680615860.html" 
+	        title="Previous Post: 模拟退火 SA">&laquo; 模拟退火 SA</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15272663505619.html" 
+	        title="Next Post: 深度学习中正则化">深度学习中正则化 &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

@@ -1,0 +1,892 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  其他算法 - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div class="blog-index">
+
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15446218642343.html">图像相似度方法</a></h1>
+			<p class="meta"><time datetime="2018-12-12T21:37:44+08:00" 
+			pubdate data-updated="true">2018/12/12</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>实现图片相似度的方法有很多，其中平均哈希（aHash），感知哈希（pHash），差异值哈希（dHash）最是常见。</p>
+
+<h3 id="toc_0">平均哈希</h3>
+
+<p>一张图片就是一个二维信号，它包含了不同频率的成分。亮度变化小的区域是低频成分，它描述大范围的信息。而亮度变化剧烈的区域（比如物体的边缘）就是高频的成分，它描述具体的细节。或者说高频可以提供图片详细的信息，而低频可以提供一个框架。 而一张大的，详细的图片有很高的频率，而小图片缺乏图像细节，所以都是低频的。所以我们平时的下采样，也就是缩小图片的过程，实际上是损失高频信息的过程。均值哈希算法就是利用图片的低频信息。</p>
+
+<p>平均哈希的步骤如下：</p>
+
+<ol>
+<li>缩小尺寸：去除高频和细节的最快方法是缩小图片，将图片缩小到8x8的尺寸，总共64个像素。不要保持纵横比，只需将其变成8*8的正方形。这样就可以比较任意大小的图片，摒弃不同尺寸、比例带来的图片差异。</li>
+<li>简化色彩：将8*8的小图片转换成灰度图像。</li>
+<li>计算平均值：计算所有64个像素的灰度平均值。</li>
+<li>比较像素的灰度：将每个像素的灰度，与平均值进行比较。大于或等于平均值，记为1；小于平均值，记为0。</li>
+<li>计算hash值：将上一步的比较结果，组合在一起，就构成了一个64位的整数，这就是这张图片的指纹。组合的次序并不重要，只要保证所有图片都采用同样次序就行了。(我设置的是从左到右，从上到下用二进制保存)。</li>
+</ol>
+
+<p>计算一个图片的hash指纹的过程就是这么简单。如果图片放大或缩小，或改变纵横比，结果值也不会改变。增加或减少亮度或对比度，或改变颜色，对hash值都不会太大的影响。最大的优点：计算速度快！这时候，比较两个图片的相似性，就是先计算这两张图片的hash指纹，也就是64位0或1值，然后计算不同位的个数(汉明距离)。如果这个值为0，则表示这两张图片非常相似，如果汉明距离小于5，则表示有些不同，但比较相近，如果汉明距离大于10则表明完全不同的图片。</p>
+
+<p>缺点：对均值敏感，例如对图像进行伽马校正或直方图均衡就会影响均值，从而影响最终的hash值。</p>
+
+<h3 id="toc_1">感知哈希</h3>
+
+<p>均值哈希虽然简单，但受均值的影响非常大。例如对图像进行伽马校正或直方图均衡就会影响均值，从而影响最终的hash值。存在一个更健壮的算法叫pHash。它将均值的方法发挥到极致。使用离散余弦变换(DCT)来获取图片的低频成分。</p>
+
+<h4 id="toc_2">离散余弦变换 DCT</h4>
+
+<p>图像的离散余弦变换广泛用于图像的压缩。对原始图像进行离散余弦变换，变换后DCT系数能量主要集中在左上角，其余大部分系数接近于零，DCT具有适用于图像压缩的特性。将变换后的DCT系数进行门限操作，将小于一定值得系数归零，这就是图像压缩中的量化过程，然后进行逆DCT运算，可以得到压缩后的图像。</p>
+
+<h5 id="toc_3">离散余弦变换的原理</h5>
+
+<p>一维DCT变换时二维DCT变换的基础，所以我们先来讨论下一维DCT变换。一维DCT变换共有8种形式，其中最常用的是第二种形式，由于其运算简单、适用范围广。我们在这里只讨论这种形式，其表达式如下：</p>
+
+<p>\[<br/>
+\begin{align*}<br/>
+F(u) = C(u)\sum_{x=0}^{N-1} f(u) \cos\Big( \frac{u\pi(2x+1)}{2N} \Big)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中<br/>
+\[<br/>
+C(u) = \left \{ \begin{array}\\\sqrt{\frac{1}{N}},\qquad &amp;u=0\\\sqrt{\frac{2}{N}},&amp;u\neq 0\\\end{array}\right .<br/>
+\]</p>
+
+<p>其中，\(f(u)\) 表示原始信号，\(F(u)\) 表示DCT变换后的系数，\(N\) 为原始信号的点数，\(C(u)\) 可以认为是补偿系数，可以使DCT变换矩阵为正交矩阵。</p>
+
+<p>二维离散余弦变换其实就是在一维变换的基础上再做了一次变换，公式为： <br/>
+\[<br/>
+\begin{align*}<br/>
+F(u,v) = \frac 1 N C(u) C(v) \sum_{x=0}^{N-1} \sum_{y=0}^{N-1} f(x,y) \cos\Big( \frac{u\pi(2x+1)}{2N}\Big) \cos\Big(\frac{v\pi(2y+1)}{2N}\Big)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>在图像的压缩码中，\(N\) 一般为8，另外由于DCT变换高度的对称性，因此我们可以使用更简单的矩阵处理方式：<br/>
+\[<br/>
+\begin{align*}<br/>
+F &amp;= AfA^T\\<br/>
+A(i,j) &amp;= C(i) \cos\Big(\frac{i\pi(2j + 1)}{2N}\Big)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>二维DCT逆变换公式为：<br/>
+\[<br/>
+\begin{align*}<br/>
+f(x,y) = \frac 1 N \sum_{x=0}^{N-1} \sum_{y=0}^{N-1} C(u) C(v) F(u,v) \cos\Big(\frac{u\pi(2x+1)}{2N}\Big) \cos\Big(\frac{v\pi(2y+1)}{2N}\Big)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>上式的各项系数分别为：<br/>
+\[<br/>
+C(u),C(v) = \left \{ \begin{array}\\ \frac{1}{\sqrt{N}} &amp;\qquad \text{if u,v = 0}\\ \sqrt{\frac{2}{N}} &amp; \qquad \text{otherwise} \\ \end{array} \right .<br/>
+\]</p>
+
+<p>同样的道理，我们利用之前的矩阵运算公式可以推导出DCT反变换相应的矩阵形式：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\quad F = AfA^T\\<br/>
+&amp;\because A^{-1} = A^T\\<br/>
+&amp;\therefore f = A^{-1} F(A^T)^{-1} = A^T F A\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>现在再来看 pHash，它先将图像从像素域变换到频率域。然后一般图像都存在很多冗余和相关性的，所以转换到频率域之后，只有很少的一部分频率分量的系数才不为0，大部分系数都为0（或者说接近于0）。经过DCT变换后的系数矩阵从左上角到右下角频率越来越高，因此图片的能量主要保留在左上角的低频系数上了。</p>
+
+<h4 id="toc_4">pHash 具体步骤</h4>
+
+<ol>
+<li>缩小尺寸：pHash以小图片开始，但图片大于8*8，32*32是最好的。这样做的目的是简化了DCT的计算，而不是减小频率。</li>
+<li>简化色彩：将图片转化成灰度图像，进一步简化计算量。</li>
+<li>计算DCT：计算图片的DCT变换，得到32*32的DCT系数矩阵。</li>
+<li>缩小DCT：虽然DCT的结果是32*32大小的矩阵，但我们只要保留左上角的8*8的矩阵，这部分呈现了图片中的最低频率。</li>
+<li>计算平均值：如同均值哈希一样，计算DCT的均值。</li>
+<li>计算hash值：这是最主要的一步，根据8*8的DCT矩阵，设置0或1的64位的hash值，大于等于DCT均值的设为1，小于DCT均值的设为0。组合在一起，就构成了一个64位的整数，这就是这张图片的指纹。</li>
+</ol>
+
+<p>分析： 结果并不能告诉我们真实性的低频率，只能粗略地告诉我们相对于平均值频率的相对比例。只要图片的整体结构保持不变，hash结果值就不变。能够避免伽马校正或颜色直方图被调整带来的影响。对于变形程度在25%以内的图片也能精准识别。</p>
+
+<h3 id="toc_5">差值哈希算法</h3>
+
+<p>比pHash，dHash的速度要快的多，相比aHash，dHash在效率几乎相同的情况下的效果要更好，它是基于渐变实现的。主要步骤：</p>
+
+<ol>
+<li>缩小尺寸：收缩到8*9（高宽）的大小，一遍它有72的像素点</li>
+<li>转化为灰度图：把缩放后的图片转化为256阶的灰度图。</li>
+<li>计算差异值：dHash算法工作在相邻像素之间，这样每行9个像素之间产生了8个不同的差异，一共8行，则产生了64个差异值</li>
+<li>获得指纹：如果左边的像素比右边的更亮，则记录为1，否则为0.</li>
+</ol>
+
+<hr/>
+
+<p><a href="https://blog.csdn.net/chenghaoy/article/details/83271885">哈希算法-图片相似度计算</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a></h1>
+			<p class="meta"><time datetime="2018-12-01T10:00:13+08:00" 
+			pubdate data-updated="true">2018/12/1</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>蒙特卡罗树搜索全称 Monte Carlo Tree Search，是一种人工智能问题中做出最优决策的方法，一般是在组合博弈中的行动（move）规划形式。它结合了随机模拟的一般性和树搜索的准确性。</p>
+
+<p>MCTS 受到快速关注主要是由计算机围棋程序的成功以及其潜在的在众多难题上的应用所致。超越博弈游戏本身，MCTS 理论上可以被用在以 {状态 state，行动 action} 对定义和用模拟进行预测输出结果的任何领域。</p>
+
+<h3 id="toc_0">蒙特卡罗树</h3>
+
+<p>关于蒙特卡罗树搜索，有个常见的错误认知，在此先纠正。在棋类博弈中，很多年前出现的是蒙特卡罗方法，就是随机游走，然后看哪里的胜率最高。但是这里有个问题：</p>
+
+<ol>
+<li>如果走在A，人有100种应对，其中99种，电脑会立刻赢，其中只有1种电脑会立刻输。</li>
+<li>如果走在B，人有100中应对，但局势很复杂，随机走下去，双方赢的概率都是50%。</li>
+</ol>
+
+<p>如果使用蒙特卡罗方法计算胜率，电脑会发现走在A的胜率是99%，走在B的胜率是50%。可是，电脑的正解应该是B，因为如果走了A，人如果足够聪明，就一定会走电脑立刻输的棋着。</p>
+
+<p>蒙特卡罗树搜索是博弈树和蒙特卡罗方法的结合，它不会犯A和B的错误，它很快就会发现B比A好。容易证明，如果给定足够的计算时间和足够的存储空间，蒙特卡罗树搜索可以收敛到完美的博弈树。</p>
+
+<p>树的搜索算法很多，如果树的层数比较浅，我们可以穷举计算每一个节点输赢的概率，那么可以使用一种最简单的策略，叫做minmax算法。基本思路是，从树的叶子节点开始看，如果是本节点就选择max的，如果是对方回合就选min，实际上这也是假设对方是聪明的也会使用minmax算法，这样在博弈论里面就达到一个纳什均衡点。</p>
+
+<p>这是搜索空间比较小的策略，MCTS要解决的是搜索空间足够大，不能计算得到所有子树的价值，这是需要一种较为高效的搜索策略，同事也得兼顾探索和利用，避免陷入局部最优解。MCTS实现这些特性的方式有很较多中，例如经典的UCB（Upper Confidence Bounds）算法，就是选择子节点的时候优先考虑没有探索过的，如果都探索过的就根据得分来选择，得分不仅是由这个子节点最终赢的概率来，而是根据这个节点玩的次数成负相关，也就是说这个子节点如果平均得分高就会被选中的概率高，同时如果子节点选中次数较多则下次不太会被选中（因为其他选择次数少的更值得探索），因此MCTS根据配置探索和利用不同的权重，可以实现比随机或者其他策略更有启发式的方法。</p>
+
+<p>前面提到的MCTS的使用场景需要是搜索空间巨大，因为搜索空间如果在计算能力以内，其实是没有必要使用MCTS的，而真正地应用上还需要其他的假设。涉及到博弈论的概率，我们要求场景必须是能分出输赢（zero-sum）、游戏信息完全公开的（fully information）、确定的（每一个操作结果没有随机因素）（determinism）、顺序的（操作都是按顺序执行）（sequential）、离散的（discrete），除了博弈论我们还要求场景是类似多臂老虎机的黑盒环境，不能通过求导或者凸优化方法来找到最优解，否则MCTS也是没有意义的。在蒙特卡罗搜索之前，没有先要有下面的理论基础。</p>
+
+<h3 id="toc_1">Game theory 基础</h3>
+
+<p>Game theory 中文名称是博弈论，是研究多个玩家在相互交互中取胜的方法。先看几个博弈论中的概念。</p>
+
+<h4 id="toc_2">零和（zero-sum）</h4>
+
+<p>零和就是所有玩家的权益之和为零，如果我赢你就是输，没有双赢或双输的出现，也不考虑合作等因素的出现。</p>
+
+<h4 id="toc_3">纳什均衡</h4>
+
+<p>所有玩家都选择对自己而言的最优解并且自己单方面做其他选择也无法再提高的点。也就是说，如果玩家都是高手，能达到或逼近纳什均衡的策略就是最优策略，如果对手不是高手不会选择最优策略，那么纳什均衡点不一定保证每局都赢，但长远看来极大概率会赢这样的新手。</p>
+
+<h4 id="toc_4">信息对称（fully information）</h4>
+
+<p>游戏中所有的信息和状态对所有玩家都是可见的，不存在只有自己可以观察到的状态，一次双方的游戏策略只需要关注共同的状态即可。</p>
+
+<h3 id="toc_5">Black box optimazation 基础</h3>
+
+<p>黑盒优化（Black box optimization）就是根据给定的数据集找到更好的选择，但是我们使用的学习算法如SVM、DNN都不是黑盒，它们是根据数学公式推导通过函数求导等方式进行的优化。如果我们能把问题描述成一个函数或凸优化问题，那么我们通过数学上的求导就可以得到最优解，这类问题并不需要用到MCTS等搜索算法，但实际上很多问题例如围棋等就无法找到一个描述输赢的函数曲线，这样就无法通过纯数学的方法解决。</p>
+
+<p>这类问题统称为黑盒优化问题，我们不能假设知道这个场景内部的函数或者模型结构，只能通过给定模型输入得到模型输出结果来优化。例如多臂老虎机（Multi-arm Bandit）问题，我们有多台老虎机可以投币，但不知道每一台输赢的概率，只能通过多次投币来测试，根据观察的结果预估每台机器的收益分布，最终选择认为收益最大的，这种方法一般会比随机方法效果好。</p>
+
+<p>黑盒优化的算法也有很多，例如进化算法、贝叶斯优化、MCTS也算是，而这些算法都需要解决如何权衡探索和利用（Exploration and Exploitation）的问题。如果我们只有一个投币，那么当前会选择期望收益最高的老虎机来投（Exploitation），但如果我们有一万个投币，我们不应该只投一个老虎机，而应该用少量币来探索一下其他老虎机（Exploration），说不定能跳过局部最优解找到更优解，当然我们也不能全部投币都用来探索了。</p>
+
+<h3 id="toc_6">UCB算法基础</h3>
+
+<p>算法本身很简单，公式如下：<br/>
+\[<br/>
+\arg\max_{v&#39;\in children\text{ }of\text{ }v} \frac{Q(v&#39;)}{N(v&#39;)} + c\sqrt{\frac{2\ln N(v)}{N(v&#39;)}}<br/>
+\]</p>
+
+<p>其中 \(v&#39;\) 表示当前树节点，\(v\) 表示父节点，Q表示这个树节点累积的quality值，\(N\) 表示这个树节点visit次数，\(C\) 是一个常量（控制exploitation和exploration权重）。</p>
+
+<p>这个公式的意思时，由两部分组成，左边是这个节点的平均收益值（越高表示这个节点期望收益好，越值得选择，用于exploitation），右边的变量是这个父节点的总访问次数除以子节点的访问次数（如果子节点访问次数越少则值越大，越值得选择，用户exploration），因此使用这个公式是可以兼顾探索和利用的。</p>
+
+<h3 id="toc_7">MCTS算法原理</h3>
+
+<p>MCTS的算法分为四步，第一步是Selection，就是在树中找到一个最好的值得探索的节点，一般策略是先选择未被探索的子节点，如果都探索过就选择UCB值最大的子节点。第二步是Expansion，在前面选中的子节点中走一步创建一个新的子节点，一般策略是随机执行一个操作并且这个操作不能与前面的子节点重复。第三步是Simulation，在前面Expansion选出来的节点开始模拟游戏，知道到达游戏结算状态，这样可以收到这个expansion出来的节点的得分。第四步是Backpropagation，就是把前面expansion出来的节点得分反馈到前面所有父节点中，更新这些节点的quality value和visit times，方便后面计算UCB。</p>
+
+<p>基本思路就是这样的，通过不断的模拟得到大部分节点的UCB值，然后下次模拟的时候根据UCB值有策略得选择值得利用和值得探索的节点继续模拟，在搜索空间巨大并且计算能力有限的情况下，这种启发式搜索能更集中地、更大概率找到一些更好的节点。下面是论文的伪代码实现。</p>
+
+<div align="center">
+    <img width="360" src="media/15436296136092/15461567273020.jpg" />
+</div>
+
+<hr/>
+
+<p><a href="https://zhuanlan.zhihu.com/p/24801451">28天自制你的 Alpha Go（1）</a><br/>
+<a href="https://zhuanlan.zhihu.com/p/30458774">如何学习蒙特卡罗树搜索（MCTS）</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15309710071828.html">自动编码器</a></h1>
+			<p class="meta"><time datetime="2018-07-07T21:43:27+08:00" 
+			pubdate data-updated="true">2018/7/7</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>自动编码（Autoencodes）是一个非常激动人心的无监督学习方法，它们取得的进展已经超过了数十年的研究人员研究的手选编码特征。</p>
+
+<p>当我们试图解决一个256*256像素的灰度图，我们需要面临 65536 维度的数据，这对于很多算法来说，存储计算都不是容易的事。更何况现在动辄就是更高清的图片、语音等数据。</p>
+
+<p>为了解决更高维的问题，出现的线性学习的PCA降维方法，PCA的数学基础无懈可击，但是它的却只对线性数据效果比较好。于是提出更只能的特征提取方法--自动编码器。</p>
+
+<h3 id="toc_0">自动编码器（AutoEncoder）</h3>
+
+<p>自编码器是一种非常有用的无监督学习模型。自编码器由 encoder 和 decoder 组成，前者将原始表示编码成隐层表示，后者将隐层表示解码成原始表示，训练目标为最小化重构误差，而且一般而言，隐层的特征维度低于原始特征维度。</p>
+
+<div align=center>
+    <img width=380 src="media/15309710071828/15391710254254.jpg" />
+</div>
+
+<p>如上图，我们将input 输入一个encoder编码器，就会得到一个code，这个code也就是输入的一个表示，也就是特征。decoder通过对code的重建会输出一个与input很像的信号，而重构后的信号与input的误差就是调整网络参数（也就是Encoder,Decoder）的校正信号。由于这里不需要input带label，所以是无监督的学习过程，学习的是无监督特征。</p>
+
+<p>假设有一组 \(d\) 维度的样本 \(x^{(n)} \in \mathbb R^d\)，\(1\le n \le N\)，自编码器将这组数据映射到特征空间得到每个样本编码 \(z^{(n)}\in \mathbb R^{p}\)，\(1\le n \le N\)，并且希望这组编码可以重构出原来的样本。</p>
+
+<p>自编码器可以分成两部分：</p>
+
+<p><strong>编码器（encoder）</strong><br/>
+\[<br/>
+f : \mathbb R^d \rightarrow \mathbb R^p<br/>
+\]</p>
+
+<p><strong>解码器（decoder）</strong><br/>
+\[<br/>
+g : \mathbb R^p \rightarrow \mathbb R^d<br/>
+\]</p>
+
+<p>自编码器的学习目标是最小化重构错误（reconstruction errors）<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathcal L &amp;= \sum_{n=1}^N ||x^{(n)} - g(f(x^{(n)}))||^2\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>最简单的自编码器是如下图所示的两层神经网络。输入层到隐藏层用来编码，隐藏层到输出层用来解码，层与层之间是全连接。</p>
+
+<div align="center">
+    <img width=360 src="media/15309710071828/15391719034110.jpg" />
+</div>
+
+<p>对于样本 \(x\)，中间隐藏层为编码<br/>
+\[<br/>
+z = s(W^{(1)} x + b^{(1)})<br/>
+\]</p>
+
+<p>输出为重构的数据<br/>
+\[<br/>
+x&#39; = s(w^{(2)} z + b^{(2)})<br/>
+\]</p>
+
+<p>其中 \(W,b\) 为网络参数，\(s(\cdot)\) 为激活函数。如果令 \(W^{(2)}\) 等于 \(W^{(1)}\) 的转置，即 \(W^{(2)} = {W^{(1)}}^T\)，称为捆绑权重（tied weights）。最初的编码器确实使用了两组 \((W,b)\)，但是Vincent在2010年的论文中做了研究，发现只要单组 \(W\) 就可以了。</p>
+
+<p>并且我们可以引入正则化项，给定一组样本 \(x^{(n)} \in [0,1]^d\)，\(1\le n \le N\)，其重构错误为<br/>
+\[<br/>
+\mathcal L = \sum_{n=1}^N ||x^{(n)} - x&#39;^{(n)}||^2 + \lambda ||W||^2_F<br/>
+\]</p>
+
+<p>其中 \(\lambda\) 为正则化项系数。通过最小化重构错误，可以有效地学习网络的参数。</p>
+
+<h3 id="toc_1">稀疏自动编码器（Sparse Autoencoder）</h3>
+
+<p>自编码器除了可以学习低维编码之外，也学习高维的稀疏编码。假设中间隐藏层 \(z\) 的维度为 \(p\) 大于输入样本 \(x\) 的维度 \(d\)，并让 \(z\) 尽量稀疏，这就是稀疏自编码器（ Sparse Auto-Encoder）。和稀疏编码一样，稀疏自编码器的优点是有很高的可解释性，并同时进行了隐式的特征选择。</p>
+
+<div align="center">
+    <img src="media/15309710071828/15470498102061.jpg" width="460px" />
+</div>
+
+<p>如上图，其实就是限制每次得到的表达code尽量稀疏。因为稀疏的表达往往比其他的表达要有效（人脑好像也是这样的，某个输入只是刺激某些神经元，其他的大部分的神经元是受到抑制的）。</p>
+
+<h4 id="toc_2">稀疏编码</h4>
+
+<p>稀疏编码（ Sparse Coding）也是一种受哺乳动物视觉系统中简单细胞感受野而启发的模型。在哺乳动物的初级视觉皮层中，每个神经元仅对处于其感受野中特定的刺激信号做出响应，比如特定方向的边缘、条纹等特征。局部感受野可以被描述为具有空间局部性、方向性和带通性（即不同尺度下空间结构的敏感性）。也就是说，外界信息经过编码后仅有一小部分神经元激活，即外界刺激在视觉神经系统的表示具有很高的稀疏性。编码的稀疏性在一定程度上符合生物学的低功耗特性。</p>
+
+<p>在数学上，（线性）编码是指给一组基向量 \(A = [a_1,...,a_p]\)，将输入样本 \(\mathbf x \in \mathbb R^d\) 表示为这些基向量的线性组合<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbf x &amp;= \sum_{i=1}^p z_i a_i\\<br/>
+&amp;= A\mathbf z\\<br/>
+\end{align*}<br/>
+\] </p>
+
+<p>其中基向量的系数 \(z = [z_1,..., z_p]\) 称为输入样本 \(\mathbf x\) 的编码（encoding），基向量 \(A\) 也称为字典（dictionary）。</p>
+
+<p>编码是对 \(d\) 维空间中的样本 \(\mathbf x\) 找到其在 \(p\) 维空间中的表示（或投影），其目标通常是编码的各个维度都是统计独立的，并且可以重构出输入样本。编码的关键是找到一组“完备”的基向量 \(A\)，比如主成分分析等。但是主成分分析得到编码通常是稠密向量，没有稀疏性。</p>
+
+<p>如果 \(p\) 个基向量刚好可以支撑 p维的欧氏空间，则这 \(p\) 个基向量是完备的。如果 \(p\) 个基向量可以支撑 \(d\) 维的欧氏空间，并且 \(p &gt; d\)，则这 \(p\) 个基向量是过完备的，冗余的。</p>
+
+<p>为了得到稀疏的编码，我们需要找到一组“超完备”的基向量（即 \(p &gt; d\)）来进行编码。在超完备基向量之间往往会存在一些冗余性，因此对于一个输入样本，会存在很多有效的编码。如果加上稀疏性限制，就可以减少解空间的大小，得到“唯一”的稀疏编码。</p>
+
+<p>给定一组 \(N\) 个输入向量 \(x^{(1)},...,x^{(N)}\)，其稀疏编码的目标函数定义为：<br/>
+\[<br/>
+L(A, Z) = \sum_{n=1}^N \Big(||x^{(n)} - A\mathbf z^{(n)}||^2 + \eta \rho(\mathbf z^{(n)})\Big)<br/>
+\]</p>
+
+<p>其中 \(\rho(\cdot)\) 是一个稀疏性衡量函数， \(\eta\) 是一个超参数，用来控制稀疏性的强度。对于一个向量 \(\mathbf z \in \mathbb R^p\)，其稀疏性定义为非零元素的比例。如果一个向量只有很少的几个非零元素，就说这个向量是稀疏的。严格的稀疏向量有时比较难以得到，因此如果一个向量只有少数几个远大于零的元素，其它元素都接近于 0，我们也称这个向量为稀疏向量。稀疏性衡量函数 \(\rho(\mathbf z)\) 是给向量 \(\mathbf z\) 一个标量分数。 \(\mathbf z\) 越稀疏， \(\rho(\mathbf z)\) 越小。</p>
+
+<p>稀疏性衡量函数有多种选择，最直接的衡量向量 \(\mathbf z\) 稀疏性的函数是 \(\mathcal l^0\) 范式<br/>
+\[<br/>
+\rho(\mathbf z) = \sum_{i=1}^p \mathbf I(|z_i| \gt 0)<br/>
+\]</p>
+
+<p>但 \(\mathcal l^0\) 范数不满足连续可导，因此很难进行优化。在实际中，稀疏性衡量函数通<br/>
+常使用 \(\mathcal l^1\) 范数<br/>
+\[<br/>
+\begin{equation}<br/>
+\rho(\mathbf z) = \sum_{i=1}^p |z_i| \label{rhs1}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>或对数函数<br/>
+\[<br/>
+\begin{equation}<br/>
+\rho(\mathbf z) = \sum_{i=1}^p \log(1 + z_i^2) \label{rhs2}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>或指数函数<br/>
+\[<br/>
+\begin{equation}<br/>
+\rho(\mathbf z) = \sum_{i=1}^p - \exp(-z_i^2) \label{rhs3}<br/>
+\end{equation}<br/>
+\]</p>
+
+<h5 id="toc_3">稀疏编码的训练</h5>
+
+<p>给定一组 \(N\) 个输入向量 \(x^{(1)},...,x^{(N)}\)，需要同时学习基向量 \(A\) 以及每个输入样本对应的稀疏编码 \(z^{(1)},...,z^{(N)}\)。稀疏编码的训练过程一般用交替优化的方法进行。</p>
+
+<p>1) 固定基向量 \(A\)，对每个输入 \(x^{(n)}\)，计算其对应的最优编码<br/>
+\[<br/>
+\min_{z^{(n)}} ||x^{(n)} - A z^{(n)}||^2 - \eta\rho(z^{(n)}), \forall n \in [1, N]<br/>
+\]</p>
+
+<p>2) 固定上一步得到的编码 \(z^{((1)}, ..., z^{(N)}\)，计算其最优的基向量<br/>
+\[<br/>
+\min_{A} \sum_{n=1}^N \Big(||x^{(n)} - Az^{(n)}||^2 \Big) + \lambda \frac 1 2||A||^2<br/>
+\]</p>
+
+<p>其中第二项为正则化项， \(\lambda\) 为正则化项系数。</p>
+
+<h5 id="toc_4">稀疏编码器</h5>
+
+<p>通过给自编码器中隐藏层单元 \(\mathbf z\) 加上稀疏性限制，自编码器可以学习到数据中一些有用的结构。<br/>
+\[<br/>
+\mathcal L = \sum_{n=1}^N ||x^{(n)} - x&#39;^{(n)}||^2 + \eta \rho(\mathbf z^{(n)}) + \lambda||W||^2<br/>
+\]</p>
+
+<p>其中 \(\rho(\cdot)\) 为稀疏性度量函数， \(W\) 表示自编码器中的参数。</p>
+
+<p>稀疏性度量函数 \(\rho(\cdot)\) 除了可以选择公式 ( \ref{rhs1} )、( \ref{rhs2} ) 和 ( \ref{rhs3} ) 的定义外，还可以定义为一组训练样本中每一个神经元激活的频率。</p>
+
+<p>给定 \(N\) 个训练样本，隐藏层第 \(j\) 个神经元平均活性值为<br/>
+\[<br/>
+\hat \rho_j = \frac 1 N \sum_{n=1}^N z_j^{(n)}<br/>
+\]</p>
+
+<p>\(\hat \rho_j\) 可以近似地看作是第 \(j\) 个神经元激活的概率。我们希望 \(\hat \rho_j\) 接近于一个事先给定的值 \(\rho^*\)，比如0.05，可以通过 KL 距离来衡量 \(\hat \rho_j\) 和 \(\rho^*\) 的差异，即<br/>
+\[<br/>
+\text{KL}(\rho^*||\hat \rho_j) = \rho^* \log \frac{\rho^*}{\hat \rho_j} + (1 − \rho^*) \log \frac{1-\rho^*}{1-\hat rho_j}<br/>
+\]</p>
+
+<p>如果 \(\hat \rho_j = \rho^*\)，则 \(\text{KL}(\rho^*||\hat rho_j) = 0\)。</p>
+
+<p>稀疏性度量函数定义为<br/>
+\[<br/>
+\rho(\mathbf z^{(n)}) = \sum_{j=1}^p \text{KL}(\rho^*||\hat \rho_j)<br/>
+\]</p>
+
+<h3 id="toc_5">堆叠自编码器</h3>
+
+<p>对于很多数据来说，仅使用两层神经网络的自编码器还不足以获取一种好的数据表示。为了获取更好的数据表示，我们可以使用更深层的神经网络。深层神经网络作为自编码器提取的数据表示一般会更加抽象，能够更好地捕捉到数据的语义信息。在实践中经常使用逐层堆叠的方式来训练一个深层的自编码器，称为堆叠自编码器（ Stacked Auto-Encoder， SAE）。堆叠自编码一般可以采用逐层训练（ layer-wise training）来学习网络参数 [Bengio et al., 2007]。</p>
+
+<div align="center">
+    <img src="media/15309710071828/15470498951741.jpg" width="560px" />
+</div>
+
+<h3 id="toc_6">降噪自动编码器（Denoising Autoencoder）</h3>
+
+<p>降噪自动编码器是在自动编码器的基础之上，为了防止过拟合问题而对输入的数据（网络的输入层）加入噪音，使学习得到的编码器更具有较强的鲁棒性，从而增强模型的泛化能力。</p>
+
+<p>降噪自动编码器的示意图如下，其中 \(x\) 是原始的输入数据，降噪自动编码以一定概率把输入层节点的值设为0，从而得到含有噪音的模型输入 \(\hat x\)。这和 Dropout 很类似，不同的是Dropout是隐含层的神经元设置0。</p>
+
+<div align="center">
+    <img width="560" src="media/15309710071828/15472892939349.jpg" />
+</div>
+
+<p>以丢失的数据 \(\hat x\) 去计算 \(y\)，计算 \(z\)，并将 \(z\) 与原始 \(x\) 做误差迭代，这样，网络就学习了这个破损的数据。</p>
+
+<p>这个破损的数据是很有用的，原因有二：<br/>
+其之一，通过与非破损数据训练的对比，破损数据训练出来的Weight噪声比较小。降噪因此得名。原因不难理解，因为擦除的时候不小心把输入噪声给擦掉了。 <br/>
+其之二，破损数据一定程度上减轻了训练数据与测试数据的代沟。由于数据的部分被擦掉了，因而这破损数据一定程度上比较接近测试数据。（训练、测试肯定有同有异，当然我们要求同舍异）。</p>
+
+<p>Denoising Auto-encoder与人的感知机理类似，比如人眼看物体时，如果物体某一小部分被遮住了，人依然能够将其识别出来。 <br/>
+人在接收到多模态信息时（比如声音，图像等），少了其中某些模态的信息有时也不会造成太大影响。 <br/>
+Autoencoder的本质是学习一个相等函数，即网络的输入和重构后的输出相等，这种相等函数的表示有个缺点就是当测试样本和训练样本不符合同一分布，即相差较大时，效果不好，而Denoising Autoencoder在这方面的处理有所进步。</p>
+
+<hr/>
+
+<p><a href="https://blog.csdn.net/hjimce/article/details/49106869">自编码到栈式自编码</a><br/>
+<a href="http://www.360doc.com/content/15/0324/08/20625606_457576675.shtml">深度学习自编码有效应对维数灾难</a><br/>
+<a href="https://blog.csdn.net/app_12062011/article/details/54312880">深度学习自编码、DA算法、SDA算法、稀疏自编码</a><br/>
+<a href="https://www.jianshu.com/p/f34842a3b19a">用自编码器去噪</a><br/>
+<a href="https://blog.csdn.net/cuclxt/article/details/51469080">从反向传播（BP）到去噪自动编码器（DAE）</a><br/>
+<a href="http://www.cnblogs.com/neopenx/p/4370350.html">降噪自动编码器</a><br/>
+<a href="https://blog.csdn.net/u010089444/article/details/52601193">自动编码器</a><br/>
+<a href="https://blog.csdn.net/xiewenbo/article/details/51675287">Deep Learning（深度学习）学习笔记整理系列之（六）AutoEncoder自动编码器</a><br/>
+<a href="https://blog.csdn.net/left_la/article/details/9159949">多种范数算法</a><br/>
+<a href="https://my.oschina.net/findbill/blog/541143">稀疏自动编码器</a><br/>
+<a href="https://www.cnblogs.com/90zeng/p/Autoencoders_and_Sparsity.html">稀疏自动编码之自动编码器和稀疏性</a><br/>
+<a href="https://wenku.baidu.com/view/d45e1b726c85ec3a87c2c5ea.html">稀疏自动编码器</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15301151892004.html">离群点检查算法 LOF</a></h1>
+			<p class="meta"><time datetime="2018-06-27T23:59:49+08:00" 
+			pubdate data-updated="true">2018/6/27</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>离群点又称之为异常点，在数据挖掘方面，经常需要在做特征工程和模型训练之前对数据进行清洗，剔除无效数据和异常数据。异常检测也是数据挖掘的一个方向，用于反作弊、伪基站、金融诈骗等领域。 </p>
+
+<p>LOF算法英文名称是Local Outlier Factor，局部离群因子检测。是基于密度的离群点检测方法中一个比较有代表性的算法。该算法会给数据集中的每个点计算一个离群因子LOF，通过判断LOF是否接近于1来判定是否是离群因子。若LOF远大于1，则认为是离群因子，接近于1，则是正常点。</p>
+
+<div align="center">
+    <img width="400" src="media/15301151892004/15370972269076.jpg" />
+</div>
+
+<p>上图从直觉上看，我们会觉得点A和点B是异常点，这是因为它们相对周围点的整体密度而言，较为孤立。现在的问题是，如何实现算法的通用性，可以满足将不同种密度分散情况迥异的集合的异常点识别。LOF可以实现我们的目标。</p>
+
+<h3 id="toc_0">LOF 算法</h3>
+
+<p>现在来介绍LOF算法相关概念的定义。</p>
+
+<ol>
+<li><strong>\(d( p,q )\)</strong>： 表示点 p 与点 q 之间的距离。</li>
+<li><p><strong>k-distance：第k距离</strong><br/>
+对于点 p 的第 k 距离 \(d_k(p) = d(p,o)\) 满足</p>
+
+<ul>
+<li>在集合中至少有不包括 p 在内的 k 个点 \(q:q\in C\{q\neq p\}\)，满足 \(d(p,q) \le d(p,o)\)；</li>
+<li>在集合中最多有不包括 p 在内的 k−1 个点 \(q:q\in C\{q\neq p\}\)，满足\(d(p,q,)\gt d(p,o)\) ；</li>
+</ul>
+
+<p>通俗的说就是点 p 的第 k 距离为 \(d(p,q)\) 就是距离点 p 第 k 远的点 q 距离，如下图</p>
+
+<div align="center">
+    <img width="150" src="media/15301151892004/15370986721083.jpg" />
+</div></li>
+<li><p><strong>k-distance neighborhood of p：第k距离邻域</strong><br/>
+点 p 的第 k 距离邻域 \(N_k(p)\)，就是 p 的第 k 距离即以内的所有点，包括第 k 距离。 因此 p 的第 k 邻域点的个数 \(|N_k(p)|\ge k\)。</p></li>
+<li><p><strong>reach-distance：可达距离</strong><br/>
+点 p 到点 o 的第 k 可达距离定义为：<br/>
+\[<br/>
+\text{reach-}d_k(o,p)=max\{d_k(p),d(p,o)\}<br/>
+\]</p>
+
+<p>也就是，点 p 到点 o 的第 k 可达距离，至少是点 p 的第 k 距离，或者为点 p、o间的真实距离。 </p>
+
+<p>这也意味着，离点 p 最近的 k 个点，p 到它们的可达距离被认为相等，且都等于\(d_k(p)\)。如下图，p 到 \(o_2\) 的第5可达距离为 \(d_5(p)\)，p 到 \(o_1\) 的第5可达距离为 \(d(o_1,p)\)。</p>
+
+<div align="center">
+    <img src="media/15301151892004/15371883100923.jpg" width="260" />
+</div></li>
+<li><p><strong>local reachability density：局部可达密度</strong><br/>
+点 \(ｐ\) 的局部可达密度表示为<br/>
+\[<br/>
+lrd_k(p) = 1/\bigg(\frac{\sum_{o\in N_k(p)} \text{reach-}d_k(p,o)}{|N_k(p)|} \bigg)<br/>
+\]</p>
+
+<p>表示点 p 的第 k 邻域内点到 p 的平均可达距离的倒数。 <br/>
+　　　　<br/>
+<strong>注意，是p的邻域点 \(N_k(p)\) 到 p 的可达距离，不是 p 到 \(N_k(p)\) 的可达距离</strong></p>
+
+<p>这个值的含义可以这样理解，首先这代表一个密度，密度越高，我们认为越可能属于同一簇，密度越低，越可能是离群点。如果 p 和周围邻域点是同一簇，那么可达距离越可能为较小的 \(d_k(o)\) ，导致可达距离之和较小，密度值较高；如果 p 和周围邻居点较远，那么可达距离可能都会取较大值 \(d(p,o)\)，导致密度较小，越可能是离群点。</p></li>
+<li><p><strong>local outlier factor：局部离群因子</strong><br/>
+点 p 的离群因子表示为<br/>
+\[<br/>
+LOF_k(p) = \frac{\sum_{o \in N_k(p)} \frac{lrd_k(o)}{lrd_k(p)}}{|N_k(p)|}<br/>
+\]</p>
+
+<p>表示点 p 的邻域 \(N_k(p)\) 内的点的局部可达密度与点 p 的局部可达密度之比的平均数。</p>
+
+<p>如果这个比值越接近1，说明 p 的其邻域点密度差不多，p 可能和邻域同属一簇；如果这个比值越小于1，说明 p 的密度高于其邻域点密度，p 为密集点；如果这个比值越大于1，说明 p 的密度小于其邻域点密度，p 越可能是异常点。 </p></li>
+</ol>
+
+<hr/>
+
+<p><a href="https://blog.csdn.net/wangyibo0201/article/details/51705966">异常点/离群点检测算法——LOF</a> </p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15291690032866.html">数据不平衡问题</a></h1>
+			<p class="meta"><time datetime="2018-06-17T01:10:03+08:00" 
+			pubdate data-updated="true">2018/6/17</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>现实中有很多类别不均衡问题，它是常见的，并且也是合理的，符合人们期望的。如，在欺诈交易识别中，属于欺诈交易的应该是很少部分，即绝大部分交易是正常的，只有极少部分的交易属于欺诈交易。这就是一个正常的类别不均衡问题。</p>
+
+<p>迄今为止 , 解决不平衡分类问题的策略可以分为两大类。一类是从训练集入手，通过改变训练集样本分布，降低不平衡程度。另一类是从学习算法入手，根据算法在解决不平衡问题时的缺陷，适当地修改算法使之适应不平衡分类问题。平衡训练集的方法主要有训练集重采样(re-sampling)方法和训练集划分方法。学习算法层面的策略包括分类器集成、代价敏感学习和特征选择方法等。</p>
+
+<h3 id="toc_0">数据层面解决数据不平衡问题</h3>
+
+<p>采样方法是通过增加稀有类训练样本数的过采样 (over-sampling)和减少大类样本数的欠采样（under-samplings)使不平衡的样本分布变得比较平衡，从而提高分类器对稀有类的识别率。</p>
+
+<h5 id="toc_1">随机欠采样（Random Under-Sampling）</h5>
+
+<p>随机欠采样的目标是通过随机地消除占多数的类的样本来平衡类分布；直到多数类和少数类的实例实现平衡，目标才算达成。我们可以从多数类 \(S_{max}\) 中随机选择少量样本 \(E\) 再合并原有少数类样本作为新的训练数据集，新数据集为 \(S_{min}+E\)；</p>
+
+<p>随机欠采样有两种类型分别为有放回和无放回两种，无放回欠采样在对多数类某样本被采样后不会再被重复采样，有放回采样则有可能。</p>
+
+<ol>
+<li><p>有放回随机欠采样</p>
+
+<p>有放回的随机采样，有一些样本被重复采样，从而在训练集中多次出现，有的则从未在训练集中出现，此则自助采样法。对于一个样本，它在某一次含 \(m\) 个样本的训练集的随机采样中，每次被采集到的概率是 \(\frac 1 m\)。不被采集到的概率为 \(1−\frac 1 m\)。如果 \(m\) 次采样都没有被采集中的概率是 \((1−\frac 1 m)^m\)。当 \(m\rightarrow \infty\)时，\((1−\frac 1 m)^m \rightarrow \frac 1 e \simeq 0.368\)。也就是说，在bagging的每轮随机采样中，训练集中大约有36.8%的数据没有被采样集采集中。对于这部分大约36.8%的没有被采样到的数据，我们常常称之为袋外数据(Out Of Bag, 简称OOB)。这些数据没有参与训练集模型的拟合，因此可以用来检测模型的泛化能力。<a href="http://www.cnblogs.com/pinard/p/6156009.html">Bagging与随机森林算法原理小结</a></p>
+
+<p>放回采样后的数据集会有一些数据重复，一些数据缺失，从 \(N\) 个样本中采样 \(K\) 个样本，不同样本数量的期望为 \(U(K)=N(1−(\frac{N−1}{N})^K)\)。证明：首先，显然有U(1)=1；其次，设从N个样本中采样k−1个样本，不同样本数量的期望为U(k−1)，则第k个样本是未曾抽到的样本的概率为1−U(k−1)N，所以U(k)=1+N−1NU(k−1)=1+N−1N+(N−1N)2+⋯+(N−1N)k−1，根据等比数列求和公式得U(K)=N(1−(N−1N)K)。对于一种特殊情况，当K=N且N足够大时，则有最终不同样本数量是原始样本数量的期望为(1−1e)，大约是23。</p></li>
+<li><p>无放回随机欠采样</p></li>
+</ol>
+
+<h5 id="toc_2">随机过采样（Random Over-Sampling）</h5>
+
+<h5 id="toc_3">基于聚类的过采样（Cluster-Based Over Sampling）</h5>
+
+<h5 id="toc_4">合成少数类过采样技术（SMOTE）</h5>
+
+<h5 id="toc_5">改进的合成少数类过采样技术（MSMOTE）</h5>
+
+<h3 id="toc_6">算法层面解决数据不平衡问题</h3>
+
+<hr/>
+
+<p><a href="https://blog.csdn.net/yaphat/article/details/60348946">不平衡数据</a><br/>
+<a href="https://mp.weixin.qq.com/s?__biz=MzA3MzI4MjgzMw==&amp;mid=2650724464&amp;idx=1&amp;sn=1f34358862bacfb4c7ea17c864d8c44d&amp;chksm=871b1c0eb06c95180e717d8316b0380602f638a764530b4b9e35ac812c7c33799d3357d46f00&amp;scene=0&amp;key=0f5e635eeb6bf20a076ad60d7f11c6ef5c5c1c8f02873bc8b458381b629a1e2ae76174d0d4ba34331c71d095e3b3b92aa7fff5e1e11badeaf6c87ff90fd264f3dc6b1eb074eaccb2ac46e8f2d440cefd&amp;ascene=0&amp;uin=MTU1NTY3MTA0Mg%3D%3D&amp;devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.11.6+build(15G1217)&amp;version=12010310&amp;nettype=WIFI&amp;fontScale=100&amp;pass_ticket=csWk%2BJXfpl7rA8r5">从重采样到数据合成：如何处理机器学习中的不平衡分类问题？</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15284680615860.html">模拟退火 SA</a></h1>
+			<p class="meta"><time datetime="2018-06-08T22:27:41+08:00" 
+			pubdate data-updated="true">2018/6/8</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>常拿来和模拟退火算法比较的就是贪心算法，该算法每次从当前解的临近解空间中选择一个最优解作为当前解，直到达到一个局部最优解。</p>
+
+<p>贪心算法实现很简单，其主要缺点是会陷入局部最优解，而不一定能搜索到全局最优解。如下图搜搜最低点：假设 A 点为当前解，贪心算法搜索到 B 点这个局部最优解就会停止搜索，因为在 B 点无论向那个方向小幅度移动都不能得到更优的解。</p>
+
+<div align="center">
+    <img width="300" src="media/15284680615860/15371931915786.jpg" />
+</div>
+
+<h3 id="toc_0">模拟退火算法</h3>
+
+<p>模拟退火算法，英文名叫 Simulate Anneal，SA。模拟退火其实也是一种贪心算法，但是它的搜索过程引入了随机因素。模拟退火算法以一定的概率来接受一个比当前解要差的解，因此有可能会跳出这个局部的最优解，达到全局的最优解。以上图为例，模拟退火算法在搜索到局部最优解 B 后，会以一定的概率接受到 E 的移动。也许经过几次这样的不是局部最优的移动后会到达 C 点，于是就跳出了局部最大值 B。</p>
+
+<p>这里的一定的概率会随着时间的推移，逐渐衰减。转移概率通过下式给出<br/>
+\[<br/>
+p = \left \{\begin{array}\\<br/>
+1\quad&amp; E(x_{new}) \le E(x_{old})\\<br/>
+\exp\Big(-\frac{E(x_{new}) - E(x_{old})}{T}\Big)\quad &amp;E(x_{new}) \gt E(x_{old})\\<br/>
+\end{array} \right .<br/>
+\]</p>
+
+<p>T 温度（表示接受较差解的意愿）开始时 \(T_0\) 非常高，指数部分接近于0，所以概率几乎为1.随着温度的递减，高成本和低成本值之间的差异越来越重要——差异越大，概率越低。因此此算法只倾向于稍差的解而不会是差很多的解。</p>
+
+<p>而<strong>经典模拟退火</strong>的降温方式式可以采用下式<br/>
+\[<br/>
+T(t) = \frac{T_0}{lg(t) + 1}<br/>
+\]</p>
+
+<p><strong>快速模拟退火算法</strong>的降温方式为<br/>
+\[<br/>
+T(t) = \frac{T_0}{t+1}<br/>
+\]</p>
+
+<p>这两种方式都能够使得模拟退火算法可能收敛于全局最小点。</p>
+
+<p>模拟退火的终止准则主要采用比较直观的方法：</p>
+
+<ul>
+<li>零度法： 给定一个比较小的正数 n ，当温度 \(T(t) &lt;= n\) 时，算法终止，表示达到了最低温度；</li>
+<li>循环总数控制法：设置温度下降的次数为一定值 \(N\) ，当温度迭代次数达到 \(t\gt N\) 时，算法终止。</li>
+<li>基于不改进规则的控制法：在一个温度和给定的迭代次数内没有改进当前的局部最优解，则算法终止；</li>
+<li>接受概率终止准则：给定一个较小的概率 \(P\) 。在一个温度和给定的迭代步数内，除当前局部最优解外，其他状态的接受概率都小于 \(P\)，算法终止。</li>
+</ul>
+
+<h2 id="toc_1"></h2>
+
+<p><a href="https://chenwenke.cn/Src/%E8%BD%AF%E4%BB%B6%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/%E8%AF%BE%E7%A8%8B%E8%AE%BE%E8%AE%A1/GhostMan/%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99/%E6%A8%A1%E6%8B%9F%E9%80%80%E7%81%AB%E7%AE%97%E6%B3%95.pdf">第二章 模拟退火算法</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+  
+	<div class="pagination">
+	
+<a href="archives.html">Blog Archives</a>
+	 
+	    
+	</div>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

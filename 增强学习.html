@@ -1,0 +1,1230 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  增强学习 - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div class="blog-index">
+
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15378797300710.html">强化学习 Reinforcement Learning</a></h1>
+			<p class="meta"><time datetime="2018-09-25T20:48:50+08:00" 
+			pubdate data-updated="true">2018/9/25</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>强化学习（Reinforcement Learning，RL），也叫增强学习，是指一类从（环境）交互中不断学习的问题以及解决这类问题的方法。强化学习问题可以描述为一个智能体从与环境的交互中不断学习以完成特定目标（比如取得最大奖励值）。和深度学习类似，强化学习中的关键问题也是<strong>贡献度分配问题</strong>，每个动作并不能直接得到监督信息，需要通过整个模型的最终监督信息（奖励）得到，并有一定的<strong>延时性</strong>。</p>
+
+<p>强化学习也是机器学习中的一个重要分支。强化学习和监督学习的不同在于，强化学习问题不需要给出“正确”策略作为监督信息，只需要给出策略的（延迟）回报，并通过调整策略来取得最大化的期望回报。</p>
+
+<h3 id="toc_0">强化学习问题</h3>
+
+<p>在强化学习中，有两个可以进行交互的对象：智能体和环境。</p>
+
+<ul>
+<li><p><strong>智能体（agent）</strong>：可以感知外界环境的环境（state）和反馈的奖励（reward），并举行学习和决策。</p>
+
+<p>智能体的<strong>决策</strong>功能是指根据外界环境的状态来做出不同的动作（action），而学习的功能是指根据外界环境的奖励来调整策略。</p></li>
+<li><p><strong>环境（environment）</strong>：智能体外部的所有事物，并受智能体动作的影响而改变其状态，并反馈给智能体相应的<strong>奖励</strong>。</p></li>
+</ul>
+
+<p>在强化学习中的基本要素包括：</p>
+
+<ul>
+<li><strong>状态 \(s\)</strong> 是对环境的描述，可以是离散的连续的，其状态空间为 \(\mathcal S\)；</li>
+<li><strong>动作 \(a\)</strong> 是对智能体行为的描述，可以是离散的或连续的，其动作空间为 \(\mathcal A\)；</li>
+<li><strong>策略 \(\pi(a|s)\)</strong> 是智能体根据环境状态 \(s\) 来决定下一步的动作 \(a\) 的函数；</li>
+<li><strong>状态转移概率 \(p(s&#39;|s,a)\)</strong> 是在智能体根据当前状态 \(s\) 做出一个动作 \(a\) 之后，环境在下一个时刻转变为状态 \(s&#39;\) 的概率；</li>
+<li><strong>即时奖励 \(r(s,a,s&#39;)\)</strong> 是一个标量函数，即智能体根据当前状态 \(s\) 做出动作 \(a\) 之后，环境会反馈给智能体一个奖励，这个奖励也经常和下一个时刻的状态 \(s&#39;\) 有关。</li>
+</ul>
+
+<h4 id="toc_1">策略</h4>
+
+<p>智能体的策略（policy）就是智能体如何根据环境 \(s\) 来决定下一步的动作 \(a\)，通常可以分为确定性策略（Deterministic Policy）和随机性策略（Stochastic Policy）两组。</p>
+
+<p><strong>确定性策略</strong>是从状态空间到动作空间的映射函数 \(\pi : \mathcal S\rightarrow \mathcal A\)。<strong>随机性策略</strong>表示在给定环境状态时，智能体选择某个动作的概率分布：<br/>
+\[<br/>
+\begin{align*}<br/>
+\pi(a|s) &amp;\overset{\vartriangle}= p(a|s)\\<br/>
+\sum_{a \in \mathcal A} \pi(a|s) &amp;= 1\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>通常情况下，强化学习一般使用随机性的策略。随机性的策略可以有很多优点。比如在学习时可以通过引入一定随机性更好地探索环境。二是使得策略（利用-探索策略）更加地多样性。比如在围棋中，确定性策略总是会在同一个位置上下棋，会导致你的策略很容易被对手预测。</p>
+
+<h3 id="toc_2">马尔可夫决策过程</h3>
+
+<p>为了简单起见，我们将智能体与环境的交互看做是离散的时间序列。下图给出了智能体与环境的交互。</p>
+
+<div align="center">
+    <img width="360" src="media/15378797300710/15378866965799.jpg" />
+</div>
+
+<p>智能体从感知到的初始环境 \(s_0\) 开始，然后决定做一个相应的动作 \(a_0\)，环境相应地发生改变到新的状态 \(s_1\)，并反馈给智能体一个即时奖励 \(r_1\)，然后智能体又根据状态 \(s_1\) 做一个动作 \(a_1\)，环境相应改变为 \(s_2\)，并反馈奖励 \(r_2\)。这样的交互可以一直进行下去。<br/>
+\[<br/>
+s_0,a_0,s_1,r_1,a_1,...,s_{t-1},r_{t-1},a_{t-1},s_t,r_t,...,<br/>
+\]</p>
+
+<p>其中 \(r_t = r(s_{t-1},a_{t-1},s_t)\) 是第 \(t\) 时刻的即时奖励。</p>
+
+<p>智能体与环境的交互的过程可以看作是一个<strong>马尔可夫决策过程。</strong></p>
+
+<p><strong>马尔可夫过程（Markov Process）</strong>：具有马尔可夫性的随机变量序列 \(s_0,s_1,...,s_t \in \mathcal S\)，其下一个时刻的状态 \(s_{t+1}\) 只取决于当前状态\(s_t\)，<br/>
+\[<br/>
+p(s_{t+1}|s_t,\cdots,s_0) = p(s_{t+1}|s_t),<br/>
+\]</p>
+
+<p>其中 \(p(s_{t+1}|s_t)\) 称为状态转移概率，\(\sum_{s_{t+1}\in \mathcal S} p(s_{t+1}|s_t) = 1\)。</p>
+
+<p><strong>马尔可夫决策过程（Markov Decision Process，MDP）</strong>：在马尔可夫过程中加入一个额外的变量：动作 \(a\)，即下一个时刻的状态 \(s_{t+1}\) 和当前时刻的状态 \(s_t\) 以及动作 \(a_t\) 相关，<br/>
+\[<br/>
+p(s_{t+1}|s_t,a_t,\cdots,s_0,a_0) = p(s_{t+1}|s_t,a_t),<br/>
+\]</p>
+
+<p>其中 \(p(s_{t+1}|s_t, a_t)\) 为状态转移概率。</p>
+
+<p>给定策略 \(\pi(a|s)\)，马尔可夫决策过程的一个轨迹（trajectory）<br/>
+\[<br/>
+\tau = s_0, a_0, s_1, r_1, a_1,\cdots, s_{T−1}, a_{T−1}, s_T , r_T<br/>
+\]</p>
+
+<p>的概率为<br/>
+\[<br/>
+\begin{align*}<br/>
+p(\tau) &amp;= p(s_0,a_0,s_1,a_1,\cdots),\\<br/>
+&amp;= p(s_0) \sum_{t=0}^{T-1} \pi(a_t|s_t) p(s_{t+1}|s_t,a_t)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>给出了马尔可夫决策过程的图模型表示。</p>
+
+<div align="center">
+    <img width="540" src="media/15378797300710/15378887529961.jpg" />
+</div>
+
+<h3 id="toc_3">强化学习的目标函数</h3>
+
+<h4 id="toc_4">总回报</h4>
+
+<p>给定策略 \(\pi(a|s)\) 智能体和环境一次交互过程的轨迹 \(\tau\) 所收到的累积奖励为总回报（return）。<br/>
+\[<br/>
+\begin{align*}<br/>
+G(\tau) &amp;= \sum_{t=0}^{T-1} r_{t+1} \\<br/>
+&amp;= \sum_{t=0}^{T-1} r(s_t,a_t,s_{t+1})<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>假设环境中有一个或多个特殊的终止状态（terminal state），当到达终止状态时，一个智能体和环境的交互过程就结束了。这一轮交互的过程称为一个回合（episode）或试验（trial）。一般的强化学习任务（比如下棋、游戏)都属于这种回合式的任务。</p>
+
+<p>如果环境中没有终止状态（比如终身学习的机器人），即 \(T = \infty\)，称为持续性强化学习任务，其总回报也可能是无穷大。为了解决这个问题，我们可以引入一个折扣率来降低远期回报的权重。折扣回报（discounted return）定义为<br/>
+\[<br/>
+G(\tau) = r_1 + \gamma r_2 + \gamma^2 r_3 + ... + \gamma^{T-1} r_{T} = \sum_{t=0}^{T-1} \gamma^t r_{t+1}<br/>
+\]</p>
+
+<p>其中 \(\gamma \in [0,1]\) 是折扣率。当 \(\gamma\) 接近于0时，智能体更在意短期回报；而当 \(\gamma\) 接近于1时，长期回报变得更重要。</p>
+
+<h4 id="toc_5">目标函数</h4>
+
+<p>因为策略和状态转移都有一定的随机性，每次试验得到的轨迹是一个随机序列，其收获的总回报也不一样。强化学习的目标是学习到一个策略 \(\pi_\theta(a|s)\) 来最大化期望回报（expected return），即希望智能体执行一系列的动作来获得尽可能多的平均回报。<br/>
+\[<br/>
+\mathcal J(\theta) = \mathbb E_{\tau\sim p_\theta(\tau)}[G(\tau)] = \mathbb E_{r\sim p_\theta(\tau)}[\sum_{t=0}^{T-1}\gamma^t r_{t+1}]<br/>
+\]</p>
+
+<p>其中 \(\theta\) 为策略函数的参数。</p>
+
+<h3 id="toc_6">值函数</h3>
+
+<p>为了评估一个策略π 的期望回报，我们定义两个值函数：状态值函数和状态-动作值函数。</p>
+
+<h4 id="toc_7">状态值函数</h4>
+
+<p>状态值函数 \(V^{\pi}(s)\) 表示从状态 \(s\) 出发，按照策略 \(\pi\) 采取行为得到的期望回报总回报<br/>
+\[<br/>
+V^{\pi}(s) = \mathbb E_{\tau\sim p(\tau)}\Big[\sum_{t=0}^{T-1} \gamma^t r_{t+1} | \tau_{s_0} = s\Big]<br/>
+\]</p>
+
+<p>其中 \(\tau_{s_0}\) 表示轨迹 \(\tau\) 的起始桩头。</p>
+
+<p>为了方便，我们用  \(\tau_{0:T}\) 表示轨迹 \(s_0,a_0,s_1,...,s_T\)，用 \(\tau_{1:T}\) 表示轨迹 \(s_1,a_1,...,s_T\)，因此有 \(\tau_{0:T} = s_0,a_0,\tau_{1:T}\)。</p>
+
+<p>根据马尔可夫性，\(V^\pi(s)\) 可展开得到<br/>
+ \[<br/>
+ \begin{align}<br/>
+ V^{\pi}(s) &amp;= \mathbb E_{\tau_{0:T}\sim p(\tau)}\Big[\sum_{t=0}^{T-1} \gamma^t r_{t+1} | \tau_{s_0} = s\Big]\nonumber\\<br/>
+ &amp;= \mathbb E_{\tau_{0:T}\sim p(\tau)}\Big[r_1 +\sum_{t=1}^{T-1} \gamma^t r_{t+1} | \tau_{s_0} = s\Big]\nonumber\\<br/>
+ &amp;= \mathbb E_{a\sim \pi(a|s)} \mathbb E_{s&#39;\sim p(s&#39;|s,a)} \mathbb E_{\tau_{0:T}\sim p(\tau)}\Big[r(s,a,s&#39;) +\sum_{t=1}^{T-1} \gamma^t r_{t+1} | \tau_{s_0} = s&#39;\Big]\nonumber\\<br/>
+ &amp;= \mathbb E_{a\sim \pi(a|s)} \mathbb E_{s&#39;\sim p(s&#39;|s,a)} \mathbb E_{\tau_{0:T}\sim p(\tau)}\Big[r(s,a,s&#39;) +\gamma\sum_{t=1}^{T-1} \gamma^{t-1} r_{t+1} | \tau_{s_0} = s&#39;\Big]\nonumber\\<br/>
+ &amp;= \mathbb E_{a\sim \pi(a|s)} \mathbb E_{s&#39;\sim p(s&#39;|s,a)} \bigg [r(s,a,s&#39;) + \gamma\mathbb E_{\tau_{0:T}\sim p(\tau)}\Big[\sum_{t=1}^{T-1} \gamma^{t-1} r_{t+1} | \tau_{s_0} = s&#39;\Big]\bigg ]\nonumber\\<br/>
+ &amp;= \mathbb E_{a\sim \pi(a|s)} \mathbb E_{s&#39;\sim p(s&#39;|s,a)} \Big [r(s,a,s&#39;) + \gamma V^{\pi}(s&#39;)\Big]\label{meap}\\<br/>
+ \end{align}<br/>
+ \]</p>
+
+<p>这称为贝尔曼方程（Bellman equation），表示当前状态的值函数可以通过下个状态的值函数来计算。</p>
+
+<p>如果给定策略 \(\pi(a|s)\)，状态转移概率 \(p(s&#39;|s, a)\) 和奖励 \(r(s,a,s&#39;)\) ，我们就可以通过迭代的方式来计算 \(V^\pi(<br/>
+s)\)。由于存在折扣率，迭代一定步数后，每个状态的值函数就会固定不变。</p>
+
+<h4 id="toc_8">状态-动作值函数</h4>
+
+<p>公式 ( \ref{meap} ) 中的第二个期望是指初始状态为 \(s\) 并进行动作 \(a\)，然后执行策略 \(\pi\) 得到的期望总回报，称为状态-动作值函函数（state-action value function）<br/>
+\[<br/>
+\begin{equation}<br/>
+Q^\pi(s,a) = \mathbb E_{s&#39;\sim p(s&#39;|s,a)} \Big [r(s,a,s&#39;) + \gamma V^{\pi}(s&#39;)\Big]\label{qpsa}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>状态-动作值函数也经常称为Q函数（Q-function）。</p>
+
+<p>状态值函数 \(V^\pi(s)\) 是Q函数 \(Q^\pi(s, a)\) 关于动作 \(a\) 的期望，<br/>
+\[<br/>
+\begin{equation}<br/>
+V^\pi(s) = \mathbb E_{a\sim\pi(a|s)}[Q^\pi(s, a)].\label{vpma}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>结合公式 ( \ref{qpsa} ) 和 ( \ref{vpma} )，Q函数可以写成<br/>
+\[<br/>
+\begin{align}<br/>
+Q^\pi(s,a) &amp;= \mathbb E_{s&#39;\sim p(s&#39;|s,a)} \Big [r(s,a,s&#39;) + \gamma V^{\pi}(s&#39;)\Big]\nonumber\\<br/>
+&amp;= \mathbb E_{s&#39;\sim p(s&#39;|s,a)} \Big [r(s,a,s&#39;) + \gamma \mathbb E_{a&#39;\sim\pi(a&#39;|s&#39;)}[Q^\pi(s&#39;, a&#39;)]\Big]\label{mess}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>这是关于Q函数的贝尔曼方程。</p>
+
+<h4 id="toc_9">值函数的作用</h4>
+
+<p>值函数可以看作是对策略 \(\pi\) 的评估。如果在状态 \(s\)，有一个动作 \(a^*\) 使得 \(Q^\pi(s, a^*) \gt V^\pi(s)\) ，说明执行动作 \(a^*\) 比当前的策略 \(\pi(a|s)\) 要好，我们就可以调整参数使得策略 \(\pi(a^*|s)\)的概率增加。</p>
+
+<h3 id="toc_10">基于值函数的学习方法</h3>
+
+<p>值函数是对策略 \(\pi\) 的评估，如果策略 \(\pi\) 有限（即状态数和动作数都有限）时，可以对所有的策略进行评估并选出<strong>最优策略 \(\pi^*\)</strong>。<br/>
+\[<br/>
+\forall s,\quad \pi^* = {\arg\max}_\pi V^\pi(s)<br/>
+\]</p>
+
+<p>但这种方式在实践找那个很难实现。假设状态空间 \(\mathcal S\) 和动作空间 \(\mathcal A\) 都是离散且有效的，策略空间为 \(|\mathcal A|^{|\mathcal S|}\)，往往也非常大。</p>
+
+<p>一种可行的方式是通过迭代的方式不断优化策略，直到选出最优策略。对于一个策略 \(\pi(a|s)\)，其Q函数为 \(Q^\pi(s,a)\)，我们可以设置一个新的策略 \(\pi&#39;(a|s)\)，<br/>
+\[<br/>
+\pi&#39;(a|s) = \left \{\begin{array}\\1\quad&amp;\text{if }a=\arg\max_{\hat a}Q^\pi(s,\hat a)\\0\quad&amp;\text{otherwise} \end{array} \right .<br/>
+\]</p>
+
+<p>即 \(\pi&#39;(a|s)\) 为一个确定性策略，也可以直接写为<br/>
+\[<br/>
+\pi&#39;(s) = {\arg\max}_a Q^\pi(s,a)<br/>
+\]</p>
+
+<p>如果执行 \(\pi&#39;\)，会有<br/>
+\[<br/>
+\forall s,\quad V^{\pi&#39;}(s) \ge V^\pi(s)<br/>
+\]</p>
+
+<p>我们可以通过下面方式来学习最优策略：先随机初始化一个策略，计算该策略的值函数，并根据值函数来设置新的策略，然后一直反复迭代直到收敛。</p>
+
+<p>基于值函数的策略学习方法中最关键的是如何计算策略 \(\pi\) 的值函数，一般有<strong>动态规划</strong>或<strong>蒙特卡罗</strong>两种计算方式。</p>
+
+<h4 id="toc_11">动态规划算法</h4>
+
+<p>从贝尔曼方程可知，如果知道马尔可夫决策过程的状态转移概率 \(p(s&#39;|s,a)\) 和奖励 \(r(s,a,s&#39;)\)，我们直接可以通过贝尔曼方程来迭代计算其值函数。这种模型已知的强化学习算法也称为基于模型的强化学习（ Model-Based Reinforcement Learning）算法，这里的模型就是指马尔可夫决策过程。</p>
+
+<p>在已知模型时，可以通过动态规划的方法来计算。常用的方法主要有策略迭代算法和值迭代算法。</p>
+
+<h5 id="toc_12">策略迭代</h5>
+
+<p>策略迭代（Policy Iteration）算法中，每次迭代可以分成两步：</p>
+
+<ol>
+<li><strong>策略评估（policy evaluation）</strong>：计算当前策略下，每个状态的函数值函数，策略评估可以通过贝尔曼方程 ( \ref{meap} ) 进行计算 \(V^\pi(s)\)。</li>
+<li><strong>策略改进（policy imporvement）</strong>：根据值函数来更新策略。</li>
+</ol>
+
+<p>策略迭代算法如下：<br/>
+<strong>输入</strong>：MDP五元组：\(\mathcal S,\mathcal A,P,r,\gamma\)；<br/>
+<strong>输出</strong>：策略 \(\pi\)；<br/>
+<strong>算法过程</strong></p>
+
+<ul>
+<li>初始化：\(\forall s,\forall a,\pi(a|s) = \frac{1}{|\mathcal A|}\)；</li>
+<li>repeat：
+
+<ul>
+<li>repeat：//策略评估
+
+<ul>
+<li>根据贝尔曼方程 ( \ref{meap} ) 计算 \(V^\pi(s),\forall s\)；</li>
+</ul></li>
+<li>until \(\forall s,V^\pi(s)\) 收敛</li>
+<li>根据公式  ( \ref{qpsa} ) 计算 \(Q(s,a)\)；</li>
+<li>\(forall s,\pi(s) = \arg\max_a Q(s,a)\)；</li>
+</ul></li>
+<li>until \(\forall s\)，\(\pi(s)\) 收敛；</li>
+</ul>
+
+<p>现在我们将<strong>策略评估</strong>和<strong>策略改进</strong>算法分开重点阐述一下，并举例说明。</p>
+
+<ol>
+<li><p>策略评估</p>
+
+<p>循环每一个状态 \(s\)，在该状态下循环所有所有的动作，利用贝尔曼公式 ( \ref{meap} ) ，利用当前的 \(V^\pi(s)\) 计算 \(V^\pi(s)\) 直到收敛。</p>
+
+<p><strong>输入</strong>：策略 \(\pi\)，要估计的策略；<br/>
+<strong>输出</strong>：收敛后的状态值 \(V^\pi\)；<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li>初始化 \(\forall s \in \mathcal S, V^\pi(s) = 0\)；</li>
+<li>repeat：
+
+<ul>
+<li>\(\triangle \leftarrow 0\)</li>
+<li>for each \(s \in \mathcal S\):do
+
+<ul>
+<li>\(v \leftarrow V^\pi(s)\)</li>
+<li>\(V(s) \leftarrow \mathbb E_{a\sim \pi(a|s)}\mathbb E_{s&#39;\sim p(s&#39;|s,a)}[r(s,a,s&#39;) + \gamma V^\pi(s&#39;)]\)</li>
+<li>\(\triangle \leftarrow max(\triangle,|v - V^\pi(s)|)\)</li>
+</ul></li>
+<li>end for</li>
+</ul></li>
+<li>until \(\triangle \lt \theta\)（一个很小的正数）</li>
+<li>return \(V^\pi\)</li>
+</ul></li>
+<li><p>策略改进</p>
+
+<p>我们计算策略的价值函数的原因是了帮助找到更好的策略。因为我们之前进行了策略评估得到了上一个策略下的每个状态下的状态值，所以接下来就要根据这些状态值对策略进行改进，计算出新的策略。计算方式如下 <br/>
+在每个状态 \(s\) 时，对每个可能的动作 \(a\) ,都计算一下采取这个动作后到达的下一个状态的期望价值。看看哪个动作可以到达的状态的期望价值函数最大，就选取这个动作。以此更新了 \(\pi(s)\)。</p>
+
+<p>首先我们可以根据公式 ( \ref{meap} ) 计算 \(Q(s,a)\)，再利用<br/>
+\[<br/>
+\pi(s) = \arg\max_a Q(s,a)<br/>
+\]</p>
+
+<p>改进策略。</p>
+
+<p><strong>输入</strong>：上一步收敛的 \(V^\pi\)；<br/>
+<strong>输出</strong>：策略 \(\pi\)<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li>repeat：
+
+<ul>
+<li>policy-stable \(\leftarrow\) true</li>
+<li>for each \(s\in \mathcal S\): do
+
+<ul>
+<li>\(\text{old-action}\leftarrow \pi(s)\)</li>
+<li>\(\pi(s) \leftarrow \arg\max_a \mathbb E_{s&#39;\sim p(s&#39;|s,a)}[r(s,a,s&#39;) + \gamma V^\pi(s&#39;)]\)</li>
+<li>if \(\text{old-action}\neq \pi(s)\)，then policy-stable\(\leftarrow\) false</li>
+</ul></li>
+<li>if policy-stable：
+
+<ul>
+<li>停止并返回 \(V^\pi\) 和 \(\pi\)</li>
+</ul></li>
+<li>else
+
+<ul>
+<li>继续策略评估步骤</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ol>
+
+<p>策略评估和策略改进两部分就组成了策略迭代，策略迭代的算法如下：<br/>
+<strong>输入</strong>：MDP 五元组：\(\mathcal S\)，\(\mathcal A\)，\(P\)，\(r\)，\(\gamma\);<br/>
+<strong>输出</strong>：输出 \(\pi\);<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li>初始化：\(\forall s,\forall a,\pi(a|s) = \frac{1}{|\mathcal A|}\);</li>
+<li>repeat:
+
+<ul>
+<li>策略评估</li>
+<li>repeat:
+
+<ul>
+<li>根据贝尔曼方程 ( 公式\ref{meap} )，计算 \(V^{\pi}(s),\forall s\);</li>
+</ul></li>
+<li>until \(\forall s,V^{\pi}(s)\) 收敛;</li>
+<li>策略改进</li>
+<li>根据公式 ( \ref{qpsa} ) 计算 \(Q(s,a)\);</li>
+<li>\(\forall s,\pi(s) = \arg\max_a Q(s,a)\);</li>
+<li>until \(\forall s,\pi(s)\) 收敛;</li>
+<li>输出：策略 \(\pi\)</li>
+</ul></li>
+</ul>
+
+<p>用 python 简单的实现这两个过程，可以参考<a href="https://zhuanlan.zhihu.com/p/28084990">这篇文章</a>，我们这里使用这个简单的例子来了解一下这两个过程。</p>
+
+<h5 id="toc_13">值迭代</h5>
+
+<p>策略迭代中的<strong>策略评估</strong>和<strong>策略改进</strong>是交替轮流进行，其中策略评估也是通过一个内部迭代来进行计算，其计算量比较大。事实上，我们不需要每次计算出每次策略对应的精确的值函数，也就是说内部迭代不需要执行到完全收敛。</p>
+
+<p>值迭代（Value Iteration）方法将策略评估和策略改进两个过程合并，来直接计算出最优策略。</p>
+
+<p>假设最优策略 \(\pi^*\) 对应的值函数称为最优值函数，那么最优状态值函数 \(V^*(s)\) 和最优状态-动作值函数 \(Q^*(s,a)\) 的关系为<br/>
+\[<br/>
+V^*(s) = \max_a Q^*(s,a)<br/>
+\]</p>
+
+<p>根据贝尔曼方程可知，最优状态值函数 \(V^*(s)\) 和最优状态-动作函数 \(Q^*(s,a)\) 也可以进行迭代计算<br/>
+\[<br/>
+\begin{align}<br/>
+V^*(s) &amp;= \max_a \mathbb E_{s&#39;\sim p(s&#39;|s,a)}\Big [r(s,a,s&#39;) + \gamma V^*(s&#39;) \Big]\label{vsmm}\\<br/>
+Q^*(s,a) &amp;= \mathbb E_{s&#39;\sim p(s&#39;|s,a)} \Big[r(s,a,s&#39;) + \gamma \max_{a&#39;} Q^*(s&#39;,a&#39;)]\label{qsme}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>这个公式称为<strong>贝尔曼最优方程（Bellman Optimality Equation）</strong>。</p>
+
+<p>值迭代算法如下：<br/>
+<strong>输入</strong>：MDP五元组：\(\mathcal S,\mathcal A,P,r,\gamma\)；<br/>
+<strong>输出</strong>：策略 \(\pi\)；<br/>
+<strong>算法过程</strong></p>
+
+<ol>
+<li>初始化：\(\forall s,V(s) = 0\)；</li>
+<li>repeat：
+
+<ul>
+<li>\(\forall s,V(s)\leftarrow \max_a \mathbb E_{s&#39;\sim p(s&#39;|s,a)} \Big [r(s,a,s&#39;) + \gamma V(s&#39;) \Big ]\)；</li>
+</ul></li>
+<li>until \(forall s\)，\(V(s)\) 收敛；</li>
+<li>根据公式 ( \ref{qsme} ) 计算 \(Q(s,a)\)；</li>
+<li>\(forall s,\pi(s) = \arg\max_a Q(s,a)\)；</li>
+</ol>
+
+<h5 id="toc_14">策略迭代与值迭代比较</h5>
+
+<p>在策略迭代中，每次迭代的时间复杂度最大为 \(O(|S|^3|A|^3)\)，<br/>
+最大迭代次数为 \(|A|^{|S|}\) 。而在值迭代中，每次迭代的时间复杂度最大为 \(O(|S|^2|A|)\)，<br/>
+但迭代次数要比策略迭代算法更多。</p>
+
+<p>策略迭代是根据贝尔曼方程来更新值函数，并根据当前的值函数来改进策<br/>
+略。而值迭代算法是直接使用贝尔曼最优方程来更新值函数，收敛时的值函数就是最优的值函数，其对应的策略也就是最优的策略。</p>
+
+<p>值迭代和策略迭代都需要经过非常多的迭代次数才能完全收敛。在实际应<br/>
+用中，可以不必等到完全收敛。这样，当状态和动作数量有限时，经过有限次迭代就可以能收敛到近似最优策略。</p>
+
+<p>基于模型的强化学习算法实际上是一种动态规划方法。在实际应用中有以下两点限制。</p>
+
+<ol>
+<li><p>要求模型已知，即要给出马尔可夫决策过程的状态转移概率 \(p(s&#39;|s,a)\) 和奖励函数 \(r(s,a,s&#39;)\)，这个要求很难满足。如果是事先不知道模型，但仍然希望通过基于模型的学习算法，也可以通过与环境交互来学习出状态转移概率和奖励函数。一个简单的计算模型的方法为 R-max [Brafman and Tennenholtz, 2002]，通过随机游走的方法来探索环境。每次随机一个策略并执行，然后收集状态转移和奖励的样本。在收集一定的样本后，就可以通过统计或监督学习来重构出马尔可夫决策过程。但是，这种基于采样的重构过程的复杂度也非常高，只能应用于状态数非常少的场合。</p></li>
+<li><p>效率问题，当状态数量较大的时候，算法的效率比较低。但在实际应用中，很多问题的状态数量和动作数量非常多。比如，围棋有 19 × 19 = 361个位置，每个位置有黑子、白子或无子三种状态，整个棋局有 \(3^361 \sim 10^170\) 种状态。动作（即落子位置）数量为 361。不管是值迭代还是策略迭代，以当前计算<br/>
+机的计算能力，根本无法计算。一个有效的方法是通过一个函数（比如神经网络）来近似计算值函数，以减少复杂度，并提高泛化能力。</p></li>
+</ol>
+
+<h4 id="toc_15">模特卡罗方法</h4>
+
+<p>在很多应用场景中，马尔可夫决策过程的状态转移概率 \(p(s&#39;|s,a)\) 和奖励函数 \(r(s,a,s&#39;)\) 都是未知的。在这种情况下，我们一般需要智能体和环境进行交互，并收集一些样本。然后再根据这些样本来求解马尔可夫决策过程最优策略。这种模型未知，基于采样的学习算法也称为模型无关的强化学习（Model-Free Reinforcement Learning）算法（也称为无模型的强化学习）。</p>
+
+<p>Q函数 \(Q^\pi(s,a)\) 为初始状态为 \(s\)，并执行动作 \(a\) 后的所能得到的期望总回报，可以写为<br/>
+\[<br/>
+Q^\pi(s, a) = \mathbb E_{\tau \sim p(\tau)} [G(\tau_{s_0=s,a_0=a})]<br/>
+\]</p>
+
+<p>其中 \(\tau_{s_0=s,a_0=a}\) 表示轨迹 \(\tau\) 的起始状态和动作为 \(s\), \(a\)。</p>
+
+<p>如果模型未知，Q函数可以通过采样来进行计算，这就是蒙特卡罗方法。对于一个策略 \(\pi\)，智能体从状态 \(s\)，执行动作 \(a\) 开始，然后通过随机游走的方法来探索环境，并计算其得到的总回报。假设我们进行 \(N\) 次试验，得到 \(N\) 个轨迹 \(\tau(1), \tau(2), \cdots, \tau(N)\)，其总回报分别为 \(G(\tau(1))\) , \(G(\tau(2))\) ,..., \(G(\tau(N))\)。 Q函数可以近似为<br/>
+\[<br/>
+Q^\pi(s,a) \approx \hat Q^\pi(s,a) = \frac 1 N \sum_{i=1}^N G(\tau^{(i)}_{s_0=s,a_0=a})<br/>
+\]</p>
+
+<p>当 \(N \rightarrow \infty\) 时， \(Q^\pi(s,a) \rightarrow Q^\pi(s,a)\)。</p>
+
+<p>在近似估计出 Q函数 \(Q^\pi(s,a)\) 之后，就可以进行策略改进。然后在新的策略下重新通过采样来估计 Q函数，并不断重复，直至收敛。</p>
+
+<p><strong>利用和探索</strong>：但在蒙特卡罗方法中，如果采用确定性策略 \(\pi\)，每次试验得到的轨迹是一样的，只能计算出 \(Q^\pi(s,\pi(s))\)，而无法计算其它动作 \(a&#39;\) 的 Q函数，因此也无法进一步改进策略。这样情况仅仅是对当前策略的利用（exploitation），而缺失了对环境的探索（exploration），即试验的轨迹尽可能覆盖所有的状态和动作，以找到更好的策略。</p>
+
+<p>为了平衡利用和探索，我们可以采用 \(\epsilon\)-贪心法（\(\epsilon\)-greedy method）。对于多臂赌博机问题。一个目标策略 \(\pi\)，其对应的 \(\epsilon\)-贪心法策略为<br/>
+\[<br/>
+\pi^\epsilon(s) = \left \{ \begin{array}\\\pi(s)\quad&amp;\text{按照概率 }1-\epsilon\\\text{随机选择 }\mathcal A\text{ 中的动作}\quad&amp;\text{按概率 }\epsilon\\\end{array}\right .<br/>
+\]</p>
+
+<p>这样， \(\epsilon\)-贪心法将一个仅利用的策略转为带探索的策略。每次选择动作 \(\pi(s)\) 的概率为 \(1 − \epsilon + \frac{1}{|\mathcal A|}\)，其它动作的概率为 \(\frac{1}{|\mathcal A|}\)。</p>
+
+<p><strong>同策略</strong>：在蒙特卡罗方法中，如果采样策略是 \(\pi^\epsilon(s)\)，不断改进策略也是 \(\pi^\epsilon(s)\) 而不是目标策略 \(\pi(s)\)。这种采样与改进策略相同（即都是 \(\pi^\epsilon(s)\)）的强化学习方法叫做同策略（on policy）方法。</p>
+
+<p><strong>异策略</strong>：如果采样策略是 \(\pi^\epsilon(s)\)，而优化目标是策略 \(\pi\)，可以通过重要性采样，引入重要性权重来实现对目标策略 \(\pi\) 的优化。这种采样与改进分别使用不同策略的强化学习方法叫做异策略（off policy）方法。</p>
+
+<h4 id="toc_16">时序差分学习方法</h4>
+
+<p>蒙特卡罗采样方法一般需要拿到完整的轨迹，才能对策略进行评估并更新模型，因此效率也比较低。</p>
+
+<p>时序差分学习（temporal-difference learning）结合了动态规划和蒙特卡罗方法，比仅仅使用蒙特卡罗采样方法的效率要高很多 [Sutton and Barto, 2011]。时序差分学习是模拟一段轨迹，每行动一步(或者几步)，就利用贝尔曼方程来评估行动前状态的价值。当时序差分学习中每次更新的动作数为最大步数时，就等价于蒙特卡罗方法。</p>
+
+<p>首先，将蒙特卡罗方法中 Q函数 \(Q^\pi(s,a)\) 的估计改为增量计算的方式，假设第 \(N\) 试验后值函数 \(\hat Q^\pi_N(s,a)\) 的平均为<br/>
+\[<br/>
+\begin{align*}<br/>
+\hat Q^\pi_N(s,a) &amp;= \frac 1 N \sum_{i=1}^N G(\tau^{(i)}_{s_0 = s,a_0 = a})\\<br/>
+&amp;= \frac 1 N \Big( G(\tau^{(N)}_{s_0 = s,a_0 = a}) + \sum_{i=1}^{N-1}G(\tau^{(i)_{s_0=s,a_0=a}}) \Big) \\<br/>
+&amp;= \frac 1 N \Big( G(\tau^{(N)}_{s_0 = s,a_0 = a}) + (N-1)Q^\pi_{N-1}(s,a)\Big)\\<br/>
+&amp;= \hat Q^\pi_{N-1}(s,a) + \frac 1 N \Big( G(\tau^{N}_{s_0=s,a_0=a}) - \hat Q^\pi_{N-1}(s,a) \Big)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(\tau_{s_0=s,a_0=a}\) 表示轨迹 \(\tau\) 的起始状态和动作为 \(s,a\)。</p>
+
+<p>值函数 \(\hat Q^\pi(s,a)\) 在第 \(N\) 试验后的平均加加上一个增量，更一般性地，我们将权重系数 \(\frac 1 N\) 改成一个比较小的正数 \(\alpha\)。这样每次采用一个新的轨迹 \(\tau_{s_0=s,a_0=a}\)，就可以更新 \(\hat Q^\pi(s,a)\)。<br/>
+\[<br/>
+\begin{equation}<br/>
+\hat Q^\pi(s,a) \leftarrow \hat Q^\pi(s,a) + \alpha \Big( G(\tau_{s_0=s,a_0=a}) - \hat Q^\pi(s,a) \Big)\label{hqpl}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>其中增量 \(\delta  \buildrel \Delta \over = G(\tau_{s_0=s,a_0=a}) - \hat Q^\pi(s,a)\) 称为蒙特卡罗误差，表示当前轨迹的真实回报 \(G(\tau_{s_0=s,a_0=a})\) 与期望回报 \(\hat Q^\pi(s,a)\) 之间的差距。</p>
+
+<p>在式 ( \ref{hqpl} ) 中，\(G(\tau_{s_0=s,a_0=a})\) 为一次实验的完整轨迹所得到的总回报。为了提高效率，可以借助动态规划的方法来计算 \(G(\tau_{s_0=s,a_0=a})\) ，而不需要得到完整的轨迹。从 \(s\)，\(a\) 开始，采样下一步的状态和动作 \((s&#39;,a&#39;)\)，并得到奖励 \(r(s,a,s&#39;)\)，然后利用贝尔曼方程来近似估计 \(G(\tau_{s_0=s,a_0=a})\) ,<br/>
+\[<br/>
+\begin{align}<br/>
+G(\tau_{s_0=s,a_0=a,s_1=s&#39;,a_1=a&#39;}) &amp;= r(s,a,s&#39;) + \gamma G(\tau_{s_0=s&#39;,a_0=a&#39;}) \nonumber\\<br/>
+&amp;\simeq r(s,a,s&#39;) + \gamma \hat Q^\pi(s&#39;,a&#39;)\label{gssr}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>其中 \(\hat Q^\pi(s&#39;,a&#39;)\) 是当前 Q函数的近似估计。</p>
+
+<p>结合公式 ( \ref{hqpl} ) 和 ( \ref{gssr})，有<br/>
+\[<br/>
+\hat Q^\pi(s,a) \leftarrow \hat Q^\pi(s,a) + \alpha\Big( r(s,a,s&#39;) + \gamma\hat Q^\pi(s&#39;a&#39;) - \hat Q^\pi(s,a) \Big)<br/>
+\]</p>
+
+<p>因此，更新 \(\hat Q^\pi(s,a)\) 只需要知道当前状态 \(s\) 和动作 \(a\)、奖励 \(r(s,a,s&#39;)\)、下一步的状态 \(s&#39;\) 和动作 \(a&#39;\)。这种策略学习称为 SARSA 算法。</p>
+
+<p>SARSA算法其采样和优化的策略都是 \(\pi^\epsilon\)，因此是一种同策略算法。为了提高计算效率，我们不需要对环境中所有的 \(s,a\) 组合进行穷举，并计算值函数。只需要将当前的探索 \((s,a,r,s&#39;,a&#39;)\) 中\(s&#39;\),\(a&#39;\) 作为下一次估计的起始状态和动作。</p>
+
+<p><strong>输入</strong>：状态空间 \(\mathcal S\)，动作空间 \(\mathcal A\)，折扣率 \(\gamma\)，学习率 \(\alpha\)<br/>
+<strong>输出</strong>：策略 \(\pi(s)\)<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li>随机初始化 \(Q(s,a)\)；</li>
+<li>\(\forall s,\forall a,\pi(a|s) = \frac{1}{|\mathcal A|}\)；</li>
+<li>repeat
+
+<ul>
+<li>初始化起始动作 \(s\)；</li>
+<li>选择动作 \(a=\pi^\epsilon(s)\)；\qquad<font>采样策略使用 \(\pi^\epsilon\) </font></li>
+<li>repeat
+
+<ul>
+<li>执行动作 \(a\)，得到即时奖励 \(r\) 和新状态 \(s&#39;\)；</li>
+<li>在状态 \(s&#39;\)，选择动作 \(a&#39; = \pi^\epsilon(s&#39;)\)；\qquad<font>优化策略(\(a&#39;\)的选择)使用 \(\pi^\epsilon\)</font></li>
+<li>\(Q(s,a) \leftarrow Q(s,a) + \alpha\Big( r + \gamma Q(s&#39;,a&#39;) - Q(s,a) \Big)\)</li>
+<li>更新策略：\(\pi(s) = \arg\max_{\alpha\in|\mathcal A|} Q(s,a)\)；</li>
+<li>\(s\leftarrow s&#39;,a\leftarrow a&#39;\)；</li>
+</ul></li>
+<li>until \(s\) 为终止状态；</li>
+</ul></li>
+<li>until \(\forall s,a\)，\(Q(s,a)\) 收敛；</li>
+<li>输出 \(\pi(s)\)</li>
+</ul>
+
+<p>时序差分学习是强化学习的主要学习方法，其关键步骤就是在每次迭代中优化 Q 函数来减少现实 \(r + \gamma Q(s&#39;, a&#39;)\) 和预期 \(Q(s,a)\) 的差距。这和动物学习的机制十分相像。在大脑神经元中，多巴胺的释放机制和时序差分学习十分吻合。Schultz [1998]的一个实验中，通过监测猴子大脑释放的多巴胺浓度，发现如果猴子获得比预期更多的果汁，或者在没有预想到的时间喝到果汁,多巴胺释放大增。如果本来预期的果汁没有喝到，多巴胺的释放就会大减。多巴胺的释放, 来自对于实际奖励和预期奖励的差异，而不是奖励本身。</p>
+
+<p>时序差分学习和蒙特卡罗方法的主要不同为：蒙特卡罗需要完整一个路径完成才能知道其总回报，也不依赖马尔可夫性质；而时序差分学习只需要一步，其总回报需要依赖马尔可夫性质来进行近似估计。</p>
+
+<h5 id="toc_17">Q学习</h5>
+
+<p>Q学习（Q-Learning）算法 [Watkins and Dayan, 1992]是一种异策略的时<br/>
+序差分学习算法。在 Q学习中，\(a&#39;\) 的选择方法为<br/>
+\[<br/>
+a&#39; \leftarrow max_{a&#39;}Q(s&#39;,a&#39;)<br/>
+\]</p>
+
+<p>与 SARSA 算法的不同， Q 学习算法不通过 \(\pi^\epsilon\) 来选下一步的动作 \(a&#39;\)，而是<br/>
+直接选最优的 Q函数，因此更新后的 Q函数是关于策略 \(\pi\) 的，而不是策略 \(\pi^\epsilon\) 的。</p>
+
+<p><strong>输入</strong>：状态空间 \(\mathcal S\)，动作空间 \(\mathcal A\)，折扣率 \(\gamma\)，学习率 \(\alpha\)<br/>
+<strong>输出</strong>：策略 \(\pi(s)\)<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li>随机初始化 \(Q(s,a)\)；</li>
+<li>\(\forall s,\forall a,\pi(a|s) = \frac{1}{|\mathcal A|}\)；</li>
+<li>repeat
+
+<ul>
+<li>初始化起始动作 \(s\)；</li>
+<li>选择动作 \(a=\pi^\epsilon(s)\)；\qquad<font>采样策略使用 \(\pi^\epsilon\) </font></li>
+<li>repeat
+
+<ul>
+<li>执行动作 \(a\)，得到即时奖励 \(r\) 和新状态 \(s&#39;\)；</li>
+<li>优化策略(\(a&#39;\)的选择)使用 \(\pi^\epsilon\)</font></li>
+<li>\(Q(s,a) \leftarrow Q(s,a) + \alpha\Big( r + \gamma \max_{a&#39;} Q(s&#39;,a&#39;) - Q(s,a) \Big)\)</li>
+<li>更新策略：\(\pi(s) = \arg\max_{\alpha\in|\mathcal A|} Q(s,a)\)；</li>
+<li>\(s\leftarrow s&#39;,a\leftarrow a&#39;\)；</li>
+</ul></li>
+<li>until \(s\) 为终止状态；</li>
+</ul></li>
+<li>until \(\forall s,a\)，\(Q(s,a)\) 收敛；</li>
+<li>输出 \(\pi(s)\)</li>
+</ul>
+
+<h4 id="toc_18">深度Q网络</h4>
+
+<p>假设现在我们使用Q学习来模拟计算机玩游戏，我们会将输入原始图像数据，假设为300*240像素的图片，然后输出几个按键（上下左右）。这种情况下，每一秒钟的状态都不一样，从理论上看，如果每一个像素都有 256种选择，那么就有<br/>
+\[<br/>
+256^{320\times 240}<br/>
+\]</p>
+
+<p>这时候我们便不可能再通过矩阵来存储状态了，我们有必要对状态的维度进行压缩，解决办法就是值函数近似（value function approximation）。</p>
+
+<p>为了在连续的状态和动作空间中计算值函数 \(Q_\pi(s,a)\)，我们可以用一个函数 \(Q\phi(s,a)\) 来表示近似计算，称为值函数近似。<br/>
+\[<br/>
+Q_\phi(\mathbf s,\mathbf a) \approx Q_\pi(s,a)<br/>
+\]</p>
+
+<p>其中 \(\mathbf s\), \(\mathbf a\) 分别是状态 \(s\) 和动作 \(a\) 的向量表示；函数 \(Q_\phi(\mathbf s,\mathbf a)\) 通常是一个参数为 \(\phi\) 的函数，比如神经网络，输出为一个实数，称为 Q网络（Q-network）。</p>
+
+<blockquote>
+<p>如果我们假设 \(Q_phi(\mathbf s,\mathbf a)\) 是一个线性函数，如下面这样的函数<br/>
+\[<br/>
+Q_\phi(\mathbf s,\mathbf a) = \mathbf w_1^T \mathbf s + \mathbf w_2^T \mathbf a + b<br/>
+\]</p>
+
+<p>其中参数 \(\phi=(\mathbf w_1,\mathbf w_2,b)\)。通过函数表示，我们就可以无所谓 \(s\) 到底是多大的维度，反正最后都通过矩阵运算降维输出为单值的 Q。</p>
+</blockquote>
+
+<p>如果动作为有限离散的 m 个动作 \(a_1,...,a_m\)，我们可以让 Q网络输出一个 m 维向量，其中每一维用 \(Q\phi(s,a_i)\) 来表示，对应值函数 \(Q(s,a_i)\) 的近似值。<br/>
+\[<br/>
+\begin{align*}<br/>
+Q_\phi(\mathbf s) = \left [\begin{array}{c}Q_phi(\mathbf s,a_1)\\Q_phi(\mathbf s,a_2)\\...\\Q_phi(\mathbf s,a_n)\\\end{array} \right ] = \left [\begin{array}{c}Q^\pi(s,a_1)\\Q^\pi(s,a_2)\\...\\Q^\pi(s,a_n)\\\end{array}\right ]<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>我们需要学习一个参数 \(\phi\) 来使得函数 \(Q_\phi(\mathbf s,\mathbf a)\) 可以逼近值函数 \(Q^\pi(s,a)\)。如果采用蒙特卡罗方法，就直接让 \(Q_\phi(\mathbf s,\mathbf a)\) 去逼近平均的总回报 \(\hat Q^\pi(s,a)\)；如果采样时序差分方法，就让 \(Q_\phi(\mathbf s,\mathbf a)\) 去逼近 \(\mathbb E_{s&#39;,a&#39;}[r+\gamma Q_\phi(\mathbf s&#39;,\mathbf a&#39;)]\)。</p>
+
+<p>以 Q学习为例，采用随机梯度下降，目标函数为 <br/>
+\[<br/>
+L(s,a,s&#39;|\phi) = \bigg(r + \gamma max_{a} Q_\phi(\mathbf s&#39;, \mathbf a&#39;)-Q_\phi(\mathbf s,\mathbf a)\bigg)^2<br/>
+\]</p>
+
+<p>其中 \(\mathbf s&#39;,\mathbf a&#39;\) 是下一时刻的状态 \(s&#39;\) 和动作 \(a&#39;\) 的向量表示。</p>
+
+<p>然而，这个目标函数存在两个问题：一是目标不稳定，参数学习的目标依赖于参数本身；二是样本之间有很强的相关性。为了解决这两个问题，Mnih et al.[2015]提出了一种深度Q网络（deep Q-networks， DQN）。深度 Q网络采取两个措施：一是目标网络冻结（freezing target networks），即在一个时间段内固定目标中的参数，来稳定学习目标；二是经验回放（experience replay），构建一个经验池来去除数据相关性。经验池是由智能体最近的经历组成的数据集。经验回放可以形象地理解为在回忆中学习。</p>
+
+<p>训练时，随机从经验池中抽取样本来来代替当前的样本用来进行训练。这样，也可以就打破了和相邻训练样本的相似性，避免模型陷入局部最优。经验回放在一定程度上类似于监督学习。先收集样本，然后在这些样本上进行训练。</p>
+
+<p>经验回放的好处是：1）深度神经网络作为有监督学习模型，要求数据满足独立同分布；2）但 Q Learning 算法得到的样本前后是有关系的。由一个连续动作序列产生的经验相互之间具有很大的相关性，一个相关性很高的样本会增大更新的方差，甚至会导致算法不稳定。为了打破数据之间的关联性，Experience Replay 方法通过存储-采样的方法将这个关联性打破了。</p>
+
+<p>深度 Q网络的学习过程如算法如下：</p>
+
+<p><strong>输入</strong>: 状态空间 \(\mathcal S\)，动作空间 \(\mathcal A\)，折扣率 \(\gamma\)，学习率 \(\alpha\)；<br/>
+<strong>输出</strong>：Q网络 \(Q_\phi(s,a)\)；<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li>初始化经验池 \(\mathcal D\)，容量为 \(N\);</li>
+<li>随机初始化 Q网络的参数 \(\phi\);</li>
+<li>随机初始化目标 Q网络的参数 \(\hat\phi = \phi\);</li>
+<li>repeat
+
+<ul>
+<li>初始化起始状态 \(s\);</li>
+<li>repeat
+
+<ul>
+<li>在状态 \(s\)，选择动作 \(a = \pi^\epsilon\);</li>
+<li>执行动作 \(a\)，观测环境，得到即时奖励 \(r\) 和新的状态 \(s&#39;\);</li>
+<li>将 \(s,a,r,s&#39;\) 放入 \(\mathcal D\) 中;</li>
+<li>从 \(\mathcal D\) 中采样 \(ss,aa,rr,ss&#39;\);
+\[
+\begin{align*}
+y = \left \{\begin{array}{ll} rr,\qquad&amp; ss&#39;\text{ is terminative node}\\rr+\gamma \max_{a&#39;} Q_{\hat \phi}(ss&#39;,a&#39;),\qquad&amp; \text{otherwise}\\\end{array}
+\right .
+\end{align*}
+\]</li>
+<li>用梯度下降法以 \((y − Q_\phi(s,a))^2\) 为损失函数来训练 Q网络;</li>
+<li>\(s \leftarrow s&#39;\);</li>
+<li>每隔 C 步， \(\hat \phi \leftarrow \phi\);</li>
+</ul></li>
+<li>until \(s\) 为终止状态;</li>
+</ul></li>
+<li>until \(\forall s,a\)， \(Q_\phi(s,a)\) 收敛;</li>
+</ul>
+
+<p>在上述过程中</p>
+
+<p>整体上，在基于值函数的学习方法中，策略一般为确定性的策略。策略优化通常都依赖于值函数，比如贪心策略 \(\pi(s) = \arg\max_a Q(s,a)\)。最优策略一般需要遍历当前状态 \(s\) 下的所有动作，并找出最优的 \(Q(s,a)\)。如果动作空间离散但是很大时，那么遍历求最大需要很高的时间复杂度；如果动作空间是连续的并且 \(Q(s,a)\) 非凸时，也很难求解出最佳的策略。</p>
+
+<blockquote>
+<p>在DQN中常见的策略优化时采用的是贪心策略，也就是说DQN常见的是off-policy的方法。由于使用了经验池，在更新当前权重的时候，其样本并不是基于当前权重的greedy策略（目标策略），因此，就必然地需要使用off-policy的方法，比如这里使用的Q-learning；</p>
+</blockquote>
+
+<h3 id="toc_19">基于策略函数的学习方法</h3>
+
+<p>强化学习的目标是学习到一个策略 \(\pi_\theta(a|s)\) 来最大化期望回报。一种直接的方法是在策略空间直接搜索来得到最佳策略，称为策略搜索（ policy search）。策略搜索本质是一个优化问题，可以分为基于梯度的优化和无梯度优化。策略<br/>
+搜索和基于值函数的方法相比，策略搜索可以不需要值函数，直接优化策略。参数化的策略能够处理连续状态和动作，可以直接学出随机性策略。</p>
+
+<p>策略梯度（ policy gradient）是一种基于梯度的强化学习方法。假设 \(\pi_\theta(a|s)\) 是一个关于 \(\theta\) 的连续可微函数<br/>
+\[<br/>
+\mathcal J(\theta) = \mathbb E_{\tau\sim p_{\theta}(\tau)}[G(\tau)] = \mathbb E_{\tau\sim p_\theta(\tau)}[\sum_{t=0}^{T-1} \gamma^t r_{t+1}]<br/>
+\]</p>
+
+<p>我们可以用梯度上升的方法来优化参数 \(\theta\) 使得目标函数 \(\mathcal J(\theta)\) 最大。<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial \mathcal J(\theta)}{\partial \theta} &amp;= \frac{\partial}{\partial \theta}\int p_\theta(\tau)G(\tau)d\tau\\<br/>
+&amp;= \int \bigg(\frac{\partial}{\partial \theta} p_\theta(\tau) \bigg) G(\tau)d\tau\\<br/>
+&amp;= \int p_\theta(\tau) \bigg(\frac{1}{p_\theta(\tau)} \frac{\partial}{\partial \theta}p_\theta(\tau)\bigg) G(\tau)d\tau\\<br/>
+&amp;= \int p_\theta(\tau) \bigg( \frac{\partial}{\partial \theta} \log p_\theta(\tau) \bigg) G(\tau)d\tau\\<br/>
+&amp;= \mathbb E_{\tau\sim p_\theta(\tau)}\bigg[\frac{\partial}{\partial \theta} \log p_\theta(\tau) G(\tau)\bigg]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(\frac{\partial}{\partial \theta} \log p_\theta(\tau)\) 为函数 \(\log p_\theta(\tau)\) 关于 \(\theta\) 的偏导数。从上式可以看出，参数 \(\theta\) 优化的方向是使得总回报 \(G(\tau)\) 越大的轨迹 \(\tau\) 的概率 \(p_\theta(\tau)\) 也越大。</p>
+
+<p>\(\log p_\theta(\tau)\) 可以进一步分解为<br/>
+\[<br/>
+\begin{align*}<br/>
+\log p_\theta(\tau) &amp;= \frac{\partial}{\partial \theta}\log\bigg(p(s_0) \prod_{t=0}^{T-1} \pi_\theta(a_t|s_t) p(s_{t+1}|s_t,a_t) \bigg)\\<br/>
+&amp;= \frac{\partial}{\partial \theta} \bigg(\log p(s_0) + \sum_{t=0}^{T-1} \log \pi_\theta(a_t|s_t) + \log p(s_{t+1}|s_t,a_t)\bigg)\\<br/>
+&amp;= \frac{\partial}{\partial \theta} \bigg( \log p(s_0) + \sum_{t=0}^{T-1}  \pi_\theta(a_t|s_t) + \log p(s_{t+1}|s_t,a_t) \bigg)\\<br/>
+&amp;= \sum_{t=0}^{T-1} \frac{\partial}{\partial \theta} \log \pi_\theta(a_t|s_t)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>可以看出，\(\frac{\partial}{\partial \theta} \log p_\theta(\tau)\) 是和状态转移概率无关，只和策略函数相关。</p>
+
+<p>因此，策略梯度 \(\frac{\partial \mathcal J(\theta)}{\partial \theta}\) 可写为<br/>
+\[<br/>
+\begin{align}<br/>
+\frac{\partial \mathcal J(\theta)}{\partial \theta} &amp;= \mathbb E_{\tau \sim p_\theta(\tau)} \bigg [\bigg( \sum_{t=0}^{T-1} \frac{\partial}{\partial \theta} \log \pi_\theta (a_t|s_t) \bigg) G(\tau)\bigg ]\nonumber\\<br/>
+&amp;= \mathbb E_{\tau \sim p_\theta(\tau)} \bigg [\bigg( \sum_{t=0}^{T-1} \frac{\partial}{\partial \theta} \log \pi_\theta (a_t|s_t) \bigg)\Big(G(\tau_{1,t-1}) + \gamma^t G(\tau_{t:T}) \Big) \bigg ]\nonumber\\<br/>
+&amp;= \mathbb E_{\tau \sim p_\theta(\tau)} \bigg [\bigg( \sum_{t=0}^{T-1} \frac{\partial}{\partial \theta} \log \pi_\theta (a_t|s_t) G(\tau_{1,t-1})\bigg) + \bigg(\sum_{t=0}^{T-1} \frac{\partial}{\partial \theta} \log \pi_\theta (a_t|s_t) \gamma^t G(\tau_{t:T}) \bigg) \bigg ]\label{meps}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>其中 \(G(\tau_{t:T})\) 为从时刻 \(t\) 作为起始时刻收到总回报<br/>
+\[<br/>
+G(\tau_{t:T}) = \sum^{T−1}_{t&#39;=t} \gamma^{t&#39;-t} r_{t&#39;+1}<br/>
+\]</p>
+
+<p>然而，当前的动作与过去的回报实际上是没有关系的，即对于 \(t&#39;\lt t\)，有<br/>
+\[<br/>
+\mathbb E r(s_{t&#39;},a_{t&#39;},s_{t&#39;+1}) \frac{\partial}{\partial \theta} \log\pi_{\theta}(a_{t}|s_{t}) = 0<br/>
+\]</p>
+
+<p>所以<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbb E_{\tau \sim p_\theta(\tau)}  \sum_{t=0}^{T-1} \frac{\partial}{\partial \theta} \log \pi_\theta (a_t|s_t) G(\tau_{1,t-1}) &amp;= \mathbb E_{\tau \sim p_\theta(\tau)}  \sum_{t=0}^{T-1} \frac{\partial}{\partial \theta} \log \pi_\theta (a_t|s_t) \sum_{t&#39;=0}^{t-1} \gamma^{t&#39;} r(s_{t&#39;},a_{t&#39;},s_{t&#39;+1})\\<br/>
+&amp;= \mathbb E_{\tau \sim p_\theta(\tau)}  \sum_{t=0}^{T-1} \sum_{t&#39;=0}^{t-1} \frac{\partial}{\partial \theta} \log \pi_\theta (a_t|s_t) \gamma^{t&#39;} r(s_{t&#39;},a_{t&#39;},s_{t&#39;+1})\\<br/>
+&amp;= 0\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>因此，我们可以修改 \ref{meps} 中的回报函数：<br/>
+\[<br/>
+\begin{equation}<br/>
+\frac{\partial \mathcal J(\theta)}{\partial \theta} = \mathbb E_{\tau \sim p_\theta(\tau)} \sum_{t=0}^{T-1} \frac{\partial}{\partial \theta} \log \pi_\theta (a_t|s_t) \gamma^t G(\tau_{t:T}) \label{fpmt}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<h4 id="toc_20">REINFORCE算法</h4>
+
+<p>公式 ( \ref{fpmt} ) 中，期望可以通过采样的方法来近似。对当前策略 \(\pi_\theta\) ，可以随机游走采集多个轨迹 \(\tau^{(1)}, \tau^{(2)},..., \tau^{(N)}\)，每一条轨迹 \(\tau^{(n)} = s_0^{(n)},a_0^{(n)},s_1^{(n)},a_1^{(n)},...\)，其梯度定义为<br/>
+\[<br/>
+\frac{\partial \mathcal J(\theta)}{\partial \theta} = \frac 1 N \sum_{n=1}^N \bigg(\sum_{t=0}^{T-1} \frac{\partial}{\partial \theta} \log \pi_\theta (a^{(n)}_t|s^{(n)}_t) \gamma^t G(\tau^{(n)}_{t:T}) \bigg)<br/>
+\]</p>
+
+<p>结合随机梯度上升算法，我们可以每次采集一条轨迹，计算每个时刻的梯度并更新参数，称为 REINFORCE算法[Williams, 1992]，如算法14.6所示。</p>
+
+<p><strong>输入</strong>: 状态空间 \(\mathcal S\)，动作空间 \(\mathcal A\)，可微分的策略函数 \(\pi_\theta(a|s)\)，折扣率 \(\gamma\)，学习率 \(\alpha\)；<br/>
+<strong>输出</strong>：策略 \(\pi_\theta\)；<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li>随机初始化参数 \(\theta\);</li>
+<li>repeat:
+
+<ul>
+<li>根据策略 \(\pi_\theta(a|s)\) 生成一条轨迹;</li>
+<li>\(τ = s_0, a_0, s_1, a_1,..., s_{T−1}, a{T−1}, s_T\)</li>
+<li>for t = 0 to T do:
+
+<ul>
+<li>计算 \(G(\tau_{t:T})\);</li>
+<li>更新策略函数参数
+\[
+\theta \leftarrow \theta + \alpha \gamma^t G(\tau_{t:T}) \frac{\partial}{\partial \theta} \log \pi_\theta(a_t|s_t)
+\]</li>
+</ul></li>
+<li>end</li>
+</ul></li>
+<li>until \(\theta\) 收敛;
+输出: 策略 \(\pi_\theta\);</li>
+</ul>
+
+<h4 id="toc_21">带基准线的REINFORCE算法</h4>
+
+<p>REINFORCE算法的一个主要缺点是不同路径之间的方差很大，导致训练不稳定，这是在高维空间中使用蒙特卡罗方法的的通病。一种减少方差的通用方法是引入一个控制变量。假设要估计函数 \(f\) 的期望，为了减少 \(f\) 的方差，我们引入一个已知期望的函数 \(g\)，令<br/>
+\[<br/>
+\hat f = f - \alpha(g - \mathbb E[g])<br/>
+\]</p>
+
+<p>因为 \(\mathbb E[\hat f] = \mathbb E[f]\)，我们可以用 \(\hat f\) 的期望来估计函数 \(f\) 的期望，同时利用函数 \(g\) 来减小 \(\hat f\) 的方差。</p>
+
+<p>函数 \(\hat f\) 的方差为<br/>
+\[<br/>
+\begin{align*}<br/>
+\text{var}(\hat f) &amp;= \text{var}[f - \alpha(g - \mathbb E[g])]\\<br/>
+&amp;= \text{var}[f - \alpha g + \alpha\mathbb E[g]]\\<br/>
+&amp;= \text{var}[f - \alpha g]\\<br/>
+&amp;= \text{var}(f) + \text{var}[\alpha g] - 2\text{cov}(f,\alpha g)\\<br/>
+&amp;= \text{var}(f) + \alpha^2 \text{var}(g) - 2\alpha\text{cov}(f,g)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(\text{var}(\cdot)\), \(\text{cov}(\cdot,\cdot)\) 分别表示方差和协方差。</p>
+
+<blockquote>
+<p>D(X+Y) = D(X) + D(Y) + 2cov(X,Y)<br/>
+D(X+c) = D(X)<br/>
+D(aX) = a<sup>2D(X)</sup><br/>
+cov(X,Y) = cov(Y,X)<br/>
+cov(aX,bY) = a<em>b</em>cov(X,Y)<br/>
+cov(X+Y,Z) = cov(X,Z) + cov(Y,Z)</p>
+</blockquote>
+
+<p>如果要使得 \(\text{var}(\hat f)\) 最小，令 \(\frac{\partial \text{var} \hat f}{\partial \alpha} = 0\)，得到<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\quad \frac{\partial \text{var} \hat f}{\partial \alpha} = 2\alpha \text{var}(g) - 2\text{cov}(f,g) = 0\\<br/>
+&amp;\quad \Rightarrow\quad \alpha = \frac{\text{cov}(f,g)}{\text{var}(g)}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>因此<br/>
+\[<br/>
+\begin{align*}<br/>
+\text{var}(\hat f) &amp;= \text{var}(f) + \alpha^2 \text{var}(g) - 2\alpha\text{cov}(f,g)\\<br/>
+&amp;= \text{var}(f) + \Big[\frac{\text{cov}(f,g)}{\text{var}(g)}\Big]^2 \text{var}(g) - 2\Big[\frac{\text{cov}(f,g)}{\text{var}(g)} \Big]\text{cov}(f,g)\\<br/>
+&amp;= \text{var}(f) + \frac{\text{cov}(f,g)^2 - 2\text{cov}(f,g)^2}{\text{var}(g)}\\<br/>
+&amp;= \text{var}(f) - \frac{\text{cov}(f,g)^2}{\text{var}(g)}\\<br/>
+&amp;= \Big(1 - \frac{\text{cov}(f,g)^2}{\text{var}(g)\text{var}(f)}\Big)\text{var}(f)\\<br/>
+&amp;= \Big(1 - \text{corr}(f,g)^2\Big) \text{var}(f)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(\text{corr}(f, g)\) 为函数 \(f\) 和 \(g\) 的相关性。如果相关性越高，则 \(\hat f\) 的方差越小。</p>
+
+<blockquote>
+<p>相关性的定义：<br/>
+\[<br/>
+\rho_{X,Y} = \frac{cov(X,Y)}{\sqrt{D(X)}\sqrt{D(Y)}}<br/>
+\]</p>
+</blockquote>
+
+<p><strong>带基准线的 REINFORCE 算法</strong>：在每个时刻 \(t\)，其策略梯度为<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial \mathcal J_t(\theta)}{\partial\theta} = \mathbb E_{s_t}\Big[\mathbb E_{a_t} \Big[ \gamma^t G(\tau_{t:T} \frac{\partial}{\partial \theta} \log \pi_\theta(a_t|s_t)) \Big] \Big]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>为了减小策略梯度的方差，我们引入一个和 \(a_t\) 无关的基准函数 \(b(s_t)\)，<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial \hat {\mathcal J_t}(\theta)}{\partial\theta} = \mathbb E_{s_t}\Big[\mathbb E_{a_t} \Big[ \gamma^t \big( G(\tau_{t:T}  - b(s_t)\big) \frac{\partial}{\partial \theta} \log \pi_\theta(a_t|s_t)) \Big] \Big]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>因为 \(b(s_t)\) 和 \(a_t\) 无关，有<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbb E_{a_t} \gamma^t b(s_t) \frac{\partial}{\partial \theta} \log \pi_\theta(a_t|s_t) &amp;= \int_{a_t} \gamma^t b(s_t) \Big(\frac{\partial}{\partial \theta} \log \pi_\theta(a_t|s_t) \Big)\pi(a_t|s_t) da_t\\<br/>
+&amp;= \int_{a_t} \gamma^t b(s_t) \Big(\frac{\partial}{\partial \theta} \pi_\theta(a_t|s_t)\Big) \frac{1}{\pi(a_t|s_t) } \pi(a_t|s_t) da_t\\<br/>
+&amp;= \int_{a_t} \gamma^t b(s_t) \frac{\partial}{\partial \theta} \pi_\theta(a_t|s_t) da_t\\<br/>
+&amp;= \frac{\partial}{\partial \theta} \gamma^t b(s_t) \int_{a_t} \pi_\theta(a_t|s_t) da_t\\<br/>
+&amp;= \frac{\partial}{\partial \theta} \Big(\gamma^t b(s_t) \cdot 1\Big)\\<br/>
+&amp;= 0\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>上式中运用了积分、微分互换不变性和<br/>
+\[<br/>
+\int_{a_t} \pi(a_t|s_t) = 1<br/>
+\]</p>
+
+<p>因此<br/>
+\[<br/>
+\frac{\partial \hat {\mathcal J_t}(\theta)}{\partial\theta} = \frac{\partial \mathcal J_t(\theta)}{\partial\theta}<br/>
+\]</p>
+
+<p>为了可以有效地减小方差， \(b(s_t)\) 和 \(G(\tau_{t:T})\) 越相关越好，一个很自然的选择是令 \(b(s_t)\) 为值函数 \(V^{\pi_\theta}(s_t)\)。但是由于值函数未知，我们可以用一个可学习的函数 \(V_\phi(s_t)\) 来近似值函数，目标函数为<br/>
+\[<br/>
+\mathcal L(\phi|s_t,\pi_\theta) = [V^{\pi_\theta}(s_t) − V_\phi(s_t)]^2<br/>
+\]</p>
+
+<p>其中 \(V^{\pi_\theta}(s_t) = \mathbb E[G(\tau_{t:T})]\) 也用蒙特卡罗方法进行估计。采用随机梯度下降法，参数 \(\phi\) 的梯度为<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial}{\partial \phi} \mathcal L(\phi|s_t,\pi_\theta) &amp;= \frac{\partial}{\partial \phi} [V^{\pi_\theta}(s_t) − V_\phi(s_t)]^2\\<br/>
+&amp;= -2[V^{\pi_\theta}(s_t) − V_\phi(s_t)]\frac{\partial}{\partial \theta} V_\phi(s_t)\\<br/>
+&amp;= -2[\mathbb E[G(\tau_{t:T})] − V_\phi(s_t)]\frac{\partial V_\phi(s_t)}{\partial \theta} \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>策略函数参数 \(\theta\) 的梯度为<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial \hat {\mathcal J_t}(\theta)}{\partial\theta} = \mathbb E_{s_t}\Big[\mathbb E_{a_t} \Big[ \gamma^t \big( G(\tau_{t:T}  - V_\phi(s_t) \big) \frac{\partial}{\partial \theta} \log \pi_\theta(a_t|s_t)) \Big] \Big]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<h5 id="toc_22">带基准线的 REINFORCE算法</h5>
+
+<p><strong>输入</strong>: 状态空间 \(\mathcal S\)，动作空间 \(\mathcal A\)，可微分的策略函数 \(\pi_\theta(a|s)\)，可微分的状态值函数 \(V_\phi(s)\)，折扣率 \(\gamma\)，学习率 \(\alpha\)，\(\beta\);<br/>
+<strong>输出</strong>: 策略 \(\pi_\theta\);<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li>随机初始化参数 \(\theta,\phi\);</li>
+<li>repeat:
+
+<ul>
+<li>根据策略 \(\pi_\theta(a|s)\) 生成一条轨迹</li>
+<li>\(τ = s_0, a_0, s_1, a_1,..., s_{T−1}, a{T−1}, s_T\)</li>
+<li>for t = 0 to T do:
+
+<ul>
+<li>计算 \(G(\tau_{t:T})\);
+\[
+\delta \leftarrow G(\tau_{t:T}) − V_\phi(s_t);
+\]</li>
+<li>更新值函数参数
+\[
+\phi \leftarrow \phi + \beta \delta \frac{\partial V_\phi(s_t)}{\partial \phi};
+\]</li>
+<li>更新策略函数参数
+\[
+\theta \leftarrow \theta + \alpha \gamma^t \delta \frac{\partial}{\partial \theta} \log \pi_\theta(a_t|s_t)
+\]</li>
+</ul></li>
+<li>end</li>
+</ul></li>
+<li>until \(\theta\) 收敛;</li>
+<li>输出: 策略 \(\pi_\theta\);</li>
+</ul>
+
+<h3 id="toc_23">Actor-Critic算法</h3>
+
+<p>在 REINFORCE算法中，每次需要根据一个策略采集一条完整的轨迹，并计算这条轨迹上的回报。这种采样方式的方差比较大，学习效率也比较低。可以借鉴时序差分学习的思想，使用动态规划方法来提高采样的效率，即从状态开始 \(s\) 的总回报可以通过当前动作的即时奖励 \(r(s,a,s&#39;)\) 和下一个状态 \(s&#39;\) 的<br/>
+值函数来近似估计。</p>
+
+<p><strong>演员-评论员算法（Actor-Critic Algorithm）</strong> 是一种结合策略梯度和时序差分学习的强化学习方法。其中演员（actor）是指策略函数 \(\pi_\theta(s, a)\)，即学习一个策略来得到尽量高的回报， 评论员（critic）是指值函数 \(V_\phi(s)\)，对当前策略的值函数进行估计，即评估 actor 的好坏。借助于值函数，Actor-Critic 算法可以进行单步更新参数，不需要等到回合结束才进行更新。<br/>
+在 Actor-Critic 算法中的策略函数 \(\pi_\theta(s,a)\) 和值函数 \(V_\phi(s)\) 都是待学习的函数，需要在训练过程中同时学习。</p>
+
+<p>假设从时刻 \(t\) 开始的回报 \(G(\tau_{t:T})\)，我们用下面公式近似计算。<br/>
+\[<br/>
+\hat G(\tau_{t:T}) = r_{t+1} + \gamma V_\phi(s_{t+1}),<br/>
+\]</p>
+
+<p>其中 \(s_{t+1}\) 是 \(t+1\) 时刻的状态， \(r_{t+1}\) 是即时奖励。</p>
+
+<p>在每步更新中，分别进行策略函数 \(\pi_\theta(s,a)\) 和值函数 \(V_\phi(s)\) 的学习。一方面，更新参数 \(\phi\) 使得值函数 \(V_\phi(s_t)\) 接近于估计的真实回报 \(\hat G(\tau_{t:T})\)，<br/>
+\[<br/>
+\min_\phi [\hat G(\tau_{t:T}) − V_\phi(s_t)]^2<br/>
+\]</p>
+
+<p>另一方面，将值函数 \(V_\phi(s_t)\) 作为基函数来更新参数 \(\theta\)，减少策略梯度的方差。<br/>
+\[<br/>
+\theta \leftarrow \theta + \alpha \gamma^t [\hat G(\tau_{t:T}) − V_\phi(s_t)] \frac{\partial}{\partial \theta}\log \pi_\theta(a_t|s_t)<br/>
+\]</p>
+
+<p>在每步更新中，演员根据当前的环境状态 \(s\) 和策略 \(\pi_\theta(a|s)\) 去执行动作 \(a\)，环境状态变为 \(s&#39;\)，并得到即时奖励 \(r\)。评论员（值函数 \(V_\phi(s)\)）根据环境给出的真实奖励和之前标准下的打分（\(r + \gamma V_\phi(s&#39;)\)），来调整自己的打分标准，使得自己的评分更接近环境的真实回报。演员则跟据评论员的打分，调整自己的策略 \(\pi_\theta\)，争取下次做得更好。开始训练时，演员随机表演，评论员随机打分。通过不断的学习，评论员的评分越来越准，演员的动作越来越好。</p>
+
+<p><strong>输入</strong>: 状态空间 \(\mathcal S\)，动作空间 \(\mathcal A\), 可微分的策略函数 \(\pi_\theta(a|s)\), 可微分的状态值函数 \(V_\phi(s)\), 折扣率 \(\gamma\)，学习率 \(\alpha &gt; 0,\beta &gt; 0\);<br/>
+<strong>输出</strong>：策略 \(\pi_\theta\);<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li>随机初始化参数 \(\theta,\phi\);</li>
+<li>repeat:
+
+<ul>
+<li>初始化起始状态 \(s\);</li>
+<li>\(\lambda = 1\);</li>
+<li>repeat:
+
+<ul>
+<li>在状态 \(s\)，选择动作 \(a = \pi_\theta(a|s)\);</li>
+<li>执行动作 \(a\)，得到即时奖励 \(r\) 和新状态 \(s&#39;\) ;</li>
+<li>\(\delta \leftarrow r + \gamma V_\phi(s&#39;) − V_\phi(s)\)</li>
+<li>\(\phi \leftarrow \beta \delta \frac{\partial}{\partial \phi} V_\phi(s)\)</li>
+<li>\(\theta \leftarrow \theta + \alpha \lambda \delta \frac{\partial}{\partial \theta} \log \pi_\theta(a|s)\)</li>
+<li>\(\lambda \leftarrow \gamma \lambda\);</li>
+<li>\(s \leftarrow s&#39;\);</li>
+</ul></li>
+<li>until \(s\) 为终止状态;</li>
+</ul></li>
+<li>until \(\theta\) 收敛;</li>
+<li>输出: 策略 \(\pi_\theta\);</li>
+</ul>
+
+<p>虽然在带基准线的 REINFORCE算法也同时学习策略函数和值函数，但是它并不是一种 Actor-Critic 算法。因为其中值函数只是用作基线函数以减少方差，并不用来估计回报（即评论员的角色）。</p>
+
+<hr/>
+
+<p><a href="https://nndl.github.io/">神经网络与深度学习</a><br/>
+<a href="https://zhuanlan.zhihu.com/p/28084990">强化学习实践一 迭代法评估4*4方格世界下的随机策略</a><br/>
+<a href="https://zhuanlan.zhihu.com/p/28498261">增强学习3-策略迭代法</a><br/>
+<a href="https://qqiang00.github.io/reinforce/javascript/demo_iteration.html">增强学习例子</a><br/>
+<a href="https://blog.csdn.net/trillion_power/article/details/78934608">强化学习(reinforcement learning)学习笔记(二)——值迭代与策略迭代</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+  
+	<div class="pagination">
+	
+<a href="archives.html">Blog Archives</a>
+	 
+	    
+	</div>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

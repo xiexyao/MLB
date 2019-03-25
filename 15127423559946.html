@@ -1,0 +1,512 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  霍夫丁不等式 Hoeffding's inequality - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">霍夫丁不等式 Hoeffding's inequality</h1>
+				<p class="meta"><time datetime="2017-12-08T22:12:35+08:00" pubdate data-updated="true">2017/12/8</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>在概率论中，Hoeffding不等式提供了有界独立随机变量之和偏离其预期值超过一定数量的概率的上界。 1963年Wassily Hoeffding证明了Hoeffding不等式。</p>
+
+<h4 id="toc_0">霍夫丁不等式的定义</h4>
+
+<p>设有两两独立的一系列随机变量 \(X_1,X_2,...,X_i,...,X_n\) 。假设对所有的 \(X_{i}\) 都是几乎有界的变量，即满足：<br/>
+\[<br/>
+P(X_i \in [a_i,b_i]) = 1<br/>
+\]</p>
+
+<p>那么这n个随机变量的经验平均数：<br/>
+\[<br/>
+\overline X = \frac{X_1+X_2+...+X_n}{n}<br/>
+\]</p>
+
+<p>霍夫丁不等式定义如下，对于任意的 \(t&gt;0\)，霍夫丁不等式理论一：<br/>
+\[<br/>
+{{\displaystyle {\begin{aligned}\operatorname {P} ({\overline {X}}-\mathbb E [{\overline {X}}]\geq t)\leq e^{-2nt^{2}}\end{aligned}}}}\\<br/>
+\]</p>
+
+<p>霍夫丁不等式理论二：<br/>
+\[<br/>
+{P ({\overline {X}}-\mathbb E [{\overline {X}}]\geq t)\leq \exp \left(-{\frac {2t^{2}n^{2}}{\sum _{i=1}^{n}(b_{i}-a_{i})^{2}}}\right),\!}\\<br/>
+{P (|{\overline {X}}-\mathbb E [{\overline {X}}]|\geq t)\leq 2\exp \left(-{\frac {2t^{2}n^{2}}{\sum _{i=1}^{n}(b_{i}-a_{i})^{2}}}\right),\!}<br/>
+\]</p>
+
+<p>在证明霍夫丁不等式之前，先来看一看霍夫丁引理：</p>
+
+<h4 id="toc_1">霍夫丁引理 Hoeffding&#39;s Lemma</h4>
+
+<p>如果 \(X\) 是一个期望为 0 的实数随机变量，即 \(\mathbb E(X)=0\) ，当 \(a \le X \le b\) ，对于任意一个 \(\lambda \in R\) ，都有：<br/>
+\[<br/>
+\mathbb E(e^{\lambda X}) \le \exp(\frac{\lambda^2(b-a)^2}{8})<br/>
+\]</p>
+
+<p>注意因为假设随机变量 \(X\) 有一个 0 的期望值，在定理中 \(a\) 和 \(b\) 必满足 \(a \le 0 \le b\)。</p>
+
+<h5 id="toc_2">引理证明</h5>
+
+<p>因为 \(e^{\lambda x}\) 是一个关于 \(x\) 的下凸函数，由琴生不等式知，对于 \(a\le x \le b\)：<br/>
+\[<br/>
+e^{\lambda X} = \exp(\frac{\lambda ab-\lambda aX - \lambda ba + \lambda bX}{b-a}) =  \exp(\frac{\lambda a(b-X)}{b-a} + \frac{\lambda b(X-a)}{b-a}) \le \frac{b-X}{b-a}e^{\lambda a} + \frac{X-a}{b-a} e^{\lambda b}<br/>
+\]</p>
+
+<p>所以：<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbb E[e^{\lambda X}] &amp;\le \mathbb E[\frac{b-X}{b-a} e^{\lambda a} + \frac{X-a}{b-a} e^{\lambda b}]\\<br/>
+&amp;= \frac{b-\mathbb E[X]}{b-a} e^{\lambda a} + \frac{\mathbb E[X]-a}{b-a} e^{\lambda b}\\<br/>
+&amp;= \frac{b}{b-a} e^{\lambda a} + \frac{-a}{b-a} e^{\lambda b}\\<br/>
+&amp;= -\frac{a}{b-a} e^{\lambda a} [-\frac b a + e^{\lambda (b - a)}]\\<br/>
+&amp;= -\frac{a}{b-a} e^{\lambda a} [-\frac{b-a+a}{a} + e^{\lambda (b - a)}]\\<br/>
+&amp;= -\frac{a}{b-a} e^{\lambda a} [-\frac{b-a}{a} -1 + e^{\lambda (b - a)}]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令 \(\theta = - \frac a {b-a} &gt; 0\)：<br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbb E[e^{\lambda X}] &amp;\le -\frac{a}{b-a} e^{\lambda a} [-\frac{b-a}{a} -1 + e^{\lambda (b - a)}]\\<br/>
+&amp;= \theta e^{-\lambda (b-a)\theta}[\frac 1 \theta - 1 + e^{\lambda(b-a)}]\\<br/>
+&amp;= e^{-\lambda (b-a)\theta}(1 - \theta + \theta e^{\lambda(b-a)})<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令 \(u = \lambda (b-a)\) ，则<br/>
+ \[<br/>
+ \begin{equation}<br/>
+ \mathbb E[e^{\lambda X}] \le e^{-\theta u}(1-\theta + \theta e^u)\label{elx}\\<br/>
+ \end{equation}<br/>
+ \]</p>
+
+<p>考虑到：<br/>
+\[<br/>
+\begin{align*}<br/>
+1-\theta + \theta e^u &amp;= \theta(\frac 1 \theta + 1 + e^u)\\<br/>
+&amp;= \theta(-\frac b a + e^{u})\\<br/>
+&amp; &gt; 0\quad \because \theta &gt; 0\text{ and } a \lt 0\text{ and } b \ge 0\\<br/>
+\end{align*}<br/>
+\] </p>
+
+<p>所以式 \ref{elx} 可以写成：<br/>
+\[<br/>
+\mathbb E[e^{\lambda X}] \le e^{-\theta u}(1-\theta + \theta e^u) = \exp[-\theta u + \log (1-\theta + \theta e^u)]<br/>
+\]</p>
+
+<p>定义：<br/>
+\[<br/>
+\left \{ \begin{array} \\<br/>
+\phi:\mathbb R \rightarrow \mathbb R\\<br/>
+\phi(u) = -\theta u + \log(1-\theta + \theta e^u)<br/>
+\end{array} \right .<br/>
+\]</p>
+
+<p>即得：<br/>
+\[<br/>
+\begin{equation}<br/>
+\mathbb E[e^{\lambda X}] \le e^{\phi(u)} \label{eep}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>运用泰勒中值定理（同济大学高数上p139），对于每一个实数 \(u\) 都存在一个 \(v\) 在 0 到 \(\mu\) 之间，有：<br/>
+\[<br/>
+\phi(u) = \phi(0) + \phi&#39;(0)u + \frac{\phi&#39;&#39;(v)}{2!}u^2<br/>
+\]</p>
+
+<p>注意到<br/>
+\[<br/>
+\begin{align*}<br/>
+\phi(0) &amp;= 0 + \log(1-\theta + \theta) = 0\\<br/>
+\phi&#39;(0) &amp;= -\theta + \frac{\theta e^u}{1-\theta+\theta e^u}\bigg |_{u=0} = 0\\<br/>
+\phi&#39;&#39;(v) &amp;= \frac{\theta e^u(1-\theta+\theta e^u) - (\theta e^u)^2}{(1-\theta+\theta e^u)^2}\bigg|_{u=v}\\<br/>
+&amp;= \frac{\theta e^u(1-\theta)}{(1-\theta+\theta e^u)^2}\bigg|_{u=v}\\<br/>
+&amp;= \frac{\theta e^v(1-\theta)}{(1-\theta+\theta e^v)^2}\\<br/>
+&amp;= \frac{\theta e^v}{1-\theta+\theta e^v} \quad \frac{1-\theta}{1-\theta+\theta e^v}\\<br/>
+&amp;= t(1-t)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中<br/>
+\[<br/>
+\begin{align*}<br/>
+t &amp;= \frac{\theta e^v}{1-\theta+\theta e^v}\\<br/>
+&amp;= \frac{\theta e^v}{1 + \theta(e^v-1)}\\<br/>
+&amp;&gt; 0<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>所以：<br/>
+\[<br/>
+\phi&#39;&#39;(v) = t(1-t) = -t^2 + t = -(t^2 - t + \frac 1 4)+\frac 1 4 = -(t-\frac 1 2)^2+\frac 1 4 \le \frac 1 4<br/>
+\]</p>
+
+<p>因此：<br/>
+\[<br/>
+\phi(x) \le \phi(0) + \phi&#39;(0)u + \frac{\phi&#39;&#39;(v)}{2!}u^2 = 0 + 0 + \frac 1 2 u^2 \cdot \frac 1 4 = \frac{u^2}{8} = \frac{\lambda^2(b-a)^2}{8}<br/>
+\]</p>
+
+<p>代入式 \ref{eep} 得：<br/>
+\[<br/>
+\mathbb E[e^{\lambda X}] \le \exp(\frac{\lambda^2(b-a)^2}{8})<br/>
+\]</p>
+
+<p>得证。</p>
+
+<h4 id="toc_3">霍夫丁不等式证明</h4>
+
+<p>令 \(S_n = X_1 + X_2 + ... + X_n\)，即 \(\overline X = \frac{S_n}{n}\) ，则霍夫丁不等式可以写成：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp; {P ({\overline {X}}-{\mathbb E} [{\overline {X}}]\geq o)\leq \exp \left(-{\frac {2o^{2}n^{2}}{\sum _{i=1}^{n}(b_{i}-a_{i})^{2}}}\right),\!}\\<br/>
+\Rightarrow &amp; {P (\frac{S_n}{n}-{\mathbb E} [\frac{S_n}{n}]\geq o)\leq \exp \left(-{\frac {2o^{2}n^{2}}{\sum _{i=1}^{n}(b_{i}-a_{i})^{2}}}\right),\!}\\<br/>
+\Rightarrow &amp; {P (\frac{S_n}{n}- \frac{\mathbb E[S_n]}{n}\geq o)\leq \exp \left(-{\frac {2o^{2}n^{2}}{\sum _{i=1}^{n}(b_{i}-a_{i})^{2}}}\right),\!}\\<br/>
+\Rightarrow &amp; {P ({S_n}- {\mathbb E[S_n]}\geq no)\leq \exp \left(-{\frac {2o^{2}n^{2}}{\sum _{i=1}^{n}(b_{i}-a_{i})^{2}}}\right),\!}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令 \(t = no\) 便可以得到：<br/>
+\[<br/>
+{P ({S_n}- {\mathbb E[S_n]}\geq t)\leq \exp \left(-{\frac {2t^{2}}{\sum _{i=1}^{n}(b_{i}-a_{i})^{2}}}\right),\!}\\<br/>
+\]</p>
+
+<p>对于 \(s,t &gt; 0\)<br/>
+\[<br/>
+\begin{align*}<br/>
+P ({S_n}- {\mathbb E[S_n]}\geq t) = P(e^{s(S_n-\mathbb E[S_n])} \ge e^{st})<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令 \(X = e^{s(S_n-\mathbb E[S_n])} \)，\(\alpha = e^{st}\)，应用马尔可夫不等式：<br/>
+\[<br/>
+\begin{align}<br/>
+P ({S_n}- {\mathbb E[S_n]}\geq t) &amp;= P(e^{s(S_n-\mathbb E[S_n])} \ge e^{st})\nonumber\\<br/>
+&amp;\le \frac{\mathbb E[e^{s(S_n-\mathbb E[S_n])}]}{e^{st}}\nonumber\\<br/>
+&amp;= e^{-st} \mathbb E[\exp(s(S_n-\mathbb E[S_n]))]\nonumber\\<br/>
+&amp;= e^{-st} \mathbb E[\exp[s(\sum_{i=1}^n X_i -\mathbb E[\sum_{i=1}^n X_i])]]\nonumber\\<br/>
+&amp;= e^{-st} \mathbb E[\exp[s(\sum_{i=1}^n(X_i -\mathbb E[X_i]))]]\nonumber\\<br/>
+&amp;= e^{-st} \mathbb E[\prod_{i=1}^n \exp[s(X_i -\mathbb E[X_i])]]\nonumber\\<br/>
+&amp;= e^{-st} \prod_{i=1}^n \mathbb E[\exp[s(X_i -\mathbb E[X_i])]]\label{spe}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>当 \(\lambda = s\) ，\(x = X_i -\mathbb E[X_i]\) 代入霍夫丁引理，可得：<br/>
+\[<br/>
+\mathbb E[\exp[s(X_i -\mathbb E[X_i])]] \le \exp(\frac{s^2(b_i-a_i)^2}{8})<br/>
+\]</p>
+
+<p>将上式代入式 \ref{spe} 得：<br/>
+\[<br/>
+\begin{align*}<br/>
+P({S_n}- {\mathbb E[S_n]}\geq t) &amp;= e^{-st} \prod_{i=1}^n \mathbb E[\exp[s(X_i -\mathbb E[X_i])]]\\<br/>
+&amp;\le e^{-st} \prod_{i=1}^n \exp({\frac{s^2(b_i-a_i)^2}{8}})\\<br/>
+&amp;= \exp(-st + \frac 1 8 s^2 \sum_{i=1}^n (b_i-a_i)^2)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>为了得到上界，我们要找到右边关于 \(s\) 的不等式的最小值，定义：<br/>
+\[<br/>
+\left \{ \begin{array}\\<br/>
+&amp;g:\mathbb R+ \rightarrow \mathbb R\\<br/>
+&amp;g(s):-st + \frac 1 8 s^2 \sum_{i=1}^n (b_i-a_i)^2\\<br/>
+\end{array}\right .<br/>
+\]</p>
+
+<p>对 \(g(s)\) 求导，并令其等于0，即 \(g&#39;(s) = 0\)：<br/>
+\[<br/>
+g&#39;(s) = -t + \frac 1 4 s \sum_{i=1}^n (b_i-a_i)^2 = 0 \\<br/>
+\Rightarrow s = \frac{4t}{\sum_{i=1}^n (b_i-a_i)^2}<br/>
+\]</p>
+
+<p>因此：<br/>
+\[<br/>
+\begin{align*}<br/>
+P({S_n}- {\mathbb E[S_n]}\geq t) &amp;\le \exp[-st + \frac 1 8 s^2 \sum_{i=1}^n (b_i-a_i)^2]\\<br/>
+&amp;= \exp[\frac{-4t^2}{\sum_{i=1}^n (b_i-a_i)^2} + \frac 1 8 (\frac{4t}{\sum_{i=1}^n (b_i-a_i)^2})^2 \sum_{i=1}^n (b_i-a_i)^2]\\<br/>
+&amp;= \exp[\frac{-4t^2}{\sum_{i=1}^n (b_i-a_i)^2} + \frac{2t^2}{\sum_{i=1}^n (b_i-a_i)^2}]\\<br/>
+&amp;= \exp[\frac{-2t^2}{\sum_{i=1}^n (b_i-a_i)^2}]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>得证。</p>
+
+<hr/>
+
+<p><a href="https://en.wikipedia.org/wiki/Hoeffding%27s_inequality">Hoeffiding inequality</a></p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html'>数学基础</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15129060526675.html" 
+	        title="Previous Post: 基于密度的聚类算法-Optics算法">&laquo; 基于密度的聚类算法-Optics算法</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15124873066800.html" 
+	        title="Next Post: 切比雪夫不等式 chebyshev's inequality">切比雪夫不等式 chebyshev's inequality &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

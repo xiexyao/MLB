@@ -1,0 +1,354 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  感知器 - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">感知器</h1>
+				<p class="meta"><time datetime="2018-04-18T01:17:28+08:00" pubdate data-updated="true">2018/4/18</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>在学习神经网络之前，先来看看一个基础的结构-感知器，可以理解为一个最基础的人工神经元。感知器在 20 世纪五、六十年代由科学家 Frank Rosenblatt 发明，其受到 Warren McCulloch 和 Walter Pitts 早期的工作的影响。</p>
+
+<p>类似于生物中的神经元，感知器从接受一段信号，经过处理后传入下一个感知器。如下图</p>
+
+<div align="center">
+    <img width="500" src="media/15239854483603/15368141404791.jpg" />
+</div>
+
+<p>上图中每一个圆圈都可以代表一个感知器，上面的感知器被分成了多层，这称为多层感知器(Multi-Layer Perception)。层与层之间的感知器有连接，而层内之间的感知器没有连接。最左边的层叫做<strong>输入层</strong>，这层负责接收输入数据；最右边的层叫<strong>输出层</strong>，我们可以从这层获取多层感知器输出数据。输入层和输出层之间的层叫做<strong>隐藏层</strong>。</p>
+
+<p>我们先了解一下单层感知器。</p>
+
+<p>一个单层感知器会接受几个二进制的输入 \(x_1,x_2,...,x_n\)，并产生一个二进制的输出</p>
+
+<div align="center">
+    <img width="500" src="media/15239854483603/15368151260680.jpg" />
+</div>
+
+<p>对于每一个输入信息都有它的重要程度，于是引入了<strong>权重</strong>的概念，用 \(w_i\) 表示输入 \(x_i\) 的权重。为了对每个感知器的结果进行调节，引入了<strong>偏置</strong>的概念，用 \(b\) 表示（对应图中的 \(w_0\)）<br/>
+\[<br/>
+net = \sum_{i} w_i x_i + b<br/>
+\]</p>
+
+<p>感知器的输出 \(y\) 为 0 或 1，是由输入加权和和偏置相加后的结果 \(net\) 再经过激活函数得到的结果。激活函数有很多种，这里使用最简单的<strong>跃阶函数</strong>，即当 \(f(x) \ge 0\) 时，输出 \(y=1\)，否则 \(y=0\)：<br/>
+\[<br/>
+y = f(net)<br/>
+\]</p>
+
+<h3 id="toc_0">感知器的结构</h3>
+
+<p>一个基本的感知器包含三个基本的部分组成</p>
+
+<p><strong>输入权值</strong>：对于感知器的每一个输入都有一个对应的权重 \(w_i\)，除权重之外还有一个偏置 \(b\)，它可以看成默认输入 \(1\) 的权重，用 \(w_0\) 表示。<br/>
+<strong>激活函数</strong>：激活函数可以将线性模型映射到非线性模型。<br/>
+<strong>输出</strong>：感知器的输出可以由下面的公式得到<br/>
+\[<br/>
+\begin{equation}<br/>
+y = f(\mathbf w \cdot \mathbf x + b)\label{yfm}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<h3 id="toc_1">感知器的训练</h3>
+
+<p>现在，你可能困惑前面的权重项和偏置项的值是如何获得的呢？这就要用到感知器训练算法：将权重项和偏置项初始化为0，然后，利用下面的感知器规则迭代的修改 \(w_i\) 和 \(b\)，直到训练完成。<br/>
+\[<br/>
+\begin{align*}<br/>
+w_i &amp;\leftarrow w_i + \triangle w_i\\<br/>
+b &amp;\leftarrow b + \triangle b\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中: <br/>
+\[<br/>
+\begin{align*}<br/>
+\triangle w_i &amp;= \eta (t-y) x_i\\<br/>
+\triangle b &amp;= \eta(t-y)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>\(w_i\) 是与输入 \(x_i\) 对应的权重项，\(b\) 是偏置项。事实上，可以把 \(b\) 看作是值永远为1的输入 \(x_b\) 所对应的权重。\(t\) 是训练样本的实际值，一般称之为label。而 \(y\) 是感知器的输出值，它是根据公式(\ref{yfm})计算得出。\(eta\) 是一个称为学习速率的常数，其作用是控制每一步调整权的幅度。</p>
+
+<p>每次从训练数据中取出一个样本的输入向量 \(\mathbf x\)，使用感知器计算其输出 \(y\)，再根据上面的规则来调整权重。每处理一个样本就调整一次权重。经过多轮迭代后（即全部的训练数据被反复处理多轮），就可以训练出感知器的权重，使之实现目标函数。</p>
+
+<hr/>
+
+<p><a href="https://www.zybuluo.com/hanbingtao/note/433855">零基础入门深度学习(1) - 感知器</a></p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html'>神经网络</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15249262782494.html" 
+	        title="Previous Post: 神经网络">&laquo; 神经网络</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15230159235437.html" 
+	        title="Next Post: 算法稳定性 stability">算法稳定性 stability &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

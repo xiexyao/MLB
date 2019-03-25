@@ -1,0 +1,707 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  朴素贝叶斯 Native Bayes - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">朴素贝叶斯 Native Bayes</h1>
+				<p class="meta"><time datetime="2017-09-16T10:37:02+08:00" pubdate data-updated="true">2017/9/16</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>在概率论和统计学中，贝叶斯理论（或者贝叶斯法则、贝叶斯规则）通常是基于和事件相关的先验知识来描述概率事件。贝叶斯定理在很多地方都应用广泛，比如垃圾邮件、疾病预测等。</p>
+
+<h3 id="toc_0">条件概率公式与贝叶斯定理</h3>
+
+<p>设A、B是两个事件，在事件A发生的条件下，事件B发生的条件概率（conditional probability）为：<br/>
+\[<br/>
+P(B|A)<br/>
+\]</p>
+
+<p>同理在事件B发生的条件下，事件A发生的条件概率为\(P(A|B)\)<br/>
+很容易想到事件A、事件B同时发生的概率等于事件A发生的概率乘上在事件A发生的条件下事件B发生的概率，即：<br/>
+\[<br/>
+P(AB) = P(A)P(B|A)<br/>
+\]<br/>
+同理也可得：\(P(AB) = P(B)P(A|B)\)<br/>
+结合两式：<br/>
+\[<br/>
+\begin{eqnarray}<br/>
+P(A)P(B|A) = P(B)P(A|B) \nonumber\\<br/>
+\Rightarrow P(B|A) = \frac{P(B)P(A|B)}{P(A)} \label{bayes}<br/>
+\end{eqnarray}<br/>
+\]<br/>
+上式（\ref{bayes}）就是贝叶斯定理公式，其中\(P(B)\)称之为先验概率（prior probability），是指在没有任何条件下事件B发生的概率，\(P(A|B)\)是事件B发生的条件事件A发生的条件概率，分母的\(P(A)\)被称为整体概率，因为它起到归一化的作用，所以又称为归一化常量。</p>
+
+<h3 id="toc_1">全概率公式和贝叶斯定理</h3>
+
+<p>如果事件组\(B_1\),\(B_2\),...,\(_n\)是样本空间\(\Omega\)的一个划分，A为任意事件，则：<br/>
+\[<br/>
+P(A) = P(A|B_1)+P(A|B_2)+...+P(A|B_n) = \sum_{i=1}^N P(A|B_i)P(B_i)<br/>
+\]<br/>
+全概率公式的意义在于，当直接计算\(P(A)\)不好计算时，而\(P(A|B_i)\)比较容易计算时，可以使用全概率公式计算\(P(A)\)。举个天气的实例，假设6月的某一天天晴的概率是0.4，多云的概率是0.4，下雨的概率是0.2。天晴的天气我出去玩的概率是0.4，多云的天气出去的概率是0.7，下雨的天气出去的概率是0.3，那么这一天我出去玩的概率设为\(P(play)\)：<br/>
+\[<br/>
+\begin{align*}<br/>
+P(play) &amp;= P(play|sunny)P(sunny)+P(play|cloudy)P(cloudy)+P(play|rain)P(rain) \\<br/>
+&amp;= 0.4\times 0.4 + 0.7\times 0.4 + 0.3\times 0.2 = 0.16+0.28+0.06=0.5<br/>
+\end{align*}<br/>
+\]<br/>
+计算得出去玩的概率为0.5。</p>
+
+<p>结合全概率公式和公式（\ref{bayes}）得：<br/>
+\[<br/>
+\begin{equation}<br/>
+P(B_j|A) = \frac{P(B_j)P(A|B_j)}{\sum_{i=1}^N P(A|B_i)P(B_i)} \label{bayes_q}<br/>
+\end{equation}<br/>
+\]</p>
+
+<h3 id="toc_2">贝叶斯定理</h3>
+
+<p>在上面的例子中，换一种问法，假设那一天如果在我出门的条件下，各个天气状况的概率分别是多少？那么便可以使用贝叶斯定理计算：<br/>
+\[<br/>
+P(sunny|play) = \frac{P(sunny)P(play|sunny)}{P(play)} = \frac{0.4\times 0.4}{0.5} = 0.32\\<br/>
+P(cloudy|play) = \frac{P(cloudy)P(play|cloudy)}{P(play)} = \frac{0.4\times 0.7}{0.5} = 0.56\\<br/>
+P(rain|play) = \frac{P(rain)P(play|rain)}{P(play)} = \frac{0.2\times 0.3}{0.8} = 0.12\\<br/>
+P(\Omega)=P(sunny|play) + P(cloudy|play) + P(rain|play) = 0.32+0.56+0.12 = 1<br/>
+\]<br/>
+我觉得从这个实例中已经完全可以理解贝叶斯定理了。</p>
+
+<h3 id="toc_3">先验概率谬误</h3>
+
+<p>先通过一个经典的例子开始说明，假设某种疾病在所有人群中的感染率是 \(0.1\%\)，医院现有的技术对于已知患病情况下，\(99\%\)的可能性可以检查出阳性；对于正常人\(99\%\)的可能性检查为正常，如果从人群中随机抽一个人去检测，医院给出的检测结果为阳性，那么这个人实际得病的概率是多少？从直观上来看，很多人会直接说\(99\%\)，那么真实情况我们来通过贝叶斯定理计算一下:<br/>
+\[<br/>
+\begin{align*}<br/>
+P(患病|阳性) &amp;= \frac{P(患病)P(阳性|患病)}{P(阳性)} = \frac{P(患病)P(阳性|患病)}{P(阳性|患病)P(患病)+P(阳性|正常)P(正常)} \\<br/>
+&amp;= \frac{0.1\%\times 99\%}{99\%\times 0.1\%+1\%\times 99.9\%} = \frac{9.9‱}{9.9‱+99.9‱} \approx 9.02\%<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>可知其实被检测出来是阳性，患病机率也不高。这种情况下，先验概率的大小会严重影响检测结果，很多时候会反直觉。先验概率数据不一定在每种情况下都存在，但是假如确实有这个数据你却不用，那么，你将毁于先验概率谬误，即忽略事前数据并因此作出错误决策。</p>
+
+<p>来一句题外话：如果这个人再去医院复检，检测结果仍为阳性，那么患病概率可以算一下：<br/>
+\[<br/>
+\begin{align*}<br/>
+P(患病|(阳性\cap 阳性)) &amp;= \frac{P(患病)P((阳性\cap 阳性)|患病)}{P((阳性\cap 阳性)|患病)P(患病)+P((阳性\cap 阳性)|正常)P(正常)} \\<br/>
+\because  P((阳性\cap 阳性)|患病) &amp;= P(阳性|患病)P(阳性|患病) = 99\% \times 99\%=98.01‱\\<br/>
+P((阳性\cap 阳性)|正常) &amp;= P(阳性|正常)P(阳性|正常) = 1\%\times 1\%=0.01‱ \\<br/>
+\therefore P(患病|(阳性\cap 阳性)) &amp;= \frac{0.1\%\times 98.01‱}{98.01‱\times 0.1\%+0.01‱\times 99.9\%} = 90.75\%\\ <br/>
+\end{align*}<br/>
+\]<br/>
+可见复检后患病的可信度一下子高出了10倍，还是很有效果的。</p>
+
+<h2 id="toc_4">贝叶斯参数估计</h2>
+
+<p>对于参数估计，一直存在两个学派的不同解决方案。频率派把需要推断的<font color=red>参数θ看做是固定的</font>未知常数，即概率虽然是未知的，但最起码是确定的一个值，同时，<font color=red>样本X 是随机的</font>，所以频率派重点研究样本空间，大部分的概率计算都是针对样本X 的分布；；贝叶斯派的观点则截然相反，他们认为<font color=red>参数是随机变量，而样本X 是固定的</font>，由于样本是固定的，所以他们重点研究的是参数的分布。在两种学派里后面要学的极大似然估计便是频率派的代表算法。而接下来的贝叶斯参数估计和后面需要学习的最大后验概率估计毫无疑问便是贝叶斯派的代表算法。</p>
+
+<p>贝叶斯参数估计是以贝叶斯公式为理论基础的参数估计方法。假设有一个样本集\(x=(x_1,x_2,...,x_n)\)，其中参数是\(\theta=(\theta_1,\theta_2,...,\theta_k)\)，贝叶斯估计的本质就是通过固定的样本利用贝叶斯方法得到参数\(\theta\)的分布。</p>
+
+<p>人们根据先验信息对参数 \(\theta\) 有个基本的认识，这个认识就是先验分布。然后我们通过实验对先验分布进行调整，调整的方法就是贝叶斯方程，调整的结果就是后验分布。</p>
+
+<h4 id="toc_5">先验分布</h4>
+
+<p>将总体中的未知参数 \(\theta\) 看作是变量，样本 \(x\) 看作是常量，可以得到关于 \(\theta\) 的方程\(\pi(\theta)\)，\(\pi(\theta)\)认为是待估计参数\(\theta\) 的先验分布，且 \(\theta\) 的取值和样本集 \(x\) 有关（以下说明中都忽略数据集，如先验分布 \(\pi(\theta,D)\) 写成 \(\pi(\theta)\) ，样本 \(\pi(x|\theta,\text{D})\) 写成 \(\pi(x|\theta)\) ）。</p>
+
+<h4 id="toc_6">后验分布</h4>
+
+<p>考虑到联合概率分布：<br/>
+\[<br/>
+h(x_1,x_2,...,x_n,\theta)=p(x_1,x_2,...,x_n|\theta)\pi(\theta)=p(\theta|x_1,x_2,...,x_n)p(x_1,x_2,...,x_n)<br/>
+\]<br/>
+所以可得：<br/>
+\[<br/>
+p(\theta|x_1,x_2,...,x_n) = \frac{p(x_1,x_2,...,x_n|\theta)\pi(\theta)}{p(x_1,x_2,...,x_n)} = \frac{\pi(\theta)\prod_{i=1}^n p(x_i|\theta)}{p(x_1,x_2,...,x_n)}<br/>
+\]<br/>
+对于\(p(x_1,x_2,...,x_n)\)，我们称之为边缘分布函数，记为 \(m(x)\)，如果参数空间\(\Theta=(\theta_1,\theta_2,...,\theta_n)\)是离散的，应用全概率公式，可得离散边缘分布：<br/>
+\[<br/>
+\begin{align*}<br/>
+m(x) &amp;= p(x_1,x_2,...,x_n) = \prod_{i=1}^n p(x_i) =\prod_{i=1}^n p(x_i|\theta_1)\pi(\theta_1)+\prod_{i=1}^n p(x_i|\theta_2)\pi(\theta_2)+...+\prod_{i=1}^n p(x_i|\theta_n)\pi(\theta_n)\\<br/>
+&amp;= \sum_{j}\pi(\theta_j)\prod_{i=1}^n p(x_i,\theta_j)\\<br/>
+\end{align*}<br/>
+\]<br/>
+如果参数空间\(\Theta\)是连续的，应用积分可得连续边缘分布：<br/>
+\[<br/>
+m(x) = p(x_1,x_2,...,x_n) = \prod_{i=1}^n p(x_i) = \prod_{i=1}^n [\int_\theta p(x_i,\theta)\pi(\theta)d\theta]=\int_\theta\prod_{i=1}^n  p(x_i,\theta)\pi(\theta)d\theta<br/>
+\]<br/>
+这里我们称\(p(\theta|x_1,x_2,...,x_n)\)为后验分布，可以分情况写出后验分布的公式：<br/>
+1）参数空间\(\Theta=(\theta_1,\theta_2,...,\theta_n)\)是离散<br/>
+\[<br/>
+\begin{align}<br/>
+p(\theta|x_1,x_2,...,x_n) = \frac{\pi(\theta)\prod_{i=1}^n p(x_i|\theta)}{\sum_{j}\pi(\theta_j)\prod_{i=1}^n p(x_i,\theta_j)} \label{ls}<br/>
+\end{align}<br/>
+\]<br/>
+2）参数空间\(\Theta\)是连续<br/>
+\[<br/>
+\begin{align}<br/>
+p(\theta|x_1,x_2,...,x_n) = \frac{\pi(\theta)\prod_{i=1}^n p(x_i|\theta)}{\int_\theta\prod_{i=1}^n  p(x_i,\theta)\pi(\theta)d\theta} \label{lx}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>这里介绍一些常用分布的后验分布：</p>
+
+<h4 id="toc_7">二项分布 binomial distribution</h4>
+
+<p>在n重伯努利试验（同样的条件下重复地、相互独立地进行的一种随机试验）中，如果它分别以概率 \(\theta\) 和 \((1-\theta)\) 取1和0为值，恰好出现 k 次1的概率为 \(p(X=k|\theta)= \text{C}_n^k\theta^k(1-\theta)^{n-k}\)，这就是二项分布的分布律，记为\(\text{X}\sim B(n,\theta)\)，当 \(n=1\) 时二项分布又称为伯努利分布。</p>
+
+<p>假设我们实现对概率\(\theta\)没有任何信息，这种情形贝叶斯本人建议使用“等同无知”的原则，使用(0,1)上的均匀分布U(0,1)作为 \(\theta\) 的先验分布，因为在(0,1)上每一点的概率都相等，这被人称为贝叶斯假设。所以 \(\theta\) 出现的概率为\(\pi(\theta)\)<br/>
+\[<br/>
+\pi(\theta) = \left \{ \begin{array}\\<br/>
+1\qquad 0\lt \theta \lt 1\\<br/>
+0\qquad \text{其他}<br/>
+\end{array}\right.<br/>
+\]</p>
+
+<p>考虑上述二项分布事件与概率 \(\theta\) 的联合概率分布：<br/>
+\[<br/>
+h(X=k,\theta) = f(X=k|\theta)\pi(\theta) = \text{C}_n^k\theta^k(1-\theta)^{n-k},\qquad k=1,2,...,n,0\lt \theta \lt 1<br/>
+\]</p>
+
+<p>考虑到该参数空间\(\theta\)是连续的，结合（\ref{lx}）式：<br/>
+\[<br/>
+\begin{align}<br/>
+\int_\theta\prod_{i=1}^n  p(x_i,\theta)\pi(\theta)d\theta &amp;= \int_\theta f(X=k|\theta)\pi(\theta)d\theta = \int_\theta \text{C}_n^k\theta^k(1-\theta)^{n-k} d\theta = \text{C}_n^k\int_0^1 \theta^k(1-\theta)^{n-k} d\theta \label{lllx}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>为方便令 \(j=n-k\) ，设：<br/>
+\[<br/>
+\begin{align*}<br/>
+J(k,j) &amp;= \int_0^1 \theta^k(1-\theta)^j d\theta<br/>
+\end{align*}<br/>
+\]<br/>
+利用分部积分法，令 \(\mu(\theta) = (1-\theta)^j\)，令 \(v(\theta) = \frac{1}{k+1}\theta^{k+1}\)，则：<br/>
+\[<br/>
+\begin{align*}<br/>
+J(k,j)&amp;=\int_0^1 \theta^k(1-\theta)^j d\theta = \int_0^1 \mu(\theta)\nu(\theta)&#39; = [u(\theta)v(\theta)]^1_0-\int_0^1 \nu(\theta) \mu(x)&#39;dx \\<br/>
+&amp;= [u(\theta)v(\theta)]^1_0-\int_0^1 \frac{1}{k+1}\theta^{k+1}(-j)(1-\theta)^{j-1}d\theta\\<br/>
+&amp;= [u(\theta)v(\theta)]^1_0 + \frac{j}{k+1}\int_0^1 \theta^{k+1}(1-\theta)^{j-1}d\theta\\<br/>
+&amp;= [u(1)v(1)-u(0)v(0)] + \frac{j}{k+1} J(k+1,j-1)\\<br/>
+&amp;= \frac{j}{k+1} J(k+1,j-1)\\<br/>
+\end{align*}<br/>
+\]<br/>
+以此类推：<br/>
+\[<br/>
+\begin{align*}<br/>
+J(k,j) &amp;= \frac{j}{k+1} J(k+1,j-1) = \frac{j(j-1)}{(k+1)(k+2)}J(k+2,j-2) = ... = \frac{j(j-1)\cdots 2\cdot 1}{(k+1)\cdots (k+j)}J(k+j,0) \\<br/>
+\end{align*}<br/>
+\]<br/>
+其中：<br/>
+\[<br/>
+J(k+j,0) = \int_0^1 \theta^{k+j}(1-\theta)^0 d\theta = \int_0^1 \theta^{k+j}d\theta = \frac{1}{k+j+1}\theta^{k+j+1}|^1_0 = \frac{1}{k+j+1}<br/>
+\]<br/>
+所以：<br/>
+\[<br/>
+J(k,j) = \frac{j(j-1)\cdots 2\cdot 1}{(k+1)\cdots (k+j)(k+j+1)} = \frac{j!}{(k+1)\cdots (k+j)(k+j+1)}<br/>
+\]<br/>
+考虑到伽马函数 \(\Gamma(n) = (n-1)!\)（这里不叙述伽马函数的由来，后面会有伽马函数的介绍）：<br/>
+\[<br/>
+J(k,j) = \frac{j!}{(k+1)\cdots (k+j)(k+j+1)} = \frac{\Gamma(j+1)\Gamma(k+1)}{\Gamma(j+k+2)}<br/>
+\]<br/>
+至此我们可以再看看式\ref{lllx}，代入得：<br/>
+\[<br/>
+\begin{align*}<br/>
+\int_\theta\prod_{i=1}^n  p(x_i,\theta)\pi(\theta)d\theta &amp; = \text{C}_n^k\int_0^1 \theta^k(1-\theta)^{n-k} d\theta = \text{C}_n^k \frac{\Gamma(n-k+1)\Gamma(k+1)}{\Gamma(n+2)}\\<br/>
+\end{align*}<br/>
+\]<br/>
+将上式带入后验公式（\ref{lx}）便可得二项分布的后验概率：<br/>
+\[<br/>
+\begin{align*}<br/>
+p(\theta|x_1,x_2,...,x_n) &amp;= \frac{\pi(\theta)\prod_{i=1}^n p(x_i|\theta)}{\int_\theta\prod_{i=1}^n  p(x_i,\theta)\pi(\theta)d\theta} = \frac{h(X=k,\theta)}{\int_\theta\prod_{i=1}^n  p(x_i,\theta)\pi(\theta)d\theta} \\<br/>
+&amp;= \frac{\Gamma(n+2)}{\text{C}_n^k\Gamma(n-k+1)\Gamma(k+1)} \text{C}_n^k\theta^k(1-\theta)^{n-k} \\<br/>
+&amp;= \frac{\Gamma(n+2)}{\Gamma(n-k+1)\Gamma(k+1)} \theta^k(1-\theta)^{n-k},\qquad k=1,2,...,n,0\lt \theta \lt 1<br/>
+\end{align*}<br/>
+\]<br/>
+对比 Beta 分布的概率密度函数：<br/>
+\[<br/>
+f(x)=\frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha)\Gamma(\beta)}x^{\alpha-1}(1−x)^{\beta−1} = \frac{1}{B(\alpha,\beta)}x^{\alpha−1}(1−x)^{\beta−1}<br/>
+\]<br/>
+只要令\(\alpha=k+1,\beta = n-k+1\)，就会发现这两者形式完全一致，所以我们可以说二项分布的后验分布服从 Beta 分布，即 \(\theta|X \sim \text{Be}(k+1,n-k+1)\)，由 Beta 分布的性质可知，二项分布后验分布的期望为：<br/>
+\[<br/>
+\theta^* = E(\theta|X) = \frac{\alpha}{\alpha+\beta} =  \frac{k+1}{n+2}<br/>
+\]</p>
+
+<p>这里举个例子：Laplace在1786年研究了巴黎的男婴出生的比率,他希望检验男婴出生的概率 \(\theta\) 是否大于0.5.为此,他收集到1745~1770年在巴黎出生的婴儿数据.其中,男婴251527个,女婴241945个,他选用U(0,1)作为 \(\theta\) 的先验分布,则 \(\theta\) 的后验分布服从 \(\beta\) 分布，即 \(\beta\sim Be(k+1,n-k+1) = Be(251528,241946)\)，所以：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;n = 251527 + 241945 = 493472\\<br/>
+&amp;\hat\theta = \frac{k+1}{n+2} = \frac{251527+1}{493472+2} = 0.5097<br/>
+\end{align*}<br/>
+\]</p>
+
+<h4 id="toc_8">高斯分布</h4>
+
+<p>设 \(x_1\) , \(x_2\) , …, \(x_n\)是来自高斯分布 \(N(\mu,\sigma^2)\)的一个样本，其中 \(\sigma^2\) 已知， \(\mu\)未知，假设 \(\mu\) 的先验分布亦为高斯分布 \(N(\theta,\tau^2)\)，其中先验均值 \(\theta\) 和先验方差 \(\tau^2\) 均已知。</p>
+
+<p>由高斯分布可知样本 \(\mu\) 的先验分布概率密度函数为：<br/>
+\[<br/>
+\pi(\mu) = \frac{1}{\sqrt{2\pi}\tau}\exp(-\frac{(\mu-\theta)^2}{2\tau^2})<br/>
+\]<br/>
+样本 \(x_1\), \(x_2\) , …, \(x_n\) 的条件概率密度函数为：<br/>
+\[<br/>
+p(x|\mu) =\prod_i^n p(x_i|\mu) = (\frac{1}{\sqrt{2\pi}\sigma})^n \exp(\sum_i^n -\frac{(x_i-\mu)^2}{2\sigma^2})\\<br/>
+\]<br/>
+所以联合概率密度为：<br/>
+\[<br/>
+\begin{align*}<br/>
+h(x,\mu) &amp;= p(x|\mu)\pi(\mu) = (\frac{1}{\sqrt{2\pi}^{n+1}\sigma^n\tau})\exp(\sum_i^n -\frac{(x_i-\mu)^2}{2\sigma^2}-\frac{(\mu-\theta)^2}{2\tau^2}) \\<br/>
+&amp; = (\frac{1}{\sqrt{2\pi}^{n+1}\sigma^n\tau})\exp(-\sum_i^n \frac{x_i^2-2\mu x_i + \mu^2}{2\sigma^2}-\frac{(\mu-\theta)^2}{2\tau^2}) \\<br/>
+&amp; = (\frac{1}{\sqrt{2\pi}^{n+1}\sigma^n\tau})\exp(- \frac{\sum_i^n x_i^2-2 \sum_i^n \mu x_i + \sum_i^n \mu^2}{2\sigma^2}-\frac{(\mu-\theta)^2}{2\tau^2}) \\<br/>
+&amp; = (\frac{1}{\sqrt{2\pi}^{n+1}\sigma^n\tau})\exp(- \frac{\sum_i^n x_i^2-2 n \mu \overline x + n\mu^2}{2\sigma^2}-\frac{(\mu-\theta)^2}{2\tau^2}) \\<br/>
+&amp;=  (\frac{1}{\sqrt{2\pi}^{n+1}\sigma^n\tau})\exp(-(\frac{n}{2\sigma^2}+\frac{1}{2\tau^2})\mu^2  + (\frac{n\overline x}{\sigma^2} + \frac{\theta}{\tau^2})\mu - (\frac{\sum_i^n x_i^2}{2\sigma^2}+\frac{\theta^2}{2\tau^2}))\\<br/>
+\end{align*}<br/>
+\]<br/>
+其中 \(\overline x = \frac{1}{n} \sum_i^n x_i\)。若令\(k = \frac{1}{\sqrt{2\pi}^{n+1}\sigma^n\tau}\)，\(A = (\frac{n}{\sigma^2}+\frac{1}{\tau^2})\)，所以 \(A&gt;0\)，\(B = (\frac{n\overline x}{\sigma^2} + \frac{\theta}{\tau^2})\)，\(C = (\frac{\sum_i^n x_i^2}{\sigma^2}+\frac{\theta^2}{\tau^2})\)，则：<br/>
+\[<br/>
+\begin{align*}<br/>
+h(x,\mu) &amp;= k\cdot \exp[-\frac{1}{2}(A\mu^2-2B\mu+C)] \\<br/>
+&amp;= k\cdot \exp[-\frac{A}{2}(\mu - \frac{B}{A})^2 - \frac{1}{2}(C-\frac{B^2}{A})]\nonumber\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>由于参数空间 \(\mu\) 是连续的，所以边缘分布 \(m(x)\)为：<br/>
+\[<br/>
+\begin{align}<br/>
+m(x) &amp;= \int_\mu\prod_{i=1}^n  p(x_i,\mu)\pi(\mu)d\mu = \int_\mu h(x,\mu) d\mu\nonumber\\<br/>
+&amp;=k\cdot \int_\mu \exp[-\frac{A}{2}(\mu-\frac{B}{A})^2 - \frac{1}{2}(C-\frac{B^2}{A})] d\mu\nonumber\\<br/>
+&amp;=k \cdot \exp[- \frac{1}{2}(C-\frac{B^2}{A})]\int_\mu \exp([-\frac{A}{2}(\mu-\frac{B}{A})^2] d\mu\label{mx}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>我们先来求解这个式子<br/>
+\[<br/>
+\begin{equation}<br/>
+\int_{-\infty}^{\infty} \exp[-\frac{A}{2}(\mu - \frac{B}{A})^2] d\mu \label{yiim}<br/>
+\end{equation}<br/>
+\]<br/>
+用 \(\nu\) 替换其中的 \(\mu\) 得：<br/>
+\[<br/>
+\begin{equation}<br/>
+\int_{-\infty}^{\infty} \exp[-\frac{A}{2}(\nu - \frac{B}{A})^2] d\nu \label{yiin}<br/>
+\end{equation}<br/>
+\]<br/>
+用式\ref{yiim}和式\ref{yiin}相乘得：<br/>
+\[<br/>
+\begin{align*}<br/>
+\int_{-\infty}^{\infty} \exp[-\frac{A}{2}(\mu - \frac{B}{A})^2] d\mu \int_{-\infty}^{\infty} \exp[-\frac{A}{2}(\nu - \frac{B}{A})^2] d\nu &amp;= \int\int_{-\infty}^{\infty} \exp[-\frac{A}{2}(\mu - \frac{B}{A})^2] \exp[-\frac{A}{2}(\nu - \frac{B}{A})^2] d\mu d\nu \\<br/>
+&amp;= \int\int_{-\infty}^{\infty} \exp\{-\frac{A}{2} [(\mu-\frac{B}{A})^2+(\nu-\frac{B}{A})^2]\}d\mu d\nu<br/>
+\end{align*}<br/>
+\]<br/>
+令\(\mu-\frac{B}{A} = r\cos\alpha\)，\(\nu-\frac{B}{A} = r\sin\alpha\)，其中\(\alpha\in[0,2\pi]，r\in[0,\infty]\)，为方便计算令\(f^2\)等于等式左边：<br/>
+\[<br/>
+\begin{align*}<br/>
+f^2 &amp;= \int_{0}^{\infty}\int_{0}^{2\pi} \exp\{-\frac{A}{2} [(r\cos\alpha)^2+(r\sin\alpha)^2]\}r dr d\alpha\\<br/>
+&amp;= \int_{0}^{\infty}\int_{0}^{2\pi} \exp(-\frac{A}{2}r^2)r dr d\alpha\\<br/>
+&amp;= \int_{0}^{\infty}\exp(-\frac{A}{2}r^2)r\int_0^{2\pi} d\alpha\\<br/>
+&amp;= 2\pi \int_0^\infty \exp(-\frac{A}{2}r^2)rdr\\<br/>
+&amp;= 2\pi \cdot [-\frac{1}{A} \exp(-\frac{A}{2}r^2) ]^\infty_0\\<br/>
+\end{align*}<br/>
+\]<br/>
+由前面定义\(A = (\frac{n}{\sigma^2}+\frac{1}{\tau^2})\)，显然 \(A&gt;0\)，所以：<br/>
+\[<br/>
+f^2 =2\pi \cdot [-\frac{1}{A} \exp(-\frac{A}{2}r^2) ]^\infty_0 = 2\pi \frac{1}{A} [\exp(0)-\exp(-\infty)] = \frac{2\pi}{A}\\<br/>
+\Rightarrow f = (\frac{2\pi}{A})^{1/2}<br/>
+\]</p>
+
+<p>将上述结果带入式\ref{mx}，可知：<br/>
+\[<br/>
+\begin{align*}<br/>
+m(x) &amp;= k \cdot \exp[- \frac{1}{2}(C-\frac{B^2}{A})]\int_\mu \exp([-\frac{A}{2}(\mu-\frac{B}{A})^2] d\mu \\<br/>
+&amp;= k \cdot \exp[- \frac{1}{2}(C-\frac{B^2}{A})] (\frac{2\pi}{A})^{1/2}<br/>
+\end{align*}<br/>
+\]<br/>
+由后验公式（\ref{lx}）可得：<br/>
+\[<br/>
+\begin{align*}<br/>
+p(\mu|x) &amp;= \frac{\pi(\mu)\prod_{i=1}^n p(x_i|\mu)}{\int_\mu\prod_{i=1}^n  p(x_i,\mu)\pi(\mu)d\mu} = \frac{h(x,\mu)}{m(x)} = \frac{k\cdot \exp[-\frac{A}{2}(\mu - \frac{B}{A})^2 - \frac{1}{2}(C-\frac{B^2}{A})]}{k \cdot \exp[- \frac{1}{2}(C-\frac{B^2}{A})] (\frac{2\pi}{A})^{1/2}} \\<br/>
+&amp;= (\frac{A}{2\pi})^{1/2} \exp[-\frac{A}{2}(\mu - \frac{B}{A})^2]\\<br/>
+&amp;= \frac{1}{2\pi\sqrt{1/A}} \exp[-\frac{(\mu - \frac{B}{A})^2}{2/A}]<br/>
+\end{align*}<br/>
+\]<br/>
+对比高斯分布可知\(p(\mu|x)\sim N(B/A,1/A)\)，即：<br/>
+\[<br/>
+p(\mu|x) \sim N(\frac{\frac{n\overline x}{\sigma^2} + \frac{\theta}{\tau^2}}{\frac{n}{\sigma^2}+\frac{1}{\tau^2}},\frac 1{\frac{n}{\sigma^2}+\frac{1}{\tau^2}}) = N(\frac{n\tau^2\overline x+\theta\sigma^2}{n\tau^2+\sigma^2},\frac{\tau^2\sigma^2}{n\tau^2+\sigma^2})<br/>
+\]</p>
+
+<p>后验均值即为贝叶斯估计：<br/>
+\[<br/>
+\hat u = \frac{n\tau^2\overline x+\theta\sigma^2}{n\tau^2+\sigma^2}<br/>
+\]</p>
+
+<h4 id="toc_9">共轭分布法</h4>
+
+<p>我们前面再二项分布时说如果一个没有任何先验知识的分布可以看作为“等同无知”，采用均匀分布U(0,1)作为先验分布，这里均匀分布也可以看作是贝塔分布 \(\text{Beta}(1,1)\)，所以二项分布 \(\text{B}(n,\theta)\) 的先验分布为 \(\text{Beta}(1,1)\) 时，后验分布为 \(\text{Beta}(k+1,n-k+1)\) ，其中k表示n次独立试验中正例出现的次数。这种先验分布和后验分布属于同一个分布类型的现象并不是偶然的，在上文的高斯分布也证明了这一点，先验分布是高斯分布，后验分布也是高斯分布。</p>
+
+<p>共轭分布法就是指<strong>先验分布和后验分布属于同一个分布类型</strong>。</p>
+
+<h4 id="toc_10">贝叶斯估计举例</h4>
+
+<p>这个举个例子，为了提高某产品质量，某部门经理希望引入不同厂家生产的一种设备，两厂家招标时称：<br/>
+<font color='#666'>1）使用厂家一设备生产后，高质量产品将占90%；</font><br/>
+<font color='#666'>2）使用厂家二设备生产后，高质量产品将占70%；</font><br/>
+部门经理根据以往两厂家的用户评价，认为厂家一的可信度为40%，厂家二的可信度为60%。</p>
+
+<p>首先来数学化这些数字，将厂家一、厂家二认为是两个不同的参数\(\theta_1\)，\(\theta_2\)，那么可知 \(p(\theta_1) = 40\%;p(\theta_2) = 60\%\)，将生产高质量产品看作概率分布 \(p(x,\theta)\)，可知\(p(x,\theta_1) = 90\%\)，\(p(x,\theta_2)=70\%\)。</p>
+
+<p>部门经理为此做了小型试验，第一次实验分别使用两厂家的设备进行生产，生产5件产品，都是高质量产品，记第一次实验为事件A，高质量产品记为1，否则为0，则：<br/>
+\[<br/>
+A|\theta_1 = (1,1,1,1,1)\\<br/>
+A|\theta_2 = (1,1,1,1,1)<br/>
+\]<br/>
+第二次实验，再生产5件产品，使用设备一都是高质量产品，使用设备二4件高质量产品，记第二次实验为事件B，则：<br/>
+\[<br/>
+B|\theta_1 = (1,1,1,1,1)\\<br/>
+B|\theta_2 = (1,1,1,1,0)\\<br/>
+\]<br/>
+我们利用事件A使用离散性后验分布概率：<br/>
+\[<br/>
+\begin{align*}<br/>
+p(\theta_1|A) &amp;= p(\theta_1|x_1,x_2,...,x_n) = \frac{p(\theta_1)\prod_{i=1}^n p(x_i|\theta_1)}{\sum_{j}\prod_{i=1}^n f(x_i,\theta_j)p(\theta_j)} \\<br/>
+&amp;= \frac{0.9^5*0.4}{0.4*0.9^5+0.6*0.7^5} = \frac{0.236}{0.236 + 0.101} = 0.700\\<br/>
+p(\theta_2|A) &amp;= p(\theta_2|x_1,x_2,...,x_n) = \frac{p(\theta_2)\prod_{i=1}^n p(x_i|\theta_2)}{\sum_{j}\prod_{i=1}^n f(x_i,\theta_j)p(\theta_j)} =0.300<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>通过实验一（事件A）更新了我们对厂家的可信度，计算得厂家一的可信度为0.7，厂家二的可信度为0.3，再来看第二次实验（事件B）计算可信度：<br/>
+\[<br/>
+\begin{align*}<br/>
+p(\theta_1|A) &amp;= p(\theta_1|x_1,x_2,...,x_n) = \frac{p(\theta_1)\prod_{i=1}^n p(x_i|\theta_1)}{\sum_{j}\prod_{i=1}^n f(x_i,\theta_j)p(\theta_j)} \\<br/>
+&amp;= \frac{0.9^5*0.7}{0.7*0.9^5+0.3*0.7^4*0.3} = \frac{0.413}{0.413+0.022} = 0.949\\<br/>
+p(\theta_2|A) &amp;= p(\theta_2|x_1,x_2,...,x_n) = \frac{p(\theta_2)\prod_{i=1}^n p(x_i|\theta_2)}{\sum_{j}\prod_{i=1}^n f(x_i,\theta_j)p(\theta_j)} = 0.051\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>通过实验二（事件B）计算已经可以得出厂家一的可信度为0.949，所以我们很有理由可以选择采进此设备。</p>
+
+<p><strong>关于贝叶斯的知识还有很多，以后遇见再继续讨论~</strong></p>
+
+<p><font color="#666"></p>
+
+<p>我们来求解这个式子的另一种方法（只解出了一半，如果有人可以继续解下去，希望能联系我）<br/>
+\[<br/>
+\begin{equation}<br/>
+\int_{-\infty}^{\infty} \exp[-\frac{A}{2}(\mu - \frac{B}{A})^2] d\mu<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>这个函数的定积分不容易直接求得，我们先看一下伽马函数 \(\Gamma(s)\) ，定义如下：<br/>
+\[<br/>
+\begin{equation}<br/>
+\Gamma(s) = \int_0^\infty e^{-x} x^{s-1} dx\qquad (s&gt;0) \label{Gamma}<br/>
+\end{equation}<br/>
+\]<br/>
+由余元公式可知：<br/>
+\[<br/>
+\Gamma(s)\Gamma(1-s) = \frac{\pi}{\sin\pi s} \qquad (0\lt s \lt 1)<br/>
+\]<br/>
+所以：<br/>
+\[<br/>
+\Gamma(\frac1 2) = \sqrt{\pi}<br/>
+\]</p>
+
+<p>对\ref{Gamma}式利用定积分换元法，\(A&gt;0\) 情况下，令 \(x = \frac{A}{2}(\mu-\frac{B}{A})^2\)，则：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\because\quad dx = A(\mu-\frac{B}{A})d\mu\\<br/>
+&amp;\therefore\quad \Gamma(s) = \int_0^\infty \exp[-\frac{A}{2}(\mu-\frac{B}{A})^2] [\frac{A}{2}(\mu-\frac{B}{A})^2]^{s-1} [A (\mu-\frac{B}{A})]d\mu \\<br/>
+&amp;\qquad\qquad = \int_0^\infty \exp[-\frac{A}{2}(\mu-\frac{B}{A})^2] (\frac{A}{2})^{s-1}\cdot (\mu-\frac{B}{A})^{2s-1}\cdot Ad\mu \\<br/>
+\end{align*}<br/>
+\]<br/>
+令 \(s=\frac 1 2\)：<br/>
+\[<br/>
+\begin{align}<br/>
+\Gamma(\frac 1 2) &amp;= \int_0^\infty \exp[-\frac{A}{2}(\mu-\frac{B}{A})^2] (\frac{A}{2})^{-1/2}\cdot (\mu-\frac{B}{A})^0\cdot Ad\mu\nonumber\\<br/>
+&amp;= \int_0^\infty \exp[-\frac{A}{2}(\mu-\frac{B}{A})^2](2A)^{1/2} d\mu = \sqrt{\pi}\nonumber\\<br/>
+&amp;\Rightarrow \int_0^\infty \exp[-\frac{A}{2}(\mu-\frac{B}{A})^2] d\mu = (\frac{\pi}{2A})^{1/2}\label{G0I}<br/>
+\end{align}<br/>
+\]<br/>
+关于<br/>
+\[<br/>
+\begin{align}<br/>
+\int_{-\infty}^0 \exp[-\frac{A}{2}(\mu - \frac{B}{A})^2] d\mu\label{GI0}<br/>
+\end{align}<br/>
+\]<br/>
+怎么解，还没有一个好的方法，希望以后能解决。</p>
+
+<p></font></p>
+
+<hr/>
+
+<p>[1] &nbsp;&nbsp;<a href="https://cosx.org/2013/01/lda-math-gamma-function">神奇的 Gamma 函数</a><br/>
+[2] &nbsp;&nbsp;<a href="https://blog.csdn.net/u010945683/article/details/48950063">贝塔与伽马分布</a><br/>
+[3] &nbsp;&nbsp;<a href="https://mp.weixin.qq.com/s/ZEoxYPgenFgzHuNnI2IieQ">贝塔分布生动的棒球例子</a></p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='EM.html'>EM</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15058431971790.html" 
+	        title="Previous Post: 极大似然估计 MLE">&laquo; 极大似然估计 MLE</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15042890159558.html" 
+	        title="Next Post: 随机领域嵌入算法 SNE">随机领域嵌入算法 SNE &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

@@ -1,0 +1,511 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  反向传播 - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">反向传播</h1>
+				<p class="meta"><time datetime="2018-05-05T05:44:43+08:00" pubdate data-updated="true">2018/5/5</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>现在，我们需要知道一个神经网络的每个连接上的权值是如何得到的。我们可以说神经网络是一个模型，那么这些权值就是模型的参数，也就是模型要学习的东西。然而，一个神经网络的连接方式、网络的层数、每层的节点数这些参数，则不是学习出来的，而是人为事先设置的。对于这些人为设置的参数，我们称之为超参数(Hyper-Parameters)。</p>
+
+<p>接下来，我们将要介绍神经网络的训练算法：反向传播算法。</p>
+
+<h3 id="toc_0">反向传播算法(Back Propagation)</h3>
+
+<p>假设有如下的神经网络</p>
+
+<div align="center">
+    <img width=500 src="media/15254702833482/15254707153853.jpg" />
+</div>
+
+<p>每个训练样本为 \((\vec x,\vec t)\)，其中向量\(\vec x\) 是训练样本的特征，而 \(\vec t\) 是样本的目标值。</p>
+
+<p>我们使用下面的方式计算出每个节点的误差项 \(\delta_i\)：</p>
+
+<ul>
+<li>对于输出节点 \(i\)
+\[
+\begin{equation}
+\delta_i = y_i(1-y_i)(t_i - y_i)\label{diy}\\
+\end{equation}
+\]</li>
+</ul>
+
+<p>其中，\(\delta_i\) 是节点的误差项，\(y_i\) 是节点的输出值，\(t_i\) 是样本对应于节点 \(i\) 的目标值。举个例子，根据上图，对于输出层节点8来说，它的输出值是 \(y_1\) ，而样本的目标值是 \(t_1\)，带入上面的公式得到节点8的误差项应该是：<br/>
+\[<br/>
+\delta_8 = y_1(1-y_1)(t_1 - y_1)<br/>
+\]</p>
+
+<ul>
+<li>对于隐藏层节点
+\[
+\begin{equation}
+\delta_i = a_i(1-a_i) \sum_{k\in \text{outputs}} w_{ki} \delta_k\label{dia}
+\end{equation}
+\]</li>
+</ul>
+
+<p>其中，\(a_i\) 是节点的输出值，\(w_{ki}\) 是节点 \(i\) 到它的下一层节点 \(k\) 的连接的权重，\(\delta_k\) 是节点 \(i\) 的下一层节点 \(k\) 的误差项。例如，对于隐藏层节点4来说，计算方法如下：<br/>
+\[<br/>
+\delta_4 = a_4(1-a_4)(w_{84}\delta_8 + w_{94}\delta_9)<br/>
+\]</p>
+
+<p>最后，更新每个连接上的权值：<br/>
+\[<br/>
+\begin{equation}<br/>
+w_{ji} \leftarrow w_{ji} + \eta \delta_j x_{ji}\label{wedx}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>其中，\(w_{ji}\) 是节点 \(i\) 到节点 \(j\) 的权重，\(\eta\) 是一个成为学习速率的常数，\(\delta_j\) 是节点 \(j\) 的误差项，\(x_{ji}\) 是节点 \(i\) 传递给节点 \(j\) 的输入。例如，权重 \(w_{84} 的更新方法如下：<br/>
+\)\(<br/>
+w_{84} \leftarrow w_{84} + \eta \delta_8 a_4<br/>
+\)$</p>
+
+<p>类似的，权重 \(w_{41}\) 的更新方法如下：<br/>
+\[<br/>
+w_{41} \leftarrow w_{41} + \eta \delta_4 x_1<br/>
+\]</p>
+
+<p>偏置项的输入值永远为1。例如，节点4的偏置项 \(w_{40}\) 应该按照下面的方法计算：<br/>
+\[<br/>
+w_{40} \leftarrow w_{40} + \eta \delta_4<br/>
+\]</p>
+
+<p>我们已经介绍了神经网络每个节点误差项的计算和权重更新方法。显然，计算一个节点的误差项，需要先计算每个与其相连的下一层节点的误差项。这就要求误差项的计算顺序必须是从输出层开始，然后反向依次计算每个隐藏层的误差项，直到与输入层相连的那个隐藏层。这就是反向传播算法的名字的含义。</p>
+
+<h3 id="toc_1">反向传播推导</h3>
+
+<p>按照机器学习的通用套路，我们先确定神经网络的目标函数，然后用随机梯度下降优化算法去求目标函数最小值时的参数值。</p>
+
+<p>我们取网络所有输出层节点的误差平方和作为目标函数：<br/>
+\[<br/>
+E_d = \frac 1 2 \sum_{i\in \text{outputs}}(t_i - y_i)^2<br/>
+\]</p>
+
+<p>使用随机梯度下降算法对目标函数进行优化：<br/>
+\[<br/>
+w_{ji} \leftarrow w_{ji} - \eta \frac{\partial E_d}{\partial w_{ji}}<br/>
+\]</p>
+
+<div align="center">
+    <img width=500 src="media/15254702833482/15254707153853.jpg" />
+</div>
+
+<p>观察上图，我们发现权重 \(w_{ji}\) 仅能通过影响节点 \(j\) 的输入值影响网络的其它部分，设 \(net_j\) 是节点 \(j\) 的加权输入，\(x_{ji}\) 是节点 \(i\) 传递给节点 \(j\) 的输入值，也就是节点 \(i\) 的输出值，即<br/>
+\[<br/>
+net_j = \vec w_j \cdot \vec x_j = \sum_{i} w_{ji} x_{ji}<br/>
+\]</p>
+
+<p>\(E_d\) 是 \(net_j\) 的函数，而 \(net_j\) 是 \(w_{ji}\) 的函数。根据链式求导法则，可以得到：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial E_d}{\partial w_{ji}} &amp;= \frac{\partial E_d}{\partial net_j}\frac{\partial net_j}{\partial w_{ji}}\\<br/>
+&amp;= \frac{\partial E_d}{\partial net_j}\frac{\partial \sum_i w_{ji} x_{ji}}{\partial w_{ji}}\\<br/>
+&amp;= \frac{\partial E_d}{\partial net_j} x_{ji} \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>对于 \(\frac{\partial E_d}{\partial net_j}\) 的推导，需要区分输出层和隐藏层两种情况。</p>
+
+<p><strong>输出层权值训练</strong>：</p>
+
+<p>对于输出层来说，\(net_j\) 仅能通过节点 \(j\) 的输出值 \(y_j\) 来影响网络其它部分，也就是说 \(E_d\) 是 \(y_j\) 的函数，而 \(y_j\) 是 \(net_j\) 的函数，其中 \(y_j = \text{sigmoid}(net_j)\) 。所以我们可以再次使用链式求导法则：<br/>
+\[<br/>
+\begin{equation}<br/>
+\frac{\partial E_d}{\partial net_j} = \frac{\partial E_d}{\partial y_j}\frac{\partial y_j}{\partial net_j}\label{fpep}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>考虑上式第一项：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial E_d}{\partial y_j} &amp;= \frac{\partial}{\partial y_j} \frac 1 2 \sum_{i\in \text{outputs}}(t_i - y_i)^2\\<br/>
+&amp;= \frac{\partial}{\partial y_j} \frac 1 2 (t_i - y_i)^2\\<br/>
+&amp;= -(t_j - y_j)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>考虑上式第二项：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial y_j}{\partial net_j} &amp;= \frac{\partial}{\partial net_j} \text{sigmoid}(net_j)\\<br/>
+&amp;= y_j(1-y_j)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>将第一项，第二项代入(\ref{fpep})得<br/>
+\[<br/>
+\frac{\partial E_d}{\partial net_j} = -(t_j - y_j)y_j(1-y_j) <br/>
+\]</p>
+
+<p>如果令 \(\delta_j = - \frac{\partial E_d}{\partial net_j}\)，也就是一个节点的误差项 \(\delta\) 是网络误差对这个节点输入的偏导数的相反数。带入上式，得到：<br/>
+\[<br/>
+\delta_j = y_i(1-y_i)(t_i - y_i)<br/>
+\]</p>
+
+<p>也就是式(\ref{diy})，将上述推导带入随机梯度下降公式，得到</p>
+
+<p>\[<br/>
+\begin{align*}<br/>
+w_{ji} &amp;\leftarrow w_{ji} - \eta \frac{\partial E_d}{\partial w_{ji}}\\<br/>
+&amp;= w_{ji} - \eta \frac{\partial E_d}{\partial net_j}\frac{\partial net_j}{\partial w_{ji}}\\<br/>
+&amp;= w_{ji} + \eta (t_j - y_j)y_j(1-y_j) x_{ji}\\<br/>
+&amp;= w_{ji} + \eta\delta_j x_{ji}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>也就是式(\ref{wedx})</p>
+
+<p><strong>隐藏层权值训练</strong>：</p>
+
+<p>现在开始推导隐藏层的 \(\frac{\partial E_d}{\partial net_j}\)。</p>
+
+<div align="center">
+    <img width="300" src="media/15254702833482/15254723302672.jpg" />
+</div>
+
+<p>首先，我们需要定义节点 \(j\) 的所有直接下游节点的集合 \(\text{Downstream}(j)\) 。例如，对于节点4来说，它的直接下游节点是节点8、节点9。可以看到 \(net_j\) 只能通过影响 \(\text{Downstream}(j)\) 再影响 \(E_d\) 。设 \(net_j\) 是节点 \(j\) 的下游节点的输入，则 \(E_d\) 是 \(net_k\) 的函数，而 \(net_k\) 是 \(net_j\) 的函数。因为 \(net_k\) 有多个，我们应用全导数公式，可以做出如下推导：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial E_d}{\partial net_j} &amp;= \sum_{k\in \text{Downstream}(j)} \frac{\partial E_d}{\partial net_k}\frac{\partial net_k}{\partial net_j}\\<br/>
+&amp;= \sum_{k\in \text{Downstream}(j)} - \delta_k \frac{\partial net_k}{\partial net_j}\\<br/>
+&amp;= \sum_{k\in \text{Downstream}(j)} - \delta_k \frac{\partial net_k}{\partial a_j} \frac{\partial a_j}{\partial net_j}\\<br/>
+&amp;= \sum_{k\in \text{Downstream}(j)} - \delta_k w_{kj} \frac{\partial a_j}{\partial net_j}\\<br/>
+&amp;= \sum_{k\in \text{Downstream}(j)} - \delta_k w_{kj} a_j (1-a_j)\\<br/>
+&amp;= - a_j (1-a_j)\sum_{k\in \text{Downstream}(j)} \delta_k w_{kj} \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>因为 \(\delta_j=-\frac{\partial E_d}{\partial net_j}\)，代入上式得：<br/>
+\[<br/>
+\delta_j = a_j(1-a_j)\sum_{k \in \text{Downstream}(j)} \delta_k w_{kj}<br/>
+\]</p>
+
+<p>上式就是式(\ref{dia})。至此，我们已经推导出了反向传播算法。需要注意的是，我们刚刚推导出的训练规则是根据激活函数是sigmoid函数、平方和误差、全连接网络、随机梯度下降优化算法。如果激活函数不同、误差计算方式不同、网络连接结构不同、优化算法不同，则具体的训练规则也会不一样。但是无论怎样，训练规则的推导方式都是一样的，应用链式求导法则进行推导即可。</p>
+
+<h3 id="toc_2">梯度检查</h3>
+
+<p>总体误差函数为<br/>
+\[<br/>
+f(x) = \frac 1 2 \sum_{i\in \text{outputs}}(t_i - y_i)^2<br/>
+\]</p>
+
+<p>对于梯度下降算法：<br/>
+\[<br/>
+w_{ji} \leftarrow w_{ji} - \eta\frac{\partial E_d}{\partial w_{ji}}<br/>
+\]</p>
+
+<p>来说，这里关键之处在于 \(\frac{\partial E_d}{\partial w_{ji}}\) 的计算一定要正确，而它是 \(E_d\) 对 \(w_{ji}\) 的偏导数。而根据导数的定义：<br/>
+\[<br/>
+f&#39;(\theta) = \lim_{\epsilon\rightarrow 0}\frac{f(\theta + \epsilon) - f(\theta - \epsilon)}{2\epsilon}<br/>
+\]</p>
+
+<p>对于任意 \(\theta\) 的导数值，我们都可以用等式右边来近似计算。我们把 \(E_d\) 看做是 \(w_ji\) 的函数，即 \(E_d(w_{ji})\)，那么根据导数定义，\(\frac{\partial E_d(w_{ji})}{\partial w_{ji}}\) 应该等于：<br/>
+\[<br/>
+\frac{\partial E_d(w_{ji})}{\partial w_{ji}} = \lim_{\epsilon \rightarrow 0}\frac{f(w_{ji} + \epsilon) - f(w_{ji} - \epsilon)}{2\epsilon}<br/>
+\]</p>
+
+<p>如果把 \(\epsilon\) 设置为一个很小的数（比如 \(10^{-4}\)），那么上式可以写成：<br/>
+\[<br/>
+\begin{equation}<br/>
+\frac{\partial E_d(w_{ji})}{\partial w_{ji}} \approx \frac{f(w_{ji} + \epsilon) - f(w_{ji} - \epsilon)}{2\epsilon}\label{fpew}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>我们可以利用该式来计算梯度 \(\frac{\partial E_d(w_{ji})}{\partial w_{ji}}\) 的值，然后同我们神经网络代码中计算出来的梯度值进行比较。如果两者的差别非常的小，那么就说明我们的代码是正确的。</p>
+
+<p>下面是梯度检查的代码。如果我们想检查参数 \(w_{ji}\) 的梯度是否正确，我们需要以下几个步骤：</p>
+
+<ol>
+<li>首先使用一个样本 \(d\) 对神经网络进行训练，这样就能获得每个权重的梯度。</li>
+<li>将 \(w_{ji}\) 加上一个很小的值(\(10^{-4}\))，重新计算神经网络在这个样本下的。</li>
+<li>将 \(w_{ji}\) 减上一个很小的值(\(10^{-4}\))，重新计算神经网络在这个样本下的。</li>
+<li>根据式(\ref{fpew})计算出期望的梯度值，和第一步获得的梯度值进行比较，它们应该几乎想等(至少4位有效数字相同)。</li>
+</ol>
+
+<p>当然，我们可以重复上面的过程，对每个权重 \(w_{ji}\) 都进行检查。也可以使用多个样本重复检查。</p>
+
+<hr/>
+
+<p><a href="https://www.zybuluo.com/hanbingtao/note/476663">零基础入门深度学习(3) - 神经网络和反向传播算法</a></p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html'>神经网络</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15264839728559.html" 
+	        title="Previous Post: 神经网络的代价函数">&laquo; 神经网络的代价函数</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15249262782494.html" 
+	        title="Next Post: 神经网络">神经网络 &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

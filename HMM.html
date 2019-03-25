@@ -1,0 +1,2180 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  HMM - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div class="blog-index">
+
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15205961685497.html">隐马尔可夫模型 Hidden Markov Model</a></h1>
+			<p class="meta"><time datetime="2018-03-09T19:49:28+08:00" 
+			pubdate data-updated="true">2018/3/9</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>关于隐马尔可夫模型有个很生动的例子，假设有一个隐士，他不能够直接获取到天气的观察情况，但是他有一些水藻。民间传说告诉我们水藻的状态与天气状态有一定的概率关系——天气和水藻的状态是紧密相关的。在这个例子中我们有两组状态，观察的状态（水藻的状态）和隐藏的状态（天气的状态）。我们希望为隐士设计一种算法，在不能够直接观察天气的情况下，通过水藻和马尔科夫假设来预测天气。</p>
+
+<p>在这种情况下，观察到的状态序列与隐藏过程有一定的概率关系。我们使用隐马尔科夫模型对这样的过程建模，这个模型包含了一个底层隐藏的随时间改变的马尔科夫过程，以及一个与隐藏状态某种程度相关的可观察到的状态集合。</p>
+
+<p>下图是隐藏状态（天气）与观察序列的示意图，假设隐藏状态由一个简单的一阶马尔可夫过程描述，那么他们之间都相互连接。</p>
+
+<div align="center">
+    <img src="media/15205961685497/15366882957510.jpg" width="500" />
+</div>
+
+<p>隐藏状态和观察状态之间的连接表示：在给定的马尔可夫过程中，一个隐藏状态生成特定的观察状态的概率。可以很清晰知道一个隐藏状态到所有观察状态的概率之和为1，即图中：<br/>
+\[<br/>
+\begin{align*}<br/>
+P(\text{Dry,Dryish,Damp,Soggy|Sun}) &amp;= 1\\<br/>
+P(\text{Dry,Dryish,Damp,Soggy|Cloud}) &amp;= 1\\<br/>
+P(\text{Dry,Dryish,Damp,Soggy|Rain}) &amp;= 1\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>除了定义了马尔科夫过程的概率关系，我们还有另一个矩阵，定义为混淆矩阵（confusion matrix），它包含了给定一个隐藏状态后得到的观察状态的概率。对于天气例子，混淆矩阵是<br/>
+\[<br/>
+\begin{array}{c|cccc}<br/>
+&amp;\quad \text{Dry}\quad &amp;\quad \text{Dryish}\quad &amp;\quad \text{Damp}\quad &amp;\quad \text{Soggy}\quad \\\hline<br/>
+\text{Sun}\quad  &amp;\quad \text{0.60}\quad &amp;\quad \text{0.20}\quad &amp;\quad \text{0.15}\quad &amp;\quad \text{0.05}\quad \\<br/>
+\text{Cloud}\quad &amp;\quad \text{0.25}\quad &amp;\quad \text{0.25}\quad &amp;\quad \text{0.25}\quad &amp;\quad \text{0.25}\quad \\<br/>
+\text{Rain}\quad &amp;\quad \text{0.05}\quad &amp;\quad \text{0.10}\quad &amp;\quad \text{0.35}\quad &amp;\quad \text{0.50}\quad \\<br/>
+\end{array}<br/>
+\]</p>
+
+<p>注意矩阵的每一行之和是 1。</p>
+
+<h3 id="toc_0">隐马尔可夫模型</h3>
+
+<p>一个隐马尔可夫模型通常需要三组参数组成：</p>
+
+<ol>
+<li><p>状态转移概率：模型在各个状态间转换的概率，通常记为矩阵 \(\mathbb A = [a_{ij}]_{N\times N}\)，其中：<br/>
+\[<br/>
+a_{ij} = P(x_{t+1} = s_j|x_t = s_i),\quad 1\le i,j\le N<br/>
+\]</p>
+
+<p>表示在任意时刻 \(t\)，状态 \(s_i\) 转移到状态 \(s_j\) 的概率。</p></li>
+<li><p>输出观察概率：模型根据当前隐藏状态获得各个观察值的概率，通常记为矩阵 \(\mathbb B = [b_{ij}]_{N\times M}\)，其中<br/>
+\[<br/>
+b_{i}(j) = P(y_t = o_j|x_t = s_i),\quad i\le i\le N,1\le j\le M<br/>
+\]</p>
+
+<p>表示在任意时刻 \(t\)，若状态为 \(s_i\)，则观察值 \(o_j\) 被获取的概率。</p></li>
+<li><p>初始状态概率：模型在初始时刻各状态出现的概率，通常记为 \(\mathbb\pi=(\pi_1,\pi_2,...,\pi_N)\)，其中：<br/>
+\[<br/>
+\pi_i = P(x_1 = s_i),\quad 1\le i\le N<br/>
+\]</p>
+
+<p>表示模型初始状态为 \(s_i\) 的概率。</p></li>
+</ol>
+
+<p>通过指定状态空间 \(\mathcal Y\)、观察空间 \(\mathcal X\) 和上述三组参数，就能确定一个隐马尔可夫模型，通常用其参数 \(\lambda = [\mathbb A,\mathbb B,\mathbb \pi]\) 来指代。给定隐马尔可夫模型 \(\lambda\)，它按如下过程产生观察序列 \(\{y_1,y_2,...,y_n\}\)：</p>
+
+<p>(1)、设置 \(t=1\)，并根据初始状态概率 \(\mathbb \pi\) 选择初始状态 \(x_1\)；</p>
+
+<p>(2)、根据状态 \(x_t\) 和输出观测概率 \(B\) 选择观测变量取值 \(y_t\)；</p>
+
+<p>(3)、根据状态 \(x_t\) 和状态转移矩阵 \(A\) 转移模型隐藏状态，即确定 \(x_{t+1}\)；</p>
+
+<p>(4)、若 \(t\lt n\)，设置 \(t=t+1\)，并转移到第 (2) 步，否则停止。</p>
+
+<p>其中 \(x_t\in\{s_1,s_2,...,s_N \}\) 和 \(y_t\in\{o_1,o_2,...,o_M \}\) 分别为第 \(t\) 时刻的隐藏状态和观测状态。</p>
+
+<p>在实际应用中，人们常关注隐马尔可夫模型的三个基本问题：</p>
+
+<ul>
+<li><p>给定模型 \(\lambda = [\mathbb A,\mathbb B,\mathbb \pi]\)，如何有效计算其产生观测序列 \(\mathbb y=\{y_1,y_2,...,y_n \}\) 的概率 \(P(\mathbb x|\lambda)\)，换言之，如何评估模型与观测序列之间的匹配程度？</p></li>
+<li><p>给定模型 \(\lambda = [\mathbb A,\mathbb B,\mathbb \pi]\) 和观测序列 \(\mathbb y=\{y_1,y_2,...,y_n \}\)，如何找到与此观测序列最匹配的隐藏状态序列 \(\mathbb y=\{ y_1,y_2,...,y_n \}\)？换言之，如何根据观测序列推断出一串的模型状态？</p></li>
+<li><p>给定模型 \(\mathbb x = \{x_1,x_2,...,x_n \}\)，如何调整模型参数 \(\lambda = [\mathbb A,\mathbb B,\mathbb \pi]\) 使得该序列出现的概率 \(\pi(\mathbb x,\lambda)\)？换言之，如何训练模型使其能最好的描述观测数据？</p></li>
+</ul>
+
+<p>现在简单说一下如何解决这三个问题：</p>
+
+<h4 id="toc_1">评估</h4>
+
+<p>计算模型 \(\lambda = [\mathbb A,\mathbb B,\mathbb \pi]\) 产生观测序列的状态通常有三种方法：</p>
+
+<ol>
+<li><p><strong>穷举法</strong>：</p>
+
+<p>一种计算观察序列概率的方法是找到每一个可能的隐藏状态，并且将这些隐藏状态下的观察序列概率相加。考虑到之前的例子，隐藏状态集合为 \(S=\{\text{Sun},\text{Cloud},\text{Rain}\}\)，观测状态为 \(V=\{\text{Dry},\text{Dryish},\text{Damp},\text{Soggy}\}\)，假设现在观测序列只有一个元素“\(\text{Dry}\)”，我们知道观测值“\(\text{Dry}\)”对应的隐藏状态可能是 \(S\) 中的任意元素，所以观测序列的概率可以表示为：<br/>
+\[<br/>
+\begin{align*}<br/>
+P(\text{Dry}) &amp;= P(\text{Dry},\{\text{Sun},\text{Cloud},\text{Rain}\})\\<br/>
+&amp;= P(\text{Dry}|\text{Sun})P(\text{Sun}) + P(\text{Dry}|\text{Cloud})P(\text{Cloud}) + P(\text{Dry}|\text{Rain})P(\text{Rain})\\<br/>
+&amp;= \sum_{\text{h} \in |S|} P(\text{Dry}|\text{h})\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>假设现在观测序列有两个元素 \(\{\text{Dry},\text{Soggy}\}\)，类比上面我们首先找出所有可能的隐藏状态序列：<br/>
+\[<br/>
+\{(\text{Sun},\text{Sun}),(\text{Sun},\text{Cloud}),(\text{Sun},\text{Rain}),(\text{Cloud},\text{Sun}),\\<br/>
+  (\text{Cloud},\text{Cloud}),(\text{Cloud},\text{Rain}),(\text{Rain},\text{Sun}),(\text{Rain},\text{Cloud}),(\text{Rain},\text{Rain})\}<br/>
+\]</p>
+
+<p>总共是3*3 = 9 种可能，根据每种可能的隐藏状态序列，计算其生成观测序列的概率，比如 \((\text{Sun},\text{Cloud})\)：<br/>
+\[<br/>
+\begin{align}<br/>
+P(\text{Dry},\text{Soggy}|\text{Sun},\text{Cloud}) &amp;= \underbrace{P(\text{Sun})P(\text{Dry}|\text{Sun})}_{t=1} \underbrace{P(\text{Sun}\rightarrow\text{Cloud})P(\text{Soggy}|\text{Cloud})}_{t=2}\nonumber\\<br/>
+&amp;= \underbrace{P(\text{Sun})}_{\text{初始概率}} \underbrace{P(\text{Sun}\rightarrow\text{Cloud})}_{\text{转移概率}} \underbrace{P(\text{Dry}|\text{Sun})P(\text{Soggy}|\text{Cloud})}_{\text{观测概率}}\label{uttu}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>同理可以求出其他可能的隐藏状态序列生成观测序列的概率，将9 种可能概率加起来便是观测序列的概率。</p>
+
+<p>由式(\ref{uttu})可以知道状态序列到观测序列的概率分成三个部分，初始概率、状态转移概率和观测概率（对应位置隐藏状态表现为观测值的概率）。现在我们推广到一般形式，列举所有可能的长度为 \(T\) 的状态序列 \(I=(i_1,i_2,...,i_T)\)，求各个状态序列 \(I\) 与观测序列 \(O=(o_1,o_2,...,o_T)\) 的联合概率 \(P(O,I,\lambda)\) ，然后对所有可能的状态序列求和得到 \(P(O|\lambda)\)。</p>
+
+<p>状态序列 \(I=(i_1,i_2,...,i_T)\) 的初始概率为 \(\pi_{i_1}\)；<br/>
+状态序列 \(I=(i_1,i_2,...,i_T)\) 的转移概率为 \(a_{i_1 i_2}a_{i_2 i_3}\cdots a_{i_{T-1} i_T}\)；</p>
+
+<p>这两部分合起来就是状态序列 \(I=(i_1,i_2,...,i_T)\) 的概率：<br/>
+\[<br/>
+P(I|\lambda) = \pi_{i_1}a_{i_1 i_2}a_{i_2 i_3}\cdots a_{i_{T-1} i_T}<br/>
+\]</p>
+
+<p>对固定状态序列 \(I=(i_1,i_2,...,i_T)\) ，得到观测序列 \(O=(o_1,o_2,...,o_T)\) 的观测概率：<br/>
+\[<br/>
+P(O|I,\lambda) = b_{i_1}(o_1)b_{i_2}(o_2)\cdots b_{i_T}(o_T)<br/>
+\]</p>
+
+<p>所以 \(O\) 和 \(I\) 同时出现的联合概率为：<br/>
+\[<br/>
+\begin{align*}<br/>
+P(O,I|\lambda) &amp;= \sum_{I} P(I|\lambda) P(O|I,\lambda)\\<br/>
+&amp;= \sum_{I} \pi_{i_1}b_{i_1}(o_1) a_{i_1 i_2} b_{i_2}(o_2)\cdots a_{i_{T-1} i_T}b_{i_T}(o_T)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>但是，利用上面公式计算量巨大，是 \(O(TN^T)\) 阶的，这种算法不可行的。</p></li>
+<li><p><strong>前向算法</strong>：</p>
+
+<p>前向算法定义局部概率 \(\alpha_t(i)\) 表示观测时刻 \(t\) 之前观测状态的序列为 \(o_1,o_2,...o_t\)的概率为前向概率。记为：<br/>
+\[<br/>
+\alpha_t(i) = P(o_1,o_2,...,o_t,i_t = s_i|\lambda)<br/>
+\]</p>
+
+<p>递推关系为<br/>
+\[<br/>
+\alpha_{t+1}(i) = \bigg[\sum_{j=1}^N \alpha_t(j) a_{ji}\bigg] b_{i}(o_{t+1})<br/>
+\]</p>
+
+<p>算法步骤为</p>
+
+<p><strong>输入</strong>：假设隐马尔可夫模型 \(\lambda=(\mathbb A,\mathbb B,\pi)\)，观测序列 \(O=(o_1,o_2,...,o_T)\)，隐藏状态总共包含 N 种状态 \(S = (s_1,s_2,...,s_N)\)；<br/>
+<strong>输出</strong>：观测序列概率 \(P(O|\lambda)\)<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li><p>初值<br/>
+\[<br/>
+\alpha_1(i) = \pi_{i}b_i(o_1),\quad i=1,2,\cdots,N<br/>
+\]</p></li>
+<li><p>递推 对 \(t=1,2,\cdots,T-1\)<br/>
+\[<br/>
+\alpha_{t+1}(i) = \bigg[ \sum_{j=1}^N \alpha_t(j)a_{ji} \bigg] b_i(o_{t+1}),\quad i=1,2,\cdots,N<br/>
+\]</p></li>
+<li><p>终止<br/>
+\[<br/>
+P(O|\lambda) = \sum_{i=1}^N \alpha_T(i)<br/>
+\]</p></li>
+</ul>
+
+<p>还是以天气的例子，假设 \(T=3\)，\(O=(\text{Dry,Dryish,Soggy})\)，状态转移矩阵如下图：<br/>
+\[<br/>
+\begin{array}{c|ccc}<br/>
+&amp;\quad \text{Sun}\quad &amp;\quad \text{Cloud}\quad &amp;\quad \text{Rain}\quad \\\hline<br/>
+\text{Sun}\quad  &amp;\quad \text{0.5}\quad &amp;\quad \text{0.2}\quad &amp;\quad \text{0.3}\quad \\<br/>
+\text{Cloud}\quad &amp;\quad \text{0.3}\quad &amp;\quad \text{0.5}\quad &amp;\quad \text{0.2}\quad\\<br/>
+\text{Rain}\quad &amp;\quad \text{0.2}\quad &amp;\quad \text{0.3}\quad &amp;\quad \text{0.5}\quad\\<br/>
+\end{array}<br/>
+\]</p>
+
+<p>初始值概率为\(\pi=(\text{Sun,Cloud,Rain})=(0.2,0.4,0.4)\)</p>
+
+<p>按照算法，（1）计算初值<br/>
+\[<br/>
+\alpha_1(1) = \pi_1b_1(o_1) = 0.2*0.6 = 0.12\\<br/>
+\alpha_1(2) = \pi_2b_2(o_1) = 0.4*0.25 = 0.1\\<br/>
+\alpha_1(3) = \pi_3b_3(o_1) = 0.4*0.05 = 0.02\\<br/>
+\]</p>
+
+<p>（2）递推计算<br/>
+\[<br/>
+\alpha_2(1) = \bigg[\sum_{i=1}^3 \alpha_1(i) a_{i1} \bigg] b_1(o_2) = \bigg[ 0.12 * 0.5 + 0.1 * 0.3 + 0.02 * 0.2\bigg ] * 0.2 = 0.0188 \\<br/>
+\alpha_2(2) = \bigg[\sum_{i=1}^3 \alpha_1(i) a_{i2} \bigg] b_2(o_2) = \bigg[ 0.12 * 0.2 + 0.1 * 0.5 + 0.02 * 0.3\bigg ] * 0.25 =  0.02 \\<br/>
+\alpha_2(3) = \bigg[\sum_{i=1}^3 \alpha_1(i) a_{i3} \bigg] b_3(o_2) = \bigg[ 0.12 * 0.3 + 0.1 * 0.2 + 0.02 * 0.5\bigg ] * 0.10  = 0.0066\\<br/>
+\\<br/>
+\alpha_3(1) = \bigg[\sum_{i=1}^3 \alpha_2(i) a_{i1} \bigg] b_1(o_3) = \bigg[ 0.0188 * 0.5 + 0.02 * 0.3 + 0.0066 * 0.2 \bigg] * 0.05 = 0.000836 \\<br/>
+\alpha_3(2) = \bigg[\sum_{i=1}^3 \alpha_2(i) a_{i2} \bigg] b_2(o_3) = \bigg[ 0.0188 * 0.2 + 0.02 * 0.5 + 0.0066 * 0.3 \bigg] * 0.25 = 0.003935 \\<br/>
+\alpha_3(3) = \bigg[\sum_{i=1}^3 \alpha_2(i) a_{i3} \bigg] b_3(o_3) = \bigg[ 0.0188 * 0.3 + 0.02 * 0.2 + 0.0066 * 0.5 \bigg] * 0.5 = 0.00647 \\<br/>
+\]</p>
+
+<p>（3）终止：<br/>
+\[<br/>
+P(O|\lambda) = \sum_{i=1}^3 \alpha_3(i) = 0.000836+0.003935 + 0.00647 = 0.011241<br/>
+\]</p></li>
+<li><p><strong>后向算法</strong></p>
+
+<p>后向算法与前向算法原理，定义局部概率 \(\beta_t(i)\) 表示观测时刻 \(t\) 之后的观测序列 \(o_{t+1},o_{t+2},...,o_T\) 的概率为后向概率。记为：<br/>
+\[<br/>
+\beta_t(i) = P(o_{t+1},o_{t+2},...,o_T|i_t=s_i,\lambda)<br/>
+\]</p>
+
+<p>后向算法的递推公式为<br/>
+\[<br/>
+\beta_t(i-1) = \sum_{j=1}^N \beta_t(j) a_{ij} b_{j}(o_{t+1})<br/>
+\]</p>
+
+<p>算法初始时，\(t=T\)，此时不存在后续时刻观测序列，此时 \(\beta_T(i) = 1\)。</p>
+
+<p><strong>输入</strong>：假设隐马尔可夫模型 \(\lambda=(A,B,\pi)\)，观测序列 \(O=(o_1,o_2,...,o_T)\)。隐藏状态总共包含 \(m\) 种状态 \(S = (s_1,s_2,...,s_m)\)；<br/>
+<strong>输出</strong>：观测序列概率 \(P(O|\lambda)\)<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li><p>初值<br/>
+\[<br/>
+\beta_T(i) = 1,\quad i=1,2,\cdots,T<br/>
+\]</p></li>
+<li><p>递推 对 \(t=T-1,T-2,\cdots,1\)<br/>
+\[<br/>
+\beta_{t-1}(i) = \sum_{j=1}^N \beta_t(j)a_{ij} b_j(o_{t+1}),\quad i=1,2,\cdots,N<br/>
+\]</p></li>
+<li><p>终止<br/>
+\[<br/>
+P(O|\lambda) = \sum_{i=1}^N \beta_1(i)\pi(i)b_i(o_1)<br/>
+\]</p></li>
+</ul>
+
+<p>以天气的例子，假设 \(T=3\)，\(O=(\text{Dry,Dryish,Soggy})\)，状态转移矩阵如前向算法所示。初始值概率为\(\pi=(\text{Sun,Cloud,Rain})=(0.2,0.4,0.4)\)</p>
+
+<p>按照算法，（1）计算初值<br/>
+\[<br/>
+\beta_3(1) = 1\\<br/>
+\beta_3(2) = 1\\<br/>
+\beta_3(3) = 1\\<br/>
+\]</p>
+
+<p>（2）递推计算<br/>
+\[<br/>
+\begin{align*}<br/>
+\beta_2(1) &amp;= \sum_{j=1}^3 \beta_3(j)a_{1j}b_{j}(o_t)\\<br/>
+&amp;= 1 * 0.5 * 0.05 + 1 * 0.2 * 0.25 + 1 * 0.3 * 0.5 \\<br/>
+&amp;= 0.225\\<br/>
+\beta_2(2) &amp;= \sum_{j=1}^3 \beta_3(j)a_{2j}b_{j}(o_t)\\<br/>
+&amp;= 1 * 0.3 * 0.05 + 1 * 0.5 * 0.25 + 1 * 0.2 * 0.5 \\<br/>
+&amp;= 0.24\\<br/>
+\beta_2(3) &amp;= \sum_{j=1}^3 \beta_3(j)a_{3j}b_{j}(o_t)\\<br/>
+&amp;= 1 * 0.2 * 0.05 + 1 * 0.3 * 0.25 + 1 * 0.5 * 0.5 \\<br/>
+&amp;= 0.335\\<br/>
+\beta_1(1) &amp;= \sum_{j=1}^3 \beta_2(j)a_{1j}b_{j}(o_t)\\<br/>
+&amp;= 0.225 * 0.5 * 0.20 + 0.24 * 0.2 * 0.25 + 0.335 * 0.3 * 0.10 \\<br/>
+&amp;= 0.04455\\<br/>
+\beta_1(2) &amp;= \sum_{j=1}^3 \beta_2(j)a_{2j}b_{j}(o_t)\\<br/>
+&amp;= 0.225 * 0.3 * 0.20 + 0.24 * 0.5 * 0.25 + 0.335 * 0.2 * 0.10 \\<br/>
+&amp;= 0.0502\\<br/>
+\beta_1(3) &amp;= \sum_{j=1}^3 \beta_2(j)a_{3j}b_{j}(o_t)\\<br/>
+&amp;= 0.225 * 0.2 * 0.20 + 0.24 * 0.3 * 0.25 + 0.335 * 0.5 * 0.10 \\<br/>
+&amp;= 0.04375\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>（3）终止：<br/>
+\[<br/>
+\begin{align*}<br/>
+P(O|\lambda) &amp;= \sum_{i=1}^3 \beta_1(i) \pi(i) b_i(o_1) \\<br/>
+&amp;= 0.04455 * 0.2 * 0.6 + 0.0502 * 0.4 * 0.25 + 0.04375 * 0.4 * 0.05\\<br/>
+&amp;= 0.011241<br/>
+\end{align*}<br/>
+\]</p></li>
+</ol>
+
+<h4 id="toc_2">解码</h4>
+
+<p>对于一个特殊的隐马尔科夫模型(HMM)及一个相应的观察序列，我们常常希望能找到生成此序列最可能的隐藏状态序列。</p>
+
+<ol>
+<li><p><strong>穷举法</strong></p>
+
+<p>类似前面的穷举法，对于观测序列 \(O=(o_1,o_2,...,o_t)\)，总共有 \(N^t\) 个可能的隐藏状态序列，其中 \(N\) 是隐藏状态 \(S\) 的个数。然后对于每一个可能隐藏状态序列，计算生成观测序列的状态的概率，再从中选出最大的概率的隐藏状态序列。这种方法可行，但是复杂度很高，不推荐使用。</p></li>
+<li><p><strong>维特比算法</strong></p>
+
+<p>关于维特比算法可以看之前的一篇文章介绍，这里直接介绍如何用维比特算法求解解码问题。</p>
+
+<p>导入两个变量 \(\delta\) 和 \(\psi\)，定义在时刻 \(t\) 状态为 \(i\) 的所有单个路径 \((i_1,i_2,...,i_t)\) 中的概率最大值为<br/>
+\[<br/>
+\delta_t(i) = \max_{i_1,i_2,...,i_{t-1}} P(i_t=i,i_{t-1},...,i_1,o_t,...,o_1|\lambda),\quad i=1,2,...,N<br/>
+\]</p>
+
+<p>由定义可得变量 \(\delta\) 的递推公式：<br/>
+\[<br/>
+\begin{align*}<br/>
+\delta_{t+1}(i) &amp;= \max_{i_1,i_2,...,i_{t}} P(i_{t+1}=i,i_{t},...,i_1,o_{t+1},...,o_1|\lambda)\\<br/>
+&amp;= \max_{1\le j\le N}[\delta_t(j) a_{ji}]b_i(o_{t+1}),\quad i=1,2,...,N<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>定义在时刻 \(t\) 状态为 \(i\) 的所有单个路径 \((i_1,i_2,...,i_{t-1},i)\) 中概率最大的路径的第 \(t-1\) 个结点为<br/>
+\[<br/>
+\psi_t(i) = \arg\max_{1\le j\le N}[\delta_{t-1}(j) a_{ji}],\quad i=1,2,...,N<br/>
+\]</p>
+
+<p>下面介绍维比特算法。</p>
+
+<p><strong>输入</strong>：模型 \(\lambda=(A,B,\pi)\) 和观测 \(O=(o_1,o_2,...,o_T)\)；<br/>
+<strong>输出</strong>：最优状态序列 \(I=(i^*_1,i^*_2,...,i^*_T)\)；<br/>
+<strong>算法过程</strong>：</p>
+
+<ul>
+<li><p>初始化<br/>
+\[<br/>
+\delta_1(i) = \pi_i b_i(o_1),\quad i=1,2,...,N\\<br/>
+\psi_1(i) = 0<br/>
+\]</p></li>
+<li><p>递推，对 \(t=2,3,...,T\)<br/>
+\[<br/>
+\delta_t(i) = \max_{1\le j\le N}[\delta_t(j) a_{ji}]b_i(o_{t+1}),\quad i=1,2,...,N\\<br/>
+\psi_t(i) = \arg\max_{1\le j\le N}[\delta_{t-1}(j) a_{ji}],\quad i=1,2,...,N<br/>
+\]</p></li>
+<li><p>终止<br/>
+\[<br/>
+P^* = \max_{1\le i\le N} \delta_{T}(i)\\<br/>
+i^*_T = \arg\max_{1\le i\le N}[\delta_T(i)]<br/>
+\]</p></li>
+<li><p>最优路径回溯，对 \(t=T-1,T-2,...,1\)<br/>
+\[<br/>
+i^*_t = \psi_{t+1}(i^*_{t+1})<br/>
+\]</p></li>
+</ul>
+
+<p>求得最优路径 \(I^* = (i^*_1,i^*_2,...,i^*_T)\)。</p>
+
+<p>还是以天气的例子，假设 \(T=3\)，\(O=(\text{Dry,Dryish,Soggy})\)，状态转移矩阵同前向算法中所示，初始值概率为\(\pi=(\text{Sun,Cloud,Rain})=(0.2,0.4,0.4)\)。</p>
+
+<p>按照算法，（1） 初始化，当 \(t=1\) 时，对每一个状态 \(i\)，\(i=1,2,3\)，求状态为 \(i\) 观测 \(o_1\) 为 Dry 的概率，记此概率为 \(\delta_1(i)\)，则：<br/>
+\[<br/>
+\delta_1(i) = \pi_ib_i(o_i) = \pi_ib_i(\text{Dry}),\quad i=1,2,3<br/>
+\]</p>
+
+<p>代入实际数据<br/>
+\[<br/>
+\delta_1(1) = \pi_1b_1(o_1) = 0.2*0.6 = 0.12\\<br/>
+\delta_1(2) = \pi_2b_2(o_1) = 0.4*0.25 = 0.1\\<br/>
+\delta_1(3) = \pi_3b_3(o_1) = 0.4*0.05 = 0.02\\<br/>
+\]</p>
+
+<p>记录 \(\psi_1(i) = 0\)，\(i=1,2,3\)。</p>
+
+<p>（2）在 \(t=2\) 时，对每一个状态 \(i\)，\(i=1,2,3\)，求在 \(t=1\) 时状态为 \(j\) 观测为 Dry 并在 \(t=2\) 时状态为 \(i\) 观测 \(o_2\) 为 Dryish 的最大概率，记此最大概率为 \(\delta_2(i)\)，则<br/>
+\[<br/>
+\delta_2(i) = \max_{1\le j\le 3}[\delta_1(j) a_{ji}] b_i(o_2)<br/>
+\]</p>
+
+<p>同时，对每一个状态 \(i\)，\(i=1,2,3\)，记录概率最大路径的前一个状态：<br/>
+\[<br/>
+\psi_2(i) = \arg\max_{1\le j\le 3}[\delta_1(j)a_{ji}],\quad i=1,2,3<br/>
+\]</p>
+
+<p>计算：<br/>
+\[<br/>
+\begin{align*}<br/>
+\delta_2(1) &amp;= \max_{1\le j\le 3}[\delta_1(j)a_{j1}] b_1(o_2)\\<br/>
+&amp;= \max{j}\{0.12* 0.5,0.1 * 0.3,0.02*0.2 \}*0.2\\<br/>
+&amp;= 0.012\\<br/>
+\psi_2(1) &amp;= 1\\<br/>
+\delta_2(2) &amp;= \max_{1\le j\le 3}[\delta_1(j)a_{j2}] b_2(o_2)\\<br/>
+&amp;= \max{j}\{0.12* 0.2,0.1 * 0.5,0.02*0.3 \}*0.25\\<br/>
+&amp;= 0.0125\\<br/>
+\psi_2(2) &amp;= 2\\<br/>
+\delta_2(3) &amp;= \max_{1\le j\le 3}[\delta_1(j)a_{j3}] b_3(o_2)\\<br/>
+&amp;= \max{j}\{0.12* 0.3,0.1 * 0.2,0.02*0.5 \}*0.1\\<br/>
+&amp;= 0.0036\\<br/>
+\psi_2(3) &amp;= 1\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>同样在 \(t=3\) 时，<br/>
+\[<br/>
+\begin{align*}<br/>
+\delta_3(1) &amp;= \max_{1\le j\le 3}[\delta_2(j)a_{j1}] b_1(o_3)\\<br/>
+&amp;= \max{j}\{0.012* 0.5,0.0125 * 0.3,0.0036*0.2 \}*0.05\\<br/>
+&amp;= 0.0003\\<br/>
+\psi_3(1) &amp;= 1\\<br/>
+\delta_3(2) &amp;= \max_{1\le j\le 3}[\delta_2(j)a_{j2}] b_2(o_3)\\<br/>
+&amp;= \max{j}\{0.012* 0.2,0.0125 * 0.5,0.0036*0.3 \}*0.25\\<br/>
+&amp;= 0.0015625\\<br/>
+\psi_3(2) &amp;= 2\\<br/>
+\delta_3(3) &amp;= \max_{1\le j\le 3}[\delta_2(j)a_{j3}] b_3(o_3)\\<br/>
+&amp;= \max{j}\{0.012* 0.3,0.0125 * 0.2,0.0036*0.5 \}*0.5\\<br/>
+&amp;= 0.0018\\<br/>
+\psi_3(3) &amp;= 1\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>（3）以 \(P^*\) 表示最优路径的概率，则<br/>
+\[<br/>
+P^* = \max_{1\le i\le 3}\delta_3(i) = 0.0018<br/>
+\]</p>
+
+<p>最优路径终点是 \(i^*_3\)：<br/>
+\[<br/>
+i^*_3 = \arg\max_{i}[\delta_3(i)] = 3<br/>
+\]</p>
+
+<p>（4）由最优路径的终点 \(i^*_3\) ，逆向找到 \(i^*_2\) 和 \(i^*_1\)：<br/>
+\[<br/>
+i^*_2 = \psi_3(i^*_3) = 1\\<br/>
+i^*_1 = \psi_2(i^*_2) = 1\\<br/>
+\]</p>
+
+<p>最优路径为 \(I=(i^*_1,i^*_2,i^*_3) = (1,1,3)\)</p></li>
+</ol>
+
+<h4 id="toc_3">学习</h4>
+
+<p>与HMM模型相关的“有用”的问题是评估（前向算法）和解码（维特比算法）——它们一个被用来测量一个模型的相对适用性，另一个被用来推测模型隐藏的部分在做什么（“到底发生了”什么）。可以看出它们都依赖于隐马尔科夫模型（HMM）参数这一先验知识——状态转移矩阵，混淆（观察）矩阵，以及 \(\pi\) 向量（初始化概率向量）。可以分为监督学习算法和非监督学习算法--Baum-Welch算法。</p>
+
+<ol>
+<li><p><strong>监督学习算法</strong></p>
+
+<p>假设已给出训练数据包含 \(S\) 个长度相同的观测序列和对应的状态序列 \(\{(O_1,I_1),(O_2,I_2),...,(O_S,I_S)\}\)，那么可以利用极大似然估计法来估计隐马尔可夫模型的参数。具体方法如下.</p>
+
+<p>（1）转移概率 \(a_{ij}\) 的估计</p>
+
+<p>设样本中时刻 \(t\) 处于 \(i\) 状态，时刻 \(t+1\) 转移到 \(j\) 状态的频数为 \(A_{ij}\) ，那么转移概率 \(a_{ij}\) 的估计为：<br/>
+\[<br/>
+\hat a_{ij} = \frac{A_{ij}}{\sum_{j=1}^M A_{ij}},\quad i=1,2,...,N;j=1,2,...,N <br/>
+\]</p>
+
+<p>（2）观测概率 \(b_j(k)\) 的估计<br/>
+设样本汇总状态为 \(j\) 并观测为 \(k\) 的频数为 \(B_{jk}\)，那么状态为 \(j\) 观测为 \(k\) 的概率 \(b_j(k)\) 为<br/>
+\[<br/>
+\hat b_j(k) = \frac{B_{jk}}{\sum_{k=1}^N B_{jk}},\quad j=1,2,...,N,k=1,2,...,M<br/>
+\]</p>
+
+<p>（3）初始状态概率 \(\pi_i\) 的估计 \(\hat \pi_i\) 为 \(S\) 个样本中初始状态为 \(q_i\) 的频率。</p>
+
+<p>由于监督学习需要使用训练数据，而人工标注训练数据往往代价很高，有时候就会利用非监督学习的方法。</p></li>
+<li><p><strong>Baum-Welch算法</strong></p>
+
+<blockquote>
+<p>在讲解Baum-Welch算法之前，我们先讲解一下单个状态和两个状态的计算公式<br/>
+( a ) 给定模型 \(\lambda\) 和观测 \(O\)，在时刻 \(t\) 处于状态 \(s_i\) 的概率，记<br/>
+\[<br/>
+\gamma_t(i) = P(i_t = s_i|O,\lambda)<br/>
+\]</p>
+
+<p>容易得<br/>
+\[<br/>
+\gamma_t(i) = \frac{P(i_t = s_i,O|\lambda)}{P(O|\lambda)}<br/>
+\]</p>
+
+<p>前向概率 \(\alpha_t(i)\) 的定义为<br/>
+\[<br/>
+\alpha_t(i) = P(o_1,o_2,...,o_t,i_t = s_i|\lambda)<br/>
+\]</p>
+
+<p>后向概率 \(\beta_t(i)\) 的定义为<br/>
+\[<br/>
+\beta_t(i) = P(o_{t+1},o_{t+2},...,o_T|i_t=s_i,\lambda)<br/>
+\]</p>
+
+<p>由前向概率和后向概率的定义可知：<br/>
+\[<br/>
+\alpha_t(i) \beta_t(i) = P(O,i_t = s_i|\lambda)<br/>
+\]</p>
+
+<p>考虑到<br/>
+\[<br/>
+P(O|\lambda) = \sum_{j=1}^N P(O,i_t=s_j|\lambda)<br/>
+\]</p>
+
+<p>于是可得<br/>
+\[<br/>
+\begin{equation}<br/>
+\gamma_t(i) = \frac{P(O,i_t=s_j|\lambda)}{P(O|\lambda)} = \frac{\alpha_t(i) \beta_t(i)}{\sum_{j=1}^N \alpha_t(j) \beta_t(j)}\label{gtf1}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>( b ) 给定模型 \(\lambda\) 和观测 \(O\)，在时刻 \(t\) 处于状态 \(s_i\) 在下一时刻处于 \(s_j\) 的概率，记为<br/>
+\[<br/>
+\begin{align*}<br/>
+\xi_t(i,j) = P(i_t=s_i,i_{t+1}=s_j|O,\lambda) &amp;= \frac{P(i_t=s_i,i_{t+1}=s_j,O|\lambda)}{P(O|\lambda)}\\<br/>
+&amp;= \frac{P(i_t=s_i,i_{t+1}=s_j,O|\lambda)}{\sum_{i=1}^N \sum_{j=1}^N P(i_t=s_i,i_{t+1}=s_j,O|\lambda)}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>而<br/>
+\[<br/>
+\begin{align*}<br/>
+P(i_t=s_i,i_{t+1}=s_j,O|\lambda) &amp;= P(i_t=s_i,o_1,o_2,...,o_t|\lambda)a_{ij}b_j(o_{t+1}) P(o_{t+2},o_{t+3},...,o_T|i_{t+1} = s_j,\lambda) \\<br/>
+&amp;= \alpha_t(i)a_{ij} b_j(o_{t+1})\beta_{t+1}(j)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>于是<br/>
+\[<br/>
+\begin{equation}<br/>
+\xi_t(i,j) = \frac{\alpha_t(i)a_{ij} b_j(o_{t+1})\beta_{t+1}(j)}{\sum_{i=1}^N \sum_{j=1}^N \alpha_t(i)a_{ij} b_j(o_{t+1})\beta_{t+1}(j)}\label{gtf2}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>( c ) 将 \(\gamma_t(i)\) 和 \(\xi_t(i,j)\) 对各个时刻 \(t\) 求和，可以得到一些有用的期望值：</p>
+
+<ul>
+<li><p>在观测 \(O\) 下状态 \(i\) 出现的期望值<br/>
+\[<br/>
+\sum_{t=1}^T \gamma_t(i)<br/>
+\]</p></li>
+<li><p>在观测 \(O\) 下由状态 \(i\) 转移的期望值<br/>
+\[<br/>
+\sum_{t=1}^{T-1} \gamma_t(i)<br/>
+\]</p></li>
+<li><p>在观测 \(O\) 下由状态 \(i\) 转移到状态 \(j\) 的期望值<br/>
+\[<br/>
+\sum_{t=1}^{T-1} \xi_t(i,j)<br/>
+\]</p></li>
+</ul>
+</blockquote>
+
+<p>假设给定训练数据只包含 \(S\) 个长度为 \(T\) 的观测序列 \(\{O_1,O_2,...,O_S\}\) 而没有对应的状态序列，目标是学习隐马尔可夫模型 \(\lambda=(\mathbb A,\mathbb B,\pi)\) 的参数，我们将观测序列看做观测数据 \(O\) ，状态序列看做不可观测的隐数据 \(I\) ，那么隐马尔可夫模型事实上是一个含有隐变量的概率模型<br/>
+\[<br/>
+P(O|\lambda) = \sum_{I} P(O|I,\lambda) P(I|\lambda)<br/>
+\]</p>
+
+<p>它的学习参数可以由 EM 算法实现。</p>
+
+<p>（1）确定完全数据的对数似然函数</p>
+
+<p>所有观测数据写成 \(O=(o_1,o_2,...,o_T)\)，所有隐数据写成 \(I=(i_1,i_2,...,i_T)\)，完全数据是 \((O,I)=(o_1,o_2,...,o_T,i_1,i_2,...,i_T)\)。完全数据的对数似然函数是 \(\log P(O,I|\lambda)\)。</p>
+
+<p>（2）EM 的E步：求Q函数 \(Q(\lambda,\overline \lambda)\)：<br/>
+\[<br/>
+\begin{align}<br/>
+Q(\lambda,\overline \lambda) &amp;= \mathbb E_I[\log P(O,I|\lambda)|O,\overline \lambda]\nonumber\\<br/>
+&amp;= \sum_I \log P(O,I|\lambda) P(I|O,\overline \lambda)\nonumber\\<br/>
+&amp;= \sum_I \log P(O,I|\lambda) \frac{P(O,I|\overline \lambda)}{P(O|I,\overline \lambda)}\label{silp}\\<br/>
+\end{align}<br/>
+\] </p>
+
+<p>其中，\(\overline \lambda\) 是隐马尔可夫模型参数的当前估计值，\(\lambda\) 是要极大化的隐马尔可夫模型参数。式(\ref{silp})中 \(P(O|I,\overline \lambda)\) 我们知道对于已知模型和隐状态序列这个概率是固定常数，可以略去。</p>
+
+<p>Q函数可以写成<br/>
+\[<br/>
+\begin{equation}<br/>
+Q(\lambda,\overline \lambda) = \sum_I \log P(O,I|\lambda){P(O,I|\overline \lambda)}\label{qlol}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>在前文中，我们已经知道已知 \(\lambda\) 模型，可以通过前向算法得出给定观测序列的概率：<br/>
+\[<br/>
+\begin{align*}<br/>
+P(O,I|\lambda) = \pi_{i_1} b_{i_1}(o_1) a_{i_1i_2}b_{i_2}(o_2) \cdots a_{i_{T-1} i_T}b_{i_T}(o_T)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>于是函数 \(Q(\lambda,\overline \lambda)\) 可以写成：<br/>
+\[<br/>
+\begin{align}<br/>
+Q(\lambda,\overline \lambda) &amp;= \sum_I \log P(O,I|\lambda){P(O,I|\overline \lambda)}\\<br/>
+&amp;= \sum_I \log\Big[ \pi_{i_1} b_{i_1}(o_1) a_{i_1i_2}b_{i_2}(o_2) \cdots a_{i_{T-1} i_T}b_{i_T}(o_T) \Big]P(O,I|\overline \lambda)\nonumber\\<br/>
+&amp;= \sum_I \log\Big[ \pi_{i_1} \prod_{t=1}^{T-1} a_{i_ti_{t+1}}  \prod_{t=1}^T b_{i_t}(o_t)\Big]P(O,I|\overline \lambda)\nonumber\\<br/>
+&amp;= \sum_I \bigg\{\log\pi_{i_1} + \log\Big[\prod_{t=1}^{T-1} a_{i_ti_{t+1}}\Big] + \log\Big[\prod_{t=1}^T b_{i_t}(o_t)\Big]\bigg\}P(O,I|\overline \lambda)\nonumber\\<br/>
+&amp;= \sum_I P(O,I|\overline \lambda) \log \pi_{i_1} + \sum_I P(O,I|\overline \lambda) \log\Big[\prod_{t=1}^{T-1} a_{i_ti_{t+1}}\Big] + \sum_I P(O,I|\overline \lambda) \log\Big[\prod_{t=1}^T b_{i_t}(o_t)\Big]\nonumber\\<br/>
+&amp;= \sum_I P(O,I|\overline \lambda) \log \pi_{i_1} + \sum_I P(O,I|\overline \lambda) \sum_{t=1}^{T-1} \log a_{i_ti_{t+1}} + \sum_I P(O,I|\overline \lambda) \sum_{t=1}^T \log b_{i_t}(o_t)\label{sipo}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>式中求和都是对所有训练数据的序列总长度 \(T\) 进行的。</p>
+
+<p>（3）EM算法的M步：极大化Q函数 \(Q(\lambda,\overline \lambda)\) 的模型参数 \(\mathbb A,\mathbb B,\pi\)。</p>
+
+<p>可以看到，我们将三项中分别的对 \(I\) 的求和进行了划分。由于隐变量 \(I=(i_1,i_2,...,i_T)\) 。原来的求和需要遍历所有 \(I\) 的取值，然后进行求和，然而这基本是不可能完成的任务。改写后，我们将遍历的空间进行了划分，同时很好地将 \(P(O,I|,\overline \lambda)\) 部分改写后也融入到求和其中。比如第一项，对 \(I\) 的遍历等价于先固定状态 \(i_1\)，使其分别取值所有可能的状态（共有S个可取的离散状态），而 \(i_2,...,i_T\) 仍然像原来一样随便取值。这样，就把 \(I\) 空间划分成了S个更小的空间。然后再把这N个空间的结果相加，等价于原来对空间 \(I\) 进行遍历。</p>
+
+<p><strong>a.式(\ref{sipo})的第一项</strong>可以写成<br/>
+\[<br/>
+\sum_I P(O,I|\overline \lambda) \log \pi_{i_1} = \sum_{i=1}^N P(O,i_1=i|\overline \lambda) \log \pi_{i}<br/>
+\]</p>
+
+<blockquote>
+<p>之前一直很纠结为什么可以这么转换，后面通过一个小例子让我明白了，假设我们有长度为3，即 \(S=3\) 的观测数据 \(O=(o_1,o_2,o_3)\)，隐藏状态的个数为2，即 \(N=2\)，可能的隐藏状态序列有<br/>
+\[<br/>
+s_1 s_1 s_1;\\<br/>
+s_1 s_1 s_2;\\<br/>
+s_1 s_2 s_1;\\<br/>
+s_1 s_2 s_2;\\<br/>
+s_2 s_1 s_1;\\<br/>
+s_2 s_1 s_2;\\<br/>
+s_2 s_2 s_1;\\<br/>
+s_2 s_2 s_2;\\<br/>
+\]</p>
+
+<p>第一项可以写成<br/>
+\[<br/>
+\begin{align*}<br/>
+\sum_I P(O,I|\overline \lambda) \log \pi_{i_1} &amp;= P(O,\{s_1 s_1 s_1\}|\lambda)\log \pi_{s_1}  + P(O,\{s_1 s_1 s_2\}|\lambda)\log \pi_{s_1}  + P(O,\{s_1 s_2 s_1\}|\lambda)\log \pi_{s_1}  + P(O,\{s_1 s_2 s_2\}|\lambda)\log \pi_{s_1} + P(O,\{s_2,s_1,s_1\}|\pi_{s_2} + P(O,\{s_2,s_1,s_2\}|\pi_{s_2} + P(O,\{s_2,s_2,s_1\}|\pi_{s_2} + P(O,\{s_2,s_2,s_2\}|\pi_{s_2} \\<br/>
+&amp;= P(O,{s_i,s_?,s_?}|\lambda)\log \pi_{s_i} \quad(i=1,2)\\<br/>
+&amp;= \sum_{i=1}^2 P(O,s_i|\lambda)\log \pi_{s_i} <br/>
+\end{align*}<br/>
+\]</p>
+
+<p>所以我们可以看出这样转换是可以的。</p>
+</blockquote>
+
+<p>我们又考虑到 \(\pi_i\) 满足约束条件 \(\sum_{i=1}^N \pi_i = 1\)，利用拉格朗日乘子法，写出拉格朗日函数：<br/>
+\[<br/>
+\sum_{i=1}^N P(O,i_1=i|\overline \lambda) \log \pi_{i} + \gamma\bigg(\sum_{i=1}^N \pi_i - 1 \bigg)<br/>
+\]</p>
+
+<p>对其求偏导并令结果为0<br/>
+\[<br/>
+\frac{\partial}{\partial \pi_i}\bigg[ \sum_{i=1}^N P(O,i_1=i|\overline \lambda) \log \pi_{i} + \gamma\bigg(\sum_{i=1}^N \pi_i - 1 \bigg) \bigg] = 0<br/>
+\]</p>
+
+<p>得<br/>
+\[<br/>
+\begin{align}<br/>
+P(O,i_1=i|\overline \lambda) + \gamma \pi_i = 0\label{poli}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>对 \(i\) 求和得到 \(\lambda\)<br/>
+\[<br/>
+\lambda = -P(O|\overline \lambda)<br/>
+\]</p>
+
+<p>代入(\ref{poli})式得<br/>
+\[<br/>
+\pi_i = \frac{P(O,i_1=i|\overline \lambda)}{P(O|I)}<br/>
+\]</p>
+
+<p><strong>b.式(\ref{sipo})的第二项</strong>可以写成<br/>
+\[<br/>
+\sum_I P(O,I|\overline \lambda) \sum_{t=1}^{T-1} \log a_{i_ti_{t+1}} = \sum_{i=1}^N \sum_{j=1}^N \sum_{t=1}^{T-1} P(O,i_t=i,i_{t+1}=j|\overline \lambda) \log a_{ij}<br/>
+\]</p>
+
+<p>应用具有约束条件 \(\sum_{j=1}^N a_{ij} = 1\) 的拉格朗日乘子法可以求出<br/>
+\[<br/>
+\sum_{i=1}^N \sum_{j=1}^N \sum_{t=1}^{T-1} P(O,i_t=i,i_{t+1}=j|\overline \lambda) \log a_{ij} + \gamma\bigg(\sum_{j=1}^N a_{ij} - 1\bigg)<br/>
+\]</p>
+
+<p>对 \(a_{ij}\) 求偏导并令结果为0<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\frac{\partial}{\partial a_{ij}}\bigg[\sum_{i=1}^N \sum_{j=1}^N \sum_{t=1}^{T-1} P(O,i_t=i,i_{t+1}=j|\overline \lambda) \log a_{ij} + \gamma\bigg(\sum_{j=1}^N a_{ij} - 1\bigg) \bigg]\\<br/>
+&amp;= \frac{\sum_{t=1}^{T-1} P(O,i_t=i,i_{t+1}=j|\overline \lambda) }{a_{ij}} + \gamma = 0 \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>得<br/>
+\[<br/>
+\begin{equation}<br/>
+\sum_{t=1}^{T-1} P(O,i_t=i,i_{t+1}=j|\overline \lambda) = \gamma a_{ij}\label{stto}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>对 \(j\) 求和可得<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\sum_{j=1}^N \sum_{t=1}^{T-1} P(O,i_t=i,i_{t+1}=j|\overline \lambda) = \sum_{j=1}^N \gamma a_{ij}\\<br/>
+&amp;\Rightarrow \sum_{t=1}^{T-1} P(O,i_t=i|\overline \lambda) = \gamma\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>上式代入(\ref{stto})得<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\sum_{t=1}^{T-1} P(O,i_t=i,i_{t+1}=j|\overline \lambda) = \sum_{t=1}^{T-1} P(O,i_t=i|\overline \lambda) a_{ij}\\<br/>
+&amp;\Rightarrow a_{ij} = \frac{\sum_{t=1}^{T-1} P(O,i_t=i,i_{t+1}=j|\overline \lambda)}{\sum_{t=1}^{T-1} P(O,i_t=i|\overline \lambda)}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p><strong>c.式(\ref{sipo})的第三项</strong>可以写成<br/>
+\[<br/>
+\sum_I P(O,I|\overline \lambda) \sum_{t=1}^T \log b_{i_t}(o_t) = \sum_{j=1}^N\sum_{t=1}^T  P(O,i_t=j|\overline \lambda) \log b_j(o_t)<br/>
+\]</p>
+
+<p>同样用拉格朗日乘子法，约束条件是 \(\sum_{k=1}^M b_j(k) = 1\)，拉格朗日方程为<br/>
+\[<br/>
+\sum_{j=1}^N \sum_{t=1}^TP(O,i_t=j|\overline \lambda)  \log b_j(o_t) + \gamma\bigg(\sum_{k=1}^M b_j(k) - 1 \bigg)<br/>
+\]</p>
+
+<p>对 \(b_j(k)\) 求导得<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\frac{\partial}{\partial b_j(k)}\bigg[\sum_{j=1}^N \sum_{t=1}^T P(O,i_t=j|\overline \lambda) \log b_j(o_t) + \gamma\bigg(\sum_{k=1}^M b_j(k) - 1 \bigg)\bigg]\\<br/>
+&amp;= \frac{\sum_{t=1}^T P(O,i_t=j|\overline \lambda) \mathbf I(o_t = k)}{b_j(k)}+ \gamma<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>这里只有在 \(o_t = k\) 时 \(b_j(o_t)\) 对 \(b_j(k)\) 的偏导数才不为0，以指示函数 \(\mathbf I(o_t = k)\) 表示。</p>
+
+<p>令上式偏导结果为0得<br/>
+\[<br/>
+\begin{align}<br/>
+\sum_{t=1}^T P(O,i_t=j|\overline \lambda) \mathbf I(o_t = k) = b_j(k) \gamma\label{stoto}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>对上式 \(k\) 求和，可得<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\sum_{k=1}^N \sum_{t=1}^T P(O,i_t=j|\overline \lambda) \mathbf I(o_t = k) = \sum_{k=1}^N b_j(k) \gamma\\<br/>
+&amp;\Rightarrow \sum_{t=1}^T P(O,i_t=j|\overline \lambda) = \gamma<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>代入(\ref{stoto})式得<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;\sum_{t=1}^T P(O,i_t=j|\overline \lambda) \mathbf I(o_t = k) = b_j(k) \sum_{t=1}^T P(O,i_t=j|\overline \lambda)\\ <br/>
+&amp;\Rightarrow b_j(k) = \frac{\sum_{t=1}^T P(O,i_t=j|\overline \lambda) \mathbf I(o_t = k)}{\sum_{t=1}^T P(O,i_t=j|\overline \lambda)}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>到现在我们已经推出了 \(\pi_i\)、\(a_{ij}\) 和 \(b_{j}(k)\) 的迭代公式<br/>
+\[<br/>
+\begin{align*}<br/>
+\pi_i &amp;= \frac{P(O,i_1=i|\overline \lambda)}{P(O|I)}\\<br/>
+a_{ij} &amp;= \frac{\sum_{t=1}^{T-1} P(O,i_t=i,i_{t+1}=j|\overline \lambda)}{\sum_{t=1}^{T-1} P(O,i_t=i|\overline \lambda)}\\<br/>
+b_j(k) &amp;= \frac{\sum_{t=1}^T P(O,i_t=j|\overline \lambda) \mathbf I(o_t = k)}{\sum_{t=1}^T P(O,i_t=j|\overline \lambda)}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>将式(\ref{gtf1})和式(\ref{gtf2}) 代入<br/>
+\[<br/>
+\begin{align*}<br/>
+\pi_i &amp;= \gamma_1(i)\\<br/>
+a_{ij} &amp;= \frac{\sum_{t=1}^{T-1}\xi_t(i,j)}{\sum_{t=1}^{T-1} \gamma_t(i) }\\<br/>
+b_j(k) &amp;= \frac{\sum_{t=1}^T \gamma_t(j) \mathbf I(o_t=k)}{\sum_{t=1}^T \gamma_t(j)}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>现在Baum-Welch算法可以描述为<br/>
+<strong>输入</strong>：观测数据 \(O=(o_1,o_2,...,o_T)\)；<br/>
+<strong>输出</strong>：隐马尔可夫模型参数<br/>
+<strong>算法过程</strong></p>
+
+<ul>
+<li>初始化，对 \(n=0\)，选取 \({a_{ij}}^{(0)}\)，\({b_j(k)}^{(0)}\) 和 \({\pi_i}^{(0)}\)，得到模型 \(\lambda^{(0)} = (\mathbb A^{(0)},\mathbb B^{(0)},\pi^{(0)})\)</li>
+<li><p>递推，对 \(n=1,2,...,\)<br/>
+\[<br/>
+\begin{align*}<br/>
+{a_{ij}^{(n+1)}} &amp;= \frac{\sum_{t=1}^{T-1}\xi_t(i,j)}{\sum_{t=1}^{T-1} \gamma_t(i) }\\<br/>
+{b_j(k)}^{(n+1)} &amp;= \frac{\sum_{t=1}^T \gamma_t(j) \mathbf I(o_t=k)}{\sum_{t=1}^T \gamma_t(j)}\\<br/>
+{\pi_i}^{(n+1)} &amp;= \gamma_1(i)\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>右侧各值按观测 \(O=(o_1,o_2,...,o_T)\) 和模型 \(\lambda^{(n)} = (\mathbb A^{(n)},\mathbb B^{(n)},\pi^{(n)})\) 计算。式中 \(\gamma_t(i)\) 和 \(\xi_t(i,j)\) 由式(\ref{gtf1})和式(\ref{gtf2})给出。</p></li>
+<li><p>终止。得到模型 \(\lambda^{(n+1)} = (\mathbb A^{(n+1)},\mathbb B^{(n+1)},\pi^{(n+1)})\)</p></li>
+</ul></li>
+</ol>
+
+<hr/>
+
+<p>[李航 统计学习方法]<br/>
+<a href="http://www.52nlp.cn/category/hidden-markov-model">HMM相关文章索引</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15195107498771.html">马尔科夫链蒙特卡罗方法 Markov Chain Monte Carlo，MCMC</a></h1>
+			<p class="meta"><time datetime="2018-02-25T06:19:09+08:00" 
+			pubdate data-updated="true">2018/2/25</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>对于一般的分布的采样，之前已经有一些方法可以解决，但是对于一些复杂分布的采样，却没有很好的函数实现，本文将介绍 MCMC 方法提供解决方法。</p>
+
+<h3 id="toc_0">马尔科夫链 Markov Chain</h3>
+
+<p>设 \(X_t\) 表示随机变量 \(X\) 在时刻 \(t\) 的取值，若该变量随时间变化的转移概率仅仅依赖于它的当前取值，与过去状态无关，所谓的“遗忘性”，即：<br/>
+\[<br/>
+P(X_{t+1}=s_{t+1}|X_0=s_0,X_1=s_1,...,X_t=s_t) = P(X_{t+1}=s_{t+1}|X_t=s_t)<br/>
+\]</p>
+
+<p>也就是说状态转移仅仅依赖于前一个状态，其中 \(s_0,s_1,...,s_i,...\) 表示随机变量 \(X\) 的可能状态，这个性质称为马尔科夫性质。具有马尔科夫性质的随机过程叫马尔科夫过程，其中变量称为马尔科夫变量。</p>
+
+<p>马尔可夫链指的是在一段时间内随机变量X的取值序列 \((X_0,X_1,...,X_m)\) ，它们满足如上的马尔可夫性质。</p>
+
+<ol>
+<li>时间、状态都离散的叫做马尔可夫链。</li>
+<li>时间连续、状态离散的叫做时间连续马尔可夫链。</li>
+<li>时间、状态都连续的叫做马尔可夫过程。</li>
+</ol>
+
+<h4 id="toc_1">转换概率</h4>
+
+<p>马尔可夫链是通过对应的转移概率定义的，转移概率指的是随机变量从一个时刻到下一个时刻，从状态 \(s_i\) 转移到另一个状态 \(s_j\) 的概率，即：<br/>
+\[<br/>
+P(i\rightarrow j):=P_{i,j} = P(X_{t+1}=s_j|X_t = s_i)<br/>
+\]</p>
+
+<p>记 \(\pi_k^{(t)}\) 表示随机变量 \(X\) 在时刻 \(t\) 的取值为 \(s_k\) 的概率，则随机变量 \(X\) 在时刻 \(t+1\) 的取值为 \(s_i\) 的概率为：<br/>
+\[<br/>
+\begin{align*}<br/>
+\pi_i^{(t+1)} &amp;= P(X_{t+1} = s_i)\\<br/>
+&amp;= \sum_{k} P(X_{t+1}=s_i|X_t = s_k)\cdot P(X_t=s_k)\\<br/>
+&amp;= \sum_k P_{k,i}\cdot \pi_{k}^{(t)}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>假设状态的数目为 \(n\)，则有：<br/>
+\[<br/>
+(\pi_1^{(t+1)},\cdots,\pi_j^{(t+1)},\cdots,\pi_n^{(t+1)}) = (\pi_1^{(t)},\cdots,\pi_i^{(t)},\cdots,\pi_1^{(t)})\left [ \begin{array}{cccccc}<br/>
+P_{1,1}&amp;P_{1,2}&amp;\cdots&amp;P_{1,j}&amp;\cdots&amp;P_{1,n}\\<br/>
+P_{2,1}&amp;P_{2,2}&amp;\cdots&amp;P_{2,j}&amp;\cdots&amp;P_{2,n}\\<br/>
+\vdots&amp;\vdots&amp;\vdots&amp;\ddots&amp;\cdots&amp;\vdots\\<br/>
+P_{i,1}&amp;P_{i,2}&amp;\cdots&amp;P_{i,j}&amp;\cdots&amp;P_{i,n}\\<br/>
+\vdots&amp;\vdots&amp;\vdots&amp;\ddots&amp;\cdots&amp;\vdots\\<br/>
+P_{n,1}&amp;P_{n,2}&amp;\cdots&amp;P_{n,j}&amp;\cdots&amp;P_{n,n}\\<br/>
+\end{array} \right]<br/>
+\]</p>
+
+<p>对于任意的 \(i\) 都有 \(\sum_{j=1}^n P_{i,j} = 1\)。若设 \(\Pi=[\pi_1^{(0)},\pi_2^{(0)},\cdots,\pi_n^{(0)}]\) 是系统的初始概率分布，\(\pi_i^{(0)}\) 是系统在初始时刻处于状态 \(i\) 的概率，满足 \(\sum_{i=1}^n \pi_i^{(0)}=1\) 。</p>
+
+<h4 id="toc_2">平稳分布</h4>
+
+<p>对于马尔可夫链，需要注意以下的两点：</p>
+
+<ol>
+<li>周期性：即经过有限次的状态转移，又回到了自身；</li>
+<li>不可约：即两个状态之间相互转移；</li>
+</ol>
+
+<p><strong>马氏定理：</strong>如果一个非周期不可约马尔可夫链的转移矩阵为 \(P\)，无论初始值 \(\pi^{(0)}\) 的取值，都有 \(\lim_{t\rightarrow \infty} \pi^{(0)} P^t\) 存在且初始值无关，记 \(\lim_{t\rightarrow \infty} \pi^{(0)} P^t = \pi^*\)，我们有：<br/>
+\[<br/>
+\pi^* P = \pi^*<br/>
+\]</p>
+
+<p>\(pi\) 是方程唯一非负解。其中：<br/>
+\[<br/>
+\pi^* =[\pi(1),\pi(2),\cdots,\pi(j),\cdots],\quad \sum_{i=0}^n \pi(i)=1<br/>
+\]</p>
+
+<p>则称 \(\pi^*\) 为马尔可夫链的平稳分布。存在稳态分布要求马尔可夫链是连通的（没有孤立点），同时不存在一个连通子图是没有对外的出边的。</p>
+
+<p><strong>细致平稳条件：</strong>如果非周期马尔可夫链的转移矩阵 \(P\) 和分布 \(\pi\) 满足 <br/>
+\[<br/>
+\pi(i) P_{i,j} = \pi(j) P_{j,i},\quad \forall i,j<br/>
+\]</p>
+
+<p>则 \(\pi^*=(\pi(1),\pi(2),\cdots,\pi(j),\cdots)\) 是马尔可夫链的平稳分布。</p>
+
+<p>这个定理是显而易见的，因为细致平稳条件的物理含义就是对于任何两个状态 \(i,j\) ，从 \(i\) 转移出去到 \(j\) 而丢失的概率质量，恰好会被从 \(j\) 转移回来到 \(i\) 的概率质量补充，所以状态 \(i\) 上的概率质量 \(\pi(i)\) 是稳定的，从而 \(\pi^*\) 是马尔可夫链的平稳分布。数学上的证明也很简单，由细致平稳条件可得：<br/>
+\[<br/>
+\sum_{i=1}^n \pi(i)P_{i,j}=\sum_{i=1}^n \pi(j)P_{j,i}= \pi(j)\sum_{i=1}^n P_{j,i} =\pi(j)\\<br/>
+\Rightarrow \pi P=\pi<br/>
+\]</p>
+
+<p>由于 \(\pi^*\) 是方程 \(\pi P=\pi\) 的解，所以 \(\pi^*\) 是平稳分布。</p>
+
+<p>马氏定理和细致平稳条件非常重要，是MCMC(Markov Chain Monte Carlo) 方法的基础。</p>
+
+<h3 id="toc_3">Metropolis 采样</h3>
+
+<p>对于给定的概率分布 \(p(x)\)，我们希望能有便捷的方式生成它对应的样本。由于马氏链能收敛到平稳分布，于是一个很的漂亮想法是：如果我们能构造一个转移矩阵为 \(P\) 的马氏链，使得该马氏链的平稳分布恰好是 \(p(x)\)，那么我们从任何一个初始状态 \(x_0\) 出发沿着马氏链转移, 得到一个转移序列 \(x_0,x_1,x_2,\cdots,x_n,x_{n+1},\cdots\)， 如果马氏链在第 \(n\) 步已经收敛了，于是我们就得到了 \(\pi(x)\) 的样本 \(x_n,x_{n+1},\cdots\)。</p>
+
+<p>这个绝妙的想法在 1953 年被 Metropolis 想到了，为了研究粒子系统的平稳性质， Metropolis 考虑了物理学中常见的波尔兹曼分布的采样问题，首次提出了基于马氏链的蒙特卡罗方法，即 Metropolis 算法，并在最早的计算机上编程实现。Metropolis 算法是首个普适的采样方法，并启发了一系列 MCMC 方法，所以人们把它视为随机模拟技术腾飞的起点。 Metropolis 的这篇论文被收录在《统计学中的重大突破》中， Metropolis 算法也被遴选为二十世纪的十个最重要的算法之一。</p>
+
+<p>假设现在有个转移矩阵为 \(Q\) 的马氏链，其中 \(q(j|i)\)，表示马尔可夫链在第 \(t\) 代时的状态为 \(i\) ，下一时刻转移到状态为 \(j\) 的概率。此时不满足细致平稳性：<br/>
+\[<br/>
+\pi(i) q(j|i) \neq \pi(j) q(i|j),\quad \forall i,j<br/>
+\]</p>
+
+<p>为了满足细致平稳性，在左边乘上右边，在右边乘上左边，也就是：<br/>
+\[<br/>
+\pi(i) q(j|i)\pi(j) q(i|j) = \pi(j) q(i|j)\pi(i) q(j|i),\quad \forall i,j<br/>
+\]</p>
+
+<p>令 \(\alpha(j|i) = \pi(j) q(i|j)\)，则上式可以写成：<br/>
+\[<br/>
+\pi(i) q(j|i) \alpha(j|i) = \pi(j) q(i|j) \alpha(i|j),\quad \forall i,j<br/>
+\]</p>
+
+<p>假设 \(Q&#39;(j|i) = q_(j|i) \alpha(j|i)\) ，所以有：<br/>
+\[<br/>
+\begin{align}<br/>
+\pi(i)\underbrace{q(j|i) \alpha(j|i)}_{Q&#39;(j|i)} = \pi(j) \underbrace{ q(i|j) \alpha(i|j)}_{Q&#39;(i|j)}\label{puaq}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>将 \(Q&#39;(j|i)\) 视为新的转移概率，这样便把原先具有转移矩阵 \(Q\) 的普通马氏链，改造为具有转移矩阵 \(Q&#39;\) 的马氏链，而 \(Q&#39;\) 是满足细致平稳条件的，平稳分布是 \(\pi^*\)，在改造过程中引入了接受概率 \(\alpha(i,j)\)，物理意义可以理解为在原来的马氏链上，从状态 \(i\) 以 \(q(j|i)\) 跳转到状态 \(j\) 的时候，我们以 \(\alpha(i|j)\) 的概率接受这个转移，于是得到新的马氏链 \(Q&#39;\) 的转移概率为 \(q(j|i) \alpha(j|i)\) 。</p>
+
+<p>得到接受概率 \(\alpha\) 之后，就可以随机从均匀分布中得到 \(u\) 值，如果 \(u \le \alpha(j|i) = \pi(j) q(i|j)\) 则接受状态 \(i\) 转移 到 \(j\)，否则不接受转移。</p>
+
+<p>具体的算法流程如下：</p>
+
+<ol>
+<li>初始化马氏链初始状态 \(X_0 = x_0\)</li>
+<li><p>对 \(t=0,1,2,...\)，循环以下过程进行采样</p>
+
+<ul>
+<li>第 \(t\) 个时刻马氏链的状态 \(X_t = x_t\)，采样 \(y\sim q(x|x_t)\)</li>
+<li>从均匀分布采样 \(u\sim U(0,1)\)</li>
+<li>如果 \(u\le \alpha(y|x_t) =  \pi(y) q(x_t|y)\)，则接受转移 \(x_t\rightarrow y\)，即\(X_{t+1} = y\)</li>
+<li>否则不接收转移，即 \(X_{t+1} = x_t\)</li>
+</ul></li>
+</ol>
+
+<p>上面过程中 \(p(x)\)，\(q(x|y)\) 说的是离散的情形，事实上即便这两个分布是连续的，以上算法仍然是有效的，于是就得到更一般的连续概率分布 \(p(x)\) 的采样算法，而 \(q(x|y)\) 就是一个任意一个连续二元概率分布对应的条件分布。</p>
+
+<h5 id="toc_4">Metropolis-Hastings 算法</h5>
+
+<p>但是Metropolis算法构造出的接受概率可能会很小，这样造成算法要经过很多的迭代才能到达平稳分布。为了加快收敛效果，我们需要在 \ref{puaq} 两边同比例增加 \(\alpha(i|j)\) 和 \(\alpha(j|i)\) ,假设要将左边的 \(\alpha(i|j)\) 增加到 1 ，需要两边同乘上 \(\frac{1}{\alpha(i|j)}\) 倍，则右边接受概率变为 \(\frac{\alpha(j|i)}{\alpha(i|j)}\)：<br/>
+\[<br/>
+\pi(i) q(j|i) = \pi(j) q(i|j) \frac{\alpha(i|j)}{\alpha(j|i)} = \frac{\pi(i) q(j|i)}{\pi(j) q(i|j)},\quad \forall i,j<br/>
+\]</p>
+
+<p>这样接受概率就可以写成：<br/>
+\[<br/>
+\begin{align*}<br/>
+\alpha(j|i) &amp;= 1\\<br/>
+\alpha(i|j) &amp;= \frac{\pi(i) q(j|i)}{\pi(j) q(i|j)}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>因为在 Metropolis 采样算法过程中，生成 \([0,1]\) 均匀分布随机值 \(u\) 必定不大于1，可以将 \(\alpha(i|j)\) 缩小范围：<br/>
+\[<br/>
+\alpha(i|j) = \frac{\pi(i) q(j|i)}{\pi(j) q(i|j)}\quad\Leftrightarrow\quad \alpha(i|j) = \min\bigg({1,\frac{\pi(i) q(j|i)}{\pi(j) q(i|j)}}\bigg)<br/>
+\]</p>
+
+<p>这样改造后接受概率对后续过程并没有影响。</p>
+
+<p>具体的算法流程如下：</p>
+
+<ol>
+<li>初始化马氏链初始状态 \(X_0 = x_0\)</li>
+<li><p>对 \(t=0,1,2,...\)，循环以下过程进行采样</p>
+
+<ul>
+<li>第 \(t\) 个时刻马氏链的状态 \(X_t = x_t\)，采样 \(y\sim q(x|x_t)\)</li>
+<li>从均匀分布采样 \(u\sim U(0,1)\)</li>
+<li>如果 \(u\le \alpha(y|x_t) =  \min\bigg({1,\frac{\pi(y) q(x_t|y)}{\pi(x_t) q(y|x_t)}}\bigg)\)，则接受转移 \(x_t\rightarrow y\)，即\(X_{t+1} = y\)</li>
+<li>否则不接收转移，即 \(X_{t+1} = x_t\)</li>
+</ul></li>
+</ol>
+
+<p>对于分布 \(\pi(x)\)，我们构造转移矩阵 \(Q&#39;\) 使其满足细致平稳条件<br/>
+\[<br/>
+p(x)Q&#39;(x\rightarrow y) = p(y)Q&#39;(y\rightarrow x)<br/>
+\]</p>
+
+<p>此处 \(x\) 并不要求是一维的，对于高维空间的 \(p(\mathbf x)\)，如果满足细致平稳条件：<br/>
+\[<br/>
+p(\mathbf x)Q&#39;(\mathbf x\rightarrow \mathbf y) = p(\mathbf y)Q&#39;(\mathbf y\rightarrow \mathbf x)<br/>
+\]</p>
+
+<p>那么以上的 Metropolis-Hastings 算法一样有效。</p>
+
+<h3 id="toc_5">MCMC-Gibbs Sampling算法</h3>
+
+<p>设想 \(p(x,y)\) 是 p.d.f. 或 p.m.f. ，如果直接对他们进行采样会比较困难。不过，我们假设我们可以很容易地从条件分布 \(p(x|y)\) 和 \(p(y|x)\) 中进行采样。假设有两个 \(x\) 轴坐标相同的点 \(A(x_1,y_1)\) 和 \(B(x_1,y_2)\)。<br/>
+易得：<br/>
+\[<br/>
+p(x_1,y_1) p(y_2|x_1) = p(x_1)p(y_1|x_1)p(y_2|x_1)\\<br/>
+p(x_1,y_2) p(y_1|x_1) = p(x_1)p(y_2|x_1)p(y_1|x_1)\\<br/>
+\]</p>
+
+<p>比较上述两个等式右边得：<br/>
+\[<br/>
+\begin{align}<br/>
+p(x_1,y_1) p(y_2|x_1) = p(x_1,y_2) p(y_1|x_1)\label{pxyp}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>即<br/>
+\[<br/>
+\begin{align}<br/>
+p(A) p(y_2|x_1) = p(B) p(y_1|x_1)\label{papy}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>同理，如果现在有个点 \(C(x_3,y_1)\)，和点 \(A\) 在同一个 \(y\) 轴上，有如下等式：<br/>
+\[<br/>
+\begin{align}<br/>
+p(A) p(x_3,y_1) = p(C) p(x_1|y_1)\label{papx}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>令<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;Q(A\rightarrow B) = p(y_B|x_1) &amp;\quad \text{if }x_A = x_B = x_1\\<br/>
+&amp;Q(A\rightarrow C) = p(x_C|y_1) &amp;\quad \text{if }y_A = y_C = y_1\\<br/>
+&amp;Q(A\rightarrow D) = 0 &amp;\quad \text{otherwise} \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>代入(\ref{papy})和(\ref{papx})得：<br/>
+\[<br/>
+p(A) Q(A\rightarrow B) = p(B) Q(B\rightarrow A)\\<br/>
+p(A) Q(A\rightarrow C) = p(C) Q(C\rightarrow A)\\<br/>
+\]</p>
+
+<p>有了如上的转移矩阵 Q，我们很容易知道对平面上任意两点 \(X\)、\(Y\)，满足细致平稳条件<br/>
+\[<br/>
+\begin{align}<br/>
+p(X)Q(X\rightarrow Y)=p(Y)Q(Y\rightarrow X)\label{pxqx}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>于是这个二维空间上的马氏链将收敛到平稳分布 \(p(x,y)p(x,y)\)。而这个算法就称为 Gibbs Sampling 算法。</p>
+
+<h5 id="toc_6">算法步骤</h5>
+
+<ol>
+<li>随机初始化 \(x_0,y_0\)</li>
+<li><p>对于 \(t=0,1,2,\cdots\)，循环采样</p>
+
+<ul>
+<li>从条件分布 \(p(Y|X=x_t)\) 中采样 \(y_{t+1}\) 得到点 \((x_t,y_{t+1})\)。</li>
+<li>从条件分布 \(p(X|Y=y_{t+1})\) 中采样 \(x_{t+1}\) 得到点 \((x_{t+1},y_{t+1})\)。</li>
+</ul></li>
+</ol>
+
+<h5 id="toc_7">Gibbs sampling 中的马氏转移链</h5>
+
+<p>以上采样过程中，如图所示，马氏链的转移只是轮换的沿着坐标轴 \(x\) 轴和 \(y\) 轴做转移，于是得到样本 \((x_0,y_0),(x_0,y_1),(x_1,y_1),(x_1,y_2),(x_2,y_2),\cdots\) 马氏链收敛后，最终得到的样本就是 \(p(x,y)p(x,y)\) 的样本，而收敛之前的阶段称为 burn-in period。</p>
+
+<p>Gibbs Sampling 算法大都是坐标轴轮换采样的，但是这其实是不强制要求的。最一般的情形可以是，在 \(t\) 时刻，可以在 \(x\) 轴和 \(y\) 轴之间随机的选一个坐标轴，然后按条件概率做转移，马氏链也是一样收敛的。轮换两个坐标轴只是一种方便的形式。</p>
+
+<p>以上的过程我们很容易推广到高维的情形，对于(\ref{papx})式，如果 \(x_1\) 变为多维情形 \(\mathbf x_1\)，可以看出推导过程不变，所以细致平稳条件同样是成立的<br/>
+\[<br/>
+p(\mathbf x_1,y_1)p(y_2|\mathbf x_1)=p(\mathbf x_1,y_2)p(y_1|\mathbf x_1)<br/>
+\]</p>
+
+<p>此时转移矩阵 \(Q\) 由条件分布 \(p(y|\mathbf x_1)\) 定义。上式只是说明了一根坐标轴的情形，和二维情形类似，很容易验证对所有坐标轴都有类似的结论。所以 \(n\) 维空间中对于概率分布 \(p(x_1,x_2,\cdots,x_n)\) 可以如下定义转移矩阵：马氏链转移的过程中，只能沿着坐标轴做转移，每次只转移一根坐标轴，沿着 \(x_i\) 这根坐标轴做转移的时候，转移概率由条件概率 \(p(x_i|x_1,x_2,\cdots,x_{i-1},x_{i+1},\cdots,x_n)\) 定义；其他的轴转移概率都设置为 0。</p>
+
+<p>于是我们可以把 Gibbs Smapling 算法从采样二维的 \(p(x,y)\) 推广到采样 \(n\) 维的 \(p(x_1,x_2,...,x_n)\)。</p>
+
+<h5 id="toc_8">n 维 Gibbs Sampling 算法步骤</h5>
+
+<ol>
+<li>随机初始化 \(\{x_i:i=1,2,\cdots,n \}\)</li>
+<li>对 \(t=0,1,\cdots\) 循环采样
+
+<ul>
+<li>\(x_1^{(t+1)} = p(x_1|x_2^{(t)},x_3^{(t)},\cdots,x_n^{(t)})\)</li>
+<li>\(x_2^{(t+1)} = p(x_2|x_1^{(t)},x_3^{(t)},\cdots,x_n^{(t)})\)</li>
+<li>\(\cdots\)</li>
+<li>\(x_j^{(t+1)} = p(x_1|x_2^{(t)},x_3^{(t)},\cdots,x_{j-1}^{(t)},x_{j+1}^{(t)},\cdots,x_n^{(t)})\)</li>
+<li>\(\cdots\)</li>
+<li>\(x_n^{(t+1)} = p(x_n|x_2^{(t)},x_3^{(t)},\cdots,x_{n-1}^{(t)})\)</li>
+</ul></li>
+</ol>
+
+<p>以上算法收敛后，得到的就是概率分布 \(p(x_1,x_2,\cdots,x_n)\) 的样本，当然这些样本并不独立，但是我们此处要求的是采样得到的样本符合给定的概率分布，并不要求独立。同样的，在以上算法中，坐标轴轮换采样不是必须的，可以在坐标轴轮换中引入随机性，这时候转移矩阵 \(Q\) 中任何两个点的转移概率中就会包含坐标轴选择的概率，而在通常的 Gibbs Sampling 算法中，坐标轴轮换是一个确定性的过程，也就是在给定时刻 \(t\)，在一根固定的坐标轴上转移的概率是 1。</p>
+
+<h3 id="toc_9">总结</h3>
+
+<p>无论 metropolis-hasting 算法还是 gibbs 算法，都需要一个 burn in 过程，只有在达到平衡状态时候得到的样本才能是平衡状态时候的目标分布的样本，因此，在 burn in 过程中产生的样本都需要被舍弃。如何判断一个过程是否达到了平衡状态还没有一个成熟的方法来解决，目前常见的方法是看是否状态已经平稳。</p>
+
+<p>关于链的收敛有这样一些检验方法</p>
+
+<ol>
+<li><strong>图形方法</strong>：这是简单直观的方法。我们可以利用这样一些图形：
+
+<ul>
+<li>迹图（trace plot）：将所产生的样本对迭代次数作图，生成马氏链的一条样本路径。如果当 \(t\) 足够大时，路径表现出稳定性没有明显的周期和趋势，就可以认为是收敛了。</li>
+<li>自相关图（Autocorrelation plot）：如果产生的样本序列自相关程度很高，用迹图检验的效果会比较差。一般自相关随迭代步长的增加而减小，如果没有表现出这种现象，说明链的收敛性有问题。</li>
+<li>遍历均值图（ergodic mean plot）：MCMC的理论基础是马尔科夫链的遍历定理。因此可以用累积均值对迭代步骤作图，观察遍历均值是否收敛。</li>
+</ul></li>
+<li><strong>蒙特卡洛误差</strong></li>
+<li><strong>Gelman-Rubin方法</strong></li>
+</ol>
+
+<hr/>
+
+<p><a href="https://www.cnblogs.com/xbinworld/p/4266146.html">随机采样方法整理与讲解</a><br/>
+<a href="https://www.jianshu.com/p/1511c94b2ac3">LDA漫游系列(四)-Gibbs Sampling</a><br/>
+<a href="https://cosx.org/2013/01/lda-math-mcmc-and-gibbs-sampling/">靳志辉 LDA-math-MCMC 和 Gibbs Sampling</a><br/>
+<a href="https://www.zybuluo.com/evilking/note/753058">自相关</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15189654050126.html">蒙特卡罗方法 Monte Carlo Simulation</a></h1>
+			<p class="meta"><time datetime="2018-02-18T22:50:05+08:00" 
+			pubdate data-updated="true">2018/2/18</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>蒙特卡罗方法（也常称之为 MC）也叫统计模拟方法，它使用随机数（或伪随机数）来解决问题，是一类重要的数值计算方法。该方法的名字来源于世界著名的赌城蒙特卡罗，而蒙特卡罗方法正是以概率为基础的方法。</p>
+
+<p>由概率定义知，某事件的概率可以用大量试验中该事件发生的频率来估算，当样本容量足够大时，可以认为该事件的发生频率即为其概率。蒙特卡罗方法正是基于这个思想。一个简单的例子可以解释蒙特卡罗方法，假设我们需要计算一个不规则图形的面积，那么图形的不规则程度和分析性计算（比如积分）的复杂程度是成正比的。而采用蒙特卡罗方法是怎么计算的呢？首先你把图形放到一个已知面积的方框内，然后假想你有一些豆子，把豆子均匀地朝这个方框内撒，散好后数这个图形之中有多少颗豆子，再根据图形内外豆子的比例来计算面积。当你的豆子越小，撒的越多的时候，结果就越精确。</p>
+
+<p>蒙特卡罗方法出现后很长一段时间都不太受到关注，直到计算机的出现，使大量模拟变得简单，这种方法才重新被关注起来。</p>
+
+<p>下面我们使用模特卡罗方法解决几个有趣的问题：</p>
+
+<h4 id="toc_0">圆周率 \(\pi\) 的计算</h4>
+
+<p>圆周率的计算常用的方法是割圆法，这里我们使用蒙特卡罗方法很容易得出，这也是蒙特卡罗算法最经典的应用。假设我们有一个半径为 \(r\) 的圆形，很容找到它外切的边长为 \(2r\) 的正方形：</p>
+
+<div align="center">
+    <img src="media/15189654050126/15348520595458.jpg" width="250" />
+</div>
+
+<p>我们知道正方形的面积为 \(2r\times 2r=4r^2\) ，圆的面积为 \(\pi r^2\)，面积之比为：<br/>
+\[<br/>
+p = \frac{s(\text{circle})}{s(\text{square})} = \frac{\pi r^2}{4r^2} = \frac{\pi}{4}<br/>
+\]</p>
+
+<p>现在使用蒙特卡罗方法生成 \(n\) 对 \([-r,+r]\) 内的随机数（包含x、y两个坐标），计算是否在圆内（与圆心的距离与 \(r\) 比较），若有 \(m\) 个点落到圆内，我们可以认为落到圆内的概率与圆与正方形面积之比相等，即：<br/>
+\[<br/>
+\frac{m}{n} = \frac{\pi}{4} \quad\Rightarrow\quad \pi = \frac{4m}{n}<br/>
+\]</p>
+
+<p>通过这种方法，随着 \(n\) 的增大，\(\pi\) 会越来越精确。</p>
+
+<h4 id="toc_1">自然对数 \(\mathbf e\) 的计算</h4>
+
+<p>使用蒙特卡罗方法计算自然对数便不那么直观了，我们来考虑一下如下的定积分：<br/>
+\[<br/>
+S = \int_1^2 \frac 1 x dx<br/>
+\]</p>
+
+<p>我们将这个函数画出<br/>
+<div align="center"><br/>
+    <img src="media/15189654050126/15348619268478.jpg" width="250" /><br/>
+</div></p>
+
+<p>如上图所示上述定积分的值即是绿色曲线与正方形围成的面积。我们通过牛顿莱布尼兹公式求定积分为：<br/>
+\[<br/>
+S = \ln(x)\Big|_1^2 = \ln(2) - \ln(1) = \ln(2)<br/>
+\]</p>
+
+<p>使用蒙特卡罗方法求解这个面积，先在所标矩形内取 \(n\) 对随机点 \((x_1,y_1),(x_2,y_2),...,(x_n,y_n)\)，即 \(x_i\) 取值范围为 \([1,2]\)，\(y_i\) 取值范围为 \([0,1]\)。满足<br/>
+\[<br/>
+y_i &lt; \frac 1 {x_i}<br/>
+\]</p>
+
+<p>的点将在所要求的面积之内，所以正方形内曲线下面的面积与正方形面积之比为落在曲线下方区域与全部随机点个数之比。假设有 \(m\) 个点满足条件，即：<br/>
+\[<br/>
+\frac{m}{n} = \frac{\ln(2)}{1}\quad\Rightarrow\quad \log_e 2 = \frac m n \quad\Rightarrow\quad e = 2^{m/n}<br/>
+\]</p>
+
+<h4 id="toc_2">定积分的计算</h4>
+
+<p>使用蒙特卡罗计算定积分有两种方法：一种就是上面的那种方法“面积法”，定积分的值便是阴影部分的面积，这里不再叙述。另一种方法是“期望法”现在来介绍这种方法：</p>
+
+<p>看如下的积分：<br/>
+\[<br/>
+\theta = \int_a^b f(x)dx<br/>
+\]</p>
+
+<p>如果我们很难求出 \(f(x)\) 的原函数，那么这个积分比较难求解。当然我们可以通过蒙特卡罗方法来求解近似值。假设我们函数图像如下图：</p>
+
+<div align="center">
+    <img width="230" src="media/15189654050126/15348644591195.jpg" />
+</div>
+
+<p>原函数的积分是函数 \(f(x)\) 下方与绿色区域的面积。一个简单的近似求解方法是在 \([a,b]\) 之间随机采样一个点。比如 \(x_1\)，然后用 \(x_1\) 代表 \([a,b]\) 内所有的 \(f(x)\) 的值。那么上面的定积分的近似求解为：<br/>
+\[<br/>
+(b-a)f(x_1)<br/>
+\]</p>
+
+<div align="center">
+    <img width="230" src="media/15189654050126/15348651594504.jpg" />
+</div>
+
+<p>也就是图中阴影的面积。显然，用一个值代表 \([a,b]\) 区间上所有的 \(f(x)\) 的值，这个假设太粗糙。那么我们可以采样 \([a,b]\) 区间的 \(n\) 个值：\(x_1,x_2,...x_{n}\) ,用它们的均值来代表 \([a,b]\) 区间上所有的 \(f(x)\) 的值：<br/>
+\[<br/>
+\overline f(x) = \frac 1 n \sum_{i=1}^{n} f(x_i)<br/>
+\]</p>
+
+<p>这样我们上面的定积分的近似求解为:<br/>
+\[<br/>
+(b-a)\overline f(x) = \frac{b-a}{n} \sum_{i=1}^{n} f(x_i)<br/>
+\]</p>
+
+<div align="center">
+    <img width="250" src="media/15189654050126/15348661212745.jpg" />
+</div>
+
+<p>如图中矩形所示，这个假设比之前的稍好一些，但是它隐含了一个假定，即 \(x\) 在 \([a,b]\) 之间是均匀分布的，而绝大部分情况，\(x\) 在 \([a,b]\) 之间不是均匀分布的。如果我们用上面的方法，则模拟求出的结果很可能和真实值相差甚远。而如果我们找到一个分布，使得它能在值较大的地方采集到更多的样本，则能更好地逼近结果。所以我们要对采样进行加权，这个权重就是重要性权重。</p>
+
+<h4 id="toc_3">重要性采样 Importance Sampling</h4>
+
+<p>假设原函数 \(f(x)\) 也许本身就是定义在一个分布之上的，我们定义这个分布为 \(p(x)\)，我们无法直接从 \(p(x)\) 上进行采样，所以另辟蹊径重新找到一个更加简明的分布 \(q(x)\) ，从它进行取样，希望间接地求出 \(f(x)\) 在分布 \(p(x) \) 下的期望。</p>
+
+<p>首先我们知道函数 \(f(x)\) 在概率分布 \(p(x)\) 下的期望为： <br/>
+\[<br/>
+\begin{align*}<br/>
+\mathbb E_p[f(x)] &amp;= \int_{x}^{}f(x) p(x) dx = \int_{x}^{}f(x) \frac{p(x)}{q(x)}q(x)dx\\<br/>
+&amp;= \int_{x}^{} f(x) w(x) q(x) dx\\<br/>
+&amp;= \mathbb E_q[f(x) w(x)]<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(w(x) = \frac{p(x)}{q(x)}\) ，被称为重要性权重。</p>
+
+<p><strong>重要性采样</strong>是通过引入重要性权重，将分布 \(p(x)\) 下 \(f(x)\) 的期望变为分布在 \(q(x)\)  下 \(f(x)w(x)\) 的期望，从而可以近似为<br/>
+\[<br/>
+\hat f(N) = \frac 1 N \Big( f(x^{(1)}) w(x^{(1)}) + ... + f(x^{(N)})w(x^{(N)}) \Big)<br/>
+\]</p>
+
+<p>其中 \(x^{(i)},i=1,2,...,N\) 是独立从 \(q(x)\) 中随机抽取的点。</p>
+
+<p>重要性采样也可以在只知道为未归一化的分布 \(\hat p(x)\) 的情况下计算函数 \(f(x)\) 的期望。</p>
+
+<p>\[<br/>
+\begin{align*}<br/>
+\mathbb E_p(f(x)) &amp;= \int_x f(x) \frac{\hat p(x)}{Z} dx\\<br/>
+&amp;= \frac{\int_x f(x) p(x) dx}{\int_x \hat p(x) dx}\\<br/>
+&amp;\approx \frac{\sum_{i=1}^N f(x^{(i)}) \hat w(x^{(i)})}{\sum_{i=1}^N \hat w(x^{(i)}) }\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>其中 \(Z\) 为配分函数，\(p(x) = \frac{\hat p(x)}{Z}\)；\(\hat w(x) = \frac{\hat p(x)}{q(x)}\)，\(x^{(i)}\) 为独立从 \(q(x)\) 中随机抽取的点。</p>
+
+<h3 id="toc_4">概率分布采样</h3>
+
+<p>蒙特卡罗方法关键是获得 \(x\) 的概率分布，基于概率分布去采样 \(n\) 个 \(x\) 的样本集代入蒙特卡罗式子中求解。对于常见均匀分布 \(\mathbf U(0,1)\) 是最容易采样的，一般可以通过各种伪随机数发生器可以产生指定范围内的均匀分布。而其他常见的概率分布，无论是离散的分布还是连续的分布，它们的样本都可以通过均匀分布 \(\mathbf U(0,1)\) 的样本转换而得。比如二维正态分布的样本 \((Z_1,Z_2)\) 可以通过对独立采样 \(\mathbf U(0,1)\) 得到的样本 \((X_1,X_2)\) 通过如下的式子转换而得：<br/>
+\[<br/>
+Z_1=\sqrt{-2\ln(X_1)} \cos(2\pi X_2)\\<br/>
+Z_2=\sqrt{-2\ln(X_1)} \sin(2\pi X_2)\\<br/>
+\]</p>
+
+<p>其他一些常见的连续分布，比如t分布，F分布，Beta分布，Gamma分布等，都可以通过类似的方式从 \(\mathbf U(0,1)\) 转化得到。</p>
+
+<p>这里介绍几个将均匀分布 \(\mathbf U(0,1)\) 转换其他分布的常见方法，并运用于各种分布的采样：</p>
+
+<h4 id="toc_5">连续型变量的逆变换法 Inverse Transform Method For Continuous Variable</h4>
+
+<p>先来看看 CDF 和 PDF 的定义：对于随机变量 \(X\)，如下定义的函数 \(F_X(x)\)：<br/>
+\[<br/>
+F_X(x) = P\{X \le x\},\quad -\infty \lt x \lt \infty<br/>
+\]</p>
+
+<p>称为 \(X\) 的累积分布函数（CDF，Cumulative Distribution Function）。已知累积分布函数满足三个性质：</p>
+
+<ol>
+<li><p><strong>有界性</strong>：<br/>
+\[<br/>
+\begin{align*}<br/>
+\lim_{x\rightarrow -\infty} F_X(x) &amp;= 0\\<br/>
+\lim_{x\rightarrow \infty} F_X(x) &amp;= 1\\<br/>
+\end{align*}<br/>
+\]</p></li>
+<li><p><strong>单调性</strong>：<br/>
+\[<br/>
+F_X(x_1)\le F_X(x_2) \quad \text{if }x_1 \le x_2<br/>
+\]</p></li>
+<li><p><strong>右连续性</strong>：<br/>
+\[<br/>
+\lim_{x\rightarrow x_0^+} F_X(x) = F_X(x_0)<br/>
+\]</p></li>
+</ol>
+
+<p>对于连续型随机变量 \(X\) 的累积分布函数 \(F_X(x)\)，如果存在一个定义在实数轴非负函数 \(f(x)\)，使得对于任意实数 \(x\)，有下式成立：<br/>
+\[<br/>
+F_X(x) = \int_{-\infty}^{x} f(t) dt<br/>
+\]</p>
+
+<p>则称 \(f(t)\) 为 \(X\) 的概率密度函数（PDF，Probability Density Function）。显然，当概率密度函数存在的时候，累积分布函数是概率密度函数的积分。</p>
+
+<p>由累积分布积分性质我们可以知道：<br/>
+\[<br/>
+\begin{equation}<br/>
+\lim_{x\rightarrow \infty} F(x) = 1\quad\Rightarrow\quad \int_{-\infty}^{\infty} f(t) dt = 1\label{lxri}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>假设我们想生成一个随机变量 \(X\) 具有累积分布函数（CDF）\(F_X(x)\)，我们希望找到一个映射能将均匀分布 \(\mathbf u\sim \text{Uniform}(0,1)\) 转换成服从 \(X\) 分布，即 \(X=T(u)\)，所以有：</p>
+
+<p>\[<br/>
+F_X(u) = P(X\le u) = P(T(u) \le u) = P(u \le T^{-1}(u)) = T^{-1}(u)<br/>
+\]</p>
+
+<p>通过这个现象，我们能很容易获得变换函数 \(T(u) = F_X^{-1}(u)\) ，这也就意味着 \(X=T(u) = F_X^{-1}(u)\) 都服从 \(F_X(x)\) 的 CDF 分布。</p>
+
+<p>举例说明一下：假设我们有均匀分布随机函数 \(U(0,1)\) 和累积分布函数：<br/>
+\[<br/>
+F(x) = 1-\exp(-\sqrt{x})<br/>
+\]</p>
+
+<p>为了去求反函数，考虑到 \(F(F^{-1}(u)) = u\)，所以有：<br/>
+\[<br/>
+\begin{align*}<br/>
+F(F^{-1}(u)) = 1-\exp(-\sqrt{F^{-1}(u)}) &amp;= u\\<br/>
+\exp(-\sqrt{F^{-1}(u)}) &amp;= 1-u\\<br/>
+\sqrt{F^{-1}(u)} &amp;=-\log(1-u)\\<br/>
+F^{-1}(u) &amp;= (\log(1-u))^2<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>再给另一个例子，我们累积分布函数在 \(x\ge 0\) 时使用指数分布 \(F_X(x) = 1-\exp(-\lambda x)\) ，其他情况为0。我们可以得到反函数通过：<br/>
+\[<br/>
+1-\exp(-\lambda x) = y \quad\Rightarrow\quad x = F^{-1}(y) = -\frac{1}{\lambda} \ln(1-y)<br/>
+\]</p>
+
+<p>注意这里如果我们用 \(y\) 代替 \(1-y\) 并不会对分布产生影响。</p>
+
+<h4 id="toc_6">离散型变量的逆变换法 Inverse Transform Method For Discrete Variable</h4>
+
+<p>考虑到在区间 \([0,1]\) 间的均匀分布 \(U\) ，它的累积分布函数为<br/>
+\[<br/>
+F_U(x) = P(U\le x) = \left \{\begin{array}\\0 &amp;\text{if  }x\lt 0\\x&amp;\text{if  }x=0\\1&amp;\text{if }x\gt 1\\\end{array}\right .<br/>
+\]</p>
+
+<p>假设 \(X\) 是离散变量，\(p_i = P(X=x_i)，i=1,2,...,i\)。如果 \(U\) 是一个均匀分布的随机变量，若 \(0\le a \le b\)，有<br/>
+\[<br/>
+P(a\le U\le b) = P(U\le b) - P(U \le a) = F_U(b) - F_U(a) = b - a<br/>
+\]</p>
+
+<p>因此对每个 \(n\) 有<br/>
+\[<br/>
+P(p_1+p_2+...+p_{n-1} \le U \le p_1 + p_2 + ... + p_{n-1} + p_n) = p_n<br/>
+\]</p>
+
+<p>现在令 \(Y=\Phi(U)\) 是关于随机变量 \(U\) 的方程，定义为：<br/>
+\[<br/>
+Y = \Phi(U) = \left \{\begin{array}\\ x_1 &amp; \text{if }U\le p_1\\ x_2 &amp; \text{if }p_1 \le U\le p_2 \\\vdots&amp;\vdots\\x_n &amp; \text{if }p_1+p_2+...+p_{n-1}\le U\le p_1 + p_2 + ... + p_{n-1}+ p_n\\\end{array}\right .<br/>
+\]</p>
+
+<p>这样 \(Y\) 有和 \(X\) 同样的分布，因此，如果 \(u_1,...,u_k\) 是从均匀分布中取样而得，\(\Phi(u_1),...,\Phi(u_k)\) 就是从 \(X\) 的分布中取样。</p>
+
+<h4 id="toc_7">逆变换法采样</h4>
+
+<p>在计算机模拟时，我们所说的抽样，其实是指从一个概率分布中生成观察值（observations）的方法。而这个分布通常是由其概率密度函数（PDF）来表示的。而且，即使在已知PDF的情况下，让计算机自动生成观测值也不是一件容易的事情，我们可以用上面逆变换法的方式通过 PDF 进行积分来得到概率分布的 CDF，然后再得到 CDF 的反函数 \(F_X^{-1}(x)\)，如果你想得到 \(m\) 个观察值，则重复下面的步骤 \(m\) 次：</p>
+
+<ol>
+<li>从 \(\mathbf U(0,1)\) 中随机生成一个值（前面已经说过，计算机可以实现从均匀分布中采样），用 \(u\) 表示。</li>
+<li>计算 \(F^{−1}(u)\) 的值 \(x\)，则 \(x\) 就是从 \(f(x)\) 中得出的一个采样点。</li>
+</ol>
+
+<p>假设我们希望在下面的 PDF 中抽样：<br/>
+\[<br/>
+f(x) = \left \{ \begin{array}\\<br/>
+8x\quad &amp;\text{if }\quad 0\le x\lt 0.25\\<br/>
+\frac 8 3 - \frac 8 3 x\quad &amp;\text{if }\quad 0.25\le x\le 1\\<br/>
+0\quad &amp;\text{otherwise}\\<br/>
+\end{array} \right .<br/>
+\]</p>
+
+<p>可以算得相应的 CDF 为：<br/>
+\[<br/>
+F(x) = \int^x_{-\infty} f(x) \mathbf dx=  \left \{ \begin{array}\\<br/>
+0,\quad &amp; \text{if }\quad  x\lt 0\\<br/>
+4x^2,\quad &amp;\text{if }\quad 0\le x\lt 0.25\\<br/>
+\frac 8 3 x - \frac 4 3 x^2 - \frac 1 3\quad &amp;\text{if }\quad 0.25\le x\le 1\\<br/>
+1\quad &amp;\text{if }\quad x\gt 1\\<br/>
+\end{array} \right .<br/>
+\]</p>
+
+<p>在通过 PDF 计算相应CDF 时，为了点的连续加入了常量值。对于 \(u\in [0,1]\)，它的反函数为：<br/>
+\[<br/>
+F^{-1}(u) = \left \{ \begin{array}\\<br/>
+\frac{\sqrt{u}}{2}\quad &amp;\text{if }\quad 0\le u\lt 0.25\\<br/>
+1 - \frac{\sqrt{3(1-u)}}{2}\quad &amp;\text{if }\quad 0.25\le u\le 1\\<br/>
+\end{array} \right .<br/>
+\]</p>
+
+<p>从下图中你可以发现 <font color="red"><strong>采样点</strong></font> 与 <font color="blue"><strong>原始分布</strong></font> 非常吻合：</p>
+
+<div align="center">
+    <img src="media/15189654050126/15351195909818.jpg" width="250" />
+</div>
+
+<h4 id="toc_8">接受拒绝法 Acceptance-Rejection Method</h4>
+
+<p>一般来说逆转换法是第一选择，但是逆转换法有自身的局限性，必须能给出累积分布函数 \(F_X(x)\) 反函数的表达式，这限制了逆变换法的使用范围。当没法给出累积分布函数 \(F_X(x)\) 的逆函数的表达式时，接受拒绝法是另一种选择。它的适用范围比逆变换法要大，只要给出概率密度函数的解析表达式即可，而大多数常用分布的概率密度函数是可以查到的。</p>
+
+<p>假设我们想对 PDF 为 \(p(x)\) 的函数进行采样，但是由于种种原因（例如这个函数很复杂），对其进行采样是相对困难的。另外有一个 PDF 为 \(q(x)\) 的函数则相对容易采样，例如采用 Inverse CDF 方法可以很容易对对它进行采样，甚至 \(q(x)\) 就是一个均匀分布，\(q(x)\) 称之为提议分布（Proposal distribution）。那么，当我们将 \(q(x)\) 与一个常数 \(M\) 相乘之后，可以实现下图所示之关系，即 \(q(x)\) 将 \(p(x)\) 完全“罩住”。</p>
+
+<div align="center">
+    <img src="media/15189654050126/15351230469930.jpg" width="250" />
+</div>
+
+<p>然后重复如下步骤，直到获得 \(m\) 个被接受的采样点：</p>
+
+<ol>
+<li>从 \(q(x)\) 中获得一个随机采样点 \(x_i\)</li>
+<li><p>对于 \(x_i\) 计算接受概率（acceptance probability）：<br/>
+\[<br/>
+\alpha = \frac{p(x_i)}{Mq(x_i)}<br/>
+\]</p></li>
+<li><p>从 \(U(0,1)\) 中随机生成一个值，用 \(u\) 表示</p></li>
+<li><p>如果 \(u \le \alpha\)，则接受 \(x_i\) 作为一个来自 \(p(x)\) 的采样值，否则就拒绝 \(x_i\) 并回到第一步。</p></li>
+</ol>
+
+<p>我们还是以之前的例子为例，使用接受决绝进行采样，使用 \(Mq(x)=3 - 2x\) 函数作为提议分布，即 \(q(x) = \frac 1 M (3-2x)\)，如下图：</p>
+
+<div align="center">
+    <img width="230" src="media/15189654050126/15351726022817.jpg" />
+</div>
+
+<p>对 \(q(x)\) 函数下面的面积进行归一化求一下 \(M\) 的大小，由 \ref{lxri} 式：<br/>
+\[<br/>
+\begin{align*}<br/>
+\int_{-\infty}^{\infty} f(x) = 1\quad&amp;\Rightarrow\quad \int_{-\infty}^{\infty} \frac 1 M f(x) = 1\\<br/>
+&amp;\Rightarrow\quad \int_{-\infty}^{0} f(x) + \int_{0}^{1} f(x) + \int_{1}^{\infty} f(x) = 1\\<br/>
+&amp;\Rightarrow\quad \int_{-\infty}^{0} 0 \mathbf dx + \int_{0}^{1} \frac 1 M (3-2x) \mathbf dx + \int_{1}^{\infty} 1 \mathbf dx = 1\\<br/>
+&amp;\Rightarrow\quad 0 + \int_{0}^{1} \frac 1 M (3-2x) \mathbf dx + 0 = 1\\<br/>
+&amp;\Rightarrow\quad \frac 1 M (3x - x^2) \bigg |_0^1 = 1\\<br/>
+&amp;\Rightarrow\quad \frac 2 M = 1\\<br/>
+&amp;\Rightarrow\quad M = 2<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>所以 \(q(x) = \frac 3 2 - x^2\) ，现在来求 \(q(x)\) 的累积分布函数：<br/>
+\[<br/>
+F_X(x) = \left \{ \begin{array} \\<br/>
+0\quad &amp; x \lt 0\\<br/>
+-\frac 1 2 x^2 + \frac 3 2 x\quad &amp;\text{if }\quad 0\le x\le 1\\<br/>
+1\quad &amp; x \gt 1\\<br/>
+\end{array}\right .<br/>
+\]</p>
+
+<p>所以 \(q(x)\) 的分布函数可以由均匀分布通过反函数求得：<br/>
+\[<br/>
+F^{-1}_X(u) = \frac 3 2 - \sqrt{\frac{9}{4} - 2u}  \quad u\in[0,1]<br/>
+\]</p>
+
+<p>现在能通过 Inverse Transform 方法对 \(q(x)\) 进行取样，取样后计算 \(\alpha\)，再取随机数 \(u\) 与 \(\alpha\) 比较决定接受拒绝，代码如下：</p>
+
+<pre><code class="language-python">import numpy as np
+from matplotlib import pyplot as plt
+import math
+# 均匀取样 10000 个数据点
+uniform_sample = np.random.rand(30000)
+# 利用Inverse Transform 将 10000 个样本转换成满足 q 分布样本
+q_sample = [3.0/2 - math.sqrt(9.0/4 - 2*x) for x in uniform_sample]
+# 计算样本 p 的值
+p = [8*x if x &gt;=0 and x &lt;0.25 else 8.0/3 - 8.0/3 * x for x in q_sample]
+# 计算样本 q 的值
+q = [3.0/2 - x for x in q_sample]
+# 计算样本 a 的值
+a = np.array(p)/(3*np.array(q))
+# 接受拒绝样本
+accept_sample = [x  for i,x in enumerate(q_sample) if np.random.rand() &lt;= a[i]]
+# 画图，原始分布
+x_d = np.linspace(0,1,5000)
+plt.plot(x_d,[8*x if x &gt;=0 and x &lt;0.25 else 8.0/3 - 8.0/3 * x for x in x_d],color=&quot;r&quot;,linewidth=3)
+# 画图，拒绝采样后的分布
+cnts, bins = np.histogram(accept_sample,bins=np.linspace(0,1,21),density=True)
+bins = (bins[:-1] + bins[1:]) / 2
+plt.plot(bins, cnts,color=&quot;g&quot;,linewidth=3)
+plt.show()
+</code></pre>
+
+<p>如下图，采样效果还是挺好的：</p>
+
+<div align="center">
+    <img src="media/15189654050126/15351958248333.jpg" width="250" />
+</div>
+
+<p>这里还有个更简单的做法，提议分布选最简单的均匀分布，如 \(q(x) = 1，M=3\) 。</p>
+
+<h4 id="toc_9">自适应的拒绝采样 Adapter Reject Sample</h4>
+
+<p>前面介绍的拒绝采样中，如果 \(p(x)\) 与 \(q(x)\) 不是很接近会使 \(\alpha\) 很小，大多数的采样都会被拒绝掉，会影响采样效率。我们需要找到一个与 \(p(x)\) 很接近的 \(q(x)\) ，如果函数是 log 式凹函数（log-concave，我们通常理解的凸函数，或下凹函数）的话，那么我们就可以采样自适应的拒绝采样方法。</p>
+
+<p>有一个的漂亮的思路是用分段的直线将分布包络起来进行采样.用分段直线进行包络时,如果分布曲线是凹的（开口向下,concave）,那么该曲线上的点的切线都将在该曲线的上方.于是在该曲线上找若干个点,并用这些点的切线,就可以将该曲线包络住。</p>
+
+<div align="center">
+    <img src="media/15189654050126/15352107929781.jpg" width="250" />
+</div>
+
+<p>大多数分布都具有指数的形式,不一定是凹函数,取对数后分布形式会变的简洁易于找切线.此时对分布的要求就转为取对数后是凹函数即可。</p>
+
+<p>总体步骤如下：</p>
+
+<ol>
+<li><p><strong>给出分布函数 PDF 的对数函数 \(f(x)=\log(p(x))\),及其对应的一阶导数函数 \(f’(x)\)；</strong></p>
+
+<div align="center">
+    <img src="media/15189654050126/15352593502795.jpg" width="300" />
+</div></li>
+<li><p><strong>给定几个初始点，求出这几个初始点的切线，并计算切线与切线的交点。如果有边界，边界一般为垂直于横轴的直线，要计算切线与边界的交点；</strong></p>
+
+<div align="center">
+    <img src="media/15189654050126/15352615796344.jpg" width="300" />
+</div>
+
+<p><font color="#666"><br/>
+我们来看看交点的求法，假设初始点开始有 \(n\) 个为 \((x_0,x_1,...x_i,...,x_{n-1})\) ，我们知道曲线在 \(x_i\) 处的一阶导数值为该点切线的斜率，用 \(\text{fprima}_{x_i}\) 表示。假设现在需要计算曲线在初始点 \(x_i\) 与相邻初始点 \(x_{i+1}\) 的切线的交点，首先设过 \(x_i\) 和 \(x_{i+1}\) 点的切线方程为：<br/>
+\[<br/>
+\begin{align}<br/>
+y &amp;= \text{fprima}_{x_i} x + b_i\label{yt1}\\<br/>
+y &amp;= \text{fprima}_{x_{i+1}} x + b_{i+1} \label{yt2}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>将 \(x_i\) 代入 \(f(x)\) 得到该点纵坐标的值，设为 \(f_{x_i}\)。将点 \((x_i,\text{f}_{x_i})\) 和 \((x_{i+1},\text{f}_{x_{i+1}})\) 分别代入两条切线方程求出常数项 \(b_i\) 和 \(b_{i+1}\) ：<br/>
+\[<br/>
+\begin{align*}<br/>
+\left \{ \begin{array}\\<br/>
+\text{f}_{x_i} = \text{fprima}_{x_i} x_i + b_i\\<br/>
+\text{f}_{x_{i+1}} = \text{fprima}_{x_{i+1}} x_{i+1} + b_{i+1} \\<br/>
+\end{array} \right .&amp;\Rightarrow \left \{ \begin{array}\\<br/>
+b_i = \text{f}_{x_i} - \text{fprima}_{x_i} x_i\\<br/>
+b_{i+1} = \text{f}_{x_{i+1}} - \text{fprima}_{x_{i+1}} x_{i+1}<br/>
+\end{array} \right.<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>已知 \ref{yt1} 与 \ref{yt2} 两条切线方程的解即为交点的坐标，所以：<br/>
+\[<br/>
+\begin{align}<br/>
+\hat x_i &amp;= \frac{b_{i+1}-b_i}{\text{fprima}_{x_i} - \text{fprima}_{x_{i+1}}} = \frac{{\text{f}_{x_{i+1}} - \text{f}_{x_i}} + \text{fprima}_{x_i} x_i- {\text{fprima}_{x_{i+1}} x_{i+1}}}{\text{fprima}_{x_i} - \text{fprima}_{x_{i+1}}} \label{xf}\\<br/>
+\hat y_i &amp;= \text{fprima}_{x_i} \hat x_i + b = \text{fprima}_{x_i} \hat x_i + \text{f}_{x_i} - \text{fprima}_{x_i} x_i = \text{fprima}_{x_i} (\hat x_i - x_i) + \text{f}_{x_i} \label{yf}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>通过式 \ref{xf} 我们可以求出相邻切线之间的切点的横坐标 \((\hat x_0,\hat x_1,...,\hat x_{n-2})\) （ \(n\) 个切线相邻切线直接交点最多为 \(n-1\) 个），再加上前后两个边界线的横坐标，便得到了所有交点的横坐标：x<br/>
+\[<br/>
+\hat x^*=(\hat x^*_0,\hat x^*_1,...,\hat x^*_{n})=(0,\hat x_0,\hat x_1,...,\hat x_{n-2},1)<br/>
+\]</p>
+
+<p>现在再来看所有交点的纵坐标，除与边界的交点外，相邻切线的交点可以由 \ref{yf} 式得到。切线与边界 \(x=0\) 的交点的纵坐标，也就是第一条切线方程与 \(x=0\) 的解：<br/>
+\[<br/>
+\begin{equation}<br/>
+\hat y^*_0 = b_0 = \text{f}_{x_0} - \text{fprima}_{x_0} x_0 =  \text{fprima}_{x_0} (0- x_0) + \text{f}_{x_0} \label{yf_1}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>切线与边界 \(x=1\) 的交点的纵坐标，也就是第 \(n-1\) 条（最后一条）切线方程与 \(x=1\) 的解：<br/>
+\[<br/>
+\begin{equation}<br/>
+\hat y^*_{n} = \text{fprima}_{x_{n-1}} + b_{n-1} = \text{fprima}_{x_{n-1}} + \text{f}_{x_{n-1}} - \text{fprima}_{x_{n-1}} x_{n-1} = \text{fprima}_{x_{n-1}}(1-x_{n-1}) + \text{f} _{x_{n-1}} \label{yf_2}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>结合 \ref{yf}、\ref{yf_1} 和 \ref{yf_2} 式：<br/>
+\[<br/>
+\hat y^*_j = \left \{ \begin{array}\\<br/>
+\text{fprima}_{x_0} (0- x_0) + \text{f}_{x_0} \quad &amp;\text{if}\quad j=0\\<br/>
+\text{fprima}_{x_i} (\hat x_i - x_i) + \text{f}_{x_i} \quad &amp;\text{if}\quad 1\le j \le n-1;i=j-1\\<br/>
+\text{fprima}_{x_{n-1}}(1-x_{n-1}) + \text{f} _{x_{n-1}} \quad &amp;\text{if}\quad j = n<br/>
+\end{array}\right .<br/>
+\]</p>
+
+<p>很容易统一纵坐标的求法 <br/>
+\[<br/>
+\hat y^*_j = \text{fprima}^* (\hat x^* - x^*) + \text{f}_{x^*}\\<br/>
+\]</p>
+
+<p>其中：<br/>
+\[<br/>
+\begin{align*}<br/>
+\text{fprima}^* &amp;= (\text{fprima}_{x_{0}}，\text{fprima}_{x_{0}}，\text{fprima}_{x_{1}},...,\text{fprima}_{x_{n-1}})\\<br/>
+x^* &amp;=(x_0,x_0,x_1,...,x_{n-1})<br/>
+\end{align*}<br/>
+\]</p>
+
+<p></font></p></li>
+<li><p><strong>将分段直线取指数转换为对应的指数曲线，分别计算各段指数曲线的定积分。也就是计算各段曲线下覆盖的面积。累积且归一化后得到一个分段 CDF</strong>；</p>
+
+<div align="center">
+    <img width="300" src="media/15189654050126/15352636080572.jpg" />
+</div>
+
+<p><font color="#666"><br/>
+上面已经求出每一条切线方程，设初始点 \(x_i\) 对应的切线方程为：<br/>
+\[<br/>
+\begin{align}<br/>
+y &amp;= \text{fprima}_{x_i} (x - x_i) + \text{f}_{x_i} \label{ytx1}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>指数曲线为：<br/>
+\[<br/>
+\begin{align}<br/>
+f_{x_i}(x) = \exp[\text{fprima}_{x_i} (x - x_i) + \text{f}_{x_i}]\label{eye}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>计算指数曲线的定积分：     \[<br/>
+\begin{align*}<br/>
+S_i &amp;= \int_{x^*_i}^{x^*_{i+1}} f_{x_i}(x) = \int_{x^*_i}^{x^*_{i+1}} \exp[\text{fprima}_{x_i} (x - x_i) + \text{f}_{x_i}]\\<br/>
+&amp;= \frac 1 {\text{fprima}_{x_i}}\exp\Big[\text{fprima}_{x_i} (x - x_i) + \text{f}_{x_i}\Big]\bigg|_{x^*_i}^{x^*_{i+1}}\\<br/>
+&amp;= \frac 1 {\text{fprima}_{x_i}}\bigg(\exp\Big[\text{fprima}_{x_i} (x^*_{i+1} - x_i)+ \text{f}_{x_i}\Big] - \exp\Big[\text{fprima}_{x_i} (x^*_i - x_i)+ \text{f}_{x_i}\Big] \bigg)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>之后对所有曲线计算出的 \(S\) 进行归一化，得到归一化参数 \(M\)，即：<br/>
+\[<br/>
+M \sum_{i=0}^{n-1} S_i = 1 \quad \Rightarrow \quad M = \frac 1 {\sum_{i=0}^{n-1} S_i}<br/>
+\]</p>
+
+<p>那初始点 \(x_i\) 对应的曲线的 CDF 函数为：<br/>
+\[<br/>
+\begin{align*}<br/>
+F_{x_i}(x) &amp;= M \int_{-\infty}^x f_{x_i}(x) \\<br/>
+&amp;= M \int_{-\infty}^x \exp[\text{fprima}_{x_i} (x - x_i) + \text{f}_{x_i}]\\<br/>
+&amp;= M \int_{-\infty}^{x_i} \exp[\text{fprima}_{x_i} (x - x_i) + \text{f}_{x_i}] + M \int_{x_i}^x \exp[\text{fprima}_{x_i} (x - x_i) + \text{f}_{x_i}]\\<br/>
+&amp;= M \sum_{j=0}^{i} S_j + M \int_{x_i}^x \exp[\text{fprima}_{x_i} (x - x_i) + \text{f}_{x_i}]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p></font></p></li>
+<li><p><strong>从均匀分布中得到一个样本，记为 \(a\)，找到属于分段 CDF 中的哪一段；</strong></p></li>
+<li><p><strong>再用该段对应的指数函数的 CDF，再次使用 \(y\)，用 Inverse Transform 找到对应的 \(y\) 的值；</strong></p></li>
+<li><p><strong>再次用均匀分布 \((0,1)\) 中产生一个随机值，若该随机值小于等于 \(p(x)/e(x)\) 则接受该样本 \(x\) ， \(e(x)\) 为该段对应的指数函数；</strong></p></li>
+<li><p><strong>若第6步中样本 \(x\) 被拒，则将 \(x\) 点加入到初始点集合中，重复2、3步，也就是多加一段以形成更好的包络；</strong></p></li>
+</ol>
+
+<p>在采样过程中用到两次 Inverse Transform 和一个拒绝采样；</p>
+
+<p>我们举个简单的例子说明这个过程，首先看一下 \(\text{Beta}(2,5)\) 分布：</p>
+
+<div align="center">
+    <img src="media/15189654050126/15352090709370.jpg" width="250" />
+</div>
+
+<p>第一步：Beta 分布函数对应的对数函数 \(f(x)=\log(p(x))\)，及其对应的对数函数一阶导数函数 \(f’(x)\)。<br/>
+\[<br/>
+\begin{align*}<br/>
+f(x) &amp;= \log(\text{Beta}(\alpha,\beta)) = \log\bigg(\frac 1 {\text{B}(\alpha,\beta)} x^{\alpha-1}(1-x)^{\beta-1}\bigg)\\<br/>
+&amp;= \frac 1 {\text{B}(\alpha,\beta)}\bigg[(\alpha-1)\log x + (\beta - 1)\log(1-x)\bigg]\\<br/>
+f&#39;(x) &amp;= \frac 1 {\text{B}(\alpha,\beta)}\bigg[\frac{\alpha-1}{x} + \frac{\beta - 1}{1-x}\bigg]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>将常数项 \(\frac 1{\text{B}(\alpha,\beta)}\) 用 \(B\) 表示，代码如下：</p>
+
+<pre><code class="language-python">import numpy as np
+from matplotlib import pyplot as plt
+
+# beta原函数
+def beta_pdf(x,a=2,b=5):
+    return B*np.power(x,(a-1))*np.power((1-x),(b-1))
+
+# beta对数函数
+def f(x, a=2, b=5):
+    return B*((a-1)*np.log(x)+(b-1)*np.log(1-x))
+
+# beta对数函数的一阶导数函数
+def fprima(x, a=2, b=5):
+    return B*((a-1)/x-(b-1)/(1-x))
+</code></pre>
+
+<p>第二步：给定几个初始点，求出这几个初始点的切线，并计算切线与切线的交点。如果有边界，边界一般为垂直于横轴的直线，要计算切线与边界的交点；</p>
+
+<p>Beta 分布有边界 \(x=0\) 和 \(x=1\) 。在示例中再给出3个初始点，那么一共有3个切线，两个边界，我们关心的交点就有4个（三条切线有两个交点，切线与两个边界有两个交点）。</p>
+
+<pre><code class="language-python"># 初始点
+x = np.array([0.1,0.4,0.8])
+
+# 初始化交点的横轴对应的值
+z = np.zeros(len(x)+1)
+z[0] = 0.0  # 第一个边界
+z[-1] = 1.0 # 第二个边界
+
+# 计算切线交点对应的横轴的值
+for j in range(len(x)-1):
+  z[j+1] = (f(x[j+1])-f(x[j]) - x[j+1]*fprima(x[j+1]) + x[j]*fprima(x[j])) / (fprima(x[j]) - fprima(x[j+1]))
+
+# 计算切线交点对应的纵轴的值
+h = f(x)
+hprime = fprima(x)
+u = hprime[[0]+range(len(x))]*(z-x[[0]+range(len(x))]) + h[[0]+range(len(x))]
+
+# 画出对应的 PDF 的对数曲线,切线,并标注交点
+fig, ax = plt.subplots()
+log_x = np.linspace(0.0,1.0,1000)
+ax.plot(log_x,f(log_x),linewidth=3)
+
+# 画切线
+for i in range(len(x)):
+    log_line_x = np.linspace(z[i],z[i+1],30)
+    log_line_y = h[i] + hprime[i]*(log_line_x-x[i])
+    ax.plot(log_line_x,log_line_y,color=&#39;green&#39;,linewidth=3)
+
+# 绘制辅助线
+xticks = []
+xticklabels = []
+
+# 初始点横坐标
+for i in range(len(x)):    
+    ax.plot([x[i]]*30,np.linspace(-35,0,30),ls=&#39;dotted&#39;,color=&#39;red&#39;,linewidth=2)
+    xticks += [x[i]]
+    xticklabels += [&quot;x[%d]&quot;%i]
+
+# 交点横坐标
+for i in range(len(z)):
+    ax.plot([z[i]]*30,np.linspace(-35,0,30),ls=&#39;dotted&#39;,color=&#39;red&#39;,linewidth=2)
+    xticks += [z[i]]
+    xticklabels += [&quot;z[%d]&quot;%i]
+
+ax.set_xticks(xticks)
+ax.set_xticklabels(xticklabels)
+
+# 绘制交点
+ax.scatter(z,u,color=&#39;blue&#39;)
+fig.show()
+</code></pre>
+
+<p>效果图：</p>
+
+<div align="center">
+    <img src="media/15189654050126/15352544615332.jpg" width="300" />
+</div>
+
+<p>第三步：将分段直线取指数转换为对应的指数曲线，分别计算各段指数曲线的定积分。也就是计算各段曲线下覆盖的面积。累积且归一化后得到一个分段 CDF。</p>
+
+<h4 id="toc_10">组合法</h4>
+
+<p>当目标分布可以用其它分布经过四则运算表示时，可以使用组合算法生成对应随机数。此部分仅以几个例子简要介绍。</p>
+
+<ol>
+<li><p><strong>正态分布（Box Muller方法）</strong></p>
+
+<p>在上文中，我们直接给出了二维正态分布由均匀分布变换的方法：二维正态分布的样本 \((Z_1,Z_2)\) 可以通过对独立采样 \(\mathbf U(0,1)\) 得到的样本 \((X_1,X_2)\) 通过如下的式子转换而得：<br/>
+\[<br/>
+Z_1=\sqrt{-2\ln(X_1)} \cos(2\pi X_2)\\<br/>
+Z_2=\sqrt{-2\ln(X_1)} \sin(2\pi X_2)\\<br/>
+\]</p>
+
+<p>证明：假设现在有两个独立的标准正态分布 \(X\sim \mathcal N(0,1)\) 和 \(Y\sim \mathcal N(0,1)\)，由于二者相互独立，则联合概率密度函数为<br/>
+\[<br/>
+\begin{align*}<br/>
+p(x,y) = p(x)p(y) &amp;= \frac{1}{\sqrt{2\pi}}\exp(-\frac{x^2}{2})\cdot \frac{1}{\sqrt{2\pi}}\exp(-\frac{y^2}{2})\\<br/>
+&amp;= \frac{1}{2\pi}\exp(-\frac{x^2+y^2}{2})<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>由逆转换法我们知道直接对 \(p(x,y)\) 求积分比较难，由此我们想到可以先将平面坐标转化为极坐标，令 <br/>
+\[<br/>
+\begin{align}<br/>
+x=\rho\cos(\theta)\label{xrc}\\<br/>
+y=\rho\sin(\theta)\label{xrs}\\<br/>
+\end{align}<br/>
+\]</p>
+
+<p>我们知道二重积分转化为极坐标下二重积分如下<br/>
+\[<br/>
+\iint\limits_D p(x,y) \mathbf dx\mathbf dy = \int_{\alpha}^{\beta} \mathbf d\theta\int_{\rho_1(\theta)}^{\rho_2(\theta)} p(\rho\cos\theta,\rho\sin\theta)\rho \mathbf d\rho<br/>
+\]</p>
+
+<p>现在我们分别对 \(\theta\) 和 \(\rho\) 来求累计分布概率<br/>
+\[<br/>
+\begin{align*}<br/>
+F_\theta(x) &amp;= \int_{0}^{x} \mathbf d\theta \int_{-\infty}^{\infty} \frac{1}{2\pi}\exp(-\frac{\rho^2}{2})\rho\mathbf d\rho\\<br/>
+&amp;= \frac{x}{2\pi} \bigg[-\exp(-\frac{\rho^2}{2})\bigg]_{-\infty}^{\infty}\\<br/>
+&amp;= \frac{x}{2\pi}\\<br/>
+F_\rho(x) &amp; = \int_{0}^{2\pi}\mathbf d\theta \int_{0}^{x} \frac{1}{2\pi}\exp(-\frac{\rho^2}{2})\rho\mathbf d\rho\\<br/>
+&amp;= \int_{0}^{x} \exp(-\frac{\rho^2}{2})\rho\mathbf d\rho\\<br/>
+&amp;= \bigg[-\exp(-\frac{\rho^2}{2}) \bigg]_{0}^{x}\\<br/>
+&amp;= 1 -\exp(-\frac{x^2}{2}) <br/>
+\end{align*}<br/>
+\]</p>
+
+<p>对 CDF 求逆函数即可得 \(\theta\) 和 \(\rho\) 的分布，即<br/>
+\[<br/>
+\theta = {F_{\theta}}^{-1}(u) = 2\pi u\\<br/>
+\rho = {F_{\rho}}^{-1}(u) = \sqrt{-2\ln(1-u)}\\<br/>
+\]</p>
+
+<p>而如果 \(u\) 是均匀分布的，那么 \(u = 1-u\) 也将是均匀分布的，于是可以用 \(u\) 替换 \(1-u\)，当我们得到均匀分布 \(U_1、U_2\) 后，可以通过下式得到二维正太分布采样：<br/>
+\[<br/>
+X = \rho\cos(\theta) = \cos(2\pi U_1)\sqrt{-2\ln U_2}\\<br/>
+Y = \rho\sin(\theta) = \sin(2\pi U_1)\sqrt{-2\ln U_2}\\<br/>
+\]</p></li>
+<li><p><strong>泊松分布（Poisson distribution）</strong></p>
+
+<p>泊松分布是一种统计与概率学里常见到的离散机率分布，概率函数为：<br/>
+\[<br/>
+p(N(t) = k) = \frac{\lambda^k}{k!} e^{-\lambda t},\quad k=1,2,...<br/>
+\]</p>
+
+<p>其中 \(N\) 表示某种函数关系，\(t\) 表示事件，\(n\) 表示发生的次数。如1小时内出生3个婴儿的概率，就表示为 \(P(N(1)= 3)\)，等号右边 \(\lambda\) 是单位时间(或单位面积)内随机事件的平均发生率。泊松分布适合于描述单位时间内随机事件发生的次数。通俗讲就是观察事物平均发生 \(\lambda\) 次的条件下，实际发生 \(k\) 次的概率。关于泊松分布<a href="https://www.face2ai.com/Math-Probability-5-4-The-Poisson-Distribution/">看这里</a></p>
+
+<p>再来看指数分布，指数分布（也称为负指数分布）是描述泊松过程中的事件之间的时间的概率分布，即事件以恒定平均速率连续且独立地发生的过程。 这是伽马分布的一个特殊情况。关于指数分布的文章<a href="http://www.ruanyifeng.com/blog/2015/06/poisson-distribution.html">看这里</a></p>
+
+<p>指数分布由泊松分布推出：设相邻两次事件间隔为 \(T\)，起始时刻为 \(T_{start}\)，则终止时间为 \(T_{start} + T\)，\(P\{T\ge t\}\) 表示 \([T_{start},T_{start} + t]\) 时间内没有事件发生，即：<br/>
+\[<br/>
+P\{T\ge t\} = P(N(t)=0) = e^{-\lambda t}<br/>
+\]</p>
+
+<p>从而可知事件发生的概率为：<br/>
+\[<br/>
+F_T(t) = 1 - P\{T\ge t\} = P\{T\lt t\} = 1 - e^{-\lambda t}<br/>
+\]</p>
+
+<p>也就是 CDF 函数为 \(F_T(t)\)，对应的概率质量函数 PMF 为：<br/>
+\[<br/>
+f_T(t) = \lambda e^{-\lambda t},\quad t\ge 0<br/>
+\]</p>
+
+<p>也就是有<br/>
+\[<br/>
+p(t=0) = \lambda<br/>
+\]</p>
+
+<p><strong>算法思想</strong>：根据分析可知，泊松分布对应的是一段时间内 （记为\(t_{max}\)）时间发生的次数，而指数分布对应的是事件发生时间间隔的概率分布；</p>
+
+<p>反过来，<strong>已知两两相邻的时间变量，该变量服从指数分布且相互独立，所有时间变量相加，并让其不超过一段时间的总量 \(t_{max}\)，则累加数的分布对应泊松（Poisson）分布</strong>。</p>
+
+<p><strong>算法步骤</strong>：</p>
+
+<p>a. 生成一组均匀分布随机数：\(U\sim U(0,1)\)；<br/>
+b. 利用逆变换法生成一系列独立的指数分布 \(X_i\)<br/>
+c. 记<br/>
+\[<br/>
+Y = X_1 + X_2 + ... + X_k<br/>
+\]</p>
+
+<p>如果 \(Y&gt;t_{max}\)，则停止，并输出 \(k−1\);否则，继续生成 \(X_{k+1}\)，直到 \(Y&gt;t_{max}\) 为止；<br/>
+d. 循环操作过程3；</p>
+
+<p>输出的一系列整数（值为 \(k−1\)）服从参数为 \(\mu=\lambda t_{max}\) 的泊松分布。</p>
+
+<p>这里我们不失一般性的令 \(t_max = 1\)，这样便需要找到最小的 \(t\) 使<br/>
+\[<br/>
+X_1 + X_2 + ... + X_k \gt 1 \quad\Rightarrow\quad \sum_{i=1}^k X_i \gt 1<br/>
+\]</p>
+
+<p>又因为 \(X_i\) 是指数分布，即<br/>
+\[<br/>
+X_i = F_T^{-1}(u_i) = \frac{\ln(1-u_i)}{-\lambda} \Leftrightarrow X_i = -\frac{\ln(u_i)}{\lambda}<br/>
+\]</p>
+
+<p>所以<br/>
+\[<br/>
+X_1 + X_2 + ... + X_k = \sum_{i=1}^k -\frac{\ln(u_i)}{\lambda} = -\frac{1}{\lambda} \ln \Big(\prod_{i=1}^k u_i\Big) \gt 1\\<br/>
+\Rightarrow \prod_{i=1}^k u_i \lt e^{-\lambda}<br/>
+\]</p>
+
+<p>所以我们算法可以变成：生成一组均匀分布随机数 \(U_1,U_2,...,U_n\)，找到最小的 \(j\) 使<br/>
+\[<br/>
+\prod_{i=1}^k U_i \lt e^{-\lambda}<br/>
+\]</p>
+
+<p>输出一系列的 \(j-1\) 满足泊松分布。</p>
+
+<p>代码如下：</p>
+
+<pre><code class="language-python">import math
+import random
+
+def poisson(Lambda):
+    j=0
+    p = 1.0
+    l = math.exp(-Lambda)
+    while p &gt;= l:
+        U = random.random()
+        p = p * U
+        j = j + 1
+    return j-1
+
+for i in range(100):
+    x = poisson(5)
+    print(x)
+</code></pre>
+
+<p>上面使用指数分布来生成泊松分布，其实泊松分布也可以通过离散型变换法得到，由于这过程中有阶乘的计算，为提升效率，这里使用一个方法简介计算，在 \(N(t)=K+1\) 时<br/>
+\[<br/>
+\begin{align}<br/>
+P(N(t) = k+1) &amp;= \frac{\lambda^{k+1}}{(k+1)!} e^{-\lambda t}\\<br/>
+&amp;= \frac{\lambda^k}{k!} e^{-\lambda t} \frac{\lambda}{k+1}\\<br/>
+&amp;= \frac{\lambda}{k+1} P(N(t)=k)<br/>
+\end{align}<br/>
+\]</p>
+
+<p>这样可以使用前一步的结果乘上 \(\frac{\lambda}{k+1}\) 得到下一个概率提升效率。</p>
+
+<p>代码如下：</p>
+
+<pre><code class="language-python">import math
+import random
+
+def poisson(Lambda):
+    k=0
+    p = math.exp(-Lambda)
+    s = p
+    U = random.random()
+    if U &lt;= math.exp(-Lambda):
+        return 0
+    else:
+        while U &gt; s:
+            p = Lambda * p / (k+1)
+            s = s + p
+            k += 1
+        return k-1
+
+for i in range(100):
+    x = poisson(5)
+    print(x)
+</code></pre></li>
+</ol>
+
+<hr/>
+
+<p><a href="http://www.cnblogs.com/pinard/p/6625739.html">刘建平Pinard-蒙特卡罗方法</a><br/>
+<a href="https://blog.csdn.net/ACdreamers/article/details/44978591">蒙特卡罗算法</a><br/>
+<a href="https://www.cnblogs.com/xingshansi/p/6539319.html">信号处理-生成给定分布</a><br/>
+<a href="https://blog.csdn.net/baimafujinji/article/details/51407703">蒙特卡罗采样-拒绝采样</a><br/>
+<a href="https://blog.csdn.net/lin360580306/article/details/51240398">随机过程-Metropolis-Hastings算法</a><br/>
+<a href="https://wenku.baidu.com/view/d2c27c0510661ed9ac51f325.html">极坐标计算二重积分</a><br/>
+<a href="https://lucius-yu.github.io/docs/probability/BasicMCSamplingMethod/">基本的蒙特卡罗采样方法</a><br/>
+<a href="http://www.ruanyifeng.com/blog/2015/06/poisson-distribution.html">泊松分布与指数分布</a><br/>
+<a href="http://www3.eng.cam.ac.uk/%7Ess248/G12-M01/Week1/ITM.pdf">Inverse Transform Method</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+  
+	<div class="pagination">
+	
+<a href="archives.html">Blog Archives</a>
+	 
+	    
+	</div>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

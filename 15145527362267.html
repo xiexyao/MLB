@@ -1,0 +1,556 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  回归分类树-CART算法 - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">回归分类树-CART算法</h1>
+				<p class="meta"><time datetime="2017-12-29T21:05:36+08:00" pubdate data-updated="true">2017/12/29</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>CART算法的英文名称是 Classfication And Regression Tree，即可以用来创建分类树也可以用来创建回归树。通过 ID3 和 C4.5 算法得到的决策树不一定是二叉树，但是通过 CART 得到的决策树肯定是二叉树。CART 算法的生成也是分为三个部分：特征选择、决策树生成、决策树剪枝：</p>
+
+<ol>
+<li>特征选择：当 CART 是分类树的时候，以基尼指数选择最优特征，同时决定该特征的最优二值切分点。</li>
+<li>决策树生成：基于训练数据生成决策树，生成的树要求尽可能大</li>
+<li>决策树剪枝：用合适的方法对已经生成的树进行剪枝选择最优子树。</li>
+</ol>
+
+<p>首先我们来分别了解一下 CART 的分类树和回归树。</p>
+
+<h3 id="toc_0">特征选择</h3>
+
+<p>首先来了解一下特征选择所需要的基尼指数知识。</p>
+
+<h5 id="toc_1">基尼指数 Gini</h5>
+
+<p>基尼指数（基尼不纯度）表示在样本集合中一个随机选中的样本被分错的概率。Gini指数越小表示集合中被选中的样本被分错的概率越小，也就是说集合的纯度越高，反之，集合越不纯。所以基尼指数（基尼不纯度）= 样本被选中的概率 * 样本被分错的概率，定义 \(p_k\) 表示选中的样本属于k类别的概率，则这个样本被分错的概率是 \((1-p_k)\)：<br/>
+\[<br/>
+Gini(k) = \sum_{k=1}^K p_k (1-p_k) = \sum_{k=1}^K p_k - \sum_{k=1}^K p_k^2 = 1 - \sum_{k=1}^K p_k^2<br/>
+\]</p>
+
+<p>当二分类时，\(Gini(k) = 2p(1-p)\)。</p>
+
+<p>假设样本集合 D 有 K 个类别，类别 \(C_k\) 包含 \(|C_k|\) 个样本，他们被正确选中为类别 \(C_k\) 的概率为：<br/>
+\[<br/>
+p(k) = \frac{|C_k|}{|D|}<br/>
+\]</p>
+
+<p>所以基尼指数：<br/>
+\[<br/>
+Gini(k) = 1 - \sum_{k=1}^K p_k^2 = 1 - \sum_{k=1}^K (\frac{|C_k|}{|D|})^2<br/>
+\]</p>
+
+<p>基于特征 A 划分样本集合 D 后，集合被分为 \(D_1,D_2,...D_n\)，在 CART 算法中 \(n=2\)，此时基尼指数：<br/>
+\[<br/>
+Gini(D,A) = \sum_{D_i} \frac{|D_i|}{|D|} Gini(D_i)<br/>
+\]</p>
+
+<p>当拥有多个特征时，需要计算以每一个取值作为划分点，对样本D划分之后子集的纯度 \(Gini(D,Ai)\)，(其中Ai 表示特征A的可能取值)。然后从所有的可能划分的 \(Gini(D,Ai)\) 中找出Gini指数最小的划分，这个划分的划分点，便是使用特征 A 对样本集合 D 进行划分的最佳划分点。</p>
+
+<h3 id="toc_2">CART生成树</h3>
+
+<p>决策树的生成是递归生成二叉决策树的过程，对分类树用基尼指数最小化准则，对回归树采用平方误差最小化准则进行特征选择，生成二叉树。</p>
+
+<h4 id="toc_3">分类树生成算法</h4>
+
+<p><b>输入</b>：训练数据集离散数据集 D，停止计算的条件；<br/>
+<b>输出</b>：CART 决策树<br/>
+<b>算法过程</b>：<br/>
+（1）设结点的训练数据集为 D ，计算现有特征对该数据基的基尼指数。此时，对每一个特征 A，对其可能取的每个值 a，根据样本点对 A=a 的测试为“是”或“否” 将 D 分割成 \(D_1\) 和 \(D_2\) 两部分，利用 \(A=a\) 的基尼指数；<br/>
+（2）在所有可能的特征 A 以及它们所有可能的切分点 a 中，选择基尼指数最小的特征及其对应的切分点作为最优特征和最优切分点，依最优特征与最优切分点，从现结点生成两个子结点，将训练数据集依特征分配到两个子结点中去。<br/>
+（3）对两个子结点递归地调用（1）、（2），直至满足停止条件；<br/>
+（4）生成 CART 决策树；</p>
+
+<p>算法停止计算的条件是结点中的样本个数小于预定阈值，或样本集的基尼指数小于阈值阈值（样本基本属于同一类），活着没有更多特征。</p>
+
+<h5 id="toc_4">举例说明</h5>
+
+<p>比如在之前决策树的14天数据中，当 \(A_1\) = 天气特征时，有三种取值，分别是晴天、阴天、下雨，可能的划分情况有{{晴天}{阴天、下雨}}、{{晴天、阴天}{下雨}}、{{阴天}{晴天、下雨}}，分别计算每一种情况的基尼指数。<br/>
+\[<br/>
+Gini(D,A_1=阴天) = \frac 4 {14}* 2*1*0 + \frac{10}{14} *2 * \frac 5 {10} * \frac 5 {10} = 0.3571 \\<br/>
+Gini(D,A_1=下雨) = \frac 5 {14}* 2*\frac 3 5 * \frac 2 5 + \frac {9}{14} * 2* \frac{6}{9} *\frac{3}{9} = 0.4571 \\<br/>
+Gini(D,A_1=晴天) = \frac 5 {14}* 2*\frac 2 5 * \frac 3 5 + \frac 9 {14} * 2 * \frac 7 9  *\frac 2 9 = 0.3937<br/>
+\]</p>
+
+<p>再计算 \(A_2\) = 湿度特征时，有三种取值，求得每一种取值的基尼指数。。。依次类推，选择所有可能特征及其所有可能的切分点种，基尼指数最小的特征和切分点。将训练数据分到两个子结点中，再对子结点按照同样的方式选择最优特征和最优切分点。CART算法每次都是生成二叉树，在这个例子中某属性特征值为3个时，有3个可能的切分点。当特征值为4个时，如a、b、c、d，可能有{{a}{b,c,d}}、{{b}{a,c,d}}、{{c}{a,b,d}}、{{d}{a,b,c}}、{{a,b}{c,d}}、{{a,c}{b,d}}、{{a,d}{b,c}}这7种。同时，如果没有把特征 \(A\) 的取值完全分开，后面我们还有机会在子节点继续选择到特征 \(A\) 来划分子结点。这和ID3或者C4.5不同，在ID3或者C4.5的一棵子树中，离散特征只会参与一次节点的建立。</p>
+
+<h4 id="toc_5">回归树的生成</h4>
+
+<p><b>输入</b>：数据集 \(D={(x_1,y_1),(x_2,y_2),...(x_n,y_n)}\)<br/>
+<b>输出</b>：CART决策树<br/>
+<b>算法过程</b>：<br/>
+一个回归树对应着输入空间的（特征空间）一个划分以及在划分的单元的输出值。假设已将输入空间划分为M个单元 \(R_1,R_2,...,R_M\)，并且在每一个单元 \(R_M\) 上有一个固定的输出值 \(c_m\)，于是回归树模型可表示为：<br/>
+\[<br/>
+f(x) = \sum_{i=1}^M c_m I(x\in R_m)<br/>
+\]</p>
+
+<p>当输入空间的划分确定时，可以用平方误差 \(\sum_{x_i\in R_m}(y_i-f(x_i))^2\) 来表示回归树对于训练数据的预测误差，用平方误差最小的准则求解每一个单元上的最优输出值。易知，单元 \(R_m\) 上的 \(c_m\) 的最优值 \(\hat c_m\) 是 \(R_m\) 上所有的输入实例 \(x_i\) 对应的输出 \(y_i\) 的均值，即：<br/>
+\[<br/>
+\hat c_m = ave(y_i|x_i \in R_m)<br/>
+\]</p>
+
+<p>特征选择时选择第 \(j\) 个变量 \(x^{j}\) 和它的取值 \(s\) ，作为切分变量和切分点，并定义两个区域：<br/>
+\[<br/>
+R_1(j,s) = \{x|x^j \le s\} \quad\quad R_2(j,s) = \{x|x^j \gt s\}<br/>
+\]</p>
+
+<p>其中定义两个区域的 \(y_i\) 均值：<br/>
+\[<br/>
+c_1 = ave(y_i|x\in R_1(j,s) \qquad c_2 = ave(y_i|x\in R_2(j,s))<br/>
+\]</p>
+
+<p>然后在所有可能特征的最优切分点上寻找最优切分变量和最优切分点，具体地，求解：<br/>
+\[<br/>
+\min_{j,s} [\min_{c_1} \sum_{x_i\in R_1(j,s)} (y_i-c_1)^2 + \min_{c_2}\sum_{x_i \in R_2(j,s)}(y_i-c2)^2]<br/>
+\]</p>
+
+<p>遍历所有输入变量，找到最优的切分变量 \(j\)，构成一个对\((j,s)\)，依次将输入空间划分为两个区域，接着对每一个区域重复上述过程生成一棵回归树，这样的回归树通常被称为最小二乘回归树。</p>
+
+<h5 id="toc_6">举例说明</h5>
+
+<p>假设考虑如下只有一个属性 \(x\) 的数据集 D：</p>
+
+<table>
+<thead>
+<tr>
+<th>x</th>
+<th>1</th>
+<th style="text-align: left">2</th>
+<th style="text-align: left">3</th>
+<th style="text-align: left">4</th>
+<th style="text-align: left">5</th>
+<th style="text-align: left">6</th>
+<th style="text-align: left">7</th>
+<th style="text-align: left">8</th>
+<th style="text-align: left">9</th>
+<th style="text-align: left">10</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>y</td>
+<td>5.56</td>
+<td style="text-align: left">5.75</td>
+<td style="text-align: left">5.91</td>
+<td style="text-align: left">6.4</td>
+<td style="text-align: left">6.8</td>
+<td style="text-align: left">7.05</td>
+<td style="text-align: left">8.9</td>
+<td style="text-align: left">8.7</td>
+<td style="text-align: left">9</td>
+<td style="text-align: left">9.05</td>
+</tr>
+</tbody>
+</table>
+
+<p>这里我们不失一般性的考虑9个切分点：1.5 , 2.5 , 3.5 , 4.5 , 5.5 , 6.5 , 7.5 , 8.5 , 9.5 。因为数据集中只有一个属性 \(x\) ，选择属性 \(x\) 所有可能的切分点将数据集分成两部份。当 \(s=1.5\) 时：<br/>
+\[<br/>
+\begin{align*}<br/>
+R_1(j=x,s=1.5) &amp;= \{x|x \le 1.5\} = \{1\}\\<br/>
+R_2(j=x,s=1.5) &amp;= \{x|x \gt 1.5\} = \{2,3,4,5,6,7,8,9,10\} <br/>
+\end{align*}<br/>
+\]</p>
+
+<p>这个区域的输出值为对应区域所有对象 \(y\) 的均值：<br/>
+\[<br/>
+\begin{align*}<br/>
+c_1 &amp;= 5.56\\<br/>
+c_2 &amp;= ave(y_i|x \in R_2(j=x,s=1.5) = \frac 1 9(5.75 + 5.91 + 6.4 + 6.8 + 7.05 + 8.9 + 8.7 + 9 + 9.05 ) = 7.50<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>在两个区域上分别用  \(\sum_{x_i\in R_m}(y_i-f(x_i))^2\) 计算平方误差：<br/>
+\[<br/>
+\begin{align*}<br/>
+\text{Loss}(R_1) &amp;= 0\\<br/>
+\text{Loss}(R_2) &amp;= \sum_{x_i\in R_2}(y_i-f(x_i)) = (5.75-7.5)^2+(5.91-7.5)^2+(6.4-7.5)^2+(6.8-7.5)^2+(7.05-7.5)^2\\<br/>
+&amp;+(8.9-7.5)^2+(8.7-7.5)^2+(9-7.5)^2+(9.05-7.5)^2 = 15.545\\<br/>
+\text{Loss}(s=1.5) &amp;= \text{Loss}(R_1) + \text{Loss}(R_2) = 15.545<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>同理可以计算出 \(x\) 的其他分割点 \(s\) 的均方误差：\(\text{Loss}(s=2.5)=12.07\)...，如果有多个属性值，用同样的方式再求出其他属性值不同切分点的均方误差。从中选出最小的均方误差对应的属性值和切分点就是最优切分变量和最优切分点。</p>
+
+<h3 id="toc_7">CART剪枝</h3>
+
+<p>CART剪枝算法就是在完整的决策树上，剪掉一些子树，使决策树变小。对CART的剪枝可以通过代价复杂度算法（Cost-Complexity Pruning，CCP）来进行：</p>
+
+<p>在剪枝过程中，计算子树的损失函数：<br/>
+\[<br/>
+C_\alpha (T) = C(T) + \alpha|T|<br/>
+\]</p>
+
+<p>其中，\(T\) 为任意子树，\(C(T)\) 为训练数据的预测误差（后面讲具体计算过程），\(|T|\) 为子树的叶节点个数，\(\alpha \ge 0\) 为参数，正则化项。\(C_\alpha (T)\) 为参数是 \(\alpha\) 是子树 T 的整体损失，参数 \(\alpha\) 用来平衡训练数据的拟合程度和模型的复杂度。</p>
+
+<p>对于固定的 \(\alpha\) ，一定存在使损失函数 \(C_\alpha(T)\) 最小的子树，将其表示为 \(T_\alpha\)，当 \(|T|\) 越大时，模型复杂度越高，对训练数据的拟合越好，反之 \(|T|\) 越小时，模型复杂度越小，但是对训练数据的拟合也不好。当 \(\alpha\) 越大，越倾向于一个复杂度较小的树。当 \(\alpha=0\) 时，不考虑模型复杂度，未剪枝的决策树对训练数据效果最好。</p>
+
+<p>Breiman 等人证明：可以用递归的方法对树进行剪枝，将 \(\alpha\) 从小增大，\(0=\alpha_0&lt;\alpha_1&lt;\alpha_2&lt;...&lt;\alpha_n&lt;+\infty\)，产生一系列的区间 \([\alpha_i,\alpha_{i+1}]，i=0,1,...,n\)；剪枝得到的子树序列对应着区间 \(\alpha\in[\alpha_i,\alpha_{i+1}]，i=0,1,...,n\) 的最优子树序列 \(\{T_0,T_1,...,T_n]\)，序列中的子树是嵌套的。</p>
+
+<p>从整体树 \(T_0\) 开始剪枝，对 \(T_0\) 的任意内部结点 \(t\)，以 \(t\) 为单结点树的损失函数是：<br/>
+\[<br/>
+C_\alpha(t) = C(t) + \alpha<br/>
+\]</p>
+
+<blockquote>
+<p>其中：<br/>
+\[<br/>
+C(t) = p(t) r(t)<br/>
+\]</p>
+
+<p>这里 \(p(t)\) 表示结点在总样本中所占的比例，\(r(t)\) 表示该结点的误差代价（分错的结点的比例，结点中类比较多的实例为正确实例）。</p>
+</blockquote>
+
+<p>以 \(t\) 为根结点的子树 \(T_t\) 的损失函数为：<br/>
+\[<br/>
+C_\alpha(T_t) = C(T_t) + \alpha|T_t|<br/>
+\]</p>
+
+<blockquote>
+<p>其中：<br/>
+\[<br/>
+C(T_t) = \sum_i^m p(t_i)r(t_i) <br/>
+\]</p>
+
+<p>这里 \(p(t_i)\) 表示每一个叶结点在总样本中所占的比例，\(r(t)\) 表示该叶结点的误差代价。</p>
+</blockquote>
+
+<p>当 \(\alpha=0\) 及 \(\alpha\) 足够小时，有不等式<br/>
+\[<br/>
+\begin{equation}<br/>
+C_\alpha(T_t) &lt; C_\alpha(t) \label{ca}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>当 \(\alpha\) 增大时，在某一 \(\alpha\) 有：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;C_\alpha(T_t) = C_\alpha(t)\\<br/>
+&amp;\Rightarrow C(T_t) + \alpha|T_t| = C_\alpha(t)\\<br/>
+&amp;\Rightarrow \alpha = \frac{C_\alpha(t) - C_\alpha(T_t)}{|T_t|-1}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>当 \(\alpha\) 再增大时，不等式 \ref{ca} 反向。只要 \(\alpha=\frac{C(t)-C(T_t)}{|T_t|-1}\) ，\(T_t\) 与 \(t\) 有相同的损失函数值，而 \(t\) 的结点少，因此 \(t\) 比 \(T_t\) 更可取，对 \(T_t\) 进行剪枝。</p>
+
+<p>为此，对 \(T_0\) 中每一内部结点 \(t\)，计算：<br/>
+\[<br/>
+g(t) = \frac{C(t) - C(T_t)}{|T_t|-1}<br/>
+\]</p>
+
+<p>它表示剪枝后整体损失函数减少的程度。在 \(T_0\) 中剪去 \(g(t)\) 最小的 \(T_t\)，将得到的子树称为 \(T_1\)，同时将最小的 \(g(t)\) 设为 \(\alpha_i\)，\(T_i\) 为区间\([\alpha_i,\alpha_2)\) 的最优子树。</p>
+
+<p>如此剪枝下去，自下而上直至得到根结点。在这一过程中，不断地增加 \(\alpha\) 的值，产生新的区间。在剪枝得到的子树序列 \(T_0\),\(T_1\),...,\(T_n\) 中通过交叉验证选取最优子树 \(T_\alpha\)。在子树序列中，每棵子树 \(T_1\),\(T_2\),...,\(T_n\) 都对应于一个参数 \(\alpha_1\),\(\alpha_2\),...,\(\alpha_n\)。所以当最优子树 \(T_k\) 确定时，对应的 \(\alpha_k\) 也确定了，即得到最优决策树 \(T_\alpha\)。</p>
+
+<h5 id="toc_8">举例说明</h5>
+
+<p>如下这棵树：</p>
+
+<div align="center">
+    <img width="400" src="media/15145527362267/15325307805907.jpg" />
+</div>
+
+<p>一开始时 \(\alpha_0=0\) ，以结点 Node1 的损失函数为：<br/>
+\[<br/>
+C(t) = p(t)r(t) = \frac{18}{40}*\frac{8}{18} = \frac 1 5\\<br/>
+C(T_t) = \frac 3 {40} *\frac 1 3 +\frac 9 {40}*\frac 4 9  + \frac 6 {40} *\frac 1 6= \frac{6}{40}<br/>
+\]</p>
+
+<p>所以：<br/>
+\[<br/>
+g(t)=\frac{C(t)-C(T_t)}{|T_t|-1} = \frac{1}{2}*(\frac 1 5-\frac 6 {40}) = \frac{1}{40}<br/>
+\]</p>
+
+<p>以结点 Node2 的损失函数为：<br/>
+\[<br/>
+C(t) = p(t)r(t) = \frac{15}{40}*\frac{6}{15} = \frac 6 {40}\\<br/>
+C(T_t) = \frac 9 {40}*\frac 4 9  + \frac 6 {40} *\frac 1 6= \frac{5}{40}<br/>
+\]</p>
+
+<p>计算：<br/>
+\[<br/>
+g(t) =\frac{C(t)-C(T_t)}{|T_t|-1} = \frac 6 {40}-\frac 5 {40} = \frac{1}{40}<br/>
+\]</p>
+
+<p>所以这个g(t)相同，选择 \(|T_t|\) 最大的进行剪枝（在和训练集误差相等的情况下选择模型复杂度较低的决策树，所以剪掉 \(|T_t|\) 较大的枝。这里也就是选择 Node1 进行剪枝得到子树 \(T_1\)，同时将最小的 g(t) 设为 \(\alpha_1\) ，\(T_1\)  为区间 \([\alpha_1,\alpha_2)\) 的最优子树。</p>
+
+<p>继续剪枝，直到得到根结点为止，这个过程中不断增加 \(\alpha\) 的值产生新的区间。 </p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E5%86%B3%E7%AD%96%E6%A0%91.html'>决策树</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15151569041850.html" 
+	        title="Previous Post: 概率近似正确学习 PAC Learning">&laquo; 概率近似正确学习 PAC Learning</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15139484052551.html" 
+	        title="Next Post: 基于层次的聚类算法-凝聚法-BIRCH算法">基于层次的聚类算法-凝聚法-BIRCH算法 &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

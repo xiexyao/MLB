@@ -1,0 +1,651 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  自适应提升方法 Adaboost - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">自适应提升方法 Adaboost</h1>
+				<p class="meta"><time datetime="2018-01-13T08:05:41+08:00" pubdate data-updated="true">2018/1/13</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>Adaboost，英文全称是 Adapter Boosting（自适应增强）的缩写，由 Yoav Freund 和 Robert Schapire 在1995年提出。Adaboost 是属于 Boosting （提升）方法中具有代表性的一种。Boosting 方法是一种常见的统计学习方法，一种能提高任意给定学习算法准确率的方法。在分类问题上，它通过改变训练样本的权重，学习多个分类器，并将这些分类器进行线性组合，来提高分类的性能。历史上，首先 Valiant 和 Kearns 提出了“弱可学习”和“强可学习”的概念：</p>
+
+<blockquote>
+<h5 id="toc_0">强可学习</h5>
+
+<p>在概率近似正确（Probably approximate correct，PAC）学习的框架中，一个概念（一个类），如果存在一个多项式的学习算法可以学习它，并且正确率很高，那么就称这个概念是强可学习的。</p>
+
+<h5 id="toc_1">弱可学习</h5>
+
+<p>而一个概念存在一个多项式的学习算法可以学习它，但是正确率仅比随机猜测略好，那么称这个概念是弱可学习的。</p>
+</blockquote>
+
+<p>同时，Valiant 和 Kearns 首次提出了PAC学习模型中弱可学习和强可学习等价性的问题，即任意弱可学习问题都可以提升为强可学习问题。后来 Schapire 最先对这个问题作出了肯定的证明，也就是最初的 Boosting 方法，也就是如果已经学习了“弱可学习算法”，便可以通过这个方法将其提升为“强可学习算法”，而显然，学习一个“弱可学习算法”比“强可学习算法”要容易很多。</p>
+
+<p>在1995年 Freund 对Schapire 提出的最初的 Boosting 算法做出了改进，提高了算法的效率，但是这两个算法都有一个天生的缺陷，都是需要知道“弱学习算法”学习正确率的下界，这在实际问题中难以做到；在1996年，Freund 和 Schapire 提出了 Adaboost 算法，效率与 Freund 之前的算法效率接近，却没有了事先知道“弱学习算法”正确率下界的限制条件，容易运用到实际问题中，因此该算法得到普遍应用。</p>
+
+<h3 id="toc_2">Boosting 算法</h3>
+
+<p>Boosting 算法是将”弱学习算法“提升到”强学习算法“的过程，主要是涉及两个部分：加法模型和前向分布算法。加法模型是指针对训练数据集学习一系列弱分类器，再将其线性相加的过程。</p>
+
+<h4 id="toc_3">加法模型</h4>
+
+<p>考虑加法模型(additive model)：<br/>
+\[<br/>
+f(x) = \sum_{m=1}^M \beta_m b(x;\gamma_m)<br/>
+\]</p>
+
+<p>其中 \(b(x;\gamma_m)\) 为基函数，\(\gamma_m\) 为基函数的参数，\(\beta_m\) 为基函数的系数。显然这是一个加法模型。</p>
+
+<p>在给定训练数据及损失函数 \(L(y,f(x))\) 的条件下，学习加法模型 \(f(x)\) 成为经验风险极小化即损失函数极小化问题：<br/>
+\[<br/>
+\min_{\beta_m,\gamma_m} \sum_i^N L(y_i,\sum_{m=1}^M \beta_m b(x_i;\gamma_m))<br/>
+\]</p>
+
+<h4 id="toc_4">前向分布算法</h4>
+
+<p>极小化上面的损失函数这是一个复杂的优化问题，前向分布算法（Forward stagewise Algorithm）解决这类问题的一个思路是：因为学习的是加法模型，如果能从前往后，每一步只学习一个基函数及其系数，逐步极小化损失函数，那么就可以简化优化的复杂度，每步只需优化如下损失函数：<br/>
+\[<br/>
+\min_{\beta,\gamma} \sum_{i=1}^N L(y_i,\beta b(x_i;\gamma))<br/>
+\]</p>
+
+<p>给定训练数据集 \(T = {(x_1,y_1),(x_2,y_2),...,(x_N,y_N)}\)，\(x_i\in \mathcal X \subseteq R^n\) ，\(y_i \in mathcal Y = \{-1,1\}\)，损失函数为 \(L(y,f(x))\)，基函数的集合 \(\{b(x;\gamma)\}，学习加法模型 \)f(x)\( 的前向分布算法如下：<br/>
+(1) 初始化 \)f_0(x)=0\(<br/>
+(2) 对 \)m=1,2,...,M<br/>
+　　(a) 极小化损失函数：<br/>
+\[<br/>
+(\beta_m,\gamma_m) = \arg \min_{\beta,\gamma} \sum_{i=1}^N L(y_i,f_{m-1}(x_i) + \beta f(x_i;\gamma))<br/>
+\]</p>
+
+<p>　　得到参数 \(\beta_m\)，\(\gamma_m\)<br/>
+　　(b) 更新：<br/>
+\[<br/>
+f_m(x) = f_{m-1}(x) + \beta_m b(x;\gamma_m)<br/>
+\]</p>
+
+<p>(3) 得到加法模型：<br/>
+\[<br/>
+f(x) = f_M(x) = \sum_{m=1}^M \beta_m b(x;\gamma_m)<br/>
+\]</p>
+
+<p>这样前向分布算法将同时求解从 \(m=1\) 到 \(M\) 所有参数 \(\beta_m\)、\(\gamma_m\) 的问题化为逐次求解各个 \(\beta_m\) 、\(\gamma_m\) 的优化问题。</p>
+
+<p>Boosting 算法采用不同的损失函数会得到不同的模型，AdaBoost 是损失函数为指数函数的 Boosting 算法。</p>
+
+<h3 id="toc_5">AdaBoost算法</h3>
+
+<p>AdaBoost是一种迭代算法，它通过提高前一轮被错误分类的样本的权值，降低被正确分类样本的权值，这样没有被正确分类的样本由于权值的增大，会得到下一轮弱分类器的更大关注。它能在学习的过程中不断减少训练误差，即在训练数据集上的分类误差率。假设给定一个二类分类的训练数据集：<br/>
+\[<br/>
+T = {(x_1,y_1),(x_2,y_2),...,(x_N,y_N)}<br/>
+\]</p>
+
+<p>其中，每一个样本都是由实例和标签组成，实例 \(x_i\in \mathcal X \subseteq R^n\) ，标记 \(y_i \in \mathcal Y = \{-1,1\}\)，\(\mathcal X\) 是实例空间，\(\mathcal Y\) 是标记空间。</p>
+
+<p>前面说到 AdaBoost 是损失函数为指数函数的 Boosting 算法，定义最终分类器的训练误差为指数形式：<br/>
+\[<br/>
+\begin{align*}<br/>
+L(y,f(x)) &amp;= \sum_{i=1}^N \exp(-y_i f(x_i))\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>假设前 \(m-1\) 轮迭代前向分步算法以及得到 \(f_{m-1}(x)\)，在第 \(m\) 轮迭代要得到 \(\alpha_m\)，\(G_m(x)\) 和 \(f_m(x)\)<br/>
+\[<br/>
+f_m(x) = f_{m-1}(x) + \alpha_m G_m(x)<br/>
+\]</p>
+
+<p>目标是使前向分步算法得到的 \(\alpha_m\) 和 \(G_m(x)\) 使 \(f_m(x)\) 在训练数据上的误差最小，即：<br/>
+\[<br/>
+\begin{align*}<br/>
+(\alpha_m,G_m(x)) &amp;= \arg \min_{\alpha,G} L(y,f_m(x))\\<br/>
+&amp;= \arg\min_{\alpha,G} \sum_{i=1}^N \exp(-y_i f_m(x_i))\\<br/>
+&amp;= \arg\min_{\alpha,G} \sum_{i=1}^N \exp[-y_i (f_{m-1}(x_i) + \alpha G(x_i))]\\<br/>
+&amp;= \arg\min_{\alpha,G} \sum_{i=1}^N \exp[f_{m-1}(x_i)] \exp[-y_i \alpha G(x_i)]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令 \(w_{mi} = \exp[-y_i f_{m-1}(x_i)]\). 上式可以表示为：<br/>
+\[<br/>
+\begin{equation}<br/>
+(\alpha_m,G_m(x)) = \arg \min_{\alpha,G} \sum_{i=1} w_{mi} \exp[-y_i \alpha G(x_i)] \\\label{ag}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>容易看出 \(w_{mi}\) 与 \(\alpha\)，\(G(x)\) 无关，只依赖于 \(f_{m-1}(x)\)，随着每一轮的迭代而发生变化。\(w_{mi}\) 可以表示每一个样本的权值。初始时设样本的权值都设为 \(1/N\)，即：<br/>
+\[<br/>
+w_{1i} = \frac 1 N, \quad i=1,2,...,N<br/>
+\]</p>
+
+<p>定义第 \(m\) 轮基本分类器 \(G_m(x)\) 在训练数据集上加权分类误差率 \(e_m\) 等于样本权重乘上错误分类：<br/>
+\[<br/>
+e_m = \sum_{i=1}^N P(G_m(x_i) \neq y_i) = \sum_{i=1}^N w_{mi} I(G_m(x_i) \neq y_i)<br/>
+\]</p>
+
+<p>对于式 \ref{ag} ，我们来求解 \(G(x)\) 和 \(\alpha\) ，设最优解为 \(G(x)^*\)，\(\alpha^*\)。先求 \(G(x)^*\)，由前向分布算法可知，每一轮只需要求解令当前分类误差率最小的 \(G_(x)\) ：<br/>
+\[<br/>
+G(x)^* = \arg\min e_m = \arg\min \sum_{i=1}^N w_{mi} I(G_m(x_i) \neq y_i)<br/>
+\]</p>
+
+<p>再求 \(\alpha*\) ，先化简一下式 \ref{ag} ：<br/>
+\[<br/>
+\begin{align*}<br/>
+\sum_{i=1} w_{mi} \exp[-y_i \alpha G(x)] &amp;= \sum_{y_i=G_m(x_i)} w_{mi} e^{-\alpha} + \sum_{y_i\neq G_m(x_i)} w_{mi} e^{\alpha} \\<br/>
+&amp;= \sum_{y_i=G_m(x_i)} w_{mi} e^{-\alpha} + \sum_{y_i\neq G_m(x_i)} w_{mi} e^{-\alpha} + \sum_{y_i\neq G_m(x_i)} w_{mi} e^{\alpha} - \sum_{y_i\neq G_m(x_i)} w_{mi} e^{-\alpha}\\<br/>
+&amp;= \sum_{i=1}^N w_{mi} e^{-\alpha} + (e^{\alpha} - e^{-\alpha}) \sum_{i=1}^N w_{mi} I(y_i\neq G_m(x_i))\\<br/>
+&amp;= e^{-\alpha}\sum_{i=1}^N w_{mi} + (e^{\alpha} - e^{-\alpha}) e_m\\<br/>
+&amp;= e^{-\alpha} + (e^{\alpha} - e^{-\alpha}) e_m\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>对 \(\alpha\) 求导可得：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial e^{-\alpha} + (e^{\alpha} - e^{-\alpha}) e_m}{\partial \alpha} &amp;= -e^{-\alpha} + (e^{\alpha} + e^{-\alpha}) e_m \\<br/>
+&amp;= -e^{-\alpha} (1+e_m) + e^{\alpha} e_m \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令求导结果为 0，得：<br/>
+\[<br/>
+\alpha^* = \frac 1 2 log \frac {1-e_m}{e_m}<br/>
+\]</p>
+
+<p>现在再来看看每一轮分类器的迭代：<br/>
+\[<br/>
+f_m(x) = f_{m-1}(x) + \alpha_m G_m(x)<br/>
+\]</p>
+
+<p>以及 \(w_{mi} = \exp[-y_i f_{m-1}(x_i)]\)，所以对于任何样本 \(x_i\) 都有：<br/>
+\[<br/>
+\begin{align*}<br/>
+&amp;f_m(x_i) = f_{m-1}(x_i) + \alpha_m G_m(x_i)\\<br/>
+\Rightarrow \quad &amp; -y_i f_m(x_i) = -y_i f_{m-1}(x_i) - y_i \alpha_m G_m(x_i)\\<br/>
+\Rightarrow \quad &amp; \exp[-y_i f_m(x_i)] = \exp[-y_i f_{m-1}(x_i) - y_i \alpha_m G_m(x_i)]\\<br/>
+\Rightarrow \quad &amp; \exp[-y_i f_m(x_i)] = \exp[-y_i f_{m-1}(x_i)] \exp[-y_i \alpha_m G_m(x_i)]\\<br/>
+\Rightarrow \quad &amp; w_{m+1,i} = w_{mi} \exp[-y_i \alpha_m G_m(x_i)]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>这样就得到了每一轮权值的更新，为了使权值和等于1，需要进行归一化处理。定义归一化因子 \(Z_m\)： <br/>
+\[<br/>
+Z_m = \sum_{i=1}^N w_{mi} \exp(-\alpha_m y_i G_m(x_i))<br/>
+\]</p>
+
+<p>权值更新函数为：<br/>
+\[<br/>
+w_{m+1,i} = \frac{w_{mi}}{Z_m} \exp[-y_i \alpha_m G_m(x_i)]<br/>
+\]</p>
+
+<h3 id="toc_6">训练误差分析</h3>
+
+<p>最终分类器在训练数据上的训练误差为：<br/>
+\[<br/>
+L(y,f_M(x)) = \sum_{i=1}^N \exp(-y_i f_M(x_i))\\<br/>
+\]</p>
+
+<p>样本在最终分类器上的样本分类误差定义为：<br/>
+\[<br/>
+err = \sum_{i=1}^N I(G_M(x_i) \neq y_i)<br/>
+\]</p>
+
+<p>现在证明可以通过减少训练误差的方式减小分类误差率。考虑到：<br/>
+\[<br/>
+I(G(x_i) \neq y_i) \le \exp(-y_i f(x_i)), \quad i = 1,2,...,N <br/>
+\]</p>
+
+<p>当 \(G(x_i) = y_i\) 时，\(I(G(x_i) \neq y_i) = 0\)，\(\exp(-y_i f(x_i)) &gt; 0\)，上式成立。<br/>
+当 \(G(x_i) \neq y_i\) 时，\(I(G(x_i) \neq y_i) = 1\)，而 \(- y_i f(x_i) &gt; 0\)，所以 \(\exp(-y_i f(x_i)) &gt; e^0 = 1\) ，上式成立。</p>
+
+<p>得证。</p>
+
+<p>现在继续来化简一下最终分类器的训练误差：<br/>
+\[<br/>
+\begin{align*}<br/>
+L(y,f_M(x_i)) &amp;= \sum_{i=1}^N \exp(-y_i f_M(x_i)) \\<br/>
+&amp;= \sum_{i=1}^N \exp(-y_i \sum_{m=1}^M \alpha_m G_m(x_i)) \\<br/>
+&amp;= \sum_{i=1}^N \prod_{m=1}^M \exp(-y_i \alpha_m G_m(x_i))\\<br/>
+&amp;= N \sum_{i=1}^N \frac 1 N \prod_{m=1}^M \exp(-y_i \alpha_m G_m(x_i))\\<br/>
+&amp;= N \sum_{i=1}^N \frac 1 N \exp(-y_i \alpha_1 G_1(x_i)) \prod_{m=2}^M \exp(-y_i \alpha_m G_m(x_i))\\<br/>
+&amp;= N \sum_{i=1}^N w_{1i} \exp(-y_i \alpha_1 G_1(x_i)) \prod_{m=2}^M \exp(-y_i \alpha_m G_m(x_i))\\<br/>
+&amp;= N \sum_{i=1}^N Z_1 w_{2,i} \prod_{m=2}^M \exp(-y_i \alpha_m G_m(x_i))\\<br/>
+&amp;= N Z_1 \sum_{i=1}^N w_{2,i} \prod_{m=2}^M \exp(-y_i \alpha_m G_m(x_i))\\<br/>
+&amp;= N Z_1 Z_2 ... Z_{m-1} \sum_{i=1}^N w_{Mi} \exp(-y_i \alpha_M G_M(x_i)) \\<br/>
+&amp;= N Z_1 Z_2 ... Z_{m-1} Z_M \sum_{i=1}^N w_{m+1,i}\\<br/>
+&amp;= N \prod_{m=1}^M Z_m<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>这一定理说明，可以在每一轮选择适当的 \(G_m(x)\) 使 \(Z_m\) 最小，从而使训练误差减小最快。而实际 \(Z_m\) 还依赖 \(\alpha_m\) 的选择，实际并不可操作。</p>
+
+<p>再来看一下 \(Z_m\) 的表达式：<br/>
+\[<br/>
+\begin{align}<br/>
+Z_m &amp;= \sum_{i=1}^N w_{mi} \exp(-\alpha_m y_i G_m(x_i)) \nonumber\\<br/>
+&amp;= \sum_{G_m(x_i) = y_i} w_{mi} \exp(-\alpha_m) + \sum_{G_m(x_i) \neq y_i} w_{mi} \exp(\alpha_m)  \nonumber\\<br/>
+&amp;= \sum_{G_m(x_i) = y_i} w_{mi} e^{-\alpha_m} + \sum_{G_m(x_i) \neq y_i} w_{mi} e^{-\alpha_m} + \sum_{G_m(x_i) \neq y_i} w_{mi}  e^{\alpha_m} - \sum_{G_m(x_i) \neq y_i} w_{mi} e^{-\alpha_m} \nonumber\\<br/>
+&amp;= e^{-\alpha_m} \sum_{i=1} ^N w_{mi} + e^{\alpha_m} e_m - e^{-\alpha_m} e_m \nonumber\\<br/>
+&amp;= e^{-\alpha_m} + e^{\alpha_m} e_m - e^{-\alpha_m}e_m  \nonumber\\<br/>
+&amp;= (1-e_m) e^{-\alpha_m} + e_m e^{\alpha_m} \label{zm}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>由 \(\alpha=\frac 1 2 log \frac {1-e_m}{e_m}\) 可得 ：<br/>
+\[<br/>
+e^{\alpha} = \sqrt{\frac{1-e_m}{e_m}}\\<br/>
+e^{-\alpha} = \sqrt{\frac{e_m}{1-e_m}}<br/>
+\]</p>
+
+<p>将上式代入 \ref{zm} 中得：<br/>
+\[<br/>
+\begin{align*}<br/>
+Z_m &amp;= 2\sqrt{e_m(1-e_m)}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令 \(\gamma_m = \frac 1 2 - e_m\)：<br/>
+\[<br/>
+Z_m = \sqrt{1-4\gamma_m^2}<br/>
+\]</p>
+
+<p>比较 \(\sqrt{1-4\gamma_m^2}\) 与 \(\exp(-2\gamma_m^2)\) 的大小：<br/>
+\(e^x\) 在 \(x_0=0\) 处泰勒展开：<br/>
+\[<br/>
+\begin{align*}<br/>
+e^x &amp;= {e^{x_0}}+\frac{e^{x_0}}{1!}(x-x_0) + \frac{e^{x_0}}{2!}(x-x_0)^2\\<br/>
+&amp;= 1 + x + \frac{x^2}{2}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令 \(x=-2\gamma_m^2\)，所以：\(\exp(-2\gamma_m^2) = 1 - 2\gamma^2 + 2\gamma_m^4\)</p>
+
+<p>\(\sqrt{1-x}\) 在 \(x_0=0\) 处泰勒展开：<br/>
+\[<br/>
+\begin{align*}<br/>
+\sqrt{1-x} &amp;= {(1-{x_0})^{1/2}} - \frac 1 2 \frac{(1-{x_0})^{-1/2}}{1!} (x-x_0) - \frac{1}{2*2} \frac{(1-{x_0})^{-3/2}}{2!}(x-x_0)^2\\<br/>
+&amp;= 1 - \frac{x}{2} - \frac{x^2}{8}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令 \(x=4\gamma_m^2\)，所以：\(\sqrt{1-4\gamma_m^2} = 1 - 2\gamma^2 - 2\gamma^4\)</p>
+
+<p>显然 \(\sqrt{1-4\gamma_m^2} \le \exp(-2\gamma_m^2)\)</p>
+
+<p>所以最终分类其的训练误差：<br/>
+\[<br/>
+\begin{align*}<br/>
+L(y,f_M(x_i)) &amp;= \sum_{i=1}^N \exp(-y_i f_M(x_i) \\<br/>
+&amp;= N\prod_{m=1}^M Z_m \\<br/>
+&amp;= N\prod_{m=1}^M \sqrt{1-4\gamma_m^2} \\<br/>
+&amp;\le \prod_{m=1}^M \exp(-2\gamma_m^2)\\<br/>
+&amp;= \exp\big (-2\sum_{m=1}^M \gamma_m^2\big )\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>这表明当 \(\gamma_m &gt; 0\) 时， AdaBoost 的训练误差是以指数速率下降的。</p>
+
+<h3 id="toc_7">算法步骤</h3>
+
+<p><b>输入</b>：训练数据集 \(T = {(x_1,y_1),(x_2,y_2),...,(x_N,y_N)}\)， \(x_i\in \mathcal X \subseteq R^n\)，\(y_i \in mathcal Y = \{-1,1\}\)。<br/>
+<b>输出</b>：最终分类器 \(G(x)\)。<br/>
+<b>算法过程</b>：<br/>
+(1) 初始化训练数据的权值初始值：<br/>
+\[<br/>
+D_1 = (w_{11},...,w_{1i},...,w_{1N})<br/>
+\]</p>
+
+<p>(2) 对 \(m=1,2,...,M\)，迭代次数为 \(M\)：<br/>
+(a) 在具有权值分布 \(D_m\) 的训练数据集上学习，得到基本分类器：<br/>
+\[<br/>
+G_m(x):\mathcal X \rightarrow \{-1,1\}<br/>
+\]</p>
+
+<p>(b) 计算 \(G_m(x)\) 在训练数据集上的分类误差率：<br/>
+\[<br/>
+e_m = P(G_m(x_i) \neq y_i) = \sum_{i=1}^N w_{mi} I(G_m(x_i)\neq y_i)<br/>
+\]</p>
+
+<p>(c) 计算 \(G_m(x)\) 的系数，也就是在最终分类器中的重要程度（对数为自然对数）：<br/>
+\[<br/>
+\alpha_m = \frac 1 2 \log \frac{1-e_m}{e_m}<br/>
+\]</p>
+
+<p>(d) 更新训练数据的权值分布：<br/>
+\[<br/>
+D_{m+1} = {w_{m+1,1},w_{m+1,2},...,w_{m+1,i},...,w_{m+1,N}}\\<br/>
+w_{m+1,i} = \frac{w_{mi}}{Z_m} \exp(-\alpha_m y_i G_m(x_i)),\quad i=1,2,...,N<br/>
+\]</p>
+
+<p>这里的 \(Z_m\) 是规范因子，为了是样本概率分布和为1：<br/>
+\[<br/>
+Z_m = \sum_{i=1}^N w_{mi} \exp(-\alpha_m y_i G_m(x_i))<br/>
+\]</p>
+
+<p>它使 \(D_{m+1}\) 成为一个概率分布。<br/>
+(3) 构建基本分类器的线性组合<br/>
+\[<br/>
+F_M(x) = \sum_{m=1}^M \alpha_m G_m(x)<br/>
+\]</p>
+
+<p>得到最终分类器<br/>
+\[<br/>
+G(x) = sign(F_M(x)) = sign(\sum_{m=1}^M \alpha_m G_m(x))<br/>
+\]</p>
+
+<h3 id="toc_8">AdaBoost举例</h3>
+
+<p>如下图的数据：<br/>
+\[<br/>
+\begin{array}{ccccccccccc}\hline<br/>
+\text{No}&amp;1 &amp; 2 &amp; 3 &amp; 4 &amp; 5 &amp; 6 &amp; 7 &amp; 8 &amp; 9 &amp; 10 \\\hline<br/>
+\text{x} &amp; 0 &amp; 1 &amp; 2 &amp; 3 &amp; 4 &amp; 5 &amp; 6 &amp; 7 &amp; 8 &amp; 9  \\\hline<br/>
+\text{y} &amp; 1 &amp; 1 &amp; 1 &amp; -1&amp; -1&amp; -1&amp; 1 &amp; 1 &amp; 1 &amp; -1 \\\hline<br/>
+\end{array}<br/>
+\]</p>
+
+<p>首先初始化样本权重 \(D_1 = (w_{11},...,w_{1i},...,w_{1N})\)，其中<br/>
+\[<br/>
+w_{1i} = 0.1, \quad i=1,2,...,10<br/>
+\]</p>
+
+<p>在具有权值分布 \(D_1\) 的训练数据集上学习，当阈值取 2.5 时样本误差率最小：<br/>
+\[<br/>
+G_1(x) = \left \{ \begin{array}\\ 1 &amp;\quad x \le 2.5 \\ 0 &amp;\quad x \gt 2.5 \\\end{array}\right .<br/>
+\]</p>
+
+<p>计算 \(G_1(x)\) 在训练集上的分类误差率为：<br/>
+\[<br/>
+e_1 = \sum_{i=1}^N w_{1i} I(G_1(x_i) \neq y_i) = 0.3<br/>
+\]</p>
+
+<p>计算 \(G_1(x)\) 的系数为：<br/>
+\[<br/>
+\alpha_1 = \frac 1 2 \log \frac{1-e_1}{e_1} = 0.4236<br/>
+\]</p>
+
+<p>更新数据集的权值分布：<br/>
+\[<br/>
+D_2 = (w_{21},w_{22},...,w_{2i},...,w_{2N})\\<br/>
+Z_1 = \sum_{i=1}^N w_{1i} \exp(-\alpha_1 y_i G_1(x_i))\\<br/>
+w_{2i} = \frac{w_{1i}}{Z_1} \exp[-y_i \alpha_1 G_1(x_i)]\\<br/>
+\]</p>
+
+<p>得 \(D_2 = (0.0715,0.0715,0.0715,0.0715,0.0715,0.0715,0.1666,0.1666,0.166,0.0715)\)，\(f_1(x) = sign(0.4236 G_1(x))\)。分类器 \(sign(f_1(x))\) 在训练集上有三个误分点。</p>
+
+<p>继续 \(m=2,...,M\) ，这里不再叙述。</p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html'>集成学习</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15167212454767.html" 
+	        title="Previous Post: 提升树与GBDT">&laquo; 提升树与GBDT</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15151569041850.html" 
+	        title="Next Post: 概率近似正确学习 PAC Learning">概率近似正确学习 PAC Learning &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

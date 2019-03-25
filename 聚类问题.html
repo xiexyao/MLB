@@ -1,0 +1,1744 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  聚类问题 - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div class="blog-index">
+
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15139484052551.html">基于层次的聚类算法-凝聚法-BIRCH算法</a></h1>
+			<p class="meta"><time datetime="2017-12-22T21:13:25+08:00" 
+			pubdate data-updated="true">2017/12/22</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>BIRCH算法是一种凝聚层次聚类算法，它的全称是Balanced Iterative Reducing And Clustering Using Hierarchies，中文名也就是利用层次方法的平衡迭代规约和聚类。在大多数情况下，BIRCH可以只扫描一次数据集就可以完成聚类，这也使它可以在数据挖掘算法中处理大数据。BIRCH的作者声明BIRCH算法是数据领域第一个可以有效处理噪音的聚类算法。</p>
+
+<p>BIRCH算法通过构建一个CF（Clustering Feature）树来实现，首先来介绍一下CF和CF树</p>
+
+<h3 id="toc_0">CF（聚类特征）</h3>
+
+<p>CF(Clustering Feature 聚类特征)，当给定一个N个d维的数据 \(X_1,X_2,...X_N\)，CF可以被定义成一个元组，即 \(\overrightarrow {CF}=(N,\overrightarrow{LS},\overrightarrow{SS})\) ，其中N表示元素的个数，\(\overrightarrow{LS}=\sum_{i=1}^N \overrightarrow X_{i}\)，它是所有元素各维度上的线性和，\(\overrightarrow{SS}=\sum_{i=1}^N (\overrightarrow X_{i})^2\)是所有数据点各维度上的平方和。</p>
+
+<p>通过一个简单例子来说明：例设一个数据集有3个数据点 (2,5) 、 (3,2) 和 (4,1) ，那么此时<br/>
+\[<br/>
+N=3\\<br/>
+\overrightarrow{LS}=(2+3+4,5+2+1)=(9,8)\\<br/>
+\overrightarrow{SS}=(2^2+3^2+4^2,5^2+2^2+1^2)=(29,30)<br/>
+\]</p>
+
+<p>使用CF元组的好处在于，很多性质都可以通过这三个特征来表示，比如：<br/>
+簇中心：<br/>
+\[<br/>
+\begin{align*}<br/>
+    \overrightarrow C&amp;=\frac{\sum_{i=1}^N \overrightarrow X_i}{N}\\<br/>
+    &amp;=\frac {\overrightarrow{LS}}{N}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>簇半径：<br/>
+\[<br/>
+\begin{align*}<br/>
+R&amp;=\sqrt{\frac{\sum_{i=1}^{N} (\overrightarrow C-\overrightarrow X_i)^2}{N}}\\<br/>
+&amp;=\sqrt{\frac{\sum_{i=1}^N (\overrightarrow C^2+\overrightarrow X_i^2-2\overrightarrow X_0\overrightarrow X_i)}{N}}\\<br/>
+&amp;=\sqrt{\frac{N\overrightarrow C^2+\overrightarrow{SS}+2\overrightarrow C\overrightarrow{LS}}{N}}<br/>
+\end{align*}<br/>
+\]<br/>
+簇直径：<br/>
+\[<br/>
+\begin{align*}<br/>
+D&amp;=\sqrt{\frac{\sum_{i}^N \sum_{j}^N (\overrightarrow{X_i}-\overrightarrow{X_j})^2}{N(N-1)}} \\<br/>
+&amp;=\sqrt{\frac{\sum_{i}^N \sum_i^N(\overrightarrow{X_i}^2+\overrightarrow{X_j}^2-2\overrightarrow X_i \overrightarrow X_j)}{N(N-1)}} \\<br/>
+&amp;=\sqrt{\frac{\sum_i^N(N\overrightarrow X_i^2+\overrightarrow{SS}-2\overrightarrow X_i \overrightarrow{LS})}{N(N-1)}}\\<br/>
+&amp;=\sqrt{\frac{N\sum_i^N(\overrightarrow X_i^2)+N\overrightarrow{SS}-2\overrightarrow{LS}\sum_i{\overrightarrow X_i})}{N(N-1)}}\\<br/>
+&amp;=\sqrt{\frac{N\overrightarrow{SS}+N\overrightarrow{SS}-2\overrightarrow{LS}\overrightarrow{LS}}{N(N-1)}}\\<br/>
+&amp;=\sqrt{\frac{2N\overrightarrow{SS}-2\overrightarrow{LS}^2}{N(N-1)}}<br/>
+\end{align*}<br/>
+\]<br/>
+假设\(CF_1=(N_1,LS_1,SS_1)\)，\(CF_2=(N_2,LS_2,SS_2)\)，它们的欧几里得距离为</p>
+
+<p>\[<br/>
+\begin{align*}<br/>
+D&amp;=\sqrt{\frac{\sum_i^{N_1}\sum_j^{N_2}(\overrightarrow{X_i}-\overrightarrow{X_j})^2}{N_1N_2}}\\<br/>
+&amp;=\sqrt{\frac{\sum_i^{N_1}\sum_j^{N_2}(\overrightarrow X_i^2+\overrightarrow X_j^2-2\overrightarrow X_i\overrightarrow X_j)}{N_1N_2}}\\<br/>
+&amp;=\sqrt{\frac{\sum_i^{N_1}(N_2\overrightarrow X_i^2+\overrightarrow{SS_2}-2\overrightarrow{LS_2}X_i)}{N_1N_2}}\\<br/>
+&amp;=\sqrt{\frac{N_2\overrightarrow{SS_1}+N_1\overrightarrow{SS_2}-2\overrightarrow{LS_2}\overrightarrow{LS_1}}{N_1N_2}}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>由上面公式可以看出，如果集群用CF元组来表示，则集群间的很多性质都可以用这个对应的CF元组来进行计算。</p>
+
+<h3 id="toc_1">CF树</h3>
+
+<p>CF树类似于B树，是由CF元组成的树形结构，如下图：</p>
+
+<div align=center>
+<img width="350px" src="media/15139484052551/15255635948989.jpg" />
+</div>
+
+<p>易知：<br/>
+\[<br/>
+\begin{align*}<br/>
+N_1 &amp;= N_2+N_3\\<br/>
+LS_1 &amp;= LS_2+LS_3\\<br/>
+SS_1 &amp;= SS_2+SS_3<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>CF树的内存结构如下图所示，CF树的顶层节点称为根节点（Root Node），最下面一层节点称为叶结点（Leaf Node），中间层为枝结点（Branch Node），其中根节点和枝结点都是由CF元组和child组成，child指向枝结点的位置。而叶结点还有两个特殊的空间prev和next，用来指向前一个叶结点和后一个叶结点。<br/>
+<div align=center><br/>
+    <img width="550px" src="media/15139484052551/15255835588796.jpg" /><br/>
+</div><br/>
+在CF树中有几个比较重要的参数需要注意：枝平衡因子\(\beta\)（Branch factor）、叶平衡因子\(\gamma\)（Leaf factor）和空间阈值\(\tau\)（threshold），\(\beta\)表示非叶节点的存储的<CF,Child>元组（entry）的个数不能超过的数量，也就是限制非叶节点的子节点数目，同理\(\gamma\)表示叶节点存储的CF元组的最大个数，也就是限制叶节点的子节点数目。\(\tau\)限制的是簇直径的阈值，既限制簇的紧密程度。上图是在\(\beta=2\)，\(\gamma=3\)的情况下绘制的。</p>
+
+<h3 id="toc_2">CF树的构造</h3>
+
+<p><b>输入</b>：数据集 D，值枝平衡因子\(\beta\)，叶平衡因子\(\gamma\)和空间阈值\(\tau\)<br/>
+<b>输出</b>：CF 树<br/>
+<b>算法过程</b>：</p>
+
+<ol>
+<li><b>初始化</b>：定义一个空的叶节点 leafNode；定义一个叶节点头节点 leafNodeHead，leafNodeHead的 next 指向 leafNode， leafNode 的 prev 指向 leafNodeHead。定义一个根节点 root 指向 leafNode；</li>
+<li>循环所有数据集，当循环到样本点 X 时，建立CF元组，再定义包含该CF元组的 minCluster ；</li>
+<li>向根节点插入 minCluster，如果根节点是叶节点，执行步骤4；否则执行步骤6；</li>
+<li><b>叶节点的插入minCluster</b>：如果被插入的叶节点的 children 为空，直接向 children 中添加一个mincluster；否则找到该叶节点的 children 中距离 minCluster 最近的节点，如上图假设找到的是节点4，判断节点4插入minCluster的CF元组后的直径，如果该直径小于空间阈值 \(\tau\)，向节点4中插入minCluster的CF元组；如果该直径大于空间阈值 \(\tau\)，则向叶结点的children 中插入一个新的节点。插入后判断叶节点的children长度是否大于叶平衡因子 \(\gamma\)，如果大于 \(\gamma\)，需要进行步骤5叶节点的分裂；插入minCluster 之后要一层层更新父结点的CF元组；</li>
+<li><b>叶节点的分裂</b>：假设要分裂的叶节点为 leaf，先找到 leaf 的children 中距离最远的两个孩子 cf1 和 cf2，定义一个新的叶节点 newLeaf ，将cf1 放入newLeaf 的children 中，定义一个枝节点 nonLeaf，nonLeaf 的父结点指向 leaf 的父结点，将 leaf 和 newLeaf 都放入 nonLeaf 的children 中，且 leaf 与 newLeaf 的父结点都指向 nonLeaf ，然后循环 leaf 的所有children，将其中与 cf1 的距离小于与 cf2 的距离的CF元组从 leaf 的children中删除，加入 newLeaf 的children中。分裂完成后，将 nonLeaf 插入nonLeaf 父节点的 children 中，并判断nonLeaf的父结点的 children 在插入了 nonLeaf 后是否超出枝平衡因子 \(\beta\)，如果超过执行步骤7进行枝节点分裂；</li>
+<li><b>枝节点的插入</b>：循环枝节点的所有children，找到与minCluster 最近的孩纸，如果该孩子是枝节点，则向该枝节点孩子继续执行步骤6；如果该孩子是叶节点，执行步骤4；</li>
+<li><b>枝节点的分裂</b>：假设要分裂的枝节点为nonLeaf，先找到 nonLeaf 的children中相距最近的两个孩子 leaf1 和 leaf2，定义一个新的枝节点newNonLeaf，向 newNonLeaf 的children 中加入leaf1，定义一个新的枝节点 parentNonLeaf，parentNonLeaf 的父节点指向nonLeaf的父结点，将 newNonLeaf 和 nonLeaf 都加入parnetNonLeaf 中，且 newNonLeaf 和 nonLeaf 的父结点都指向 parentNonLeaf；循环 nonLeaf 的所有children，将与 leaf1 的距离小于与 leaf2 的距离的孩子从 nonLeaf 的 children 中删除，加入newNonLef 的children中；分裂完成后，将 parentNonLeaf 插入它父节点的 children 中，并判断插入后是否超过枝平衡因子 \(\beta\)，如果超过执行步骤7进行枝节点分裂；</li>
+<li><b>根节点更新</b>步骤3执行完成后，此时root已经不在是根节点，要递归找到父结点，令root等于parent等于空的节点，此时完成root的更新。</li>
+</ol>
+
+<h3 id="toc_3">代码实例</h3>
+
+<pre><code>#coding=utf-8
+import os
+import sys
+import numpy as np
+import math
+
+class MinCluster(object):
+    def __init__(self):
+        self.cf = None
+        self.inst_marks = []
+
+    @staticmethod
+    def getDiameter(cluster1, cluster2):
+        cf = CF.clone(cluster1.cf)
+        cf.addCF(cluster2.cf,True)
+        diameter = 0.0
+        for i in range(len(cf.LS)):
+            diameter += 2*cf.N*cf.SS[i]-2*cf.LS[i]
+        diameter = diameter/(cf.N*cf.N-cf.N)
+        return math.sqrt(diameter)
+
+class CF(object):
+    def __init__(self,data=None):
+        if data is not None:
+            self.N = 1
+            self.LS = data
+            self.SS = np.zeros_like(data)
+            for i in range(self.LS.size):
+                self.SS[i] = math.pow(self.LS[i],2)
+        else:
+            self.N = 0
+            self.LS = np.zeros(BIRCH.dimen)
+            self.SS = np.zeros(BIRCH.dimen)
+
+    #UPGMA的变体
+    def getDistanceTo(self, cf):
+        dis = 0.0
+        for i in range(len(cf.LS)):
+            dis += self.SS[i] / self.N + cf.SS[i] / cf.N - 2 * self.LS[i] * cf.LS[i] / (cf.N * self.N)
+        return math.sqrt(dis)
+
+    def addCF(self,cf, add):
+        if add:
+            self.N += cf.N
+            for i in range(len(self.LS)):
+                self.LS[i] += cf.LS[i]
+                self.SS[i] += cf.SS[i]
+        else:
+            self.N -= cf.N
+            for i in range(len(self.LS)):
+                self.LS[i] -= cf.LS[i]
+                self.SS[i] -= cf.SS[i]
+
+    @staticmethod
+    def clone(cf):
+        new_cf = CF()
+        new_cf.N = cf.N
+        for i in range(len(cf.LS)):
+            new_cf.LS[i] = cf.LS[i]
+            new_cf.SS[i] = cf.SS[i]
+        return new_cf
+
+class TreeNode(CF):
+    def __init__(self):
+        CF.__init__(self)
+        self.parent = None
+        self.children = []
+
+    def addChild(self, cluster):
+        self.children.append(cluster)
+
+    def split(self):
+        pass
+
+    def absorbSubCluster(self, cluster):
+        pass
+
+# 定义一个叶节点
+class LeafNode(TreeNode):
+
+    def __init__(self):
+        TreeNode.__init__(self)
+        self.L = 10
+        self.T = 2.8
+        self.prev = None
+        self.next = None
+
+    def absorbSubCluster(self, cluster):
+        # 找到叶节点的孩子中与cluster最近的簇
+        cf = cluster.cf
+        nearIndex = 0
+        minDist = sys.maxsize
+        child_len = len(self.children)
+        if child_len &gt; 0:
+            for i in range(child_len):
+                dist = cf.getDistanceTo(self.children[i].cf)
+                if dist &lt; minDist:
+                    nearIndex = i
+            # 计算两个簇合并之后的直径
+            mergeDiameter = MinCluster.getDiameter(self.children[i],cluster)
+            if mergeDiameter &gt; self.T:
+                # 那么将cluster作为一个单路的子结点插入叶结点下
+                self.addChild(cluster)
+                if len(self.children) &gt; self.L:
+                    self.split()
+            else:
+                self.children[nearIndex].mergeCluster(cluster)
+        else:
+            self.addChild(cluster)
+        self.addCFUpToRoot(cluster.cf)
+
+    def split(self):
+        # 找到距离最远的两个结点
+        c1 = -1
+        c2 = -1
+        maxDist = 0
+        for i in range(len(self.children) - 1):
+            for j in range(i + 1, len(self.children)):
+                dist = self.children[i].cf.getDistanceTo(self.children[j].cf)
+                if dist &gt; maxDist:
+                    maxDist = dist
+                    c1 = i
+                    c2 = j
+        # 以这两个孩子为中心，分成两个簇
+        newLeafNode = LeafNode()  # 新建一个簇存放领养新结点
+        newLeafNode.children.append(self.children[c2])
+        # 如果本结点已经是根结点，创建一个结点领养新结点
+        if self.parent is None:
+            nonLeafNode = NonLeafNode()
+            nonLeafNode.N = self.N
+            nonLeafNode.LS = self.LS.copy()
+            nonLeafNode.SS = self.SS.copy()
+            self.parent = nonLeafNode
+            nonLeafNode.addChild(self)
+        # 根结点领养新结点
+        newLeafNode.parent = self.parent
+        self.parent.addChild(newLeafNode)
+
+        for i in range(len(self.children)):
+            if i != c1 and i != c2:
+                dist1 = self.children[i].cf.getDistanceTo(self.children[c1].cf)
+                dist2 = self.children[i].cf.getDistanceTo(self.children[c2].cf)
+                if dist1 &gt; dist2:
+                    newLeafNode.addChild(self.children[i])
+        for child in newLeafNode.children:
+            newLeafNode.addCF(child.cf, True)
+            self.children.remove(child)
+            self.addCF(child.cf, False)
+        # 把新增加的leafNode加入双向列表
+        if self.next is not None:
+            newLeafNode.next = self.next
+            newLeafNode.next.prev = newLeafNode
+        self.next = newLeafNode
+        newLeafNode.prev = self
+        # 结点分裂是否导致枝结点也需要分裂
+
+        nonLeafNode = self.parent
+        if len(nonLeafNode.children) &gt; nonLeafNode.B:
+            nonLeafNode.split()
+
+    def addCFUpToRoot(self, cf):
+        leaf = self
+        while leaf is not None:
+            leaf.addCF(cf,True)
+            leaf = leaf.parent
+
+
+class NonLeafNode(TreeNode):
+    def __init__(self):
+        TreeNode.__init__(self)
+        self.B = 5
+
+    def absorbSubCluster(self, cluster):
+        cf = cluster.cf
+        nearIndex = 0
+        minDist = sys.maxsize
+        child_len = len(self.children)
+        for i in range(child_len):
+            dist = cf.getDistanceTo(self.children[i])
+            if dist &lt; minDist:
+                nearIndex = i
+        self.children[nearIndex].absorbSubCluster(cluster)
+
+    def split(self):
+        # 找到距离最远的两个结点
+        c1 = -1
+        c2 = -1
+        maxDist = 0
+        for i in range(len(self.children) - 1):
+            for j in range(i + 1, len(self.children)):
+                dist = self.children[i].getDistanceTo(self.children[j])
+                if dist &gt; maxDist:
+                    maxDist = dist
+                    c1 = i
+                    c2 = j
+        # 以这两个孩子为中心，分成两个簇
+        newLeafNode = NonLeafNode()  # 新建一个簇存放领养新结点
+        newLeafNode.children.append(self.children[c2])
+        # 如果本结点已经是根结点，创建一个结点领养新结点
+        if self.parent is None:
+            nonLeafNode = NonLeafNode()
+            nonLeafNode.N = self.N
+            nonLeafNode.LS = self.LS.copy()
+            nonLeafNode.SS = self.SS.copy()
+            self.parent = nonLeafNode
+            nonLeafNode.addChild(self)
+        # 根结点领养新结点
+        newLeafNode.parent = self.parent
+        self.parent.addChild(newLeafNode)
+
+        for i in range(len(self.children)):
+            if i != c1 and i != c2:
+                dist1 = self.children[i].getDistanceTo(self.children[c1])
+                dist2 = self.children[i].getDistanceTo(self.children[c2])
+                if dist1 &gt; dist2:
+                    newLeafNode.addChild(self.children[i])
+        for child in newLeafNode.children:
+            newLeafNode.addCF(child, True)
+            self.children.remove(child)
+            self.addCF(child, False)
+        # 结点分裂是否导致枝结点也需要分裂
+        nonLeafNode = self.parent
+        if len(nonLeafNode.children) &gt; nonLeafNode.B:
+            nonLeafNode.split()
+
+class BIRCH(object):
+    dimen = 4
+    def __init__(self):
+        self.dimen = BIRCH.dimen # 数据点的维度
+        self.leafNodeHead = LeafNode() # 叶节点的头
+        self.point_num = 0 # 数据点个数
+
+    def buildTree(self, fileName):
+        leaf = LeafNode()
+        root = leaf
+        self.leafNodeHead.next = leaf
+        leaf.prev = self.leafNodeHead
+        # 判断是否存在
+        if not os.path.exists(fileName):
+            print(&quot;Data File Not Exists&quot;)
+            return
+        # 读取文件
+        with open(fileName) as fr:
+            for line in fr.readlines():
+                self.point_num +=1
+                data = np.zeros([self.dimen],np.float64)
+                lineAttr = line.strip().split(&quot;\t&quot;)
+                for i in range(data.size):
+                    data[i] = lineAttr[i]
+                # 处理数据
+                mark = str(self.point_num) + lineAttr[data.size]
+                # 根据一个point创建一个minCluster
+                cf = CF(data)
+                subCluster = MinCluster()
+                subCluster.cf = cf
+                subCluster.inst_marks.append(mark)
+                # 把新的point插到树中
+                root.absorbSubCluster(subCluster)
+                while root.parent is not None:
+                    root = root.parent
+        return root
+
+if __name__ == &#39;__main__&#39;:
+    birch = BIRCH()
+    root = birch.buildTree(&quot;iris.txt&quot;)
+    print(root)
+</code></pre>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15134035483527.html">基于层次的聚类算法-分裂法-BiKMeans算法与DIANA算法</a></h1>
+			<p class="meta"><time datetime="2017-12-16T13:52:28+08:00" 
+			pubdate data-updated="true">2017/12/16</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>BiKMeans算法与DIANA算法是两种典型的分裂式基于层次的聚类算法，在介绍算法之前，先了解一下基于层次聚类算法。</p>
+
+<h3 id="toc_0">基于层次聚类算法</h3>
+
+<p>在数据挖掘（data mining）和统计学（statistics）中，层次聚类（Hierarchical clustering)是聚类分析的一种方法。层次化聚类的策略通常分为两种：<br/>
+    <strong>凝聚法（Agglomerative)</strong>：这是一种自下向上的方式，开始时把每一个元素当作一个单个的簇，在沿着层次结构向上移动过程中，合并成对的簇。<br/>
+    <strong>分裂法（Divisive)</strong>：这是一种自上向下的方式，开始时将所有所有元素当成一个簇，在沿着层次结构向下移动过程中，递归的进行分裂操作。<br/>
+    通常，合并和分裂在决定过程中都是用贪心的方式。层次化聚类的结果通常表现为系统树状图（<em>dendrogram</em>）的形式。</p>
+
+<p>在大多数的层次聚类方法中，为了决定哪些簇应该被合并（凝聚法）或者两个簇应该被分裂（分裂法），我们需要来度量观察集合之间的不相似度，这可以通过选择一个合适的度量标准和链接标准来实现。</p>
+
+<h4 id="toc_1">度量标准（Metric）</h4>
+
+<p>选择一个合适的度量标准将会影响集群的形状。一些元素可能会在某个度量标准下距离很近，在另一个度量标准下距离会很远，例如在二维空间里，(1,0)和(0,0)两个点在通常标准下它们的距离总是1，但是(1,1)和(0,0)两个点它们的曼哈顿距离（Manhattan distance）是2，但是欧几里得距离（Euclidean distance）是\(\sqrt {2}\)，最大距离（Maximum distance）是1。</p>
+
+<p>下面是一些在层次聚类中通常使用的度量标准：</p>
+
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>公式</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>欧几里得距离（Euclidean distance）</td>
+<td>\(\|a-b\|_{2}=\sqrt{\sum_{i}(a_{i}-b_{i})^{2}}\)</td>
+</tr>
+<tr>
+<td>平方欧几里得距离（Squared Euclidean distance）</td>
+<td>\(\|a-b\|_{2}=\sum_{i}(a-b)^{2}\)</td>
+</tr>
+<tr>
+<td>曼哈顿距离（Manhattan distance）</td>
+<td>\(\|a-b\|_{1}=\sum_{i}\left\vert a_{i}-b_{i}\right\vert\)</td>
+</tr>
+<tr>
+<td>最大距离（Maximum distance）</td>
+<td>\(\|a-b\|_{\infty}=\max_{i}\left\vert a_{i}-b_{i}\right\vert\)</td>
+</tr>
+</tbody>
+</table>
+
+<p>对于一些文本或非数字类型的数据，通常使用海明距离（Hamming distance）或者编辑距离（Edit distance or Levenshtein distance）</p>
+
+<h4 id="toc_2">连接标准（Linkage criteria)</h4>
+
+<p>连接标准根据观察对象间成对的距离确定观察组之间的距离。两个观察对象A和B之间的常用的连接标准如下：</p>
+
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>英文名称</th>
+<th>公式</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>全连接聚类(最大连接)</td>
+<td>Maximum or complete-linkage clustering</td>
+<td>\(\max\,\{\,d(a,b):a \in A,\,b \in B\,\}\)</td>
+</tr>
+<tr>
+<td>单连接聚类(最小连接)</td>
+<td>Minimum or single-linkage clustering</td>
+<td>\(\min\,\{\,d(a,b):a\in A,\,b\in B\,\}\)</td>
+</tr>
+<tr>
+<td>平均连接聚类</td>
+<td>Mean or average-linkage clustering or UPGMA</td>
+<td>\(\frac{1}{\vert A \vert\vert B \vert}\sum_{a \in A}\sum_{b \in B}d(a,b)\)</td>
+</tr>
+<tr>
+<td>质心连接聚类</td>
+<td>Centroid-linkage clustering or UPGMC</td>
+<td>\(\|c_{t}-c_{s}\|\) 这里\(c_{t}\)和\(c_{s}\)是各自集合的质心</td>
+</tr>
+</tbody>
+</table>
+
+<p>上面公式里的d函数就是前面介绍的度量标准（Metric），采用哪种距离计算函数。</p>
+
+<h4 id="toc_3">凝聚聚类（自下而上）</h4>
+
+<p>假设需要聚类一些数据，采用欧几里得距离（Euclidean distance）作为距离计算函数。<strong>用给定的高度来切割树将会得到给定精度的分区聚类</strong>。假设聚类产生的系统树状图如下：</p>
+
+<div align=center>
+    <img width=250 src="media/15134035483527/15253679953629.jpg" />
+</div>
+
+<p>如图若在系统树状图的第二行后面切割将会产生四个集群{a},{b,c},{d,e},{f}。</p>
+
+<div align=center>
+    <img width=250 src="media/15134035483527/15253682104508.jpg" />
+</div>
+
+<p>同理，如果在系统树状图的第三行后面切割则会产生三个集群 {a} , {b,c} , {d,e,f} 。这是一个更粗糙的聚类，但是集群的数量会更少，同时集群的大小会变大。</p>
+
+<p>凝聚聚类是采用逐步合并集群的方式从单个的元素生成层次结构，在上面的例子中，有六个元素 {a} , {b} , {c} , {d}, {e} , {f} ，第一步是决定哪两个元素将被合并到一个集群。通常，我们依据距离选择两个距离最近的元素来合并。假设我们已经合并了两个最近的集群 {b} 和 {c} 得到一个新的集群 {b,c}，现在集群为 {a} , {b,c} , {e} , {f}，如果要进一步合并他们，我们需要计算 {a} 和 {b,c} 的距离，因此这里需要定义两个集群间的距离，距离计算时 {b,c} 中心点位置的选择就需要连接标准的制定。</p>
+
+<p>当集群的数量足够的少的时候，可以决定来停止聚类。另外一些连接标准可以保证凝聚之后的集群间的距离比凝聚之前更远，当集群分离太远而不能进行合并时可以选择停止聚类。</p>
+
+<h4 id="toc_4">分裂聚类（自上而下）</h4>
+
+<p>分裂聚类算法开始时将所有元素当做一个簇。一个大的簇会被逐步分裂直到簇个数达到自定的大小，因为分裂一个大小为n的集群会存在 \(2^n\) 种方式，因此这里需要启发式分裂方法。关于分裂聚类的典型算法有Bisecting KMeans算法、DIANA算法，这里直接通过BiKMeans算法和DIANA算法来了解分裂聚类算法。</p>
+
+<h3 id="toc_5">BiKMeans 算法</h3>
+
+<p>BiKMeans（Bisecting KMeans、二分KMeans）是一种常见的分裂聚类算法，通过它名字便知道它与基于划分的聚类算法KMeans算法肯定关系很大，其实它是KMeans算法的改进版本。由于传统的KMeans算法的聚类结果易受到初始聚类中心点选择的影响，因此在传统的KMeans算法的基础上进行算法改进，一定程度上克服了算法陷入局部最优状态。</p>
+
+<p>二分KMeans在分裂过程中以降低SSE（误差平方和）为目标。开始时将所有的对象作为一个簇，然后用KMeans方式（K=2）将簇一分为二；如果簇的大小小于指定给定大小，再在两个簇中选择能最大限度降低SSE的簇进行一分为二；以此进行下去，直到簇的数目等于用户给定的数目k为止。</p>
+
+<h5 id="toc_6">算法步骤</h5>
+
+<p><b>输入</b>：数据集 D ，簇个数 K<br/>
+<b>输出</b>：聚类后的簇 \(C_1\),\(C_2\),...,\(C_K\)<br/>
+<b>算法过程</b>：</p>
+
+<pre><code>将所有数据点看成一个簇；
+h=1；
+当前簇的数目 h 小于 K 时：  
+    对于每一个簇：  
+        在该簇上进行KMeans聚类（k=2），分裂成两个簇 
+        计算划分后的误差平方和 SSE
+    比较 h 种划分的SSE值，选择SSE值最小的那种簇划分进行划分
+    更新簇的分配结果
+    添加新的“簇中心”
+    簇的数目 h 加1
+</code></pre>
+
+<h3 id="toc_7">DIANA算法</h3>
+
+<p>DIANA算法（DIvisive ANAlysis)算法是一种分裂式层次聚类算法，首先将所有的对象初始化到一个簇中，然后根据一些原则将该簇分裂，直到到达用户指定的簇数目或者两个簇之间的距离超过了某个阈值。</p>
+
+<h5 id="toc_8">算法步骤</h5>
+
+<p><b>输入</b>：数据集 D ，簇个数 K<br/>
+<b>输出</b>：聚类后的簇 \(C_1\),\(C_2\),...,\(C_K\)<br/>
+<b>算法过程</b>：</p>
+
+<pre><code>将所有数据点看成一个簇；
+h=1；
+当前簇的数目 h 小于 K 时：
+    在所有簇中找出具有最大直径的簇，在该簇上操作：
+        找到簇中每一个点与其他点的平均距离；
+        将平均距离最大的点放入splinter group 中，其他点放入old party中；
+        循环 old party 中所有点：
+            找到与 splinter group 中最近的点的距离不大于到old party中最近点的距离的点；
+            将该点加入splinter group；
+        spilnter group和old party为被选中的簇分裂成的2个簇与其它簇一起组成新的簇集合；
+        簇的数目 h 加1
+</code></pre>
+
+<p>下面举例说明，假设二维空间八个元素，分布位置如下：</p>
+
+<p>\[<br/>
+\begin{array}{|c|c|c|}<br/>
+\hline<br/>
+\text{坐标点} &amp; \text{属性1} &amp; \text{属性2} \\<br/>
+\hline<br/>
+P_1 &amp; 1 &amp; 1 \\<br/>
+P_2 &amp; 1 &amp; 2 \\<br/>
+P_3 &amp; 2 &amp; 1 \\<br/>
+P_4 &amp; 2 &amp; 2 \\<br/>
+P_5 &amp; 3 &amp; 4 \\<br/>
+P_6 &amp; 3 &amp; 5 \\<br/>
+P_7 &amp; 4 &amp; 4 \\<br/>
+P_8 &amp; 4 &amp; 5 \\<br/>
+\hline<br/>
+\end{array}<br/>
+\]</p>
+
+<ol>
+<li><p>找出具有最大直径的集群，开始时指的就是所有集群。</p></li>
+<li><p>在最大直径集群中，找到每个点与其他点的平均距离：<br/>
+\(P_1\)与其他点平均距离为：<br/>
+    \(\begin{align*}<br/>
+    d(P_1)&amp;=(\sqrt{(1-1)^2+(2-1)^2}+\sqrt{(2-1)^2+(1-1)^2}+\dots+\sqrt{(4-1)^2+(5-1)^2})/7\\<br/>
+    &amp;=(1+1+1.1414+3.6+4.24+4.47+5)/7\\<br/>
+    &amp;=2.96<br/>
+    \end{align*}\)<br/>
+    同理：<br/>
+\(d(P_2)=(1+1.414+1+2.828+3.6+3.6+4.24)/7=2.526\)<br/>
+\(d(P_3)=(1+1.414+1+3.16+4.12+3.6+4.27)/7=2.68\)<br/>
+\(d(P_4)=(1.414+1+1+2.24+3.16+2.828+3.6)/7=2.18\)<br/>
+\(d(P_5)=2.18\)<br/>
+\(d(P_6)=2.68\)<br/>
+\(d(P_7)=2.526\)<br/>
+\(d(P_8)=2.96\)   </p>
+
+<p>在上面所有的距离中，\(P_1\) 与其他点的平均距离最远，放入 splinter group，其他点放入 old party 中，那么 splinter group={\(P_1\)}，old party={\(P_2\),\(P_3\),\(P_4\),\(P_5\),\(P_6\),\(P_7\),\(P_8\)}</p></li>
+<li><p>找出 old party 中到 splinter group 最近的点的距离不大于到 old party 其他点最小距离的点，加入到 splinter group 中。</p>
+
+<p>对于old party中的每一个点依次计算，首先计算点 \(P_2\) 到 splinter group 最近点的距离：\(P_2\) 到 splinter group 中点 \(P_1\) 的距离为1，因为 splinter group 中只有 \(P_1\) 一个点，所以 \(P_2\) 到 splinter group 中最近的点的距离为1；</p>
+
+<p>计算\(P_2\) 到 old parter 中最近点的距离：\(P_2\) 到 old party 中点 \(P_3\) 的距离为1.1414；\(P_2\) 到 old party 中点 \(P_4\) 的距离为1; \(P_2\) 到 old party 中点 \(P_5\) 的距离为2.828；\(P_2\) 到 old party 中点 \(P_6\) 的距离为3.6；\(P_2\) 到 old party 中点 \(P_7\) 的距离为3.6；\(P_2\) 到 old party 中点 \(P_8\) 的距离为4.24；因此 \(P_2\) 到 old party 中最近的点 \(P_4\) 的距离是1；</p>
+
+<p>满足<strong>到splinter group最近的点距离不大于到old party其他点最小距离</strong>的条件，因此将\(P_2\)加入splinter group中。此时splinter group={ \(P_1\) , \(P_2\) }，old party={ \(P_3\) , \(P_4\) , \(P_5\) , \(P_6\) , \(P_7\) , \(P_8\) }</p></li>
+<li><p>重复步骤3，直到不存在这样的点结束，此时已经将最大的集群分成两个。如果此时集群的数量未达到终止条件，则继续重复步骤2，选择一个最大直径的集群进行分裂。</p></li>
+</ol>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15129060526675.html">基于密度的聚类算法-Optics算法</a></h1>
+			<p class="meta"><time datetime="2017-12-10T19:40:52+08:00" 
+			pubdate data-updated="true">2017/12/10</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>前面我们介绍了一种基于密度的聚类算法DBSCAN，在缺点里提到 DBSCAN 算法对参数敏感，不同的 \(\epsilon\) 和 MinPts 会有不同结果，而这个参数是需要我们手动设置的。而 Optics算法在这一点上做出了改进，它对输入参数的设置不敏感。</p>
+
+<h3 id="toc_0">算法介绍</h3>
+
+<p>Optics算法的英文名称是Order Point To Identify the Clustering Structure。由于该算法是DBSCAN算法的改进，它们在很多概念上是公用的，比如直接密度可达、核心对象、密度相连等，除此之外Optics算法引入了独有的一些概念：</p>
+
+<ul>
+<li><p><b>核心距离(core-distance)</b><br/>
+&emsp;&emsp;假设 p 是核心对象，那么使 p 满足阈值 MinPts 最小的半径 R，称之为核心距离。即核心对象 p 的 R-邻域内至少有 MinPts 个对象，而对于任意小于 R 的 R&#39;，核心对象 p 的 R&#39;-邻域内对象的数量都小于 MinPts。对于任意核心对象 p，有核心距离 \(\text{cd}(p) \le \epsilon\)。</p></li>
+<li><p><b>可达距离(reachability-distance)</b><br/>
+&emsp;&emsp;假设 p 是核心对象， q 对 p 的可达距离 \(\text{rd}(q|p)\) 为对象 p 到 q 的距离与 p 核心距离的较大值称为可达距离，即：<br/>
+\[<br/>
+rd(q|p) = \left \{\begin{array}\\<br/>
+undifined &amp;\quad\quad \text{if}\quad |D_\epsilon(p)| \gt MinPts\\<br/>
+max\{cd(p),\text{dist}(p,q)\} &amp;\quad\quad <br/>
+\text{if}\quad |D_\epsilon(p)| \le MinPts<br/>
+\end{array} \right .<br/>
+\]</p>
+
+<p>&emsp;&emsp;注意：一个点会有很多的可达距离，选取最小的可达距离，。</p></li>
+</ul>
+
+<h3 id="toc_1">算法步骤</h3>
+
+<p><b>输入</b>：数据集合 D，参数\(\epsilon\) 和 MinPts<br/>
+<b>输出</b>：数据集合 D 各元素的一个有序排列，包括核心距离和可达距离<br/>
+<b>算法过程</b>：</p>
+
+<pre><code>创建两个队列，有序队列 dpQue 和结果队列 dpList。
+循环不在dpList中的对象：
+    如果当前对象 dp 是核心对象；
+        将 dp 加入有序队列 dpQue；
+    如果有序队列 dpQue 非空：
+        从 dpQue 中取出第一个元素 newDp，加入结果队列，并从 dpQue 中删除；
+        如果该元素 newDp 是核心对象：
+            循环 newDp 所有的直接密度可达对象：
+                设该直接密度可达对象为 tempDp，可达距离为 tempDist;
+                如果对象 tempDp 不在结果队列中：
+                    如果对象 tempDp 不在有序队列 dpQue 中：
+                        将对象 tempDp 加入 dpQue 中；
+                    如果对象 tempDp 在有序队列 dpQue 中：
+                        如果 dpQue 中已经存在的对象 tempDp 的可达距离大于tempDist:
+                            更新 dpQue 中对象 tempDp 的可达距离为 tempDist；
+            对 dpQue 队列按照可达距离重新排序；
+</code></pre>
+
+<p>该算法主要逻辑就是找出每一个对象最小的可达距离。关键点在于如果对象 p 是核心对象，对象 p 所有直接密度可达对象关于对象 p 的可达距离都与 p 的核心距离有关。所以循环对象 p 的所有直接密度可达对象，如果不在 dpQue 中需要插入，已经在 dpQue 中，要更新可达距离。</p>
+
+<h5 id="toc_2">数据结构</h5>
+
+<pre><code class="language-python">class DataPoint:
+    def __init__(self,point,name):
+        self.point = point
+        self.name  = name
+
+    # 获取数据点维度
+    def getDimension(self):
+        return len(self.point)
+
+    # 定义深拷贝
+    def copy(self):
+        temp = DataPoint(self.point, self.name)
+        temp.setReachableDistance(self.reachableDistance)
+        return temp
+        
+    # 设置可达距离 
+    def setReachableDistance(self,reachableDistance):
+        self.reachableDistance = reachableDistance
+
+    # 获取可达距离
+    def getReachableDistance(self):
+        return self.reachableDistance
+    
+    # 获取数据点名称
+    def getName(self):
+        return self.name
+</code></pre>
+
+<h5 id="toc_3">返回两个点的欧几里得距离</h5>
+
+<pre><code class="language-python">def getDistance(dp1, dp2):
+    distance = 0.0
+    dim1 = dp1.getDimension()
+    dim2 = dp2.getDimension()
+    if dim1 == dim2:
+        for i in range(dim1):
+            temp = math.pow((dp1.point[i]-dp2.point[i]), 2)
+            distance += temp
+        distance = math.pow(distance, 0.5)
+        return distance
+    return distance
+</code></pre>
+
+<h5 id="toc_4">判断是否是核心对象，并返回所有直接密度对象</h5>
+
+<pre><code class="language-python">def isKeyAndReturnObjects(dataPoint, dataPoints, radius, ObjectNum):
+    arrivableObjects = [] #用来存储所有直接密度可达对象
+    distances = [] #对应直接可达对象的欧几里得距离
+
+    for i in range(len(dataPoints)):
+        dp = dataPoints[i]
+        distance = getDistance(dataPoint, dp)
+        if distance &lt;= radius: #在radius-邻域内
+            distances.append(distance)
+            arrivableObjects.append(dp)
+
+    if len(arrivableObjects)&gt;=ObjectNum : #是核心对象
+        newDistances = distances[:]
+        newDistances.sort()
+        coreDistance=distances[ObjectNum-1] #核心距离
+        dataPoint.setReachableDistance(coreDistance)
+        for j in range(len(arrivableObjects)):
+            if coreDistance &gt; newDistances[j]: #可达距离的计算
+                arrivableObjects[j].setReachableDistance(coreDistance)
+            else:
+                arrivableObjects[j].setReachableDistance(newDistances[j])
+        return arrivableObjects
+    return None
+</code></pre>
+
+<h5 id="toc_5">核心代码，可以对比上面的算法过程</h5>
+
+<pre><code class="language-python">def startAnalysis(dataPoints, radius, ObjectNum):
+    dpList = []
+    dpQue = []
+    total = 0
+    while total &lt; len(dataPoints):
+        if isContainedInList(dataPoints[total], dpList) == -1 :# 不在结果队列里面
+            tmpDpList = isKeyAndReturnObjects(dataPoints[total],dataPoints, radius, ObjectNum) # 如果对象是核心对象，返回直接密度可达对象
+            if tmpDpList and len(tmpDpList) &gt; 0 :
+                newDataPoint = dataPoints[total].copy()
+                dpQue.append(newDataPoint)
+        while dpQue:
+            tempDpfromQ = dpQue.pop(0)
+            newDataPoint = tempDpfromQ.copy()
+            dpList.append(newDataPoint)
+            tempDpList = isKeyAndReturnObjects(tempDpfromQ,dataPoints, radius, ObjectNum)
+            print(newDataPoint.getName() + &quot;:&quot; + str(newDataPoint.getReachableDistance()))
+            if tempDpList != None and len(tempDpList) &gt; 0:
+                for i in range(len(tempDpList)):
+                    tempDpfromList = tempDpList[i]
+                    indexInList = isContainedInList(tempDpfromList,dpList)
+                    indexInQ = isContainedInList(tempDpfromList, dpQue)
+                    if indexInList == -1: #当前密度可达对象不在结果集中
+                        if indexInQ &gt; -1: #当前密度可达对象在dpQue中，看是否能更新可达距离
+                            index = -1
+                            for dataPoint in dpQue: #这里的循环就是为了找到dpQue中的该直接密度可达对象
+                                index += 1
+                                if index == indexInQ:
+                                    if dataPoint.getReachableDistance() &gt; tempDpfromList.getReachableDistance():
+                                        dataPoint.setReachableDistance(tempDpfromList.getReachableDistance())
+                        else:
+                            dpQue.append(tempDpfromList.copy())
+            # 对Q进行重新排序
+            dpQue.sort(key = lambda dp:dp.getReachableDistance())
+        total+=1
+        print(&quot;------&quot;)
+    return dpList
+</code></pre>
+
+<h5 id="toc_6">主函数</h5>
+
+<pre><code class="language-python">dpoints = []
+
+    dpoints.append(DataPoint([2,3],&quot;a&quot;))
+    dpoints.append(DataPoint([2,4],&quot;b&quot;))
+    dpoints.append(DataPoint([1,4],&quot;c&quot;))
+    dpoints.append(DataPoint([1,3],&quot;d&quot;))
+    dpoints.append(DataPoint([2,2],&quot;e&quot;))
+    dpoints.append(DataPoint([3,2],&quot;f&quot;))
+
+    dpoints.append(DataPoint([8,7],&quot;g&quot;))
+    dpoints.append(DataPoint([8,6],&quot;h&quot;))
+    dpoints.append(DataPoint([7,7],&quot;i&quot;))
+    dpoints.append(DataPoint([7,6],&quot;j&quot;))
+    dpoints.append(DataPoint([8,5],&quot;k&quot;))
+
+    dpoints.append(DataPoint([100,2],&quot;l&quot;))## 噪音点
+
+    dpoints.append(DataPoint([8,20],&quot;m&quot;))
+    dpoints.append(DataPoint([8,19],&quot;n&quot;))
+    dpoints.append(DataPoint([7,18],&quot;o&quot;))
+    dpoints.append(DataPoint([7,17],&quot;p&quot;))
+    dpoints.append(DataPoint([8,21],&quot;q&quot;))
+
+    startAnalysis(dpoints, 2, 4)
+</code></pre>
+
+<h5 id="toc_7">输出结果</h5>
+
+<p><img src="media/15129060526675/15322365491439.jpg" alt="" style="width:250px;"/></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15121851089277.html">基于密度的聚类算法-Meanshift算法</a></h1>
+			<p class="meta"><time datetime="2017-12-02T11:25:08+08:00" 
+			pubdate data-updated="true">2017/12/2</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15117059954234.html">基于密度的聚类算法-DBSCAN算法</a></h1>
+			<p class="meta"><time datetime="2017-11-26T22:19:55+08:00" 
+			pubdate data-updated="true">2017/11/26</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<p>DBSCAN算法的英文名称是 Density-Based Spatial Clustering of Applications with Noise，中文名称是含有噪声的基于密度的空间聚类算法。与KMeans算法基于只能基于凸分布样本不同的是，基于密度的DBSCAN算法适用于任何形状的样本集。</p>
+
+<h3 id="toc_0">基于密度聚类算法</h3>
+
+<p>基于密度的算法是根据样本集之间的紧密程度，基于密度的算法可以在具有噪音的样本中发现任意形状和大小的簇。DBSCAN算法是其中的代表算法。为了更好的说明基于密度的聚类算法，先来看幅图：</p>
+
+<div align=center>
+    <img width=300 src="media/15117059954234/15320142792578.jpg" />
+</div>
+
+<p>基于密度聚类算法核心思想就是先发现密度较高的点，然后把相近的高密度点逐步都连成一片，进而生成各种簇。如果该样本集使用基于密度的聚类方法，能很好的进行聚类。由图中可以知道同类中的点相聚很近，不同类的点相聚较远。</p>
+
+<h3 id="toc_1">DBSCAN算法</h3>
+
+<p>DBSCAN算法既然是通过密度来进行聚类，我们知道密度的定义是单位面积内样本点的个数，这里有两个重要的参数，面积的大小和样本点的数量。所以这里我们引入两个参数（<b>\(\epsilon\)</b>,<b>MinPts</b>）来描述样本点的紧密程度，其中，\(\epsilon\) 描述了某一样本的半径阈值，<b>MinPts</b> 描述了某一样本的半径为 \(\epsilon\) 的邻域中样本个数的阈值。</p>
+
+<p>定义几个概念：</p>
+
+<ul>
+<li><p><b>\(\epsilon\)-邻域</b>：对于给定对象 \(x_j\in D\)，半径为 \(\epsilon\) 内的邻域叫做该对象的 \(\epsilon\)-邻域。定义对象 \(x_j\) 的 \(\epsilon\)-邻域内样本组成的样本集 \(D_{\epsilon}(x_j)\)，有：<br/>
+\[<br/>
+D_{\epsilon}(x_j) = \{x\in D|\text{dist}(x-x_j)\le \epsilon\}<br/>
+\]</p></li>
+<li><p><b>核心对象</b>：如果对象 \(x_j\) 的 \(\epsilon\)-领域内的对象数量 \(|D_{\epsilon}(x_j)| \) 大于等于 MinPts ，则认为样本点 \(x_j\) 是核心对象。</p></li>
+<li><p><b>直接密度可达</b>：如果对象 \(x_j\) 属于核心对象，对象 \(x_i\) 在 \(x_j\) 的\(\epsilon\)-邻域内，即\(x_i\in D_{\epsilon}(x_j)\) ，则称对象 \(x_i\) 从对象 \(x_j\) 直接密度可达。直接密度可达不具有对称性。</p></li>
+<li><p><b>密度可达</b>：如果对象 \(x_j\) 从对象 \(x_i\) 直接密度可达，对象 \(x_k\) 从对象 \(x_j\) 直接密度可达，此时认为 \(x_k\) 从对象 \(x_i\) 密度可达。密度可达不具有对称性。</p></li>
+<li><p><b>密度相连</b>：如果对象 \(x_p\) 到对象 \(x_q\) 和 对象 \(x_o\) 都密度可达，此时认为对象 \(x_q\) 和对象 \(x_o\) 密度相连，具有对称性。</p></li>
+</ul>
+
+<p>如下图，设 MinPts=6，圆的半径为 \(\epsilon\)，易看出对象 \(a\) 的 \(\epsilon\)-邻域内的样本点数量为6，对象 \(b\) 的 \(\epsilon\)-邻域内的样本点数量为7，均大于 MinPts，所以对象 \(a\) 和对象 \(b\) 都是核心对象。对象 \(c\) 在核心对象 \(a\) 的 \(\epsilon\)-邻域内，称对象 \(c\) 从对象 \(a\) 直接密度可达。同理对象 \(a\) 在核心对象 \(b\) 的\(\epsilon\)-邻域内，称对象 \(a\) 从对象 \(b\) 直接密度可达，所以 \(c\) 从 \(b\) 密度可达。对象 \(d\)在核心对象 \(b\) 的\(\epsilon\)-邻域内，即 \(b\) 到 \(d\) 直接密度可达，并且可知 \(d\) 到 \(c\) 密度相连。</p>
+
+<div align=center>
+    <img width=300 src="media/15117059954234/15320184035358.jpg" />
+</div>
+
+<p>DBSCAN算法的目标是寻找到最大密度的相连的样本集合作为一个簇。在这个簇里有一个或多个核心对象，如果只有一个核心对象，那么其他点都在这个对象的 \(\epsilon\)-邻域内；如果有多个核心对象，那么必定任何一个核心对象 \(\epsilon\)-邻域内都有其他的核心对象，否则这两个核心对象无法密度可达。在算法中，我们将不是核心对象但在核心对象的 \(\epsilon\)-邻域内的对象称为边界点，将不在任何一个核心对象的 \(\epsilon\)-邻域的样本点称为噪音点。</p>
+
+<h3 id="toc_2">DBSCAN算法步骤</h3>
+
+<p><b>输入</b>：</p>
+
+<ul>
+<li>D：包含 n 个对象的数据集</li>
+<li>\(\epsilon\)：邻域半径参数</li>
+<li>MinPts：样本个数阈值</li>
+</ul>
+
+<p><b>输出</b>：基于密度的簇集合<br/>
+<b>算法过程</b>：</p>
+
+<pre><code>标记所有对象为未访问
+执行以下步骤，直到没有对象被标记为未访问：
+    随机选取一个标记为未访问的对象p；
+    标记p为已访问；
+    如果对象p的ϵ-邻域内对象至少有MinPts个(即对象p为核心对象)：
+        创建一个新的簇C，将对象p加入C；
+        定义一个集合N，将对象p的ϵ-邻域的所有对象加入N；
+        循环N中的每一个对象p‘：
+            如果对象p’被标记为未访问：
+                标记p’为已访问；
+                如果对象p‘的ϵ-邻域内对象至少有MinPts个：
+                    将对象p’的ϵ-邻域内所有对象加入N；
+            如果p‘不属于任何一个簇，将p‘加入C中
+        输出簇C；
+    否则标记为噪音点或边界点；
+</code></pre>
+
+<h3 id="toc_3">DBSCAN算法优缺点</h3>
+
+<h6 id="toc_4">优点：</h6>
+
+<p>1）不需要事先输入簇的个数，会自动发现簇的个数<br/>
+2）可以发现任意形状的簇<br/>
+3）可以在聚类的同时发现噪音点</p>
+
+<h6 id="toc_5">缺点：</h6>
+
+<p>1）对参数敏感，需要手动输入参数 \(\epsilon\) 和MinPts<br/>
+2）样本较多时，计算量大，可以通过建立KD树来搜索近邻改进算法<br/>
+3）样本密度不均匀时，聚类间距差相差很大时，聚类质量较差</p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15109749394756.html">基于层次的聚类算法-自下向上-Chameleon算法</a></h1>
+			<p class="meta"><time datetime="2017-11-18T11:15:39+08:00" 
+			pubdate data-updated="true">2017/11/18</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15103700734723.html">基于层次的聚类算法-自下向上-Rock算法</a></h1>
+			<p class="meta"><time datetime="2017-11-11T11:14:33+08:00" 
+			pubdate data-updated="true">2017/11/11</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15103338404339.html">基于划分的聚类算法-KMean算法与KMean++及优化</a></h1>
+			<p class="meta"><time datetime="2017-11-11T01:10:40+08:00" 
+			pubdate data-updated="true">2017/11/11</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<blockquote>
+<p>聚类就是按照某个特定标准(如距离准则)把一个数据集分割成不同的类或簇，使得同一个簇内的数据对象的相似性尽可能大，同时不在同一个簇中的数据对象的差异性也尽可能地大。即聚类后同一类的数据尽可能聚集到一起，不同数据尽量分离。</p>
+</blockquote>
+
+<p>聚类算法还算比较常用的算法之一，我们在实际开发中，也经常需要用到。聚类算法的种类有很多，在后续遇到的时候再好好学习，这里来学习一种比较简单的聚类算法，<code>k-means</code>算法（<code>k-means</code>算法是距离准则的一种），以及它的几个变种算法。</p>
+
+<h3 id="toc_0">k-means 算法</h3>
+
+<p><code>k-means</code>是聚类方法中最常用的之一，该算法是以<code>k</code>为参数，将对象分成<code>k</code>个簇，使同一个簇中的元素尽可能的相似，不同簇的元素有很大的差异性。<code>k-means</code>的算法过程如下：</p>
+
+<ol>
+<li>随机在数据集中选出<code>k</code>个元素，假定为簇中心</li>
+<li>对数据集中的每一个元素，找出离自己最近的那个簇中心，比如<code>k1</code>，那么这个元素便属于<code>k1</code>簇</li>
+<li>遍历完所有的簇后，此时，每一个簇<code>k1,k2,k3...k</code>都包含若干元素，分别计算这些簇的平均值，作为新的簇中心</li>
+<li>重复<code>2</code>,<code>3</code>直到所有数据点所属的簇不再发生变化，停止。至此，数据集划分成了<code>k</code>个簇。</li>
+</ol>
+
+<p>这个过程看起来十分简单，下面用代码实现，首先加载数据集：</p>
+
+<pre><code class="language-python">import numpy as np
+from matplotlib import pyplot as plt
+
+
+# 加载数据集
+def load_data_set():
+    fr = open(file)
+    data = []
+    for line in fr.readlines():
+        data.append(list(map(float, line.strip().split(&quot;\t&quot;))))
+    return data
+
+# 聚类
+def split_group(data, center, k):
+    group = {}
+    cluster_change = False
+    if isinstance(data, list):  # 如果是一个list，也就是第一次传入，默认假设分类为-1的
+        data = {-1: data}
+    for index, arr in data.items():
+        for ele in arr:
+            ele_arr = np.tile(ele, k).reshape(-1, 2)
+            distance = np.sum((ele_arr - center) ** 2, axis=1)
+            min_p = np.argmin(distance)
+            if group.get(min_p) is None:
+                group[min_p] = []
+            group[min_p].append(ele)
+            if cluster_change is False and min_p != index:
+                cluster_change = True
+    return group, cluster_change
+
+
+def random_select(data,k):
+    column_num = np.shape(data)[1]
+    min_n = np.min(data, axis=0)
+    max_n = np.max(data, axis=0)
+    return np.random.uniform(min_n, max_n, (k,column_num))
+
+
+if __name__ == &#39;__main__&#39;:
+    file = &quot;/Users/Fei/Desktop/testSet.txt&quot;
+    k = 4
+    data = load_data_set()
+    # 画出所有的点
+    plt.subplot(111)
+    # 从数据集中随机获取四个点，作为簇中心
+    center = random_select(data,k)
+    # center = np.random.uniform(random.choices(data, k=k))
+    cluster = data.copy()
+    cluster_change = True
+    while cluster_change:
+        # 循环每一个数据集找出离自己最近的簇中心，加入这个簇
+        cluster, cluster_change = split_group(cluster, center, k)
+        # 获取新的簇中心点
+        center = np.array([np.sum(np.array(y), axis=0) / 20 for (x, y) in cluster.items()])
+    # 绘制最终位置
+    plt.scatter(np.array(cluster[0])[:, 0], np.array(cluster[0])[:, 1], c=&quot;black&quot;)
+    plt.scatter(np.array(cluster[1])[:, 0], np.array(cluster[1])[:, 1], c=&quot;green&quot;)
+    plt.scatter(np.array(cluster[2])[:, 0], np.array(cluster[2])[:, 1], c=&quot;blue&quot;)
+    plt.scatter(np.array(cluster[3])[:, 0], np.array(cluster[3])[:, 1], c=&quot;yellow&quot;)
+    plt.scatter(center[:, 0], center[:, 1], c=&quot;red&quot;)
+    plt.show()
+
+</code></pre>
+
+<p>效果如下：</p>
+
+<div align=center>
+    <img width=450 src="media/15103338404339/15176316411276.jpg" />
+</div>
+
+<p>可以看到整个聚类还是比较成功的，当然其实这种方式还是有些缺点的</p>
+
+<p>不足：<br/>
+1、很多数据集我们事先并不知道到底分成多少个类比较合适，也就是<code>k</code>的值难以确定。<br/>
+2、聚类的效果很大程度是需要依靠第一次随机<code>k</code>个簇中心的选择。如果第一次选择的<code>k</code>个簇中心的位置不好，比如两个簇中心相距很近，后面聚类效果可能并不理想。</p>
+
+<h3 id="toc_1">k-means++ 算法</h3>
+
+<p>为了上述解决第二个问题，我们直观上也应该觉得两个簇中心的距离应该越远越好，于是<code>k-means++</code>算法就出现了。<code>k-means++</code>算法首先会随机选出一个数据中的一个点做为簇中心，然后后面的几个簇中心的选择方法是：首先计算所有点和距离最近的簇中心的距离，距离越大的点作为簇中心的概率越大，重复执行多次，选出<code>k</code>个簇中心，然后使用<code>k-means</code>方法聚类。</p>
+
+<p>该算法中关键点在于怎么选出<code>k</code>个簇中心。</p>
+
+<pre><code class="language-python">data = load_data_set()
+    # 随机选择一个点作为簇中心点
+    centroids = random.choices(data,k=1)
+    dists = {}
+    # 遍历所有的点，找出与这个点最近的簇中心之间的距离
+    data_len = len(data)
+    for i in range(k-1):
+        cent = centroids[i]
+        # 绝对的最大最小
+        dists[i] = np.sum(np.power(np.tile(cent, data_len).reshape((-1, 2)) - data,2),axis=1)
+        centroids.append(random.choices(data, np.min([y for x,y in dists.items()],axis=0))[0])
+</code></pre>
+
+<p>上面代码虽然很少但是做的事情很多。关键点在于</p>
+
+<pre><code class="language-python">random.choices(data, np.min([y for x,y in dists.items()],axis=0))[0]
+</code></pre>
+
+<p>这里先使用<code>np.min([y for x,y in dists.items()],axis=0)</code>方法求出每个点距离它最近的簇中心的距离，因为<code>[y for x,y in dists.items()]</code>第一行的元素表示每一个点距离第一个簇中心的距离，第二行的元素表示每个点距离第二个簇中心的距离......以此类推，以此对每一列求最小值既可得到每一个点距离最近的簇中心的距离。<br/>
+然后我们将这个距离作为选择每一个点的概率，通过<code>random.choices()</code>方法即可实现。</p>
+
+<p>完整代码如下：</p>
+
+<pre><code class="language-python">import numpy as np
+import random
+from matplotlib import pyplot as plt
+
+def load_data_set():
+    data = []
+    with open(file) as fr:
+        for line in fr.readlines():
+            data.append(list(map(float,line.strip().split(&#39;\t&#39;))))
+    return data
+
+def split_group(data, center, k):
+    group = {}
+    cluster_change = False
+    if isinstance(data, list):  # 如果是一个list，也就是第一次传入，默认假设分类为-1的
+        data = {-1: data}
+    for index, arr in data.items():
+        for ele in arr:
+            ele_arr = np.tile(ele, k).reshape(-1, 2)
+            distance = np.sum((ele_arr - center) ** 2, axis=1)
+            min_p = np.argmin(distance)
+            if group.get(min_p) is None:
+                group[min_p] = []
+            group[min_p].append(ele)
+            if cluster_change is False and min_p != index:
+                cluster_change = True
+    return group, cluster_change
+
+if __name__ == &#39;__main__&#39;:
+    file = u&quot;/Users/Fei/Desktop/testSet.txt&quot;
+    k = 4
+    data = load_data_set()
+    # 随机选择一个点作为簇中心点
+    centroids = random.sample(data,1)
+    dists = {}
+    # 遍历所有的点，找出与这个点最近的簇中心之间的距离
+    data_len = len(data)
+    for i in range(k-1):
+        cent = centroids[i]
+        # 绝对的最大最小
+        dists[i] = np.sum(np.power(np.tile(cent, data_len).reshape((-1, 2)) - data,2),axis=1)
+        centroids.append(random.choices(data, weights=np.min([y for x,y in dists.items()],axis=0))[0])
+    # 用得到的四个簇中心点来计算划分簇
+    cluster = data.copy()
+    cluster_change = True
+    while cluster_change:
+        # 循环每一个数据集找出离自己最近的簇中心，加入这个簇
+        cluster, cluster_change = split_group(cluster, centroids, k)
+        # 获取新的簇中心点
+        centroids = np.array([np.sum(np.array(y), axis=0) / 20 for (x, y) in cluster.items()])
+    # 绘制最终位置
+    plt.scatter(np.array(cluster[0])[:, 0], np.array(cluster[0])[:, 1], c=&quot;black&quot;)
+    plt.scatter(np.array(cluster[1])[:, 0], np.array(cluster[1])[:, 1], c=&quot;green&quot;)
+    plt.scatter(np.array(cluster[2])[:, 0], np.array(cluster[2])[:, 1], c=&quot;blue&quot;)
+    plt.scatter(np.array(cluster[3])[:, 0], np.array(cluster[3])[:, 1], c=&quot;yellow&quot;)
+    plt.scatter(np.array(centroids)[:, 0], np.array(centroids)[:, 1], c=&quot;red&quot;)
+    plt.show()
+</code></pre>
+
+<p>效果如下：</p>
+
+<div align=center>
+    <img width=450 src="media/15103338404339/15176479650413.jpg" />
+</div>
+
+<p>效果看上去和<code>k-means</code>一致，而在某些时候虽然只是改变了簇中心的选择，但是这十分有效。</p>
+
+<h3 id="toc_2">KMean算法优化——elkan KMeans</h3>
+
+<p>在传统的KMean算法中，每一次迭代需要求出所有样本点到所有质心间的距离，这样做会比较耗时。elkan KMeans利用了两边之和大于等于第三边,以及两边之差小于第三边的三角形性质，来减少距离的计算。</p>
+
+<div align=center>
+    <img width=450 src="media/15103338404339/15319350436275.jpg" />
+</div>
+
+<p>如上图，由三角形性质（两边之差小于第三边）可知：</p>
+
+<p>\[<br/>
+AB - AC \le BC<br/>
+\]</p>
+
+<p>当我们计算出质心A和质心B之间的距离AB后，当需要判断C与A和B哪个更近时，只需要再计算C与A之间的距离AC，如果<br/>
+\[<br/>
+2AC \le AB \quad \Rightarrow \quad AC \le AB - AC \le BC \quad \Rightarrow \quad AC \le BC<br/>
+\]</p>
+
+<p>那么便省去了计算B与C的距离BC。</p>
+
+<h3 id="toc_3">KMeans算法优化——Mini Batch KMeans</h3>
+
+<p>在统的K-Means算法中，要计算所有的样本点到所有的质心的距离。如果样本量非常大，比如达到10万以上，特征有100以上，此时用传统的K-Means算法非常的耗时，就算加上elkan KMeans优化也依旧。在大数据时代，这样的场景越来越多。此时Mini Batch K-Means应运而生。</p>
+
+<p>顾名思义，Mini Batch，也就是用样本集中的一部分的样本来做传统的K-Means，这样可以避免样本量太大时的计算难题，算法收敛速度大大加快。当然此时的代价就是我们的聚类的精确度也会有一些降低。一般来说这个降低的幅度在可以接受的范围之内。</p>
+
+<p>在Mini Batch K-Means中，我们会选择一个合适的批样本大小batch size，我们仅仅用batch size个样本来做K-Means聚类。那么这batch size个样本怎么来的？一般是通过无放回的随机采样得到的。</p>
+
+<p>为了增加算法的准确性，我们一般会多跑几次Mini Batch K-Means算法，用得到不同的随机采样集来得到聚类簇，选择其中最优的聚类簇。</p>
+
+<hr/>
+
+<p><a href="http://www.cnblogs.com/pinard/p/6164214.html">K-means聚类算法原理</a></p>
+
+
+		</div>
+
+		
+
+	</article>
+ 
+	<article>
+		 <header>
+		  	<h1 class="entry-title"><a href="15097627425135.html">KNN 算法 与 KD树</a></h1>
+			<p class="meta"><time datetime="2017-11-04T10:32:22+08:00" 
+			pubdate data-updated="true">2017/11/4</time></p>
+		 </header>
+	  	<div class="entry-content">
+		  	
+		  	<h3 id="toc_0">KNN 算法</h3>
+
+<p>KNN 算法全称是 K-Nearest Neighbors，中文名称 K 近邻算法，作为一种基本的分类算法。KNN采用一种投票表决的方式，首先在样本空间里选出目标对象最相似的 K 个近邻，用这 K 个近邻大多数归属的类别作为目标对象的类别，其中 K 通常是不大于20的整数。KNN算法中，所选择的近邻都是已经正确分类的对象。该方法在定类决策上只依据最邻近的一个或者几个样本的类别来决定待分样本所属的类别。</p>
+
+<p>如下图是两个部落居民居住分布图：</p>
+
+<div align=center>
+    <img width="300" src="media/15097627425135/15316253197416.jpg" />
+</div>
+
+<p>如果要用 KNN 方法裁决金矿所有权，采用 \(K=1\) 时，会认为金矿属于B部落，因为离金矿最近的居民（对象）属于B部落（类别），所以金矿（目标对象）属于B部落：</p>
+
+<div align=center>
+    <img width="300" src="media/15097627425135/15316252573368.jpg" />
+</div>
+
+<p>如果采用 \(K=3\) 时，情况就会不同，认为金矿属于A部落，离金矿最近的3个居民（对象）中，有2个（大多数）属于A部落，所以金矿（目标对象）属于A部落：</p>
+
+<div align="center">
+    <img width="300" src="media/15097627425135/15316253946661.jpg" />
+</div>
+
+<p>在这个例子中，<strong>最相近</strong>用的是欧几里得距离：</p>
+
+<p>\(D = \sqrt{{(x_{1}-x_{2})^{2}+(y_{1}-y_{2})^{2}}}\)</p>
+
+<p>在实际项目中，可能还会采用其他距离，如曼哈顿距离：<br/>
+\(D = \|x_{1}-x_{2}\|+\|y_{1}-y_{2}\|\)</p>
+
+<p>在KNN算法中，由于k选择的不同，得到的分类也可能是不同的，如当 \(K=1\) 时，金矿属于B部落，而当 \(K=3\) 时，金矿属于A部落。</p>
+
+<h5 id="toc_1">算法步骤：</h5>
+
+<ol>
+<li>计算目标对象与各训练数据之间的距离；</li>
+<li>按照距离的递增关系进行排序；</li>
+<li>选取与目标对象距离最小的K个点；</li>
+<li>确定目标对象最近的 K 个点所在类别的出现频率；</li>
+<li>返回前K个点中出现频率最高的类别作为目标对象的预测分类。</li>
+</ol>
+
+<h5 id="toc_2">算法缺点</h5>
+
+<p>从算法上来看，KNN 算法有一些缺点：<br/>
+1）只计算了最近 K 个邻居的类别，而未考虑 K 个邻居远近程度，也就是距离近的邻居和距离远的邻居具有相同的投票权。因此，我们可以采用权值的方法来改进，和该样本距离小的邻居权值大，和该样本距离大的邻居权值则相对较小，由此，将距离远近的因素也考虑在内，避免因一个样本过大导致误判的情况；</p>
+
+<p>2）在计算时，需要计算所有待分类对象与所有训练对象的距离，再进行排序选择出最近的 K 个邻居。因此我们需要一种快速搜索近邻的算法，一种比较常见的算法就是KD树。</p>
+
+<h3 id="toc_3">BST树</h3>
+
+<p>在介绍KD树之前，先介绍一种一维形式二叉查找树 BST（Binary Search Tree），可以快速定位一维数据，如下图：</p>
+
+<div align="center">
+    <img width="250px" src="media/15097627425135/15316274460262.jpg" />
+</div>
+
+<p>BST 具有以下性质：</p>
+
+<ol>
+<li>若它的左子树不为空，则它的左子树节点上的值皆小于它的根节点。</li>
+<li>若它的右子树不为空，则它的右子树节点上的值皆大于它的根节点。</li>
+<li>它的左右子树也分别是二叉查找树。</li>
+</ol>
+
+<p>当上图中，要搜索结点64便很简单，将64与根结点56比较，64比56大，在它的的右子树上；将64与子结点78比较，64比78小，在结点78的左子树上；如此递归下去，很容易搜索到结果。</p>
+
+<p>构造BST树也非常简单，在集合中选择一个点作为根结点（尽可能选择一个使左右子树深度差不多的点，如中位点），然后按照上面方法找到一个叶结点作为父结点，按照左小右大开辟新结点。假设上例中，我们需要插入一个72的结点，比较根结点56与72，56小于72，在根结点56的右子树上；发现结点78，比较72与78，72小于78，在结点78的左子树上；发现结点64，因为64是叶结点，需要开辟新结点，72比64大，所以将结点72作为64的右结点：</p>
+
+<div align="center">
+    <img width="250" src="media/15097627425135/15316291384018.jpg" />
+</div>
+
+<p>如果再插入点60，发现结点64后，60比64小，且64不含左子树，开辟新结点60作为64的左子结点，如下：</p>
+
+<div align="center">
+    <img width="250" src="media/15097627425135/15316290927517.jpg" />
+</div>
+
+<p>下面叙述在BST上搜索最近邻的方法：</p>
+
+<ol>
+<li>在BST树上找到包含目标点 x 的叶结点：从根结点出发，递归向下访问BST树，如目标结点小于切分点的值，则移动到左子结点，否则移动到右子结点，直到子结点为叶结点为止，记录当前搜索路径 search_path。</li>
+<li>从 search_path 中取出最后一个点作为”当前最近点“，计算距离=该叶结点与目标结点距离，并设为“当前最近距离”。</li>
+<li>回溯搜索路径 search_path，对每个结点计算该结点和目标结点的距离，如果该距离小于当前最小距离，则更新该结点为“当前最近点”，并更新“当前最近距离”为该距离。</li>
+</ol>
+
+<p>在一维数据上，可以通过BST树来实现。拓展到k维数据上，便可以通过构建KD树来迅速搜索最近邻。</p>
+
+<h3 id="toc_4">KD树</h3>
+
+<p>假设输入为k维空间的数据集 \(D=(x_1,x_2,...,x_N)\)，其中 \(x_i = (x_i^{(1)},x_i^{(2)},...,x_i^{(k)})\)，输出为KD树。</p>
+
+<ol>
+<li>开始：构造根结点，根结点对于包含 \(D\) 的k维空间的超矩形区域。</li>
+<li>选择 \(x^{(1)}\) 为坐标轴，以 \(D\) 中所有实例的 \(x^{(i)}\) 坐标的中位数（偶数个数，其中任何一个都可以）为切分点，将根结点分为两个区域，切分由通过切分点并与坐标轴垂直的超平面实现。由根结点生成深度为1的左、右子结点；左子结点对应坐标 \(x^{(i)}\) 小于切分点的子区域，右子结点对应坐标 \(x^{(i)}\) 大于切分点的子区域。落在超平面的实例点保存在根结点。</li>
+<li>重复：对深度为 j 的结点，选择 \(x^{(l)}\) 为切分的坐标轴，其中 \(l=j\%k+1\) ，以该结点的区域中所有实例的 \(x^{(l)}\) 坐标的中位数为切分点，将该结点对应的区域分成两个子区域，切分由通过切分点并与坐标轴 \(x^{(l)}\) 垂直的超平面实现。由该结点生成深度 j+1 的左右子结点。左子结点对应坐标 \(x^{(l)}\) 小于切分点的子区域，右子结点对应坐标 \(x^{(l)}\) 大于切分点的子区域。</li>
+<li>直到两个子区域没有实例存在时则结束，此时形成了KD树的特征空间划分。</li>
+</ol>
+
+<p>举个2维空间的例子，数据集 \(D=((2,3)^T,(5,4)^T,(9,6)^T,(4,7)^T,(8,1)^T,(7,2)^T)\)构造平衡KD树。</p>
+
+<p>1）构造根结点为包含 \(D\) 的k维空间的超矩形区域。</p>
+
+<div align="center">
+    <img width="300" src="media/15097627425135/15316691655134.jpg" />
+</div>
+
+<p>2）选择 \(x^{(1)}\) 轴，所有实例的 \(x^{(1)}\) 轴值为（2，5，9，4，8，7），中位数为7，切分为过7且与 \(x^{(i)}\) 轴垂直的超平面：</p>
+
+<div align="center">
+    <img width="300" src="media/15097627425135/15316729790397.jpg" />
+</div>
+
+<p>3）分割超平面将根结点分成两部分，其中 \(x^{(1)} \lt 7\) 的分为左子结点，分别为 \(((2,3)^T,(4,7)^T,(5,4)^T)\)，\(x^{(1)} \gt 7\) 的分为右子结点，分别为 \(((8,1)^T,(9,6)^T)\)。左子结点 \(x^{(2)}\) 轴的中位数为4，右子结点 \(x^{(2)}\) 轴的中位数为6，分别过中位数且垂直 \(x^{(2)}\) 轴作分割超平面：</p>
+
+<div align="center">
+    <img width="300" src="media/15097627425135/15316732569554.jpg" />
+</div>
+
+<p>4）对上面过程形成的左右结点，深度为2，选择 \(x^{(1)}\) 轴进行分割：</p>
+
+<div align="center">
+    <img width="300" src="media/15097627425135/15316735112236.jpg" />
+</div>
+
+<p>特征空间划分完成，对分割线上的结点，可以建立KD树：</p>
+
+<div align="center">
+    <img width="300" src="media/15097627425135/15316743917066.jpg" />
+</div>
+
+<h3 id="toc_5">KD树最近邻搜索</h3>
+
+<p>KD树的最近邻搜索同BST大同小异：</p>
+
+<ol>
+<li>在KD树上找到包含目标点 x 的叶结点：从根结点出发，递归向下访问KD树，如目标结点小于切分点的值，则移动到左子结点，否则移动到右子结点，直到子结点为叶结点为止，记录沿途经过点为search_path。</li>
+<li>从 search_path 中取出最后一个点为”当前最近点“，计算距离=该结点与目标结点距离，并设为“当前最近距离”。</li>
+<li><p>回溯搜索路径 search_path，对每个结点执行以下操作：</p>
+
+<p>（a）如果该结点保存的实例点比当前最近点距目标点更近，则以该实例点为“当前最近点”；<br/>
+（b）当前节点为根节点，结束。否则检查该子结点的父结点的另一个子结点对应的区域是否有更近的点。具体的，检查另一个子结点对应的区域是否与以目标点为球心、以目标点与“当前最近点”间的距离为半径的超球体相交。如果相交，可能在另一个子结点对应的区域内存在距离目标更近的点，移动到另一个子结点，<font color=red>将其当做根节点，重复步骤1，2，3进行目标节点最近邻搜索</font>。如果不相交，向上回退。</p></li>
+</ol>
+
+<p>举个一个例子来阐述这个算法：假设数据集 \(D = ((4,1)^T,(3,4)^T,(5,4)^T,(2,3)^T,(3,5)^T,(5,3)^T,(4.1,9)^T)\)，需要搜索最近邻的对象为 \((4.1,5)\) ，这里生成KD树的步骤直接省略，生成的KD树如下：</p>
+
+<div align="center">
+    <img width="320" src="media/15097627425135/15319189036938.jpg" />
+</div>
+
+<p>生成的特征空间如下：</p>
+
+<div align="center">
+    <img width="250" src="media/15097627425135/15319274240539.jpg" />
+</div>
+
+<p>从根节点 \((4,1)\) 开始，递归向下搜索KD树，第一个切分点值为 \(4\) ，小于目标节点对应值 \(4.1\)，移动到右子节点 \((5,4)\) ；第二个切分点值为 \(4\) ，小于目标节点对应值 \(9\) ，移动到右子节点 \((4.1,9)\) ，该节点为叶节点，记录沿途经过点为 search_path 为 \(((4,1)^T,(5,4)^T，(4.1,9)^T)\) 。</p>
+
+<p>从 search_path 中取出最后一个点 \((4.1,9)^T\) ，步骤（a）：计算该节点与目标节点 \((4.1,5)^T\) 的距离为4，设该节点为“当前最近点”，当前距离为“当前最近距离”；步骤（b）：以 \((4.1,5)^T\) 为圆心，4为半径作圆，与超平面 \(y=4\) 相交，最近点可能在父节点的另一个节点 \((5,3)^T\) 上，将 \((5,3)^T\) 当做根节点，进行最近邻搜索。</p>
+
+<ul>
+<li>因为 \((5,3)^T\) 是叶节点，直接计算它与目标节点的距离为2.19，小于“当前最近距离”，更新“当前最近点”为 \((5,3)^T\) 和更新“当前最近距离”为2.19。</li>
+</ul>
+
+<div align="center">
+    <img width="270" src="media/15097627425135/15366780863386.jpg" />
+</div>
+
+<p>从 search_path 中取出最后一个点 \((5,4)^T\) ，步骤（a）：计算该节点与目标节点 \((4.1,5)^T\) 的距离为1.35，小于“当前最近距离”，更新&quot;当前最近点&quot;为 \((5,4)^T\) 和更新”当前最近距离“为1.35；步骤（b）：以 \((4.1,5)^T\) 为圆心，1.35为半径作圆，与超平面 \(x=4\) 相交，最近点可能在父节点的另外一个节点 \((3,4)^T\) 上，将 \((3,4)^T\) 当做根节点，搜索最近邻。</p>
+
+<div align="center">
+    <img width="270" src="media/15097627425135/15366782535217.jpg" />
+</div>
+
+<ul>
+<li>从根节点 \((3,4)^T\) 开始搜索目标节点 \((4.1,5)^T\) 的最近邻，\((3,4)^T\) 切分点的值是4，目标节点 \((4.1,5)^T\) 对应位置值 5 大于切分点，在 \((3,4)^T\) 的右子节点 \((3,5)^T\) 上，因为\((3,5)^T\)是叶节点搜索结束，此时 \(\text{search_path}^{*}\) 为 \(((3,4)^T,(3,5)^T)\) 。</li>
+<li>从 \(\text{search_path}^{*}\) 中取出最后一个点 \((3,5)^T\)，步骤（a）：计算该节点与目标节点的距离为1.10，小于“当前最近距离”，更新“当前最近点“为 \((3,5)^T\) 和”更新当前最近距离“为1.10；步骤（b）：以 \((4.1,5)^T\) 为圆心，1.10为半径作圆，与超平面 \(y=4\) 相交，最近点可能在父节点的另外一个节点 \((2,3)^T\) 上，将 \((2,3)^T\) 当做根节点，搜索最近邻，由于\((2,3)^T\) 是叶节点，直接计算与目标节点的距离为2.9，大于“当前最近距离”，不更新。</li>
+<li>从 \(\text{search_path}^{*}\) 中取出最后一个点 \((3,4)^T\)，步骤（a）：计算该节点与目标节点的距离为1.49，大于“当前最近距离”，不更新。步骤（b）：当前节点为根节点，结束。</li>
+</ul>
+
+<p>从 search_path 中取出最后一个点 \((4,1)^T\) ，步骤（a）：计算该节点与目标节点的距离为4.001，大于“当前最近距离”，不更新；步骤（b）：当前节点为根节点，结束。</p>
+
+<p>所以“最近点”为 \((3,5)^T\) ，当前最近距离为1.10。</p>
+
+<h3 id="toc_6">KD树相关代码</h3>
+
+<p>节点定义</p>
+
+<pre><code class="language-python">class KD_node:
+    def __init__(self, point=None, split=None, LL = None, RR = None, parent = None):
+        &quot;&quot;&quot; 
+        point:数据点 
+        split:划分域 
+        LL, RR:节点的左子节点跟右子节点
+        parent:父节点
+        &quot;&quot;&quot;
+        self.point = point
+        self.split = split
+        self.left = LL
+        self.right = RR
+        self.parent = parent
+</code></pre>
+
+<p>创建KD树：</p>
+
+<pre><code class="language-python">def createKDTree(root,data_list,split=0,parent=None):
+    &quot;&quot;&quot; 
+    root:当前树的根节点 
+    data_list:数据点的集合(无序) 
+    return:构造的KDTree的树根 
+    &quot;&quot;&quot;
+    LEN = len(data_list)
+    if LEN == 0:
+        return
+    # 数据点的维度
+    dimension = len(data_list[0])
+    # 根据划分域的数据对数据点进行排序
+    data_list.sort(key=lambda x: x[split])
+    # 选择下标为len / 2的点作为分割点
+    point = data_list[LEN // 2]
+    root = KD_node(point, split, parent=parent)
+    root.left = createKDTree(root.left, data_list[0:(LEN // 2)],(split+1)%dimension,root)
+    root.right = createKDTree(root.right, data_list[(LEN // 2 + 1):LEN],(split+1)%dimension,root)
+</code></pre>
+
+<p>搜索最近邻步骤1：搜索KD树代码</p>
+
+<pre><code class="language-python">def findKD(root, query):
+    &quot;&quot;&quot;
+    root: KDTree的树根
+    query: 查询点
+    return: 返回KD树查找到的叶节点
+    &quot;&quot;&quot;
+    temp_root = root
+    next = None
+    ##二分查找建立路径
+    while temp_root.left and temp_root.right:
+        # 当前节点的划分域
+        ss = temp_root.split
+        if query[ss] &lt;= temp_root.point[ss]:
+            next = temp_root.left
+        else:
+            next = temp_root.right
+        if next is None:
+            break
+        else:
+            temp_root = next
+    return temp_root
+</code></pre>
+
+<p>步骤2：搜索最近邻代码</p>
+
+<pre><code class="language-python">    def findNN(root, query, NN = None, min_dist = None):
+    &quot;&quot;&quot; 
+    root:KDTree的树根 
+    query:查询点 
+    return:返回距离data最近的点NN，同时返回最短距离min_dist 
+    &quot;&quot;&quot;
+    # 初始化为root的节点
+    temp_root = findKD(root,query)
+    dist = computeDist(query, temp_root.point)
+    if min_dist is None or dist &lt; min_dist:
+        min_dist = dist
+        NN = temp_root.point
+    while root != temp_root:
+        if temp_root.parent:
+            ss = temp_root.parent.split
+            if abs(query[ss] - temp_root.parent.point[ss]) &lt; min_dist:
+                if query[ss] &lt;= temp_root.parent.point[ss]:
+                    brother = temp_root.parent.right
+                else:
+                    brother = temp_root.parent.left
+                NN,min_dist = findNN(brother, query, NN, min_dist)
+        temp_root = temp_root.parent
+        dist = computeDist(query,temp_root.point)
+        if dist &lt; min_dist:
+            min_dist = dist
+            NN = temp_root.point
+
+    return NN, min_dist
+</code></pre>
+
+<h3 id="toc_7">KD树搜索K邻域</h3>
+
+<p>搜索最近邻了解后，搜索K邻域便很简单，维护一个存放节点和对应距离的堆，将搜索最近邻过程中计算的节点和相应的距离加入其中，如果堆的大小小于K，直接加入；如果堆的大小等于K，则替换最大距离的节点。搜索结束后，输出K邻域即可。</p>
+
+
+		</div>
+
+		
+
+	</article>
+  
+	<div class="pagination">
+	
+<a href="archives.html">Blog Archives</a>
+	 
+	    
+	</div>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

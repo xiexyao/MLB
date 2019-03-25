@@ -1,0 +1,733 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  期望最大化算法 EM - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">期望最大化算法 EM</h1>
+				<p class="meta"><time datetime="2017-10-25T23:12:14+08:00" pubdate data-updated="true">2017/10/25</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>期望最大化算法的英文名称是 Expectation Maximization Algorithm，被称为机器学习十大算法之一。它是一种启发式迭代算法，是一种从不完全数据中求极大似然的算法。算法的每次迭代由两部组成：E步，求期望（Expectation）；M步，求最大值。</p>
+
+<p>看到某篇文章中有个生动的例子阐述EM算法的核心思想：食堂大师傅炒了一盘菜，要等分给俩个人吃，显然没有必要拿天平去称分量，而是可以先随意的将菜倒入两个碗中，然后对比两个碗，从多的里面拿出少量放入少的碗里，再进行比较，再从多的里面拿出少量放入少的碗中，这个过程一直迭代下去，直到看不出哪个多一点少一点为止。</p>
+
+<p>而EM算法便是这样，假设我们不知道A和B两个参数的值，并且如果知道了A的值，就能很容易求出B的值，知道B的值，也能很容易求出A的值。可以考虑先赋予A一个初值，通过这个值求出B的值，再反过来通过B的值求得A的值，反复迭代直到A、B收敛。</p>
+
+<h3 id="toc_0">二硬币问题</h3>
+
+<p>考虑一个掷硬币的例子：假设有A和B两个密度不相等硬币，它们掷出来的正面和反面的概率不相等，我们将 A 和 B 投掷出来的正面的概率设为 \(\theta_A\) 和 \(\theta_B\) ，现在独立的进行5次实验，每次实验选取 A 或 B 中一枚硬币投掷10次，统计出正面的概率。</p>
+
+<p>在这个实验中，我们记录两组向量 \(x=(x_1,x_2,x_3,x_4,x_5)\) 和 \(z=(z_1,z_2,z_3,z_4,z_5)\) ，其中 \(x_i\in(0,1,2,3,4,5,6,7,8,9,10)\) 代表第 \(i\) 次实验中出现正面朝上的次数，\(z_i\in(A,B)\) 表示第 \(i\) 次实验投掷的是硬币A还是硬币B。这次设置的参数估计是完整数据情况，因为我们模型里关联的随机变量（每次实验的结果和投掷硬币的类型）的值都是已知的。</p>
+
+<p>这里一个简单的估计 \(\theta_A\) 和 \(\theta_B\) 的方法是返回每一个硬币观察到的正面的比例。<br/>
+\[<br/>
+\begin{equation}<br/>
+\hat\theta_A = \frac{\text{用 A 硬币投掷出来的正面的次数}}{\text{用 A 硬币投掷的总的次数}} \label{ybzm}\\<br/>
+\hat\theta_B = \frac{\text{用 B 硬币投掷出来的正面的次数}}{\text{用 B 硬币投掷的总的次数}} \\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>实际上，在统计学上这种直观的猜测被称为极大似然估计。如果用 \(\log P(x;z;\theta)\)表示得到的观察到的正面次数 \(x\) 和 使用硬币的类型 \(z\) 的联合概率的对数形式（对数似然），那么\ref{ybzm}中的公式就是求解使 \(\log P(x;z;\theta)\) 最大的 \(\hat\theta=(\theta_A,\theta_B)\) 。</p>
+
+<div align=center>
+    <img width=500 src="media/15089443346795/15308145217430.jpg">
+</div>
+
+<p>现在考虑挑战一个参数估计问题中更大的变体，我们给出正面次数的记录但不给出每一组投掷的硬币的类型。我们将 z 称为隐藏变量或潜在因子。这种新设置中的参数估计被称为不完整数据情况。这次对每一种硬币计算正面出现的比例将不再可行，因为我们将不知道每一次实验中所使用的硬币类型。然而，我们有一些方法来使数据完整（在我们的例子中，正确猜测5次实验中使用的是哪个金币），然后我们就能将不完整数据的参数估计简化到完整数据的极大似然估计。</p>
+
+<p>可以通过一个迭代的方法得到完整数据通过下列步骤：开始时给定一个初始值 \(\hat \theta^{(t)}=(\hat\theta^{(t)}_A,\hat\theta^{(t)}_B)\)，我们通过这个初始值来估计5次实验中每一次最有可能使用的硬币是 A 还是 B。然后我们假设这些结论（即猜测指定的硬币）是正确的，然后再使用常规的最大似然估计处理来获得 \(\hat\theta^{(t+1)}\)。最后，重复这两个过程直到收敛。随着参数模型的改进，最终完成的质量也会提高。</p>
+
+<p>如下图所示：先初始化 \(\hat\theta_A^{(0)}=0.6\) 和 \(\hat\theta_B^{(0)}=0.5\) ，我们第一轮实验掷的 5H 和 5T ，正面出现的概率是0.5，更有可能是用硬币 B 投掷，同理第二轮实验正面的概率为0.9，更有可能是硬币 A 投掷......全部猜测完之后，便可以根据我们猜测计算出投掷硬币 A 正面出现的次数是24，反面出现的次数是6，那么可以计算出硬币 A 正面出现的概率 \(\hat\theta_A^{(1)}=0.8\)，同理计算出硬币 B 正面出现的概率 \(\hat\theta_B^{(1)}=0.45\)。重复这个过程，得出最终过程。</p>
+
+<div align=center>
+    <img width=520 src="media/15089443346795/15308182178307.jpg">
+</div>
+
+<p>期望最大化算法就是对这个基本思想的改进。期望最大化算法并不需要在每一次迭代中选出一个最有可能的硬币（ A 还是 B ），而是用当前参数 \(\hat\theta^{(t)}\) 计算出投掷硬币是 A 或 B 的概率，在此基础上建立一个所有可能完成数据的加权训练数据集。最后，通过改进版本的极大似然估计处理这些加权训练数据集得出一个新的估计参数 \(\hat\theta^{(t+1)}\) 。通过使用加权训练集而不是单个的最有可能的完整数据的好处是EM算法考虑了模型在每一个完整数据的置信度。</p>
+
+<p>如下图所示：先初始化 \(\hat\theta_A^{(0)}=0.6\) 和 \(\hat\theta_B^{(0)}=0.5\) ，我们第一轮实验掷的 5H 和 5T ，所以是用硬币 A 投掷的，正面出现的概率为 \(P_A=\text{C}_{10}^5 (\hat\theta_A^{(0)})^5 (1-\theta_A^{(0)})^5\)，如果是硬币 B 投掷的，正面出现的概率为 \(P_B=\text{C}_{10}^5 (\hat\theta_B^{(0)})^5 (1-\theta_B^{(0)})^5\)，所以投掷的是硬币 A 的概率为：\(\frac{P_A}{P_A+P_B}\thickapprox 0.45\)，同理可求的投掷的是硬币 B 的概率为：\(\frac{P_B}{P_A+P_B}\thickapprox 0.55\)。实际发生正面向上的次数是5，所以这次硬币 A 正面向上的期望为 \(5\times 0.45=2.2\)，硬币 B 正面向上的期望是 \(5\times 0.55\thickapprox 2.8\)，同理求出其他实验结果，这时候再按照完整数据求的硬币 A 正面向上的概率：<br/>
+\[<br/>
+\hat\theta_A^{(1)} = \frac{21.3}{21.3+8.6} = 0.71<br/>
+\]<br/>
+同理可求得硬币 B 正面向上的概率。重复这两个流程，便可得最终结果。</p>
+
+<div align=center>
+    <img width=520 src="media/15089443346795/15308183981554.jpg">
+</div>
+
+<p>总的来说，通过这个EM算法例子，可知EM算法包括两个步骤：E步骤求期望的过程；M步骤，求极大的过程。</p>
+
+<h3 id="toc_1">琴生不等式 Jensen inequality</h3>
+
+<p>1）若 \(f(x)\) 是区间 \((a,b)\) 上的凸函数，有：<br/>
+\[<br/>
+f[E(x)] \ge E[f(x)]<br/>
+\]</p>
+
+<p>2) 若 \(f(x)\) 是区间 \((a,b)\) 上的凹函数（下凸函数），有：<br/>
+\[<br/>
+f[E(x)] \le E[f(x)]<br/>
+\]</p>
+
+<p>3）加权形式凸函数，有：<br/>
+\[<br/>
+f(a_1x_1+a_2x_2+...+a_nx_n) \ge a_1f(x_1) + a_2f(x_2) + ... + a_nf(x_n),\sum_{i=1} a_i = 1<br/>
+\]</p>
+
+<p>4）加权形式凹函数（下凸函数），有：<br/>
+\[<br/>
+f(a_1x_1+a_2x_2+...+a_nx_n) \le a_1f(x_1) + a_2f(x_2) + ... + a_nf(x_n),\sum_{i=1} a_i = 1<br/>
+\]</p>
+
+<p>在本文中，使用加权形式凸函数，令 \(f(x) = \log(x)\) ，\(f(x)&#39;&#39; = (1/x)&#39; = -x^{-2} &lt; 0\)，所以 \(f(x)\) 是凸函数，则：<br/>
+\[<br/>
+\begin{equation}<br/>
+\log[\sum_{i=1} a_i x_i] \ge \sum_{i=1} a_i f(x_i) \label{jensen0}<br/>
+\end{equation}<br/>
+\]</p>
+
+<h3 id="toc_2">EM算法推导</h3>
+
+<p>现在通过一个经典的三硬币模型，来看一下EM算法的算法步骤以及推导过程。</p>
+
+<h5 id="toc_3">三硬币模型</h5>
+
+<p>假设有三枚硬币，记为 A，B，C。这些硬币都是密度不均匀的，投掷正面向上的概率分别为 \(\pi\)，\(p\)，\(q\)。现在进行实验：每轮实验先投掷 A 硬币，如果正面朝上，则投掷 B 硬币，如果反面朝上，则投掷 C 硬币；然后投掷选出的硬币，记录正面向上为1，反面向上为0。独立重复进行 n 次实验，假设只能观察到最终记录的结果，不能观察到掷硬币的过程，现在要估计 \(\theta=(\pi,p,q)\) 的概率参数。</p>
+
+<p>将问题抽象出来：</p>
+
+<ul>
+<li><strong>输入</strong>：观察数据 \(Y\)</li>
+<li><p><strong>输出</strong>：模型参数 \(\theta\)</p></li>
+<li><p><strong>方法</strong>：定义隐变量为 \(Z\) ，则观察数据的对数似然函数 <br/>
+\[<br/>
+L(\theta|Y) = \log P(Y|\theta) = \log \sum_Z P(Y,Z|\theta) = \log \sum_Z P(Y|Z,\theta) P(Z|\theta)<br/>
+\]</p>
+
+<p>最大化观测数据的对数似然函数<br/>
+\[<br/>
+\theta^* = arg \max_\theta L(\theta|Y)<br/>
+\]</p></li>
+</ul>
+
+<p>对于这个问题不能直接求解，只能通过迭代的方式求解。EM算法便是用来求解此类问题的一种迭代算法。EM算法首先选取参数的初值 \(\theta^{(0)} = (\pi^{(0)},p^{(0)},q^{(0)})\)，然后通过迭代，第 \(i\) 次迭代参数的估计值记为 \(\theta^{(i)} = (\pi^{(i)},p^{(i)},q^{(i)})\)，在第 \(i+1\) 次迭代的E步迭代参数的估计值记为 \(\theta\)。</p>
+
+<h5 id="toc_4">E 步骤：</h5>
+
+<p>定义完全数据 \(Y\), \(Z\) 的对数似然函数 \(\log P(Y,Z|\theta)\)，关于未观测数据 \(Z\) 在给定观测数据 \(Y\) 和当前参数估计 \(\theta_i\) 的情况下的后验概率分布 \(P(Z|Y,\theta_i)\) 的条件期望称为 \(Q\)函数：<br/>
+\[<br/>
+\begin{align*}<br/>
+Q(\theta,\theta^{(i)}) &amp;= E_Z[\log P(Y,Z|\theta)|Y,\theta^{(i)}] \\<br/>
+&amp;= \sum_Z \log P(Y,Z|\theta) P(Z|Y,\theta^{(i)}) <br/>
+\end{align*}<br/>
+\]</p>
+
+<p>\(Q\) 函数中的两个概率分布：</p>
+
+<ul>
+<li><p>完全数据 \(Y\), \(Z\) 的对数似然函数 \(\log P(Y,Z|\theta)\)：<br/>
+\[<br/>
+\log P(Y,Z|\theta) = \log P(Y|Z,\theta)P(Z|\theta)<br/>
+\]</p></li>
+<li><p>未观测数据 \(Z\) 的后验概率分布 \(P(Z|Y,\theta^{(i)})\)：<br/>
+\[ <br/>
+\begin{equation}<br/>
+P(Z|Y,\theta^{(i)})=\frac{P(Y,Z|\theta^{(i)})}{P(Y|\theta^{(i)})}=\frac{P(Y,Z|\theta^{(i)})}{\sum_{Z′}P(Y,Z′|\theta^{(i)})}=\frac{P(Y|Z,\theta^{(i)})P(Z|\theta^{(i)})}{\sum_{Z′}P(Y|Z′,\theta^{(i)})P(Z′|\theta^{(i)})}\label{zhy}<br/>
+\end{equation}<br/>
+\]</p></li>
+</ul>
+
+<h5 id="toc_5">M步骤：</h5>
+
+<p>求解使 \(Q(\theta,\theta^{(i)})\) 最大的 \(\theta\) ，确定第 \(i+1\) 次迭代的参数估计值 \(\theta^{(i+1)}\) ：<br/>
+\[<br/>
+\theta^{(i+1)} = arg \max_\theta Q(\theta,\theta^{(i)})<br/>
+\]</p>
+
+<h5 id="toc_6">证明：</h5>
+
+<p>在迭代过程中，我们希望新估计值 \(\theta\) 能使 \(L(\theta)\) 增加，即 \(L(\theta) &gt; L(\theta^{(i)})\)，并逐步成为最大值，所以：<br/>
+\[<br/>
+\begin{align}<br/>
+L(\theta) - L(\theta^{(i)}) &amp;= \log P(Y|\theta) - \log P(Y|\theta^{(i)}) \nonumber\\<br/>
+&amp;= \log [\sum_Z P(Z,\theta) P(Y|Z,\theta)] - \log P(Y|\theta^{(i)}) \nonumber\\<br/>
+&amp;= \log [\sum_Z P(Y|Z,\theta^{(i)}) \frac{P(Z,\theta) P(Y|Z,\theta)}{P(Y|Z,\theta^{(i)})}] - \log P(Y|\theta^{(i)}) \label{ptl}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>使用式 \ref{jensen0} 得：<br/>
+\[<br/>
+\log [\sum_Z P(Y|Z,\theta^{(i)}) \frac{P(Z,\theta) P(Y|Z,\theta)}{P(Y|Z,\theta^{(i)})}] \ge \sum_Z P(Y|Z,\theta^{(i)}) \log \frac{P(Z,\theta) P(Y|Z,\theta)}{P(Y|Z,\theta^{(i)})}<br/>
+\]</p>
+
+<p>将上式带入式 \ref{ptl} 得：<br/>
+\[<br/>
+\begin{align*}<br/>
+L(\theta) - L(\theta^{(i)}) &amp;\ge  \sum_Z P(Y|Z,\theta^{(i)}) \log \frac{P(Z,\theta) P(Y|Z,\theta)}{P(Y|Z,\theta^{(i)})} - \log P(Y|\theta^{(i)})\\<br/>
+&amp;= \sum_Z P(Y|Z,\theta^{(i)}) \log \frac{P(Z,\theta) P(Y|Z,\theta)}{P(Y|Z,\theta^{(i)})P(Y|\theta^{(i)})}\\<br/>
+\end{align*}<br/>
+\] </p>
+
+<p>令 <br/>
+\[<br/>
+\begin{equation}<br/>
+B(\theta,\theta^{(i)}) = L(\theta^{(i)}) + \sum_Z P(Y|Z,\theta^{(i)}) \log \frac{P(Z,\theta) P(Y|Z,\theta)}{P(Y|Z,\theta^{(i)})P(Y|\theta^{(i)})} \label{BTT}\\<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>则：<br/>
+\[<br/>
+L(\theta) \ge B(\theta,\theta^{(i)})<br/>
+\]</p>
+
+<p>那么，\(B(\theta,\theta^{(i)})\) 是 \(L(\theta)\) 的下限。并从式 \ref{BTT} 可知：<br/>
+\[<br/>
+ L(\theta^{(i)}) = B(\theta^{(i)},\theta^{(i)})<br/>
+\] </p>
+
+<p>任何能使 \(B(\theta,\theta^{(i)})\) 变大的 \(\theta\) 都能使 \(L(\theta)\) 增大，选择 \(\theta^{(i+1)}\) 使 \(B(\theta,\theta^{(i)})\) 达到极大。即：<br/>
+\[<br/>
+\theta^{(i+1)} = arg \max_\theta B(\theta,\theta^{(i)})<br/>
+\]</p>
+
+<p>现在对 \(B(\theta,\theta^{(i)})\) 求 \(\theta^{(i+1)}\) ：<br/>
+\[<br/>
+\begin{align*}<br/>
+\theta^{(i+1)} &amp;= arg \max_\theta B(\theta,\theta^{(i)}) = arg \max_\theta [L(\theta^{(i)}) + \sum_Z P(Y|Z,\theta^{(i)}) \log \frac{P(Z,\theta) P(Y|Z,\theta)}{P(Y|Z,\theta^{(i)})P(Y|\theta^{(i)})} ] \\<br/>
+&amp;= arg \max_\theta \{L(\theta^{(i)}) + \sum_Z P(Y|Z,\theta^{(i)}) [\log P(Z,\theta) P(Y|Z,\theta) - \log P(Y|Z,\theta^{(i)})P(Y|\theta^{(i)})]\} \\<br/>
+&amp;= arg \max_\theta [L(\theta^{(i)}) + \sum_Z P(Y|Z,\theta^{(i)}) \log P(Z,\theta) P(Y|Z,\theta) - \sum_Z P(Y|Z,\theta^{(i)}) \log P(Y|Z,\theta^{(i)})P(Y|\theta^{(i)})] \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>省去其中含有 \(\theta^{(i)}\) 的常数项：<br/>
+\[<br/>
+\begin{align*}<br/>
+\theta^{(i+1)} &amp;= arg \max_\theta [L(\theta^{(i)}) + \sum_Z P(Y|Z,\theta^{(i)}) \log P(Z,\theta) P(Y|Z,\theta) - \sum_Z P(Y|Z,\theta^{(i)}) \log P(Y|Z,\theta^{(i)})P(Y|\theta^{(i)})] \\<br/>
+&amp;= arg \max_\theta [\sum_Z P(Y|Z,\theta^{(i)}) \log P(Z,\theta) P(Y|Z,\theta)]\\<br/>
+&amp;= arg \max_\theta [\sum_Z P(Y|Z,\theta^{(i)}) \log P(Y,Z|\theta)]\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令<br/>
+\[<br/>
+Q(\theta,\theta^{(i)}) = \sum_Z P(Y|Z,\theta^{(i)}) \log P(Y,Z|\theta)<br/>
+\]</p>
+
+<p>所以这就像相当于 EM 算法的一次迭代，即求 \(Q\)函数及求其极大化的过程。</p>
+
+<h5 id="toc_7">EM算法的收敛性</h5>
+
+<p>要证明EM 算法的收敛性，也就是每一次迭代都比以前的结果更优，也就是证明：<br/>
+\[<br/>
+\begin{equation}<br/>
+L(\theta^{(i+1)}) \ge  L(\theta^{(i)}) \quad\Leftrightarrow\quad \log P(Y|\theta^{(i+1)}) \ge \log P(Y|\theta^{(i)})\label{LTLL}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>也就是证明 \(\log P(Y|\theta)\) 单调递增，考虑到：</p>
+
+<p>\[<br/>
+\begin{align}<br/>
+\because \quad &amp; \sum_Z P(Z|Y,\theta^{(i)})=1\nonumber\\<br/>
+\therefore \quad &amp; \log P(Y|\theta)= [\log P(Y|\theta)]\sum_Z P(Z|Y,\theta^{(i)})\nonumber\\<br/>
+&amp;\qquad\qquad = \sum_Z P(Z|Y,\theta^{(i)})\log P(Y|\theta)\nonumber\\<br/>
+\because \quad &amp;P(Y|\theta) = \frac{P(Y,Z|\theta)}{P(Z|Y,\theta)}\nonumber\\<br/>
+\therefore \quad &amp; \log P(Y|\theta) = \sum_Z P(Z|Y,\theta^{(i)})\log \frac{P(Y,Z|\theta)}{P(Z|Y,\theta)}\nonumber\\<br/>
+&amp;\qquad\qquad = \sum_Z P(Z|Y,\theta^{(i)}) \log P(Y,Z|\theta) - \sum_Z P(Z|Y,\theta^{(i)}) \log P(Z|Y,\theta) \nonumber\\<br/>
+&amp;\qquad\qquad = E_Z[\log P(Y,Z|\theta)|Y,\theta^{(i)}] - E_Z[\log P(Z|Y,\theta)|Y,\theta^{(i)}]\label{slxzm}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>令</p>
+
+<p>\[<br/>
+\begin{align*}<br/>
+H(\theta,\theta^{(i)}) &amp;= E_Z[\log P(Z|Y,\theta)|Y,\theta^{(i)}]= \sum_Z P(Z|Y,\theta^{(i)}) \log(Z|Y,\theta)<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>所以式 \ref{slxzm} 可以写成 \(\log P(Y|\theta) = Q(\theta,\theta^{(i)}) - H(\theta,\theta^{(i)})\)，则：<br/>
+\[<br/>
+\begin{align*}<br/>
+L(\theta^{(i+1)}) - L(\theta^{(i)}) &amp;= \log P(Y|\theta^{(i+1)}) - \log P(Y|\theta^{(i)}) \\<br/>
+&amp;= [Q(\theta^{(i+1)},\theta^{(i)}) - H(\theta^{(i+1)},\theta^{(i)})] - [Q(\theta^{(i)},\theta^{(i)}) - H(\theta^{(i)},\theta^{(i)})] \\<br/>
+&amp;= [Q(\theta^{(i+1)},\theta^{(i)})- Q(\theta^{(i)},\theta^{(i)})] - [H(\theta^{(i+1)},\theta^{(i)}) - H(\theta^{(i)},\theta^{(i)})] \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>因为EM算法是求 \(\theta^{(i+1)}\) 使 \(Q(\theta,\theta^{(i)})\) 增大，所以第一项不用证明，必大于0，现证明第二项：<br/>
+\[<br/>
+\begin{align*}<br/>
+H(\theta^{(i+1)},\theta^{(i)}) - H(\theta^{(i)},\theta^{(i)}) &amp;= \sum_Z  P(Z|Y,\theta^{(i)}) \log P(Z|Y,\theta^{(i+1)})  - \sum_Z P(Z|Y,\theta^{(i)})\log(Z|Y,\theta^{(i)}) \\<br/>
+&amp;= \sum_Z P(Z|Y,\theta^{(i)}) \log \frac{P(Z|Y,\theta^{(i+1)})}{P(Z|Y,\theta^{(i)})} \\<br/>
+&amp;\le \log [\sum_Z \log P(Z|Y,\theta^{(i)}) \frac{P(Z|Y,\theta^{(i+1)})}{P(Z|Y,\theta^{(i)})} ]\\<br/>
+&amp;= \log [\sum_Z P(Z|Y,\theta^{(i+1)})]\\<br/>
+&amp;= 0<br/>
+\end{align*}<br/>
+\]  </p>
+
+<p>所以\(L(\theta^{(i+1)}) - L(\theta^{(i)}) \ge 0\)，得证。从上面的推导可以看出，EM算法可以保证收敛到一个稳定点，但是却不能保证收敛到全局的极大值点，因此它是局部最优的算法，当然，如果我们的优化目标 \(Q(θ,θ^{(i)})\) 是凸的，则EM算法可以保证收敛到全局最大值，这点和梯度下降法这样的迭代算法相同。</p>
+
+<h4 id="toc_8">三硬币求解</h4>
+
+<p>我们用 \(y\) 表示观察变量，表示一次实验观察的结果是 1（正面） 或 0（反面）；使用 \(z\) 表示隐变量，表示未观察到的投掷 A 硬币的结果。一次实验观察数据 \(Y_i\) 的概率：<br/>
+\[<br/>
+\begin{align*}<br/>
+P(Y_i=y|\theta) &amp;= \sum_z P(y,z|\theta) = \sum_z P(z|\theta)P(y|z,\theta) \\<br/>
+&amp;= \pi p^y (1-p)^{1-y} + (1-\pi) q^y (1-q)^{1-y}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>将观察数据表示为 \(Y=(Y_1,Y_2,...,Y_n)^T\)，不可观察数据表示为 \(Z=(Z_1,Z_2,...,Z_n)^T\)，观察数据的似然函数为：<br/>
+\[<br/>
+\begin{align*}<br/>
+P(Y|\theta) &amp;= P(Y_1,Y_2,...,Y_n|\theta) = \prod_{i=1}^n P(Y_i|\theta) \\<br/>
+&amp;= \prod_{i=1}^n [\pi p^{y_i} (1-p)^{1-{y_i}} + (1-\pi) q^{y_i} (1-q)^{1-y_{i}}]<br/>
+\end{align*}<br/>
+\]</p>
+
+<h6 id="toc_9">E步骤：</h6>
+
+<p>先定义Q函数为：<br/>
+\[<br/>
+\begin{align*}<br/>
+Q(\theta,\theta^{(i)}) &amp;= E_Z[\log P(Y,Z|\theta)|Y,\theta^{(i)}] \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>现在来化简 Q函数，先看：<br/>
+\[<br/>
+P(Y,Z|\theta) = \prod_j P(Y_j,Z_j|\theta) = \prod_j \prod_k P(Y_j,Z_j=k|\theta)^{Z_{jk}}<br/>
+\]</p>
+
+<p>这里使用 \(Z_{jk}\) 表示观察数据 \(Y_j\) 对应的隐藏数据，也就是硬币 A 的结果，在这个例子中 \(k=\{0,1\}\)：<br/>
+\[<br/>
+Z_{jk} = \left \{ \begin{array}\\ 1 \quad &amp; Z_j = k\\ 0 \quad &amp; Z_j \neq k\\\end{array}\right .<br/>
+\]</p>
+
+<p>所以：<br/>
+\[<br/>
+\begin{align*}<br/>
+\log P(Y,Z|\theta) &amp;= \log \prod_j \sum_k P(Y_j,Z_j=k|\theta)^{Z_{jk}} = \sum_j \sum_k Z_{jk} \log P(Y_j,Z_j=k|\theta) <br/>
+\end{align*}<br/>
+\]</p>
+
+<p>上式代入 Q函数得：<br/>
+\[<br/>
+\begin{align*}<br/>
+Q(\theta,\theta^{(i)}) &amp;= E_Z[\log P(Y,Z|\theta)|Y,\theta^{(i)}] \\<br/>
+&amp;= \sum_Z P(Z|Y,\theta^{(i)}) \log P(Y,Z|\theta)\\<br/>
+&amp;= \sum_Z P(Z|Y,\theta^{(i)}) \sum_j \sum_k Z_{jk} \log P(Y_j,Z_j=k|\theta)\\<br/>
+&amp;= \sum_j \sum_k \sum_Z P(Z|Y,\theta^{(i)}) (Z_{jk})\log P(Y_j,Z_j=k|\theta)\\<br/>
+&amp;= \sum_j \sum_k \log P(Y_j,Z_j=k|\theta) \sum_Z P(Z|Y,\theta^{(i)}) Z_{jk}\\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>现在来计算 \(\sum_Z P(Z|Y,\theta^{(i)}) Z_{jk}\)，因为只有 \(Z_j=k\) 时 \(Z_{jk}=1\) ，其他都等于0，所以：<br/>
+\[<br/>
+\sum_Z P(Z|Y,\theta^{(i)}) Z_{jk} = \sum_Z Z_{jk} \sum_j\sum_k P(Z_j=k|Y_j,\theta^{(i)}) = P(Z_j=k|Y_j,\theta^{(i)})<br/>
+\]</p>
+
+<p>分别代入 \(k=0\) 或 \(k=1\)，得：<br/>
+\[<br/>
+\begin{align*}<br/>
+P(Z_j=0|Y_j,\theta^{(i)}) &amp;= \frac{\pi^{(i)} (p^{(i)})^{y_j}(1-p^{(i)})^{1-y_j}}{\pi^{(i)} (p^{(i)})^{y_j}(1-p^{(i)})^{1-y_j} + (1-\pi^{(i)}) (q^{(i)})^{y_j}(1-q^{(i)})^{1-y_j}} \\<br/>
+P(Z_j=1|Y_j,\theta^{(i)}) &amp;= \frac{(1-\pi^{(i)}) (q^{(i)})^{y_j}(1-q^{(i)})^{1-y_j}}{\pi^{(i)} (p^{(i)})^{y_j}(1-p^{(i)})^{1-y_j} + (1-\pi^{(i)}) (q^{(i)})^{y_j}(1-q^{(i)})^{1-y_j}} \\<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>令：</p>
+
+<p>\[<br/>
+\begin{equation}<br/>
+\mu_{i,j} = \frac{\pi^{(i)} (p^{(i)})^{y_j}(1-p^{(i)})^{1-y_j}}{\pi^{(i)} (p^{(i)})^{y_j}(1-p^{(i)})^{1-y_j} + (1-\pi^{(i)}) (q^{(i)})^{y_j}(1-q^{(i)})^{1-y_j}}\label{muij}<br/>
+\end{equation}<br/>
+\]</p>
+
+<p>则：</p>
+
+<p>\[<br/>
+\sum_Z P(Z_j=k|Y_j,\theta^{(i)}) Z_{jk} = \left \{ \begin{array}\\<br/>
+\mu_{i,j} &amp; \quad if\quad k=0\\<br/>
+1-\mu_{i,j} &amp; \quad if\quad k=1\\<br/>
+\end{array} \right .<br/>
+\]</p>
+
+<p>再求 \(\sum_j \sum_k \log P(Y_j,Z_j=k|\theta)\)，分别代入 \(k=0\) 或 \(k=1\) 得：</p>
+
+<p>\[<br/>
+P(Y_j,Z_j|\theta) = \left \{ \begin{array}\\<br/>
+\pi p^{y_j}(1-p)^{1-y_j}&amp; \quad if \quad k = 0\\<br/>
+(1-\pi) q^{y_j}(1-q)^{1-y_j}&amp;\quad if \quad k = 1\\<br/>
+\end{array} \right .<br/>
+\]</p>
+
+<p>所以Q函数可以改写为：</p>
+
+<p>\[<br/>
+Q(\theta,\theta^{(i)}) = \sum_j \{\mu^{i,j} \log [\pi p^{y_j}(1-p)^{1-y_j}] + (1-\mu^{i,j}) \log [(1-\pi) q^{y_j}(1-q)^{1-y_j}]\}<br/>
+\]</p>
+
+<h6 id="toc_10">M步骤</h6>
+
+<p>Q函数对参数 \(\pi\) 求导：<br/>
+\[<br/>
+\begin{align*}<br/>
+\frac{\partial Q(\theta,\theta^{(i)})}{\partial \pi} &amp;= \sum_j \frac{\partial \{\mu^{i,j} \log [\pi p^{y_j}(1-p)^{1-y_j}] + (1-\mu^{i,j}) \log [(1-\pi) q^{y_j}(1-q)^{1-y_j}]\}}{\partial \pi}\\<br/>
+&amp;= \sum_j [\mu^{i,j} \frac{p^{y_j}(1-p)^{1-y_j}}{\pi p^{y_j}(1-p)^(1-y_j)} - (1-\mu_{i,j})\frac{q^{y_j}(1-q)^{1-y_j}}{(1-\pi)q^{y_j}(1-q){1-y_j}}]\\<br/>
+&amp;= \sum_j [\frac{\mu_{i,j}}{\pi} - \frac{1-\mu_{i,j}}{1-\pi}]\\<br/>
+&amp;= \sum_j [\frac{\mu_{i,j}(1-\pi) - (1-\mu_{i,j})\pi}{\pi(1-\pi)}]\\<br/>
+&amp;= \sum_j [\frac{\mu_{i,j} - \pi}{\pi(1-\pi)}]\\<br/>
+&amp;= \frac{\sum_j \mu_{i,j} - n\pi}{\pi(1-\pi)}] = 0\\<br/>
+\Rightarrow \quad &amp; \pi = \frac 1 n \sum_j \mu_{i,j}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>Q函数对参数 \(p\) 求导：</p>
+
+<p>\[<br/>
+\begin{align*}<br/>
+\frac{\partial Q(\theta,\theta^{(i)})}{\partial p} &amp;= \sum_j \frac{\partial \{\mu^{i,j} \log [\pi p^{y_j}(1-p)^{1-y_j}] + (1-\mu^{i,j}) \log [(1-\pi) q^{y_j}(1-q)^{1-y_j}]\}}{\partial p}\\<br/>
+&amp;= \sum_j [\mu_{i,j}\frac{\pi y_j p^{y_j-1}(1-p)^{1-y_j}-\pi p^{y_j}(1-y_j)(1-p)^{-y_j}}{\pi p^{y_j}(1-p)^{1-y_j}}]\\<br/>
+&amp;= \sum_j [\mu_{i,j}\frac{y_j(1-p)-p(1-y_j)}{p(1-p)}]\\<br/>
+&amp;= \sum_j [\frac{\mu_{i,j}(y_j-p)}{p(1-p)}]\\<br/>
+&amp;= \frac{\sum_j \mu_{i,j} y_j - \sum_j \mu_{i,j}p}{p(1-p)} = 0\\<br/>
+\Rightarrow \quad &amp; p = \frac{\sum_j \mu_{i,j}y_j}{\sum_j \mu_{i,j}}<br/>
+\end{align*}<br/>
+\]</p>
+
+<p>Q函数对参数 \(q\)求导，同上，直接写出结果：</p>
+
+<p>\[<br/>
+q = \frac{\sum_j (1-\mu_{i,j})y_j}{\sum_j (1-\mu_{i,j})}<br/>
+\]</p>
+
+<p>综合三式得：</p>
+
+<p>\[<br/>
+\begin{align}<br/>
+\pi^{(i+1)} &amp;= \frac 1 n \sum_j \mu_{i,j}\label{pii1}\\<br/>
+p^{(i+1)} &amp;= \frac{\sum_j \mu_{i,j}y_j}{\sum_j \mu_{i,j}}\label{pi1}\\<br/>
+q^{(i+1)} &amp;= \frac{\sum_j (1-\mu_{i,j})y_j}{\sum_j (1-\mu_{i,j})}\label{qi1}<br/>
+\end{align}<br/>
+\]</p>
+
+<p>当给定初值便可以进行迭代求解了。</p>
+
+<p>假设三硬币模型的结果如下：</p>
+
+<p>\[<br/>
+1,1,0,1,0,0,1,0,1,1<br/>
+\]</p>
+
+<p>假定一开始我们设初始值 \(\pi^{(0)}=0.5,p^{(0)} = 0.5,q^{(0)} = 0.5\)，由式 \ref{muij} 对 \(y_j=0\) 或 \(y_j=1\) ，都有：<br/>
+\[<br/>
+\mu_{0,0} = \frac{\pi^{(0)} (p^{(0)})^{y_0}(1-p^{(0)})^{1-y_0}}{\pi^{(0)} (p^{(0)})^{y_0}(1-p^{(0)})^{1-y_0} + (1-\pi^{(0)}) (q^{(0)})^{y_0}(1-q^{(0)})^{1-y_0}} = 0.5\\<br/>
+\mu_{0,1} = \frac{\pi^{(0)} (p^{(0)})^{y_1}(1-p^{(0)})^{1-y_1}}{\pi^{(0)} (p^{(0)})^{y_1}(1-p^{(0)})^{1-y_1} + (1-\pi^{(0)}) (q^{(0)})^{y_1}(1-q^{(0)})^{1-y_1}} = 0.5\\<br/>
+\]</p>
+
+<p>利用式 \ref{pii1}、式\ref{pi1}、式 \ref{qi1} 迭代可得：<br/>
+\[<br/>
+\pi^{(1)} = 0.5,\quad p^{(1)} = 0.6,\quad q^{(1)} = 0.6<br/>
+\]</p>
+
+<p>由 \ref{muij} 得：</p>
+
+<p>\[<br/>
+\mu_{1,0} = 0.5,\quad \mu_{1,1} = 0.5<br/>
+\]</p>
+
+<p>继续迭代得：<br/>
+\[<br/>
+\pi^{(2)} = 0.5,\quad p^{(2)} = 0.6,\quad q^{(2)} = 0.6<br/>
+\]</p>
+
+<p>于是得到 \(\theta\) 的极大似然估计为：<br/>
+\[<br/>
+\hat \pi = 0.5,\quad \hat p = 0.6,\quad \hat q = 0.6<br/>
+\]</p>
+
+<p>另外我们可以试一下，设置不同的初值，最终结果可能不同，也就是说EM算法与初值的选取有关，选择不同的初值可能会得到不同的结果。</p>
+
+<hr/>
+
+<p><a href="http://www.cs.tau.ac.il/%7Ershamir/algmb/archive/EM-BW.pdf">Introduction to Expectation Maximization</a></p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='EM.html'>EM</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15092133657181.html" 
+	        title="Previous Post: 决策树 Decision Tree">&laquo; 决策树 Decision Tree</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15084379846372.html" 
+	        title="Next Post: 维特比算法 Viterbi Algorithm">维特比算法 Viterbi Algorithm &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>

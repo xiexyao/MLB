@@ -1,0 +1,380 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>
+    
+  随机森林 Random Forest - 邪逍遥
+  
+
+  </title>
+  <meta name="author" content="">
+  <meta name="description" content="历经千重罪，练就不死心">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link href="asset/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="atom.xml" rel="alternate" title="邪逍遥" type="application/atom+xml">
+  <script src="asset/js/modernizr-2.0.js"></script>
+  <script src="asset/js/jquery.min.js"></script>
+  <script src="asset/highlightjs/highlight.pack.js"></script>
+  <link href="asset/highlightjs/styles/solarized_light.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <style type="text/css">
+  .cat-children-p{ padding: 6px 0px;}
+  .hljs{background: none;}
+  </style>
+  <script type="text/javascript">
+  var isAddSildbar = true;
+  </script>
+  <script src="asset/js/octopress.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+//链接新开窗口
+function addBlankTargetForLinks () {
+  $('a[href^="http"]').each(function(){
+      $(this).attr('target', '_blank');
+  });
+}
+$(document).ready(function(event) {
+  addBlankTargetForLinks();
+});
+</script>
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="index.html">邪逍遥</a></h1>
+  
+    <h2>历经千重罪，练就不死心</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+
+  <li id=""><a target="self" href="index.html">Home</a></li>
+
+  <li id=""><a target="_self" href="archives.html">Archives</a></li>
+
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content"> 
+<div>
+	<article class="hentry" role="article">
+	<header>
+			  	<h1 class="entry-title">随机森林 Random Forest</h1>
+				<p class="meta"><time datetime="2018-02-10T01:04:05+08:00" pubdate data-updated="true">2018/2/10</time></p>
+			 </header>
+		  	<div class="entry-content">
+			  	<p>随机森林，英文名为 Random Forest，后面简称 RF，它是 Bagging 算法的进化版，它在 Bagging 的基础上改进了一些内容：</p>
+
+<ol>
+<li>随机森林就是由多棵 CART 树构成的。</li>
+<li>对于普通的决策树，我们会在节点上所有的 \(n\) 个样本特征中选择一个最优的特征来做决策树的左右子树划分，但是 RF 通过随机选择节点上的一部分样本特征。假设特征总数目为 \(n\) ，每次随机选择 \(n_{sub}\) 个样本特征，在其中选择一个最优的特征来做决策树的左右子树划分。这样进一步增强了模型的泛化能力。如果 \(n_{sub}=n\) ，则此时 RF 的 CART 决策树和普通的 CART 决策树没有区别。\(n_{sub}\) 越小，则模型越健壮，当然此时对于训练集的拟合程度会变差。在实际案例中，一般会通过交叉验证调参获取一个合适的 \(n_{sub}\) 的值。</li>
+</ol>
+
+<h3 id="toc_0">随机森林算法步骤</h3>
+
+<p><b>输入</b>：样本集 \(D=\{(x_1,y_1),(x_2,y_2),...,(x_m,y_m)\}\)，弱分类器迭代次数 \(T\)<br/>
+<b>输出</b>：最终的强分类器 \(f(x)\)<br/>
+<b>算法过程</b>：</p>
+
+<ul>
+<li><p>对于\(t=1,2,...,T\)：</p>
+
+<ul>
+<li>对训练集进行第 \(t\) 次随机采样，共采集 \(m\) 次，得到包含 \(m\) 个样本的采样集 \(D_t\)；</li>
+<li>用采样集 \(D_t\) 训练第 \(t\) 个决策树模型 \(G_t(x)\) ，在训练决策树模型的节点的时候，在节点上所有的样本特征中选择一部分样本特征， 在这些随机选择的部分样本特征中选择一个最优的特征来做决策树的左右子树划分；</li>
+</ul></li>
+<li><p>如果是分类算法预测，则 \(T\) 个弱学习器投出最多票数的类别或者类别之一为最终类别。如果是回归算法，\(T\) 个弱学习器得到的回归结果进行算术平均得到的值为最终的模型输出。</p></li>
+</ul>
+
+<h3 id="toc_1">随机森林扩展</h3>
+
+<p>由于 RF 在实际应用中的良好特性，基于 RF ，有很多变种算法，应用也很广泛，不光可以用于分类回归，还可以用于特征转换，异常点检测等。下面对于这些RF家族的算法中有代表性的做一个总结。</p>
+
+<h5 id="toc_2">Extra-Trees 极端随机树</h5>
+
+<p>ET 或 Extra-Trees（Extremely randomized trees，极端随机树）是由PierreGeurts等人于2006年提出。该算法与随机森林算法十分相似，都是由许多决策树构成。但该算法与随机森林有两点主要的区别：</p>
+
+<ol>
+<li><p>随机森林应用的是 Bagging 模型，而 ET 是使用所有的训练样本得到每棵决策树，也就是每棵决策树应用的是相同的全部训练样本；</p></li>
+<li><p>随机森林是在一个随机子集内得到最佳分叉属性，而 ET 是完全随机的得到分叉值，从而实现对决策树进行分叉的。</p></li>
+</ol>
+
+<p>从第二点可以看出，由于随机选择了特征值的划分点位，而不是最优点位，这样会导致生成的决策树的规模一般会大于 RF 所生成的决策树。也就是说，模型的方差相对于RF进一步减少，但是偏倚相对于 RF 进一步增大。在某些时候，Extra-Trees 的泛化能力比 RF 更好。</p>
+
+<h5 id="toc_3">Totally Random Trees Embedding</h5>
+
+<p>Totally Random Trees Embedding(以下简称 TRTE)是一种非监督学习的数据转化方法。它将低维的数据集映射到高维，从而让映射到高维的数据更好的运用于分类回归模型。我们知道，在支持向量机中运用了核方法来将低维的数据集映射到高维，此处TRTE提供了另外一种方法。</p>
+
+<p>TRTE 在数据转化的过程也使用了类似于 RF 的方法，建立 \(T\) 个决策树来拟合数据。当决策树建立完毕以后，数据集里的每个数据在T个决策树中叶子节点的位置也定下来了。比如我们有3颗决策树，每个决策树有5个叶子节点，某个数据特征 \(x\) 划分到第一个决策树的第2个叶子节点，第二个决策树的第3个叶子节点，第三个决策树的第5个叶子节点。则 \(x\) 映射后的特征编码为 \((0,1,0,0,0,\qquad 0,0,1,0,0,\qquad 0,0,0,0,1)\)，有15维的高维特征。这里特征维度之间加上空格是为了强调三颗决策树各自的子编码。</p>
+
+<p>映射到高维特征后，可以继续使用监督学习的各种分类回归算法了。　　　　</p>
+
+<h5 id="toc_4">Isolation Forest　　　　</h5>
+
+<p>Isolation Forest（以下简称IForest）是一种异常点检测的方法。它也使用了类似于RF的方法来检测异常点。</p>
+
+<p>对于在 \(T\) 个决策树的样本集，IForest 也会对训练集进行随机采样,但是采样个数不需要和 RF 一样，对于 RF，需要采样到采样集样本个数等于训练集个数。但是 IForest 不需要采样这么多，一般来说，采样个数要远远小于训练集个数？为什么呢？因为我们的目的是异常点检测，只需要部分的样本我们一般就可以将异常点区别出来了。</p>
+
+<p>对于每一个决策树的建立， IForest 采用随机选择一个划分特征，对划分特征随机选择一个划分阈值。这点也和 RF 不同。</p>
+
+<p>外，IForest 一般会选择一个比较小的最大决策树深度 max_depth ,原因同样本采集，用少量的异常点检测一般不需要这么大规模的决策树。</p>
+
+<p>对于异常点的判断，则是将测试样本点 \(x\) 拟合到 \(T\) 颗决策树。计算在每颗决策树上该样本的叶子节点的深度 \(h_t(x)\) ，从而可以计算出平均高度 \(h(x)\)。此时我们用下面的公式计算样本点 \(x\) 的异常概率:<br/>
+\[<br/>
+s(x,m)=2^{−\frac{h(x)}{c(m)}}<br/>
+\]</p>
+
+<p>其中，\(m\) 为样本个数。\(c(m)\) 的表达式为：<br/>
+\[<br/>
+c(m)=2\ln(m−1)+\xi−2\frac{m−1}{m},\quad \xi\text{ 为欧拉常数}<br/>
+\]</p>
+
+<p>\(s(x,m)\) 的取值范围是 \([0,1]\) ,取值越接近于1，则是异常点的概率也越大。</p>
+
+<h5 id="toc_5">优缺点</h5>
+
+<p>RF的主要优点有：</p>
+
+<ol>
+<li>训练可以高度并行化，对于大数据时代的大样本训练速度有优势。个人觉得这是的最主要的优点。</li>
+<li>由于可以随机选择决策树节点划分特征，这样在样本特征维度很高的时候，仍然能高效的训练模型。</li>
+<li>在训练后，可以给出各个特征对于输出的重要性</li>
+<li>由于采用了随机采样，训练出的模型的方差小，泛化能力强。</li>
+<li>相对于Boosting系列的Adaboost和GBDT， RF实现比较简单。</li>
+<li>对部分特征缺失不敏感。</li>
+</ol>
+
+<p>RF的主要缺点有：</p>
+
+<ol>
+<li>在某些噪音比较大的样本集上，RF模型容易陷入过拟合。</li>
+<li>取值划分比较多的特征容易对RF的决策产生更大的影响，从而影响拟合的模型的效果。</li>
+</ol>
+
+<hr/>
+
+<p><a href="https://www.cnblogs.com/pinard/p/6156009.html">Bagging与随机森林算法原理小结</a><br/>
+<a href="https://blog.csdn.net/xbmatrix/article/details/69488867?locationNum=10&amp;fps=1">Extra-Trees原理</a></p>
+
+			</div>
+
+		
+	  
+		<footer>
+		 <p class="meta">
+
+			<strong>Categories:</strong>&nbsp; 
+			<span class="categories">
+			
+			    <a class='category' href='%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html'>集成学习</a>&nbsp;
+			 
+			</span>
+		    </p>
+		    <p class="meta">
+		      
+		 </p>
+	    
+		<div class="sharing">
+		  
+          
+
+          
+
+		</div>
+
+	    <p class="meta">
+	    
+	        <a class="basic-alignment left" href="15189654050126.html" 
+	        title="Previous Post: 蒙特卡罗方法 Monte Carlo Simulation">&laquo; 蒙特卡罗方法 Monte Carlo Simulation</a>
+	    
+	    
+	        <a class="basic-alignment right" href="15176349609265.html" 
+	        title="Next Post: Numpy中random模块方法用法">Numpy中random模块方法用法 &raquo;</a>
+	    
+	    </p>
+	  </footer>
+	</article>
+</div>
+ <aside class="sidebar"> 
+
+	<section>
+	  <h1>Categories</h1>
+	  <ul id="recent_posts">
+	  
+	      <li class="post">
+	        <a href="%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98.html"><strong>最短路径问题&nbsp;(5)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98.html"><strong>聚类问题&nbsp;(9)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95.html"><strong>其他算法&nbsp;(6)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95.html"><strong>基础算法&nbsp;(23)</strong></a>
+	         <p class="cat-children-p"> 
+	        
+	        	<a href="SVM.html">SVM&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="SNE.html">SNE&nbsp;(1)</a>&nbsp;&nbsp;
+	        
+	        	<a href="EM.html">EM&nbsp;(5)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E5%86%B3%E7%AD%96%E6%A0%91.html">决策树&nbsp;(2)</a>&nbsp;&nbsp;
+	        
+	        	<a href="HMM.html">HMM&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0.html">集成学习&nbsp;(8)</a>&nbsp;&nbsp;
+	        
+	        	<a href="%E9%99%8D%E7%BB%B4.html">降维&nbsp;(3)</a>&nbsp;&nbsp;
+	        
+	         </p> 
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80.html"><strong>数学基础&nbsp;(14)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="Python%E5%AD%A6%E4%B9%A0.html"><strong>Python学习&nbsp;(2)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html"><strong>神经网络&nbsp;(15)</strong></a>
+	        
+	        
+	        
+	      </li>
+	  
+	      <li class="post">
+	        <a href="%E5%A2%9E%E5%BC%BA%E5%AD%A6%E4%B9%A0.html"><strong>增强学习&nbsp;(1)</strong></a>
+	        
+	        
+	        
+	      </li>
+	   
+	  </ul>
+	</section>
+	<section>
+	  <h1>Recent Posts</h1>
+	  <ul id="recent_posts">
+	  
+	      
+		      <li class="post">
+		        <a href="15454660806753.html">深度学习中的正则化-Dropout方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15446218642343.html">图像相似度方法</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15436296136092.html">蒙特卡罗树搜搜 MCTS</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15424711438602.html">人工神经网络-GAN</a>
+		      </li>
+	     
+	  
+	      
+		      <li class="post">
+		        <a href="15418610530072.html">人工神经网络-SOM自组织系统</a>
+		      </li>
+	     
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	  
+	      
+	   
+	  </ul>
+	</section>
+	
+</aside> </div></div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 -  -
+  <span class="credit">Powered by <a target="_blank" href="http://www.mweb.im">MWeb</a> &nbsp;&nbsp; Theme by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+
+  
+    
+
+<script src="asset/chart/all-min.js"></script><script type="text/javascript">$(function(){    var mwebii=0;    var mwebChartEleId = 'mweb-chart-ele-';    $('pre>code').each(function(){        mwebii++;        var eleiid = mwebChartEleId+mwebii;        if($(this).hasClass('language-sequence')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = Diagram.parse($(this).text());            diagram.drawSVG(eleiid,{theme: 'simple'});        }else if($(this).hasClass('language-flow')){            var ele = $(this).addClass('nohighlight').parent();            $('<div id="'+eleiid+'"></div>').insertAfter(ele);            ele.hide();            var diagram = flowchart.parse($(this).text());            diagram.drawSVG(eleiid);        }    });});</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+
+</body>
+</html>
